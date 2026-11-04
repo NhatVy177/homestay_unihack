@@ -2,6 +2,8 @@
 
 Cập nhật: **05/11/2026, giờ Việt Nam**.
 
+> Tiếp nối **2026-11-05 00:38:27 +07:00**: repo hiện hành là `NhatVy177/homestay_unihack` (`D:\HomeStayDorm`, main lúc kiểm tra), mốc nền `40acf39`. Dùng [spec/](../spec/README.md) để theo dõi chức năng, quyết định, nhật ký và tiến độ. Phần “đã có” bên dưới nói về nhánh Avalanche cũ ở homedorm; nền đó **chưa được nhập/xác minh lại trong repo mới**. Xem [progress.md](../spec/progress.md) trước khi triển khai. Phạm vi kỹ thuật của kế hoạch này giữ nguyên; spec là bản tóm tắt và hồ sơ thực hiện, không phải kế hoạch thay thế.
+
 Bản bàn giao toàn bộ bối cảnh cuộc trò chuyện cho tài khoản GPT khác: [handoff.md](handoff.md). Ngày 05/11 chỉ bổ sung tài liệu bàn giao; phạm vi kỹ thuật hiện hành vẫn theo bản hợp nhất ngày 04/11 dưới đây.
 
 Quy ước làm việc theo yêu cầu Vy: sau mỗi đợt thay đổi hoàn tất, kiểm tra phù hợp, commit với danh tính Git `NhatVy177` và push lên đúng repo/nhánh đang làm; báo lại liên kết và commit đã push. Nếu push thất bại, báo rõ trạng thái để tránh nhầm với bản đã có trên GitHub.

@@ -1,5 +1,7 @@
 # UniHack Proposal — Ý tưởng và phương án sản phẩm
 
+> Ghi chú **2026-11-05 00:38:27 +07:00**: phần bên dưới là lịch sử các ý tưởng từng cân nhắc. Hướng hiện hành đã chọn **HomeStayDorm × Avalanche** theo [plan.md](plan.md) và [spec/scope.md](../spec/scope.md). Các câu “chưa chọn” hay “ưu tiên hiện tại” trong thân tài liệu thuộc giai đoạn nghiên cứu cũ, không thay đổi lựa chọn đang thực hiện.
+
 Nơi lưu các ý tưởng, so sánh, lựa chọn và thiết kế để tiếp tục phát triển. Các ý tưởng đều là giả thuyết ban đầu và **chưa có lựa chọn cuối cùng**. Thể lệ và hạn nộp xem [README.md](README.md); kiến thức nền và kế hoạch làm việc xem [Unihack_Context.md](Unihack_Context.md).
 
 ## Hướng nghiên cứu hiện tại: bài toán doanh nghiệp và cơ hội sản phẩm

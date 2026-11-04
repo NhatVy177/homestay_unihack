@@ -12,6 +12,8 @@ HomeStayDorm/
 │  ├─ frontend/    # React + Vite
 │  └─ scripts/     # Công cụ hỗ trợ phân tích code
 ├─ hackathon/      # Bối cảnh, proposal và kế hoạch UniHack/Avalanche
+├─ spec/           # Phạm vi, quyết định, tiến độ và nhật ký làm việc
+├─ AGENTS.md       # Hướng dẫn AI đọc và cập nhật hồ sơ mỗi phiên
 ├─ run.bat         # Chạy nhanh trên Command Prompt
 └─ run.ps1         # Chạy nhanh trên PowerShell
 ```
@@ -51,6 +53,7 @@ npm run dev
 
 ## Tài liệu UniHack
 
+- [Bắt đầu cho Vy và AI tiếp nối](spec/README.md) — xem [tiến độ hiện tại](spec/progress.md) và [nhật ký có thời gian](spec/journal.md).
 - [Tổng quan cuộc thi](hackathon/README.md)
 - [Kế hoạch thực hiện](hackathon/plan.md)
 - [Proposal](hackathon/Proposal.md)

@@ -1,5 +1,7 @@
 # Bàn giao cuộc trò chuyện — HomeStayDorm × Avalanche / UniHack 2026
 
+> Cập nhật tiếp nối **2026-11-05 00:38:27 +07:00**: repo làm việc đã chuyển sang `NhatVy177/homestay_unihack`, local `D:\HomeStayDorm`. Đọc [sổ làm việc](../spec/README.md) và [tiến độ hiện tại](../spec/progress.md) trước. Phần bên dưới là bàn giao từ phiên cũ: nền Avalanche ở `homedorm/feature/avalanche-settlement` được nhắc đến **chưa có trong main repo mới tại mốc kiểm tra `40acf39`**. Các đường dẫn `Web/` trong bản cũ tương ứng `web/` ở repo mới. Giữ nguyên phần gốc để tra nguồn trao đổi.
+
 Cập nhật **05/11/2026, giờ Việt Nam**. Tài liệu để chuyển sang một tài khoản GPT khác, bao gồm bối cảnh, lựa chọn đã thống nhất trong plan và trạng thái triển khai thực tế. Đây là ảnh chụp trạng thái tại thời điểm bàn giao; khi làm tiếp phải đọc Git hiện tại và [plan.md](plan.md).
 
 ## 1. Người dùng, mục tiêu và cách làm việc
