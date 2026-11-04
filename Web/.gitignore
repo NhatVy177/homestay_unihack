@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+*.env
+
+# Logs
+*.log
+npm-debug.log*
+error_log.txt
+
+# Build outputs
+dist/
+build/
+
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/
+
+# Uploads
+backend/uploads/chung-tu/*
+!backend/uploads/chung-tu/.gitkeep
+backend/uploads/chung-tu-doi-soat/*
+!backend/uploads/chung-tu-doi-soat/.gitkeep
