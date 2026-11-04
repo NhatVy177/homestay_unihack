@@ -7,6 +7,7 @@ Hệ thống quản lý thuê phòng HomeStayDorm, được dùng làm nền t�
 ```text
 HomeStayDorm/
 ├─ database/       # Schema, seed data, stored procedures và trigger SQL Server
+├─ blockchain/     # Khung riêng: contract, test, scripts, shared và deployment
 ├─ web/
 │  ├─ backend/     # REST API Node.js + Express
 │  ├─ frontend/    # React + Vite
@@ -18,7 +19,7 @@ HomeStayDorm/
 └─ run.ps1         # Chạy nhanh trên PowerShell
 ```
 
-Phần Avalanche sẽ được bổ sung ở bước tiếp theo, tách khỏi mã web và database hiện có để không làm hỏng các luồng nghiệp vụ SQL Server.
+Phần Avalanche có [khung module riêng](blockchain/README.md), chưa có contract/toolchain chạy được. Ví/ký sẽ nằm ở `web/frontend/src/lib/avalanche/`; adapter/relayer sẽ nằm ở `web/backend/integrations/avalanche/`. Hai app tiếp tục dùng các lệnh chạy hiện tại; trạng thái thực tế theo [spec/progress.md](spec/progress.md).
 
 ## Chạy local
 

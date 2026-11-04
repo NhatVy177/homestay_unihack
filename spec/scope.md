@@ -10,6 +10,8 @@ MVP: một chi nhánh, ba vai trò **quản lý – kế toán – khách thuê*
 
 ## Các chức năng cần thực hiện
 
+Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchain/](../blockchain/README.md); ví/ký ở frontend, adapter/relayer ở backend. Đã tạo khung thư mục, chưa triển khai F-01–F-09; không thay đổi phạm vi nghiệm thu dưới đây.
+
 | Mã | Chức năng / người thao tác | Điều kiện nghiệm thu |
 |---|---|---|
 | F-01 | Ví trong tài khoản — khách thuê | Khách thiết lập ví ngay trong app; liên kết tài khoản bằng phiên hợp lệ + challenge ký một lần; thử đăng nhập lại/khôi phục. Không gửi khóa khách cho backend; thay ví không đổi người ký hồ sơ cũ. SDK và loại ví chưa chọn. |

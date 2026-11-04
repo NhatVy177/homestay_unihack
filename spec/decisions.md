@@ -13,6 +13,7 @@ Ghi nhận ban đầu: **2026-11-05 00:38:27 +07:00**. Các quyết định 04/1
 | D-005 | 2026-11-04, không rõ giờ; plan §4, §8 | Demo đầu tiên dùng hợp đồng đủ hạn, cọc giả 3 triệu, v2 hoàn 2,5 triệu. Tái sử dụng calculator; policy hash chỉ ràng buộc tài liệu. Nguồn cọc và quy tắc thực tế vẫn cần chốt ở Q-01/Q-02. |
 | D-006 | 2026-11-05, không rõ giờ trao đổi; chat hiện tại, commit `40acf39` | Repo làm việc chuyển sang `NhatVy177/homestay_unihack`, local `D:\HomeStayDorm`, nhánh main lúc chuyển. Cấu trúc `database/`, `web/`, `hackathon/`, bỏ docs học phần; giữ SQL Server. Origin đã đổi; lịch sử Git cũ vẫn được giữ trong repo mới. |
 | D-007 | 2026-11-05; yêu cầu hiện tại, ghi lúc 00:38:27 +07:00 | Dùng `spec/` đơn giản và AGENTS.md để nối tiếp giữa các AI: ghi scope, quyết định, tiến độ, đường dẫn/nội dung đã sửa và nhật ký giờ Việt Nam. Tên thư mục/cách chia 5 file là lựa chọn triển khai của AI cho yêu cầu này. |
+| D-008 | 2026-11-05 00:48:51 +07:00; yêu cầu Vy và đọc Senpai local `cde3357` | Tạo module `blockchain/` ở root cùng repo để chứa contract/test/scripts/shared/deployments; integration client ở frontend, integration server ở backend. Senpai dùng Next.js gom web/API còn HomeStayDorm có hai app riêng. Đây là lựa chọn tổ chức code trong quyền Vy giao; không đổi scope D-001–D-005. Mới tạo khung, chưa nhập nền cũ hoặc chọn toolchain/SDK. |
 
 Khi thay đổi một quyết định, thêm mã mới cùng thời gian, lý do, nguồn và mã bị thay thế; cập nhật nhãn quyết định cũ thành “được thay bởi D-xxx”. Không xóa lịch sử hoặc mặc định gợi ý AI/BTC là yêu cầu của Vy.
 

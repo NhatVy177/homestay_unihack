@@ -1,55 +1,46 @@
-happyroom-skeleton/
-├─ happyroom-backend/
-│  ├─ controllers/
-│  │  ├─ auth.controller.js
-│  │  ├─ dangKyThue.controller.js
-│  │  ├─ lichXemPhong.controller.js
-│  │  ├─ datCoc.controller.js
-│  │  ├─ nhanPhong.controller.js
-│  │  ├─ traPhong.controller.js
-│  │  └─ suaChuaBaoTri.controller.js
-│  ├─ database/
-│  │  ├─ connection.js       # ket noi SQL Server va goi stored procedure
-│  │  └─ sql/
-│  │     ├─ app.sql          # database va cac bang
-│  │     └─ auth.sql         # SP_DangKy va SP_DangNhap, chay bang SQL Server
-│  ├─ middleware/
-│  ├─ routes/
-│  │  ├─ auth.routes.js
-│  │  ├─ dangKyThue.routes.js
-│  │  ├─ lichXemPhong.routes.js
-│  │  ├─ datCoc.routes.js
-│  │  ├─ nhanPhong.routes.js
-│  │  ├─ traPhong.routes.js
-│  │  └─ suaChuaBaoTri.routes.js
-│  ├─ services/
-│  │  ├─ auth.service.js
-│  │  ├─ dangKyThue.service.js
-│  │  ├─ lichXemPhong.service.js
-│  │  ├─ datCoc.service.js
-│  │  ├─ nhanPhong.service.js
-│  │  ├─ traPhong.service.js
-│  │  └─ suaChuaBaoTri.service.js
-│  ├─ index.js
-│  └─ package.json
-│
-├─ happyroom-frontend/
-│  ├─ public/
+HomeStayDorm/
+├─ database/                         # SQL Server: schema, seed, SP, trigger
+├─ blockchain/                       # Khung module Avalanche riêng, cùng repo
+│  ├─ contracts/                     # Solidity (chưa có contract)
+│  ├─ test/                          # Test contract/shared (chưa triển khai)
+│  ├─ scripts/                       # Compile/export/deploy/verify (chưa triển khai)
 │  ├─ src/
-│  │  ├─ api/
-│  │  ├─ components/common/
-│  │  ├─ constants/
-│  │  ├─ layouts/
-│  │  ├─ pages/
-│  │  │  ├─ dashboard/
-│  │  │  ├─ dangKyThue/
-│  │  │  ├─ lichXemPhong/
-│  │  │  ├─ datCoc/
-│  │  │  ├─ nhanPhong/
-│  │  │  ├─ traPhong/
-│  │  │  └─ suaChuaBaoTri/
-│  │  └─ styles/
-│  ├─ index.html
-│  └─ package.json
-│
-└─ HuongDanChay.txt
+│  │  └─ abi/                        # ABI và mã thuần dùng chung khi triển khai
+│  ├─ deployments/                   # Metadata public sau khi deploy được xác minh
+│  ├─ package.json                   # Private package, chưa cài toolchain
+│  └─ README.md                      # Trách nhiệm và ranh giới giữa các phần
+├─ web/
+│  ├─ backend/
+│  │  ├─ controllers/
+│  │  ├─ routes/
+│  │  ├─ services/                   # Nghiệp vụ hiện có, gồm calculator đối soát
+│  │  ├─ repositories/
+│  │  ├─ database/connection.js       # Kết nối SQL; script SQL ở database/ gốc
+│  │  ├─ middleware/
+│  │  ├─ integrations/avalanche/      # Chỗ dành cho adapter/relayer/sync server
+│  │  ├─ index.js
+│  │  └─ package.json
+│  ├─ frontend/
+│  │  ├─ public/
+│  │  ├─ src/
+│  │  │  ├─ api/
+│  │  │  ├─ auth/
+│  │  │  ├─ components/
+│  │  │  ├─ layouts/
+│  │  │  ├─ pages/                   # Trang nghiệp vụ; Verify khi triển khai
+│  │  │  ├─ lib/avalanche/            # Chỗ dành cho ví/ký/RPC/evidence client
+│  │  │  └─ styles/
+│  │  └─ package.json
+│  └─ scripts/
+├─ hackathon/                        # Kế hoạch chi tiết và bối cảnh cũ
+├─ spec/                             # Scope, quyết định, tiến độ, nhật ký
+├─ AGENTS.md                         # Quy ước để AI tiếp nối
+├─ README.md                         # Hướng dẫn chạy hiện hành
+├─ run.bat
+└─ run.ps1
+
+Cập nhật: 2026-11-05 00:48:51 +07:00.
+Cây rút gọn, không liệt kê mọi file của Web2.
+Các thư mục blockchain mới là khung, giữ chỗ bằng .gitkeep/README.
+Chưa có contract/ABI, toolchain, ví nhúng, relayer hoặc deployment Fuji.
+Không cần cài/chạy blockchain để tiếp tục chạy web hiện tại.

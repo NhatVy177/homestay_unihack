@@ -66,6 +66,12 @@ Senpai minh họa cách giấu thao tác kỹ thuật khỏi luồng thông thư
 
 ## 3. Luồng sản phẩm và kiến trúc mới
 
+### Tổ chức code đã chọn sau khi đọc Senpai local (05/11/2026)
+
+Tách `blockchain/` ở root, cùng cấp `web/` và `database/`: `contracts/`, `test/`, `scripts/`, `src/` dùng chung (gồm `src/abi/`) và `deployments/`. Ví/ký/đọc chain thuộc `web/frontend/src/lib/avalanche/`; adapter nghiệp vụ, relayer và đồng bộ thuộc `web/backend/integrations/avalanche/`. Giữ calculator và SQL ở backend/database. Chi tiết: [blockchain/README.md](../blockchain/README.md), D-008/J-004 trong spec.
+
+Senpai dùng một app Next.js nên đặt contract trong `web/contracts/` và dùng `web/lib/` cho client/server. HomeStayDorm có React và Express riêng nên module root giúp tách toolchain và dùng chung định nghĩa bằng chứng. Đây mới là khung, không phải đã nhập nền `09f8270`, có ABI/SDK, relayer hay deployment; scope tính năng giữ nguyên. Chọn toolchain sau khi rà nhánh cũ.
+
 **Một câu giới thiệu:** HomeStayDorm giúp khách thuê và đơn vị vận hành xác nhận cùng một bản bàn giao/đối soát tiền cọc, lưu lịch sử trên Avalanche và tự kiểm chứng hồ sơ đã đồng ý.
 
 Tình huống demo: nệm đã rách lúc nhận phòng, nhưng khi trả phòng bảng đối soát lại tính phí vết rách đó. Khách dùng bản bàn giao đã lưu để phản hồi; kế toán điều chỉnh thành phiên bản mới; khách xác nhận bản đúng.

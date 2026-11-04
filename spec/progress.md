@@ -1,13 +1,13 @@
 # Tiến độ và điểm tiếp tục
 
-Cập nhật: **2026-11-05 00:43:02 +07:00**. Người cập nhật: Codex trong phiên làm việc cùng Vy.
+Cập nhật: **2026-11-05 00:50:10 +07:00**. Người cập nhật: Codex trong phiên làm việc cùng Vy.
 
 ## Điểm đứng hiện tại
 
-- Repo: `https://github.com/NhatVy177/homestay_unihack.git`; local `D:\HomeStayDorm`; branch kiểm tra: `main`; commit nền trước đợt ghi sổ: `40acf39`.
+- Repo: `https://github.com/NhatVy177/homestay_unihack.git`; local `D:\HomeStayDorm`; branch kiểm tra: `main`; commit trước đợt dựng khung blockchain: `a83b18e` (sổ làm việc, J-003); nền tổ chức Web2: `40acf39`.
 - Đã tổ chức `database/`, `web/`, `hackathon/` và push repo mới trong phiên trước. Không thay SQL Server hoặc logic nghiệp vụ khi đổi cấu trúc.
-- Đợt hiện tại thiết lập sổ làm việc `spec/` và hướng dẫn AI; không triển khai chức năng Avalanche.
-- **Repo main hiện chưa có `blockchain/`, file Solidity hoặc trang Avalanche Verify.** `git ls-files '*avalanche*' '*blockchain*' '*.sol'` không trả file; App.jsx không có route Avalanche. Đây là khác biệt quan trọng với handoff cũ.
+- Đợt hiện tại đọc Senpai local và tạo khung `blockchain/` riêng cùng các vị trí integration frontend/backend theo D-008/J-004.
+- **Đã có thư mục/package blockchain nhưng chưa có file Solidity, ABI, trang Avalanche Verify hoặc toolchain chạy được.** Integration mới chỉ có README. Các chức năng F-01–F-09 chưa được triển khai trong repo này; không nhầm khung với nền được handoff mô tả.
 - Handoff báo nền contract/adapter/evidence/Verify ở `homedorm/feature/avalanche-settlement`, commit `09f8270`; **chưa kiểm tra lại nhánh đó hoặc nhập về repo này**. Không khởi động lại từ đầu mà bỏ qua nền cũ, cũng không đánh dấu nó đã có ở đây.
 
 ## Công việc và bằng chứng
@@ -23,6 +23,7 @@ Cập nhật: **2026-11-05 00:43:02 +07:00**. Người cập nhật: Codex trong
 | T-07 | Nối UI ba vai trò, SQL, evidence và Verify | Chưa bắt đầu | F-02/F-03/F-04/F-06/F-07/F-08; cần kiểm tra SQL và receipt/event phục hồi. |
 | T-08 | Deploy, verify source và nghiệm thu Fuji | Chưa bắt đầu | F-09; chưa có deployment/tx/source verification được xác minh trong repo mới. |
 | T-09 | Hồ sơ nộp và demo | Chưa bắt đầu | README setup/ghi công, video 2–3 phút, slides, kiểm tra link; Q-06/Q-07. |
+| T-10 | Tổ chức module blockchain sau khi đọc Senpai | Hoàn thành | Khung root + integration client/server, private package chưa có dependencies; 34 link local, JSON, ignore rules và diff đã kiểm tra. Commit mang mã J-004. Không đồng nghĩa hoàn thành tính năng blockchain. |
 
 ## Kiểm thử: phân biệt nguồn kết quả
 
@@ -31,9 +32,10 @@ Cập nhật: **2026-11-05 00:43:02 +07:00**. Người cập nhật: Codex trong
 | Phiên cấu trúc lại repo, trước `40acf39` | Frontend `npm run build` qua; backend `node --check` qua; đường dẫn SQL kiểm tra tồn tại; hash 4 file UniHack khi chép trùng nguồn. | Không E2E SQL; build có cảnh báo bundle lớn và `use client`; không phải kiểm thử Avalanche. Hai dòng trắng cuối run.bat/run.ps1 là thay đổi có sẵn, đã giữ lại. |
 | Handoff phiên AI cũ, mục 9 | Báo 4 test contract + 3 adapter, build frontend, deploy EVM local qua. | Chỉ là báo cáo lịch sử ở nhánh cũ; chưa chạy lại, chưa bao gồm ví/relayer/scope mới và không chứng minh Fuji. |
 | Phiên sổ làm việc | Đọc đủ 5 file hackathon, đối chiếu Git và calculator local. | Kiểm tra tài liệu mới ghi ở J-003; không chạy app/test nghiệp vụ trong đợt chỉ sửa tài liệu. |
+| Phiên tổ chức blockchain | Đọc Senpai local tại `cde33571a348c26bae614f11aa31b32487cbc285`: contract, Foundry config, export artifact, ví/ký, relayer/API và README. | Chưa chạy Senpai, chưa kiểm deployment; giữ nguyên thay đổi có sẵn `senpai/web/package-lock.json`. Kết quả kiểm tra khung ghi ở J-004. |
 
 ## Bước tiếp theo cho AI
 
-Bắt đầu T-03: đọc nhánh Avalanche cũ và đối chiếu với scope hiện hành, xác định phần tái sử dụng; sau đó T-04/T-05. Chỉ đọc/ghi hồ sơ được thực hiện trong đợt hiện tại. Khi bắt tay triển khai, thử một luồng nhỏ trước khi làm nhiều màn hình; không lấy mô tả handoff làm bằng chứng đã tích hợp.
+Bắt đầu T-03: đọc nhánh Avalanche cũ và đối chiếu với scope hiện hành, xác định phần tái sử dụng vào khung đã có; sau đó T-04/T-05. Di chuyển adapter phụ thuộc nghiệp vụ sang integration backend; giữ mã thuần dùng chung ở blockchain/src. Chọn toolchain sau khi rà nền cũ, rồi bổ sung dependency/lockfile, compile/test và cách nối shared vào hai app. Khi bắt tay triển khai, thử một luồng nhỏ trước khi làm nhiều màn hình; không lấy mô tả handoff làm bằng chứng đã tích hợp.
 
 Vướng mắc đang biết nằm ở Q-01 đến Q-07 trong [decisions.md](decisions.md). Chưa có tác vụ triển khai blockchain đang chạy hoặc thay đổi code ứng dụng dở dang do đợt ghi sổ này.

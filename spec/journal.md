@@ -39,3 +39,22 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra lúc **2026-11-05 00:43:02 +07:00**: 31 link local trong 10 file Markdown hợp lệ; spec có đúng 5 file; `git diff --check` qua cho các file tracked đã sửa. Diff tài liệu gốc chỉ thêm chú thích/link, giữ nội dung lịch sử; không sửa code ứng dụng/SQL. Không chạy lại build/test nghiệp vụ vì đợt này chỉ sửa Markdown. Kiểm tra staged diff được thực hiện trước commit.
 - Kết quả: T-02 hoàn thành về nội dung và kiểm tra; `progress.md` đã cập nhật thời gian/trạng thái. Bước tiếp T-03 kiểm tra nhánh Avalanche cũ trước khi tiếp tục tích hợp.
 - Git: commit mang mã J-003; xem `git log --all --grep="J-003"`. Trạng thái push được đối chiếu với origin sau khi commit, không tự điền hash chưa tồn tại.
+
+## 2026-11-05 00:48:51 +07:00 — J-004 — Đọc Senpai và tách module blockchain
+
+- Người thực hiện: Codex theo yêu cầu Vy đọc `D:\Nam4\Contest\senpai`, đánh giá cấu trúc Avalanche và tổ chức riêng nếu phù hợp.
+- Căn cứ: Senpai local HEAD `cde33571a348c26bae614f11aa31b32487cbc285`; đọc README, package, Foundry config, MiuCoin, script export artifact, ví/ký, relayer và API session. Chưa chạy app/test hoặc xác minh deployment Senpai. Có thay đổi sẵn trong `web/package-lock.json` của Senpai, không sửa repo tham khảo.
+- Kết luận D-008: Senpai gom Next.js nên đặt contract dưới web; HomeStayDorm React/Express riêng phù hợp `blockchain/` ở root. Ví và relayer vẫn chạy ở đúng app. Chỉ tạo khung phân trách nhiệm; không copy token/x402/vault, chưa nhập nhánh `09f8270`, chưa chọn SDK/toolchain và chưa deploy.
+- File và nội dung:
+  - `blockchain/README.md`: sơ đồ, phân trách nhiệm, chiều phụ thuộc, quy ước ABI/deployment và đối chiếu Senpai; ghi rõ trạng thái khung.
+  - `blockchain/package.json`: private ESM package, chưa có dependencies/scripts runtime. `blockchain/.gitignore`: output, secrets, dữ liệu chain local.
+  - `blockchain/contracts/.gitkeep`, `test/.gitkeep`, `scripts/.gitkeep`, `src/abi/.gitkeep`, `deployments/.gitkeep`: giữ các vị trí dự kiến trong Git.
+  - `web/backend/integrations/avalanche/README.md`: adapter, relayer và đồng bộ server; calculator vẫn thuộc services.
+  - `web/frontend/src/lib/avalanche/README.md`: vị trí ví/ký/đọc chain/evidence client; pages/components vẫn ở frontend.
+  - `README.md`, `web/CauTrucThuMuc.txt`: cây thư mục mới và trạng thái chạy; loại đường dẫn skeleton lỗi thời khỏi cây thư mục.
+  - `hackathon/plan.md`, `spec/scope.md`: thêm tổ chức code, giữ phạm vi F-01–F-09.
+  - `spec/decisions.md`, `spec/progress.md`, `spec/journal.md`: D-008, T-10, phân biệt khung mới với nền cũ chưa nhập và nhật ký đợt này.
+- Kiểm tra lúc **2026-11-05 00:50:10 +07:00**: 34 link local hợp lệ; package JSON parse được, private ESM đúng; 7 đường dẫn thử cho env/output/local deployment bị ignore, ABI/deployment Fuji/source placeholder không bị ignore; `git diff --check` qua. Senpai vẫn chỉ có thay đổi package-lock tồn tại trước phiên. Không chạy lại build/test ứng dụng hoặc thêm tests vì chỉ thêm khung/Markdown, không đổi import/dependency/runtime web. Trước commit kiểm tra staged diff bao gồm các file mới.
+- Kết quả: T-10 hoàn thành phần tổ chức thư mục; đã cập nhật progress. Chưa có contract/test nghiệp vụ/deployment để báo chạy thành công.
+- Bước tiếp: T-03 kiểm tra nền cũ; sau đó chọn toolchain và nối các phần theo scope. T-10 không thay nghiệm thu F-01–F-09.
+- Git: commit mang mã J-004; tra bằng `git log --all --grep="J-004"`; báo hash và trạng thái push sau khi thực hiện.

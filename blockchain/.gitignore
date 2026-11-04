@@ -1,0 +1,18 @@
+# Secrets (also covered by the repository root)
+.env
+.env.*
+!.env.example
+
+# Toolchain dependencies and generated output
+node_modules/
+artifacts/
+cache/
+out/
+build/
+dist/
+coverage/
+broadcast/
+
+# Ephemeral local chain data; keep verified public deployment manifests
+.local/
+deployments/local/

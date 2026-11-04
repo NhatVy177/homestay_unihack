@@ -1,0 +1,7 @@
+{
+  "name": "@homestaydorm/blockchain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Scaffold for HomeStayDorm settlement contracts and shared evidence utilities; toolchain not configured yet."
+}
