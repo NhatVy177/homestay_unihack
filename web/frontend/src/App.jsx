@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext.jsx';
 import { getAuthenticatedHomePath } from './auth/auth.routes.js';
@@ -16,6 +16,8 @@ import NhanVienSalePage from './pages/nhanVienSale/NhanVienSalePage.jsx';
 import NhanVienQuanLyPage from './pages/nhanVienQuanLy/NhanVienQuanLyPage.jsx';
 import NhanVienKeToanPage from './pages/nhanVienKeToan/NhanVienKeToanPage.jsx';
 import AdminPage from './pages/admin/AdminPage.jsx';
+const AvalanchePortal = lazy(() => import('./pages/avalanche/AvalanchePortal.jsx'));
+const AvalancheVerifyPage = lazy(() => import('./pages/avalanche/AvalancheVerifyPage.jsx'));
 
 function LoadingScreen() {
   return <div className="auth-loading">Đang kiểm tra phiên đăng nhập...</div>;
@@ -62,6 +64,8 @@ export default function App() {
     <Routes>
       <Route path="/" element={<TrangChu />} />
       <Route path="/kham-pha-phong" element={<KhamPhaPhongPage />} />
+      <Route path="/ho-so-xac-nhan" element={<ProtectedRoute><Suspense fallback={<LoadingScreen />}><AvalanchePortal /></Suspense></ProtectedRoute>} />
+      <Route path="/kiem-chung-avalanche" element={<Suspense fallback={<LoadingScreen />}><AvalancheVerifyPage /></Suspense>} />
 
       <Route
         path="/khach-hang"

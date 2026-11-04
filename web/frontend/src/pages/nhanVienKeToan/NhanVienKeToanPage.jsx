@@ -67,6 +67,7 @@ export default function NhanVienKeToanPage() {
             </button>
           ))}
         </nav>
+        <Link className="ktp-side-item" to="/ho-so-xac-nhan">Hồ sơ xác nhận bàn giao / đối soát</Link>
       </aside>
 
       <div className="kp-app">

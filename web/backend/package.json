@@ -6,16 +6,20 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "avalanche:db:check": "node scripts/avalanche-db.mjs check",
+    "avalanche:db:migrate": "node scripts/avalanche-db.mjs migrate"
   },
   "dependencies": {
+    "@homestaydorm/settlement": "file:../../blockchain",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "msnodesqlv8": "^6.2.2",
     "mssql": "^12.5.4",
     "multer": "^2.2.0",
-    "pg": "^8.23.0"
+    "pg": "^8.23.0",
+    "viem": "^2.57.16"
   },
   "devDependencies": {
     "nodemon": "^3.1.14",

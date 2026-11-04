@@ -29,6 +29,7 @@ import { startHoaDonQuaHanScheduler } from './services/hoaDonQuaHan.service.js';
 import { startDatCocHetHanScheduler } from './services/datCocHetHan.service.js';
 import { startLichXemPhongDenGioScheduler } from './services/lichXemPhongDenGio.service.js';
 import hopDongRoutes from './routes/hopDong.routes.js';
+import avalancheRoutes from './routes/avalanche.routes.js';
 
 // Load bien moi truong trong file .env
 dotenv.config();
@@ -66,6 +67,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/avalanche', avalancheRoutes);
 app.use('/api/trang-chu', trangChuRoutes); // Public — no auth
 
 // Moi luong nghiep vu co route rieng, de nhom tach code de hon

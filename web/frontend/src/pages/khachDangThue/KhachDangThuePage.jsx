@@ -148,6 +148,7 @@ export default function KhachDangThuePage() {
 
       <div className="rt-frame rt-shell">
         <aside className="rt-sidebar" aria-label="Menu khách đang thuê">
+          <a className="rt-side-link" href="/ho-so-xac-nhan">Bàn giao & đối soát cần xác nhận</a>
           {navigationGroups.map((group) => (
             <div className="rt-side-group" key={group.title}>
               <p className="rt-side-label">{group.title}</p>

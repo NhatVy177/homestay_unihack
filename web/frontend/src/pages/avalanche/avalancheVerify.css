@@ -1,0 +1,8 @@
+.avalanche-verify { max-width: 760px; margin: 48px auto; padding: 32px; color: #193234; background: #fff; border-radius: 20px; box-shadow: 0 12px 40px #17323218; }
+.avalanche-verify h1 { margin: 22px 0 14px; font-size: 2rem; }
+.avalanche-verify label { display: block; margin: 24px 0 8px; font-weight: 700; }
+.avalanche-verify input { display: block; max-width: 100%; }
+.avalanche-verify section { margin-top: 24px; padding: 16px; border-radius: 12px; }
+.avalanche-verify-ok { background: #e9f7f1; }
+.avalanche-verify-error { background: #fff1ee; }
+.avalanche-verify-note { margin-top: 32px; color: #4c6264; }

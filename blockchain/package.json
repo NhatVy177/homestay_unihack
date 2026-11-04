@@ -1,7 +1,19 @@
 {
-  "name": "@homestaydorm/blockchain",
-  "version": "0.0.0",
+  "name": "@homestaydorm/settlement",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Scaffold for HomeStayDorm settlement contracts and shared evidence utilities; toolchain not configured yet."
+  "description": "Versioned handover and deposit settlement confirmations without custody.",
+  "exports": { "./evidence": "./src/evidence.js", "./confirmation": "./src/confirmation.js", "./abi": "./src/abi.js" },
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "compile": "node scripts/compile.mjs",
+    "test": "npm run compile && node --test test/*.test.mjs",
+    "test:sql": "node --env-file=../web/backend/.env --test test/sql.test.mjs",
+    "chain": "hardhat node --network local --hostname 127.0.0.1",
+    "deploy:local": "npm run compile && node scripts/deploy.mjs local",
+    "deploy:fuji": "npm run compile && node scripts/deploy.mjs fuji"
+  },
+  "dependencies": { "viem": "2.57.16" },
+  "devDependencies": { "@openzeppelin/contracts": "5.6.1", "hardhat": "3.21.2", "solc": "0.8.38" }
 }
