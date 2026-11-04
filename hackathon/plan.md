@@ -1,10 +1,10 @@
 # HomeStayDorm × Avalanche — Kế hoạch UniHack 2026
 
-Cập nhật: **05/11/2026, giờ Việt Nam**.
+Cập nhật: **2026-11-05 02:13:15 +07:00** (quy trình bàn giao D-009; trạng thái code xem spec/progress.md).
 
 > Tiếp nối **2026-11-05 00:38:27 +07:00**: repo hiện hành là `NhatVy177/homestay_unihack` (`D:\HomeStayDorm`, main lúc kiểm tra), mốc nền `40acf39`. Dùng [spec/](../spec/README.md) để theo dõi chức năng, quyết định, nhật ký và tiến độ. Phần “đã có” bên dưới nói về nhánh Avalanche cũ ở homedorm; nền đó **chưa được nhập/xác minh lại trong repo mới**. Xem [progress.md](../spec/progress.md) trước khi triển khai. Phạm vi kỹ thuật của kế hoạch này giữ nguyên; spec là bản tóm tắt và hồ sơ thực hiện, không phải kế hoạch thay thế.
 
-Bản bàn giao toàn bộ bối cảnh cuộc trò chuyện cho tài khoản GPT khác: [handoff.md](handoff.md). Ngày 05/11 chỉ bổ sung tài liệu bàn giao; phạm vi kỹ thuật hiện hành vẫn theo bản hợp nhất ngày 04/11 dưới đây.
+Bối cảnh lịch sử: [handoff.md](handoff.md). Quy trình bàn giao điện tử D-009 bên dưới là quyết định mới nhất của Vy, ưu tiên khi mâu thuẫn với mô tả cũ. Cập nhật tài liệu không chứng minh code đã triển khai.
 
 Quy ước làm việc theo yêu cầu Vy: sau mỗi đợt thay đổi hoàn tất, kiểm tra phù hợp, commit với danh tính Git `NhatVy177` và push lên đúng repo/nhánh đang làm; báo lại liên kết và commit đã push. Nếu push thất bại, báo rõ trạng thái để tránh nhầm với bản đã có trên GitHub.
 
@@ -81,14 +81,28 @@ Tình huống demo: nệm đã rách lúc nhận phòng, nhưng khi trả phòng
 | Bước | Người dùng thấy | Hệ thống thực hiện |
 |---|---|---|
 | 1. Thiết lập xác nhận trong tài khoản | Đăng nhập và thiết lập khả năng xác nhận hồ sơ trong app | Khởi tạo/liên kết ví nhúng, chứng minh kiểm soát ví và hướng dẫn khôi phục theo cơ chế đã chọn. |
-| 2. Bàn giao lúc nhận phòng | Xem hiện trạng, điều khoản, số cọc; lưu bản sao; bấm “Xác nhận biên bản” | Trình duyệt tính hash từ bản đang hiển thị, khách ký; relayer gửi; contract kiểm tra người ký và hồ sơ. |
+| 2. Bàn giao lúc nhận phòng | Nhân viên dẫn xem phòng và lập biên bản; khách xem hiện trạng/ảnh/cọc trên trang hợp đồng, yêu cầu chỉnh sửa hoặc ký bằng ví nhúng. Nếu chưa ký tại chỗ, nhận email link ký sau. | Web2 phân quyền và phát hành phiên bản; khách tự ký đúng snapshot; relayer gửi Avalanche và chỉ báo đã xác nhận khi receipt/event hợp lệ. |
 | 3. Đối soát lúc trả phòng | Kế toán lập bản 1 với khoản trừ và số hoàn/thu thêm | Calculator Web2 lập snapshot; contract ghi nhận phiên bản và bảo vệ số học cơ bản. |
 | 4. Phản hồi và sửa đổi | Khách phản đối; kế toán lập bản 2; khách xác nhận | Mỗi hành động ràng buộc đúng hồ sơ/phiên bản/hash. Giữ lịch sử bản cũ; phản đối được xử lý bởi con người. |
 | 5. Lưu và kiểm chứng | Khách có file bằng chứng, nút “Kiểm tra hồ sơ” và “Xem giao dịch trên Avalanche” | Verify dùng file khách giữ và RPC để đối chiếu; không cần lấy lại bản gốc từ server quản lý. |
 
+
+### Luồng nhận phòng và ký điện tử đã chốt — D-009 (05/11/2026)
+
+HomeStayDorm hướng tới **sinh viên có smartphone**. Giữ nhân viên dẫn khách đến xem phòng và kiểm tra thiết bị/tài sản trực tiếp; **không chuyển sang mô hình tự check-in**.
+
+1. **Nhân viên (Web2):** lập biên bản bàn giao từ hồ sơ hợp đồng, hiện trạng/ảnh, cọc và chính sách liên quan; phát hành phiên bản để khách xem. Biên bản tồn tại trong SQL không đồng nghĩa giao diện khách đã có.
+2. **Khách thuê (Web2):** đăng nhập vào Hợp đồng của tôi → Chi tiết hợp đồng → Biên bản bàn giao (vị trí UI đề xuất), xem đầy đủ nội dung, ảnh và bản sao trước khi quyết định. Có thể **yêu cầu chỉnh sửa**; nhân viên xử lý và phát hành phiên bản mới, giữ lịch sử bản cũ; không cho ký bản bị thay thế.
+3. **Chưa ký ngay tại phòng:** gửi **email có link mở đúng hồ sơ/biên bản** để khách đăng nhập, xem và ký sau. Email/link hoặc OTP **không phải chữ ký** và không được cấp quyền đọc công khai; server phải kiểm tra tài khoản, hợp đồng và phiên bản. Nếu chưa ký, có thể nhắc lại và nhân viên theo dõi. Mốc 24 giờ chỉ là **gợi ý lịch nhắc**, chưa chốt thành hạn cứng hoặc tự hủy hợp đồng.
+4. **Xác nhận bắt buộc:** để biên bản chuyển sang **Hoàn tất xác nhận điện tử**, chính khách thuê phải chủ động ký snapshot hiện hành qua ví nhúng; relayer chỉ trả gas, không ký thay. Browser đối chiếu hash của bản đang hiển thị; khi Fuji có receipt/event đúng mới đánh dấu đã xác nhận trong SQL/UI và xuất bằng chứng đầy đủ.
+5. **Hai trạng thái riêng:** (a) bàn giao thực tế/chìa khóa do nhân viên ghi nhận; (b) xác nhận điện tử chờ ký/đang gửi/lỗi/đã ký/yêu cầu sửa. Khách có thể đã nhận phòng thực tế nhưng biên bản vẫn chờ ký; không tự động coi đã đồng ý.
+6. **Khi mạng/Privy/chain lỗi:** giữ trạng thái chưa hoàn tất, cho mở lại link và ký lại có kiểm tra receipt/chống giao dịch trùng; không tự ký. **Không xây nhánh ký giấy song song trong MVP** và không thể ghi hash tài liệu bằng ví nhân viên rồi gọi là khách đã ký.
+
+**Web2 cần bổ sung, không xây lại toàn hệ thống:** giao diện khách xem/phản hồi/ký, giao diện nhân viên phát hành/sửa/theo dõi, API quyền truy cập theo hợp đồng và phiên bản, gửi email thông báo/nhắc; tái dùng dữ liệu bàn giao và màn hợp đồng hiện có. Không đưa email, ảnh, nội dung biên bản hoặc PII lên chain. Email provider và lịch nhắc chi tiết là Q-08/Q-09.
+
 Báo trả phòng vẫn có thể diễn ra trong Web2; MVP không yêu cầu giao dịch on-chain riêng cho thời điểm báo trước. Hoàn/thu thêm tiền nằm trong luồng thanh toán Web2; trạng thái “đã xác nhận đối soát” không có nghĩa “đã nhận tiền”.
 
-Trạng thái chính dự kiến: chờ xác nhận bàn giao → đang thuê → chờ xác nhận đối soát ↔ có phản đối/phiên bản mới → đã thống nhất đối soát. Contract bản MVP không cần bước `PaymentReported` hay `Closed` chứng minh thanh toán. Việc chỉnh bản đã chấp nhận cần quy trình đồng thuận mới; không cho ghi đè trong MVP.
+Trạng thái xác nhận: chờ xác nhận bàn giao → đã xác nhận bàn giao → chờ xác nhận đối soát ↔ phản đối/phiên bản mới → đã thống nhất đối soát. **Nhận phòng thực tế/đã giao chìa khóa là trạng thái Web2 riêng, không suy ra từ chữ ký trên chain.** Contract bản MVP không cần bước `PaymentReported` hay `Closed` chứng minh thanh toán. Việc chỉnh bản đã chấp nhận cần quy trình đồng thuận mới; không cho ghi đè trong MVP.
 
 ### Ví nhúng và app trả phí: mục tiêu của bản thi
 
@@ -186,6 +200,7 @@ Mẫu tự gửi, điều chỉnh đúng các phần được dùng và phạm v
 - Khách nhận bằng chứng ngay trong quá trình xác nhận, mở lại được dù không gọi API tài liệu của bên quản lý.
 - Contract verify được mã nguồn, địa chỉ/ABI/UI thống nhất; README hướng dẫn dựng và chạy bản demo.
 - UI thể hiện đúng khi người dùng từ chối, chữ ký hết hạn, relayer/chain/SQL lỗi. Không báo đã xác nhận chỉ vì người dùng đã bấm nút.
+- Test bàn giao D-009: nhân viên lập và phát hành; sinh viên xem đúng tài liệu và ảnh, yêu cầu sửa rồi ký bản mới; email link chỉ mở hồ sơ sau đăng nhập; người khác không đọc/ký hộ; bản cũ không ký được; giao chìa khóa không tự đổi trạng thái on-chain.
 
 ### Các kiểm thử cần giữ/thêm khi triển khai
 

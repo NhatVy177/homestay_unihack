@@ -1,6 +1,6 @@
 # Phạm vi chức năng hiện hành
 
-Ghi nhận: **2026-11-05 00:38:27 +07:00**. Tóm tắt từ [plan](../hackathon/plan.md), mục 1, 3, 4 và 8; [handoff](../hackathon/handoff.md), mục 6–9. Trạng thái triển khai xem [progress.md](progress.md).
+Ghi nhận ban đầu: **2026-11-05 00:38:27 +07:00**; cập nhật nghiệp vụ **2026-11-05 02:13:15 +07:00** (D-009). Tóm tắt từ [plan](../hackathon/plan.md), mục 1, 3, 4 và 8; [handoff](../hackathon/handoff.md), mục 6–9. Trạng thái triển khai xem [progress.md](progress.md).
 
 ## Mục tiêu và người dùng
 
@@ -15,7 +15,7 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 | Mã | Chức năng / người thao tác | Điều kiện nghiệm thu |
 |---|---|---|
 | F-01 | Ví trong tài khoản — khách thuê | Khách thiết lập ví ngay trong app; liên kết tài khoản bằng phiên hợp lệ + challenge ký một lần; thử đăng nhập lại/khôi phục. Không gửi khóa khách cho backend; thay ví không đổi người ký hồ sơ cũ. SDK và loại ví chưa chọn. |
-| F-02 | Xác nhận bàn giao — quản lý lập, khách xác nhận | Hiển thị hiện trạng, chính sách và cọc còn giữ; cùng snapshot được hiển thị, băm tại browser và ký. Khách lưu bản sao tại bước xác nhận; receipt/event đúng mới báo đã ghi nhận. |
+| F-02 | Bàn giao trực tiếp + ký điện tử — nhân viên lập, sinh viên xác nhận | Nhân viên dẫn xem phòng, lập/phát hành bản bàn giao Web2; khách xem nội dung/ảnh/chính sách/cọc trong trang hợp đồng, yêu cầu chỉnh sửa hoặc tự ký phiên bản hiện hành. Nếu chưa ký tại chỗ: email link để đăng nhập ký sau. Không có ký giấy song song trong MVP; browser hash/ký đúng snapshot, chỉ receipt/event hợp lệ mới hoàn tất điện tử. |
 | F-03 | Lập đối soát có phiên bản — kế toán | Snapshot khoản trừ, hoàn/thu thêm dựa trên calculator Web2; lưu phiên bản/hash và kiểm tra tổng, số học. Chốt nguồn cọc thực tế trước khi nối dữ liệu; không tự sao chép toàn bộ chính sách sang Solidity. |
 | F-04 | Phản đối → sửa → đồng ý — khách/kế toán | Phản đối ràng buộc đúng bản và hash lý do; con người xem xét, tạo v2 giữ v1; khách ký đúng bản hiện hành. Chặn sửa bản đã chấp nhận và hành động sai thứ tự/quyền. |
 | F-05 | App trả gas qua relayer | Chữ ký EIP-712 ràng buộc action, hồ sơ, version/hash, nonce, deadline và domain chain/contract. Kiểm tra EOA hoặc ERC-1271 theo ví đã chọn; chặn replay/sai signer. Relayer có quyền gửi, không ký thay khách; giới hạn yêu cầu/gas. |
@@ -23,6 +23,17 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 | F-07 | Verify độc lập — người giữ file | File + RPC đủ để kiểm tra, không xin lại tài liệu từ API quản lý. Dùng deployment đáng tin cậy để đối chiếu contract; chỉ rõ file bị sửa/thiếu, phiên bản cũ, trạng thái hiện tại và lỗi đọc RPC. |
 | F-08 | Đồng bộ chain – SQL và trạng thái UI | Chỉ thành công sau receipt + event đúng. Gửi lặp không tạo bản ghi trùng; chain thành công/SQL lỗi có cách đọc lại để phục hồi. Lưu chain ID, contract, tx hash, log index; phân biệt đang gửi/thất bại/đã ghi nhận. |
 | F-09 | Triển khai và demo Fuji | Contract deploy và verify source; ABI/address/UI thống nhất; chạy luồng đầy đủ ba vai trò, có tx thật, test phù hợp, README setup và bằng chứng demo. Local pass không thay thế nghiệm thu này. |
+
+
+## Nghiệp vụ bàn giao mới nhất — D-009
+
+- **Không tự check-in.** Nhân viên vẫn dẫn sinh viên xem phòng, ghi tình trạng và ảnh, rồi phát hành biên bản Web2 từ hồ sơ hợp đồng. Tận dụng nghiệp vụ hiện tại; không coi dữ liệu SQL sẵn có là đã có UI khách.
+- **Khách có thao tác thật:** Hợp đồng của tôi → Chi tiết → Biên bản bàn giao (UX đề xuất); đọc/lưu bản sao, phản hồi sai sót hoặc ký bằng ví nhúng. Nhân viên xử lý phản hồi và phát hành phiên bản mới; giữ lịch sử, chặn ký bản cũ.
+- **Chưa ký tại chỗ:** gửi email link mở hồ sơ để đăng nhập/ký sau. Link/OTP không đồng nghĩa ký; kiểm tra quyền chủ hợp đồng; nhắc ký nếu chưa hoàn tất. Mốc 24 giờ là đề xuất, không là deadline cứng.
+- **Bắt buộc chữ ký điện tử của chính khách** để hoàn tất xác nhận trên Avalanche; không nhân viên ký hộ, không coi ghi hash bởi nhân viên là chữ ký khách, không fallback giấy trong MVP.
+- **Hai trạng thái khác nhau:** bàn giao thực tế/chìa khóa (Web2) và xác nhận điện tử (chờ ký/đang gửi/đã ký/lỗi/cần chỉnh). Khách có thể nhận phòng thực tế trước khi ký xong; không tự đồng ý/hủy hợp đồng khi quá hạn.
+- Mất mạng hoặc chain lỗi: cho khách mở lại/ký sau, kiểm tra receipt, đồng bộ idempotent. Thêm UI khách/nhân viên, API phân quyền/phiên bản, email; tái dùng cấu trúc Web2 thay vì làm lại hệ thống. Không đưa dữ liệu nhạy cảm lên chain.
+- **Test bắt buộc:** email không tự ký; user sai quyền không xem/ký; bản cũ không ký; từ chối/chỉnh sửa không ép chấp nhận; không báo ký thành công khi chưa có receipt; trạng thái bàn giao thực tế không tự đồng bộ thành chữ ký.
 
 ## Luồng demo đã thống nhất trong plan
 

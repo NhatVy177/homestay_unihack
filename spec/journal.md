@@ -58,3 +58,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kết quả: T-10 hoàn thành phần tổ chức thư mục; đã cập nhật progress. Chưa có contract/test nghiệp vụ/deployment để báo chạy thành công.
 - Bước tiếp: T-03 kiểm tra nền cũ; sau đó chọn toolchain và nối các phần theo scope. T-10 không thay nghiệm thu F-01–F-09.
 - Git: commit mang mã J-004; tra bằng `git log --all --grep="J-004"`; báo hash và trạng thái push sau khi thực hiện.
+
+## 2026-11-05 02:13:15 +07:00 — J-005 — Chốt nhân viên bàn giao, sinh viên ký điện tử qua link email khi cần
+
+- Người thực hiện: ChatGPT theo yêu cầu của Vy; thời gian trên là lúc ghi hồ sơ, không phải giờ của mọi trao đổi trước.
+- Yêu cầu: cập nhật quyết định để AI khác hiểu và push lên repo, viết prompt Codex sửa code. HomeStayDorm phục vụ sinh viên, nhân viên vẫn dẫn xem phòng; khách phải tự ký điện tử, nếu chưa ký tại chỗ thì gửi email link để ký sau. Không chọn tự check-in hay fallback giấy song song trong MVP.
+- Kết luận: D-009, F-02; tách bàn giao thực tế với xác nhận chain, khách có quyền phản hồi/sửa phiên bản; email/link/OTP không là chữ ký; 24h chỉ là gợi ý, Q-08/Q-09 còn mở.
+- File/nội dung: hackathon/plan.md (luồng sản phẩm), spec/scope.md (nghiệm thu F-02), spec/decisions.md (D-009 và Q-08/Q-09), spec/progress.md (đầu việc và giới hạn snapshot code), spec/journal.md (mục này).
+- Kiểm tra: chỉ so nội dung tài liệu; chưa chạy build/test app hay Fuji. Chưa kiểm code local mà Codex vừa hoàn thành; phải đọc source và git status trước khi sửa.
+- Bước tiếp: Codex kiểm code thực tế, triển khai phần thiếu UI khách, email, phiên bản/phản hồi, chữ ký/receipt, test quyền và trạng thái; cập nhật nhật ký.
+- Git: thay đổi tài liệu trên main bằng một commit J-005; đối chiếu SHA commit với nhánh main sau push.
