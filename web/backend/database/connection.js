@@ -50,12 +50,12 @@ function getConfig() {
   if (!user) {
     throw new Error(
       'Missing SQL Server config: DB_USER (or set DB_TRUSTED_CONNECTION=true). ' +
-      'Check Web/backend/.env for local SQL Server values.'
+      'Check web/backend/.env for local SQL Server values.'
     );
   }
 
   if (hasPort && instanceName) {
-    throw new Error('Use either DB_PORT or DB_INSTANCE in Web/backend/.env, not both.');
+    throw new Error('Use either DB_PORT or DB_INSTANCE in web/backend/.env, not both.');
   }
 
   const config = {

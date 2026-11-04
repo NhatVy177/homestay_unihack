@@ -31,8 +31,8 @@ Thumbs.db
 *.user
 
 # Uploads / user attachments (preserve folder with .gitkeep)
-Web/backend/uploads/chung-tu/*
-!Web/backend/uploads/chung-tu/.gitkeep
-Web/backend/uploads/chung-tu-doi-soat/*
-!Web/backend/uploads/chung-tu-doi-soat/.gitkeep
+web/backend/uploads/chung-tu/*
+!web/backend/uploads/chung-tu/.gitkeep
+web/backend/uploads/chung-tu-doi-soat/*
+!web/backend/uploads/chung-tu-doi-soat/.gitkeep
 

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const dir = 'd:/NAM3/HomeStayDorm/Web/frontend/src/pages/nhanVienSale';
+const dir = __dirname;
 
 const tabs = [
   'TongQuanTab.jsx',

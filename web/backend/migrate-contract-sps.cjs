@@ -20,17 +20,18 @@ async function run() {
     const pool = await sql.connect(config);
     console.log('Connected to SQL Server successfully.');
 
-    const sqlFilePath = path.join(__dirname, '../../Database/SP_NhanPhong/sql_data.sql');
+    const sqlFilePath = path.join(__dirname, '../../database/SP_NhanPhong/sp_lap_hop_dong_thue.sql');
     console.log('Reading SQL file:', sqlFilePath);
     const content = fs.readFileSync(sqlFilePath, 'utf8');
 
-    // Split batches by GO
+    // Split batches by GO (ignoring GO inside comments/strings, but standard is \bGO\b)
     const batches = content.split(/\bGO\b/i);
     console.log(`Found ${batches.length} batches to execute.`);
 
     for (let i = 0; i < batches.length; i++) {
       const query = batches[i].trim();
       if (query) {
+        // Remove USE HOMEDORM4 batch to avoid issues
         if (query.toUpperCase().startsWith('USE ')) {
           console.log(`Skipping USE batch: ${query}`);
           continue;
@@ -40,15 +41,16 @@ async function run() {
           console.log(`Successfully executed batch ${i + 1}/${batches.length}`);
         } catch (err) {
           console.error(`Error in batch ${i + 1}:`, err.message);
+          // Print snippet of query
           console.error(query.slice(0, 200) + '...');
         }
       }
     }
 
     await pool.close();
-    console.log('Data import finished.');
+    console.log('Migration finished.');
   } catch (err) {
-    console.error('Data import failed:', err);
+    console.error('Migration failed:', err);
   }
 }
 

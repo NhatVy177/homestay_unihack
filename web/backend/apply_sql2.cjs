@@ -28,9 +28,9 @@ const config = {
       console.log('Successfully applied ' + path);
     };
     
-    await executeScript('../../Database/SP_DKyThue/dang-ky-thue.sql');
-    await executeScript('../../Database/SP_DKyThue/khach-moi.sql');
-    await executeScript('../../Database/SP_DKyThue/sp_tudongxuly.sql');
+    await executeScript('../../database/SP_DKyThue/dang-ky-thue.sql');
+    await executeScript('../../database/SP_DKyThue/khach-moi.sql');
+    await executeScript('../../database/SP_DKyThue/sp_tudongxuly.sql');
   } catch (err) {
     console.error(err);
   } finally {

@@ -20,8 +20,8 @@ const config = {
     
     // Read dang-ky-thue.sql and khach-moi.sql
     let alterLoaiPhong = fs.readFileSync('alter_loaiphong.sql', 'utf8');
-    let dangKyThue = fs.readFileSync('../../Database/SP_DKyThue/dang-ky-thue.sql', 'utf8');
-    let khachMoi = fs.readFileSync('../../Database/SP_DKyThue/khach-moi.sql', 'utf8');
+    let dangKyThue = fs.readFileSync('../../database/SP_DKyThue/dang-ky-thue.sql', 'utf8');
+    let khachMoi = fs.readFileSync('../../database/SP_DKyThue/khach-moi.sql', 'utf8');
     
     // Split by GO and execute
     const executeScript = async (script) => {

@@ -13,7 +13,7 @@ const config = {
 };
 
 sql.connect(config).then(p => {
-  const sqlStr = fs.readFileSync('../../Database/SP_DKyThue/khach-moi.sql', 'utf8');
+  const sqlStr = fs.readFileSync('../../database/SP_DKyThue/khach-moi.sql', 'utf8');
   const batches = sqlStr.split(/\bGO\b/i);
   return batches.reduce((prom, batch) => prom.then(() => {
     if(batch.trim()) {

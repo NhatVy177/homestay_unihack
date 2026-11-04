@@ -54,7 +54,7 @@ async function run() {
     console.log('Connected to SQL Server successfully.');
 
     // 1. Run migration
-    let success = await executeFile(pool, '../../Database/SP_NhanPhong/migration_gop_thanh_vien.sql');
+    let success = await executeFile(pool, '../../database/SP_NhanPhong/migration_gop_thanh_vien.sql');
     if (!success) {
       console.error('Migration failed. Aborting rest of execution.');
       await pool.close();
@@ -62,7 +62,7 @@ async function run() {
     }
 
     // 2. Run residency SPs
-    success = await executeFile(pool, '../../Database/SP_NhanPhong/sp_cu_tru_nhan_phong.sql');
+    success = await executeFile(pool, '../../database/SP_NhanPhong/sp_cu_tru_nhan_phong.sql');
     if (!success) {
       console.error('Residency SPs compilation failed. Aborting rest of execution.');
       await pool.close();
@@ -70,7 +70,7 @@ async function run() {
     }
 
     // 3. Run contract SPs
-    success = await executeFile(pool, '../../Database/SP_NhanPhong/sp_lap_hop_dong_thue.sql');
+    success = await executeFile(pool, '../../database/SP_NhanPhong/sp_lap_hop_dong_thue.sql');
     if (!success) {
       console.error('Contract SPs compilation failed. Aborting rest of execution.');
       await pool.close();
@@ -78,7 +78,7 @@ async function run() {
     }
 
     // 4. Reload test data
-    success = await executeFile(pool, '../../Database/SP_NhanPhong/sql_data.sql');
+    success = await executeFile(pool, '../../database/SP_NhanPhong/sql_data.sql');
     if (!success) {
       console.error('Reloading mock data failed.');
       await pool.close();

@@ -1,0 +1,231 @@
+# HomeStayDorm × Avalanche — Kế hoạch UniHack 2026
+
+Cập nhật: **05/11/2026, giờ Việt Nam**.
+
+Bản bàn giao toàn bộ bối cảnh cuộc trò chuyện cho tài khoản GPT khác: [handoff.md](handoff.md). Ngày 05/11 chỉ bổ sung tài liệu bàn giao; phạm vi kỹ thuật hiện hành vẫn theo bản hợp nhất ngày 04/11 dưới đây.
+
+Quy ước làm việc theo yêu cầu Vy: sau mỗi đợt thay đổi hoàn tất, kiểm tra phù hợp, commit với danh tính Git `NhatVy177` và push lên đúng repo/nhánh đang làm; báo lại liên kết và commit đã push. Nếu push thất bại, báo rõ trạng thái để tránh nhầm với bản đã có trên GitHub.
+
+Đây là bản kế hoạch hiện hành để Vy chia sẻ và triển khai. Bản này hợp nhất phản hồi BTC, hai lần phản biện của Claude và trạng thái mã nguồn; thay thế những lựa chọn scope cũ còn mâu thuẫn. Lịch sử đã commit vẫn nằm trong Git. Tài liệu nền: [README.md](README.md), [Unihack_Context.md](Unihack_Context.md), [Proposal.md](Proposal.md).
+
+## 1. Phương án đề xuất và căn cứ
+
+**Tiếp tục HomeStayDorm. Phần mới chính là xác nhận bàn giao và đối soát tiền cọc có phiên bản trên Avalanche Fuji, dùng ví trong app và app trả phí ghi nhận.** Người thuê xem tài liệu, chủ động xác nhận, giữ được bằng chứng và tự kiểm tra về sau.
+
+Mục tiêu trải nghiệm: người thuê dùng tài khoản HomeStayDorm, không phải cài MetaMask/Core hay tự xin AVAX thử. Ví nhúng và chữ ký được triển khai từ một thử nghiệm nhỏ sớm, trước khi nối toàn bộ hệ thống. Đây là quyết định thiết kế đề xuất, không phải yêu cầu bắt buộc được suy ra từ lời BTC.
+
+| Nội dung | Căn cứ và trạng thái |
+|---|---|
+| Nền HomeStayDorm | React/Vite, Express, SQL Server. Vy xác nhận bản mới đưa lên GitHub từ local chạy tốt. Đã đọc mã và kiểm thử phần blockchain; chưa kiểm thử toàn bộ app với SQL Server của Vy. |
+| Đóng góp | Theo Vy, Vy là leader, trực tiếp thực hiện phần lớn UI/UX, frontend/backend và nghiệp vụ từ trước cuộc thi; một số phần do thành viên khác đóng góp. Chưa có bảng ghi công chi tiết. |
+| Solo và dự án cũ | Ảnh phản hồi người Vy giới thiệu là BTC ngày 04/11: được nộp solo, được nộp nhiều project và được dùng project cũ. Giữ ảnh làm căn cứ; không tự gán chức danh khác. |
+| Định hướng tích hợp | BTC phản hồi phù hợp với hướng Web2 đưa sang Web3 một cách hợp lý; gợi ý ví trong tài khoản, token/point, ưu đãi và thanh toán mô phỏng. Những ví dụ này không đồng nghĩa phải làm tất cả. |
+| README | BTC nhấn mạnh cách setup/run và công nghệ; có thể dùng AI hỗ trợ soạn. Vẫn ghi công và mô tả đúng phần làm thêm. |
+| Điểm thi | Slide: Technical Implementation 25 và Avalanche Integration 25; Vy cho biết vòng 1 ưu tiên hai mục này. Ảnh phản hồi hiện có chưa nói rõ cách chia điểm nền cũ/phần mới. Câu “BTC chấm toàn bộ sản phẩm” trong bản Claude chưa có trích dẫn trực tiếp để xác nhận. |
+| Phạm vi Web3 | Hash, phiên bản, xác nhận/phản đối và kiểm chứng. Contract không giữ/chuyển tiền hoặc phân xử hư hỏng. |
+| Thanh toán và point | Quyết toán tiền tiếp tục qua nghiệp vụ Web2. Cổng mô phỏng là phần tùy chọn. Token điểm chưa thuộc bản thi dự kiến. |
+
+### Đã có và còn phải làm
+
+Mã nguồn: [NhatVy177/homedorm](https://github.com/NhatVy177/homedorm). Nền Web2: `d1dd520b4e55377ffe1821b178c4c89dd48db08c`. Phần bổ sung: nhánh [feature/avalanche-settlement](https://github.com/NhatVy177/homedorm/tree/feature/avalanche-settlement), commit `09f8270` sau khi sửa metadata tác giả.
+
+- Đã có contract `DormSettlement`, adapter dùng calculator của HomeDorm, utility bộ bằng chứng và trang Verify. Theo lần thực hiện trước: kiểm thử contract/adapter local, build frontend và deploy local đã qua.
+- Contract hiện dùng quyền qua `msg.sender`; chưa có đường xác nhận EIP-712 qua relayer. Nó vẫn có bước báo trả và khai báo/xác nhận thanh toán. Bản triển khai tiếp theo cần thu gọn các bước này theo scope mới.
+- Chưa có ví nhúng, relayer, các nút xác nhận nối SQL, xuất bằng chứng trong luồng ký, deployment Fuji hoặc verify mã nguồn trên explorer.
+- Đổi plan không đồng nghĩa các phần trên đã được xây dựng hay kiểm thử.
+
+## 2. Yêu cầu từ workshop và cách học từ Senpai
+
+Ảnh workshop thể hiện:
+
+- Nộp **by 21 November** tại `team1vn.xyz`; ảnh không ghi giờ đóng cổng/múi giờ.
+- dApp chạy trên Avalanche L1 riêng, Fuji testnet hoặc C-Chain mainnet.
+- Repo có README; public hoặc thêm `tuantqse90` nếu private; giám khảo phải mở được mọi liên kết.
+- Slide Canva/Google Slides; video demo 2–3 phút, nêu vấn đề trong 30 giây đầu, thể hiện một luồng hoàn chỉnh.
+- “Your own contract, verified on the block explorer.” Deploy và verify source là hai việc riêng.
+- “Built with AI? Fine. Be ready to explain every part.”
+
+| Tiêu chí trong slide | Điểm |
+|---|---:|
+| Technical implementation | 25 |
+| Avalanche integration | 25 |
+| Creativity & innovation | 15 |
+| Impact & use case | 15 |
+| Presentation & pitching | 10 |
+| UI/UX & demo | 10 |
+
+Giữ ưu tiên kỹ thuật/tích hợp như Vy đã nêu, đồng thời dành thời gian cho trải nghiệm, hướng dẫn chạy và demo toàn sản phẩm. Chưa suy ra công thức chấm mới từ việc BTC cho dùng project cũ.
+
+Tham khảo [tuantqse90/senpai](https://github.com/tuantqse90/senpai), bản đã đọc `cde33571a348c26bae614f11aa31b32487cbc285`. Đã đọc mã, chưa xác minh deployment hay chạy kiểm thử của Senpai. Nó dùng token MIU thử, HTTP 402 và ủy quyền EIP-3009 cho thanh toán; HomeStayDorm sẽ dùng typed data cho hành động bàn giao/đối soát, không sao chép nguyên giao thức thanh toán.
+
+Nguồn cố định: [MiuCoin.sol](https://github.com/tuantqse90/senpai/blob/cde33571a348c26bae614f11aa31b32487cbc285/web/contracts/src/MiuCoin.sol), [client pay.ts](https://github.com/tuantqse90/senpai/blob/cde33571a348c26bae614f11aa31b32487cbc285/web/lib/pay.ts), [API session](https://github.com/tuantqse90/senpai/blob/cde33571a348c26bae614f11aa31b32487cbc285/web/app/api/session/route.ts), [tests](https://github.com/tuantqse90/senpai/blob/cde33571a348c26bae614f11aa31b32487cbc285/web/scripts/e2e.mjs), [MIT License](https://github.com/tuantqse90/senpai/blob/cde33571a348c26bae614f11aa31b32487cbc285/LICENSE). Nếu dùng mã theo giấy phép này, giữ thông báo bản quyền/giấy phép.
+
+Senpai minh họa cách giấu thao tác kỹ thuật khỏi luồng thông thường và trả gas hộ người dùng. Nó không phải thang chấm hay yêu cầu HomeStayDorm có token/x402. Tốc độ, giá gas của demo đó không được dùng như số liệu đo của HomeStayDorm.
+
+## 3. Luồng sản phẩm và kiến trúc mới
+
+**Một câu giới thiệu:** HomeStayDorm giúp khách thuê và đơn vị vận hành xác nhận cùng một bản bàn giao/đối soát tiền cọc, lưu lịch sử trên Avalanche và tự kiểm chứng hồ sơ đã đồng ý.
+
+Tình huống demo: nệm đã rách lúc nhận phòng, nhưng khi trả phòng bảng đối soát lại tính phí vết rách đó. Khách dùng bản bàn giao đã lưu để phản hồi; kế toán điều chỉnh thành phiên bản mới; khách xác nhận bản đúng.
+
+### Phần đưa vào bản thi
+
+| Bước | Người dùng thấy | Hệ thống thực hiện |
+|---|---|---|
+| 1. Thiết lập xác nhận trong tài khoản | Đăng nhập và thiết lập khả năng xác nhận hồ sơ trong app | Khởi tạo/liên kết ví nhúng, chứng minh kiểm soát ví và hướng dẫn khôi phục theo cơ chế đã chọn. |
+| 2. Bàn giao lúc nhận phòng | Xem hiện trạng, điều khoản, số cọc; lưu bản sao; bấm “Xác nhận biên bản” | Trình duyệt tính hash từ bản đang hiển thị, khách ký; relayer gửi; contract kiểm tra người ký và hồ sơ. |
+| 3. Đối soát lúc trả phòng | Kế toán lập bản 1 với khoản trừ và số hoàn/thu thêm | Calculator Web2 lập snapshot; contract ghi nhận phiên bản và bảo vệ số học cơ bản. |
+| 4. Phản hồi và sửa đổi | Khách phản đối; kế toán lập bản 2; khách xác nhận | Mỗi hành động ràng buộc đúng hồ sơ/phiên bản/hash. Giữ lịch sử bản cũ; phản đối được xử lý bởi con người. |
+| 5. Lưu và kiểm chứng | Khách có file bằng chứng, nút “Kiểm tra hồ sơ” và “Xem giao dịch trên Avalanche” | Verify dùng file khách giữ và RPC để đối chiếu; không cần lấy lại bản gốc từ server quản lý. |
+
+Báo trả phòng vẫn có thể diễn ra trong Web2; MVP không yêu cầu giao dịch on-chain riêng cho thời điểm báo trước. Hoàn/thu thêm tiền nằm trong luồng thanh toán Web2; trạng thái “đã xác nhận đối soát” không có nghĩa “đã nhận tiền”.
+
+Trạng thái chính dự kiến: chờ xác nhận bàn giao → đang thuê → chờ xác nhận đối soát ↔ có phản đối/phiên bản mới → đã thống nhất đối soát. Contract bản MVP không cần bước `PaymentReported` hay `Closed` chứng minh thanh toán. Việc chỉnh bản đã chấp nhận cần quy trình đồng thuận mới; không cho ghi đè trong MVP.
+
+### Ví nhúng và app trả phí: mục tiêu của bản thi
+
+- Ví nhúng giải quyết việc cài ví; relayer giải quyết việc khách phải có AVAX. Đây là hai phần khác nhau và đều cần thử trên Fuji.
+- Ưu tiên SDK ví nhúng có hỗ trợ Fuji, ký EIP-712, liên kết được với tài khoản HomeStayDorm và có cơ chế khôi phục rõ. Chưa chọn nhà cung cấp hay khẳng định miễn phí trước khi kiểm tra SDK, mô hình giữ khóa, điều khoản và chi phí.
+- Không mặc định tự làm ví chỉ được bảo vệ bằng PIN ngắn trong trình duyệt. Mã hóa như vậy chưa giải quyết việc đoán PIN ngoại tuyến, mã JavaScript độc hại hay mất dữ liệu trình duyệt. Nếu chọn ví local cho bản thử, phải xác định cách bảo vệ khóa/sao lưu và giới hạn dùng với khóa thử; không mô tả như ví sản phẩm đã an toàn.
+- Gắn ví với tài khoản vẫn cần xác thực phiên đăng nhập và challenge ký một lần. “Ví nằm trong tài khoản” không cho phép server tùy ý gán ví khác cho khách. Thay ví trong SQL không được thay người ký của hồ sơ đã chốt trên chain.
+- Khách xem và chủ động xác nhận từng bản; khóa khách không gửi cho backend ứng dụng. UX có thể dùng bước xác nhận trong app theo SDK, không hứa tuyệt đối không có màn xác nhận bảo mật.
+- Vai trò quản lý/kế toán có thể dùng khóa thử do dịch vụ vận hành giữ, với phân quyền và nhật ký thao tác rõ. Khóa relayer dùng trả gas không được quyền ký thay khách.
+- Thử một lát cắt nhỏ: tài khoản thử → ví nhúng → ký → relayer → contract → receipt. Chọn mô hình ví và khôi phục sau thử nghiệm này, trước khi làm nhiều màn hình.
+
+### Quy tắc chữ ký và đồng bộ
+
+- Typed data ràng buộc domain với chain ID, địa chỉ contract, phiên bản giao thức; message chứa loại hành động, mã hồ sơ, phiên bản, commitment/hash, nonce và hạn dùng. Phản đối phải ràng buộc cả hash lý do.
+- Contract kiểm tra người ký đúng vai trò, trạng thái, phiên bản hiện tại và chống replay. Không coi `msg.sender` của relayer là người dùng. Nếu giữ đường giao dịch trực tiếp để phát triển, nó phải tuân cùng quy tắc.
+- Chọn hỗ trợ chữ ký phù hợp loại ví SDK thực sự trả về: EOA hoặc smart account/ERC-1271. Không giả định mọi chữ ký đều kiểm tra được chỉ bằng khôi phục địa chỉ EOA.
+- Relayer chỉ nhận các hành động được phép, kiểm tra quyền và chữ ký trước khi gửi; giới hạn yêu cầu và ngân sách gas. Nó vẫn có thể chậm/từ chối gửi, nên chữ ký cục bộ chưa được coi là đã ghi trên chain.
+- UI phân biệt đang gửi, đã ghi nhận, thất bại. SQL chỉ đánh dấu xác nhận on-chain sau receipt thành công và sự kiện đúng hồ sơ/phiên bản.
+- Gửi lặp không tạo hành động trùng. Nếu chain đã thành công nhưng SQL lỗi, có tác vụ đọc lại event để phục hồi; lưu chain ID, contract, tx hash và log index để đối chiếu.
+
+### Bằng chứng phải đi cùng hành động xác nhận
+
+1. Chuẩn hóa snapshot một lần: biên bản/chính sách/bảng tiền, mã hồ sơ, phiên bản và manifest tài liệu đính kèm. Giao diện hiển thị và chữ ký dùng cùng snapshot; không gửi một hash do backend tạo mà không tự đối chiếu nội dung.
+2. Trình duyệt tính hash và kiểm tra các số tiền, sau đó cho xuất bộ bằng chứng trước hoặc ngay tại bước xác nhận. Bao gồm nội dung, salt từng tài liệu, mã hồ sơ/phiên bản, chain ID, contract và commitment; ảnh/file cần có bản gốc kèm hash, không chỉ URL có thể hết hạn.
+3. Có bước lưu bản sao và xác nhận người dùng đã lưu. Trình duyệt không đảm bảo file thực sự được lưu lâu dài; không dùng việc tự tải file làm bằng chứng rằng khách đã giữ được nó.
+4. Sau receipt, bổ sung tx hash/sự kiện/trạng thái và cho tải bản hoàn chỉnh. Bản trước khi gửi phải ghi rõ chưa được chain xác nhận.
+5. Verify chạy với file khách giữ và RPC. Đổi nội dung làm hash lệch; bản cũ đã bị thay thế phải hiển thị đúng lịch sử, không báo như bản hiện hành.
+
+Thông tin cư trú, CCCD, tài khoản ngân hàng, ảnh và nội dung chi tiết ở ngoài chain. On-chain có ID khó đoán, ví, commitment, phiên bản, trạng thái và số tiền tối thiểu cần cho logic. Demo dùng dữ liệu giả; không gọi toàn bộ biên bản là “công khai”. Salt giảm rủi ro dò nội dung, không bảo đảm ẩn danh.
+
+### Thanh toán mô phỏng và point
+
+- Giữ quy trình chuyển khoản/tiền mặt hiện có. Chỉ thêm cổng thanh toán mô phỏng sau khi luồng chính trên Fuji đạt nghiệm thu; dùng để minh họa đặt cọc hoặc quyết toán nếu nó giúp demo.
+- Simulator tự dựng phải được gọi rõ là mô phỏng, không phải API MoMo chính thức. Nếu chọn MoMo sandbox thật, kiểm tra tài liệu, tài khoản và API thu/hoàn riêng trước khi tích hợp.
+- Nếu làm callback mô phỏng, kiểm tra mã yêu cầu, số tiền, trạng thái và chống ghi nhận hai lần; tách rõ thu tiền và hoàn tiền. Không nhận tiền hoặc thông tin thanh toán thật cho demo.
+- Chưa thêm token loyalty. Nếu làm ở giai đoạn sau, điểm thưởng là ưu đãi riêng có quy tắc tích/đổi; không dùng point thay khoản tiền cọc phải hoàn.
+
+## 4. Chính sách cọc và giới hạn contract
+
+| Điểm | Quyết định/công việc |
+|---|---|
+| Cọc ban đầu và cọc còn giữ | Chốt nguồn dữ liệu thực tế; nếu cọc đã cấn vào tiền thuê, không gọi toàn bộ cọc ban đầu là số đang giữ. Adapter hiện lấy `tienCocBanDau`, nên cần đối chiếu trước khi nối hồ sơ thật. |
+| Tỷ lệ hoàn | Code `doiSoatCalculator.service.js` có 80% cho cọc chưa ký hợp đồng, 100% khi hết hạn, 50% nếu trả sớm và ở dưới 6 tháng, 70% từ 6 tháng. Đây là logic quan sát trong code, cần Vy xác nhận nghiệp vụ nếu mô tả cũ khác. |
+| Thời gian | Code dùng tháng lịch qua `calculateStayMonths`; không đổi sang 180 ngày hay thời gian báo trước khi chưa chốt yêu cầu. |
+| Chính sách đầu kỳ | Giữ bản chính sách và hash tại lúc nhận phòng để khách đồng ý, cùng số cọc đã được hai bên xác nhận. MVP demo hợp đồng đủ hạn/tỷ lệ 100% trước; không tự sáng tác tỷ lệ khác. |
+| Kiểm tra on-chain | Contract hiện tự tính `refund = max(depositHeld − deductions, 0)` và `topUp = max(deductions − depositHeld, 0)`. Adapter gộp phần cọc không được hoàn theo chính sách vào khoản trừ. |
+| Điều contract chưa kiểm tra | Chưa tự quyết định tỷ lệ 80/50/70/100, khoản hư hỏng hợp lý hay ngày ở thực tế. `policyHash` ràng buộc tài liệu, không tự thi hành toàn bộ nội dung tài liệu. |
+| Giữ tính nhất quán | Dùng chung calculator Web2 qua adapter và kiểm tra tổng/số học on-chain. Nếu mở rộng để contract áp dụng tỷ lệ, phải chốt dữ liệu đầu vào, cách làm tròn và thêm kiểm thử đối chiếu; không chép toàn bộ nghiệp vụ sang Solidity. |
+
+Lý do dùng chain: khách và bên vận hành có lịch sử chung để kiểm tra phiên bản, thứ tự giao dịch và thời điểm ghi nhận, giảm khả năng quản trị viên sửa kín lịch sử so với một DB do một bên giữ. Thời điểm ghi on-chain không chứng minh thời điểm sự kiện ngoài đời hay lúc chữ ký được tạo.
+
+Chữ ký trên PDF/timestamp bên thứ ba và nhật ký DB cũng giải quyết một phần bài toán. Lựa chọn Avalanche dựa vào triển khai EVM và khả năng phục vụ luồng xác nhận; chỉ đưa số phí/tốc độ sau khi đo, ghi rõ Fuji là testnet, không suy ra cam kết cho mainnet. Việc thêm phép tính vào contract tự nó không tạo ra lợi thế độc quyền cho Avalanche.
+
+## 5. Dùng nền dự án nhóm để thi solo
+
+BTC đã chấp nhận solo và dùng dự án cũ trong phạm vi cuộc thi. Ghi rõ nền cũ và phần mới, lưu ảnh phản hồi; không cần tiếp tục chờ lại cùng câu hỏi.
+
+1. Ghi đúng phần Vy làm và đóng góp của thành viên khác; lập bảng dựa trên thông tin thực tế, không tự điền tên hoặc tỷ lệ.
+2. Thống nhất việc dùng/sửa/demo/công khai phần thành viên khác đóng góp; lưu sự đồng ý nếu có. Chưa ghi nhận trong trao đổi rằng mọi người đã đồng ý.
+3. README ghi tech stack, setup/run, dữ liệu mẫu, phần nền Web2, phần mới cho UniHack, thư viện/tham khảo và AI hỗ trợ.
+4. Giữ mốc nền `d1dd520` và lịch sử thay đổi mới. Không biến phần code có sẵn thành phần tự nhận mới xây dựng trong cuộc thi.
+
+Nếu một phần không được phép dùng, thay phần đó hoặc tách contract/Verify thành demo độc lập với dữ liệu giả. Phương án này là dự phòng, không phải nhánh phát triển song song.
+
+## 6. Phản hồi BTC và những gì còn cần xác minh
+
+Ảnh ngày 04/11 đã trả lời: được solo/nhiều project; README cần hướng dẫn chạy và công nghệ; được dùng project cũ; hướng Web2 → Web3 hợp lý được khuyến khích. Ảnh sau gợi ý ví nhúng, point/ưu đãi và thanh toán mô phỏng.
+
+Không cần xin BTC duyệt từng lựa chọn SDK, token hay kiến trúc. Những điểm chưa có nguồn trực tiếp:
+- Giờ đóng cổng theo giờ Việt Nam, cổng nộp cuối cùng và có phải nộp thêm Builder Hub hay không.
+- Cách tính điểm riêng cho phần có sẵn/phần làm mới, nếu cần làm rõ.
+- Ngày công bố top 10/địa điểm chung kết; lịch workshop 11/11 và office hours 19/11 xuất hiện trong bản Claude nhưng chưa được xác minh từ nguồn BTC trong lượt này.
+
+Tin nhắn ngắn nếu lịch chính thức vẫn chưa rõ:
+
+> Dạ anh cho em xác nhận thêm giờ đóng cổng theo giờ Việt Nam và mình chỉ nộp trên team1vn.xyz hay cần thêm Builder Hub ạ? Nếu đã có lịch công bố top 10 và địa điểm chung kết thì anh cho em xin thông tin để em sắp xếp ạ.
+
+## 7. Tin nhắn cho thành viên nhóm cũ
+
+Mẫu tự gửi, điều chỉnh đúng các phần được dùng và phạm vi chia sẻ repo:
+
+> Mình muốn phát triển thêm HomeStayDorm để thi UniHack solo. BTC đã cho phép dùng project cũ. Mình sẽ dùng lại các phần [liệt kê], thêm chức năng xác nhận bàn giao/đối soát trên Avalanche và demo/chia sẻ repo [public hay private cho giám khảo].
+>
+> Mình sẽ ghi đúng đóng góp của từng người và phần làm thêm. Các bạn có đồng ý cho mình sử dụng, chỉnh sửa và trình diễn các phần trên không? Nếu cần giới hạn phần nào thì nói giúp mình để thống nhất nhé.
+
+Đồng ý dùng cho cuộc thi không mặc nhiên là đồng ý cho mọi hình thức sử dụng về sau.
+
+## 8. Nghiệm thu và demo
+
+### Điều kiện hoàn thành bản thi
+
+- Một chi nhánh, ba vai trò quản lý–kế toán–khách; dữ liệu mẫu có thể khởi tạo lại.
+- Người thuê xác nhận trong app, không phải cài ví ngoài hoặc tự chuẩn bị gas; ví và phương thức khôi phục đã thử đúng với SDK lựa chọn.
+- Luồng bàn giao → đối soát v1 → phản đối → v2 → chấp nhận → kiểm chứng chạy trên Fuji.
+- Khách nhận bằng chứng ngay trong quá trình xác nhận, mở lại được dù không gọi API tài liệu của bên quản lý.
+- Contract verify được mã nguồn, địa chỉ/ABI/UI thống nhất; README hướng dẫn dựng và chạy bản demo.
+- UI thể hiện đúng khi người dùng từ chối, chữ ký hết hạn, relayer/chain/SQL lỗi. Không báo đã xác nhận chỉ vì người dùng đã bấm nút.
+
+### Các kiểm thử cần giữ/thêm khi triển khai
+
+- Quyền của cả ba vai trò, sai người ký, replay, hết hạn, sai loại hành động, sai chain/contract, sai phiên bản/hash, lý do phản đối bị thay.
+- Không bỏ test phân quyền đường giao dịch trực tiếp nếu vẫn giữ nó. Backend/nhân viên không thể tự xác nhận thay khách.
+- Hồ sơ trùng, hành động sai thứ tự, phiên bản đã chấp nhận không bị sửa. Không có chữ ký mới thì không tự chuyển sang “đã đồng ý”.
+- Hoàn/thu thêm/bằng 0; tổng từng khoản khớp tổng trừ; quy tắc làm tròn khớp calculator.
+- Tải bundle rồi sửa tài liệu, đổi một con số, thiếu ảnh/salt hoặc sai deployment: Verify chỉ ra không khớp/thiếu dữ liệu; không gọi API quản lý để lấy bản gốc.
+- Relayer gửi lặp, không đủ gas, timeout; chain thành công nhưng SQL chưa cập nhật: đọc lại receipt/event phục hồi đúng một lần.
+- Thử khóa ví/đăng nhập lại/khôi phục theo phương án chọn; không âm thầm gán địa chỉ mới làm chủ hồ sơ cũ.
+- Chỉ khi làm simulator mới thêm kiểm tra callback sai số tiền và callback gửi lặp.
+
+Đây là tiêu chí cần đạt cho phiên bản tiếp theo; kiểm thử local đã có không chứng minh các chức năng chưa viết.
+
+### Kịch bản demo 2–3 phút
+
+1. 0–30 giây: giới thiệu HomeStayDorm và vấn đề vết rách nệm bị tính phí dù đã có trước; thông báo Fuji, dữ liệu thử và phần mô phỏng nếu dùng.
+2. Mở bản bàn giao đã xác nhận và đã lưu vào máy khách: ghi nhận vết rách, cọc 3.000.000 VND giả lập, hợp đồng đủ hạn.
+3. Đối soát v1 trừ 500.000 VND khoản khác và 400.000 VND cho vết rách. Khách phản đối. Con người xem hồ sơ, kế toán lập v2 bỏ 400.000 VND; khách xem bản tiền hoàn 2.500.000 VND, lưu bản sao và bấm “Xác nhận đối soát”.
+4. Hiển thị app đã ghi nhận trên Avalanche. Dùng file khách giữ kiểm chứng; sửa một khoản để Verify báo lệch; mở explorer và source contract.
+5. Nói rõ: chain kiểm tra phiên bản và chữ ký, không xác định nệm có rách thật, không chuyển tiền hoàn hay thay hợp đồng thuê. Không kết luận hiệu lực pháp lý của chữ ký khi chưa được đánh giá.
+
+Cổng thanh toán mô phỏng chỉ xuất hiện thêm nếu hoàn thiện sớm; demo chính vẫn kết thúc trọn vẹn ở việc hai bên thống nhất và kiểm chứng đối soát. Nêu rõ ảnh/hồ sơ hay giao dịch nào đã chuẩn bị trước.
+
+## 9. Thứ tự thực hiện và mốc nội bộ
+
+Lịch dự kiến theo giờ Việt Nam, cần điều chỉnh theo kết quả thử nghiệm và hạn BTC xác nhận.
+
+| Mốc | Đầu ra |
+|---|---|
+| 04–06/11 | Chốt nguồn cọc và policy demo; thử SDK ví nhúng/ký EIP-712/khôi phục, phác relayer; kiểm tra truy cập RPC Fuji và nguồn gas thử. Chọn ví dựa vào kết quả thử, không chỉ README quảng cáo. |
+| 07–10/11 | Thu gọn contract, thêm chữ ký/nonce/hạn dùng, test quyền và replay; deploy + verify Fuji; một luồng xác nhận tối thiểu có bằng chứng xuất tại trình duyệt. |
+| 11–14/11 | Nối ba vai trò và SQL, xuất bộ bằng chứng đầy đủ, Verify, xử lý receipt/event và lỗi đồng bộ. |
+| 15–17/11 | Chạy end-to-end, phục hồi lỗi và hoàn thiện UI. Chỉ thêm simulator nhỏ nếu toàn bộ luồng chính đã đạt nghiệm thu. |
+| 18–19/11 | Đóng scope, kiểm tra setup từ đầu, README/ghi công, slide và video; đo giao dịch Fuji thực tế. |
+| 20/11 | Mục tiêu nội bộ hoàn tất nộp, nếu phù hợp hạn chính thức. Không coi 21/11 mặc nhiên là một ngày dự phòng trọn vẹn. |
+
+Nếu thử ví nhúng/relayer chưa đạt, ưu tiên sửa lát cắt nhỏ này và cắt simulator/point trước. Ví giao dịch trực tiếp trên Fuji có thể dùng kiểm thử nội bộ trong lúc phát triển, nhưng chưa đạt mục tiêu UX nộp bài. Không âm thầm coi fallback là chức năng đã hoàn thành.
+
+Các phụ thuộc còn lại: chốt nghiệp vụ cọc với Vy; quyền truy cập SQL/dữ liệu mẫu; chọn và cấu hình SDK ví; kết nối RPC/nguồn AVAX thử cho relayer/deploy. Không yêu cầu Vy gửi khóa bí mật qua chat.
+
+## 10. Nhật ký và quyết định so với bản Claude mới
+
+- 04/11: Vy xác nhận nền Web2 chạy tốt, gửi repo từ local và làm rõ mình thực hiện phần lớn; ghi nhận đóng góp còn lại từ thành viên nhóm.
+- 04/11: BTC xác nhận solo/dùng project cũ, README và hướng tích hợp phù hợp; các gợi ý ví/point/MoMo được ghi nhận là đề xuất.
+- 04/11: Đã có nền contract/adapter/Verify local. Đây chưa phải luồng hoàn chỉnh trên Fuji.
+- 04/11, bản hợp nhất: đưa ví trong app + app trả gas vào mục tiêu MVP. Thực hiện thử nghiệm sớm để chọn SDK và cách giữ/khôi phục khóa; không mặc định ví tự chế với PIN ngắn.
+- 04/11, bản hợp nhất: đưa việc tải bằng chứng vào chính bước xác nhận, tính hash từ nội dung hiển thị ở trình duyệt; xử lý trạng thái trước/sau receipt.
+- 04/11, bản hợp nhất: bỏ khai báo/xác nhận tiền và thời điểm báo trước khỏi scope on-chain MVP; giữ quy trình tiền ở Web2.
+- 04/11, bản hợp nhất: simulator thanh toán là tùy chọn sau nghiệm thu; chưa làm token point để tập trung một use case.
+- 04/11, bản hợp nhất: chưa ghi “BTC chấm toàn bộ sản phẩm” hoặc lịch workshop/office hours thành sự thật khi thiếu nguồn trực tiếp. Hai tiêu chí kỹ thuật/tích hợp vẫn được ưu tiên.

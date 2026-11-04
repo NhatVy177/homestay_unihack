@@ -5,8 +5,8 @@ require('dotenv').config();
 
 async function run() {
   const config = {
-    user: process.env.DB_USER || 'sa',
-    password: process.env.DB_PASS || '123',
+    user: process.env.DB_USER || 'thanh',
+    password: process.env.DB_PASS || '123456',
     server: process.env.DB_SERVER || 'localhost',
     port: parseInt(process.env.DB_PORT || '1433'),
     database: process.env.DB_NAME || 'HOMEDORM4',
@@ -20,7 +20,7 @@ async function run() {
     const pool = await sql.connect(config);
     console.log('Connected to SQL Server successfully.');
 
-    const sqlFilePath = path.join(__dirname, '../../Database/SP_NhanPhong/sp_ghi_nhan_khoan_thu_nhan_phong.sql');
+    const sqlFilePath = path.join(__dirname, '../../database/SP_NhanPhong/sql_data.sql');
     console.log('Reading SQL file:', sqlFilePath);
     const content = fs.readFileSync(sqlFilePath, 'utf8');
 
@@ -46,9 +46,9 @@ async function run() {
     }
 
     await pool.close();
-    console.log('Migration finished.');
+    console.log('Data import finished.');
   } catch (err) {
-    console.error('Migration failed:', err);
+    console.error('Data import failed:', err);
   }
 }
 

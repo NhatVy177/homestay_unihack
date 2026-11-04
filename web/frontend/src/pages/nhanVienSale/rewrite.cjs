@@ -1,5 +1,7 @@
 const fs = require('fs');
-const file = 'd:/NAM3/HomeStayDorm/Web/frontend/src/pages/nhanVienSale/NhanVienSalePage.jsx';
+const path = require('path');
+
+const file = path.join(__dirname, 'NhanVienSalePage.jsx');
 let content = fs.readFileSync(file, 'utf8');
 
 const registrationsSectionRegex = /\{activeView === 'registrations' && \([\s\S]*?\)\}\n\n\s*\{activeView === 'schedule' && \(/;

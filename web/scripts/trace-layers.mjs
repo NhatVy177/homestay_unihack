@@ -5,7 +5,7 @@
 //   GUI (api.js)  ->  BUS (route -> controller -> service)  ->  DAO (stored procedure)
 // Đồng thời báo SP nào đã được định nghĩa trong file .sql, SP nào CHƯA có.
 //
-// Cách dùng (chạy trong thư mục Web/):
+// Cách dùng (chạy trong thư mục web/):
 //   node scripts/trace-layers.mjs datCoc
 //   node scripts/trace-layers.mjs            (liệt kê các module có thể quét)
 // ============================================================
