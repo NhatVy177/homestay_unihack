@@ -254,3 +254,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: đọc `HopDongXacNhanSection.jsx` (`EmailCodeGate`, `accountEmail={user.email}`, tiếp tục `pending` khi signer `ready`), `AccountSignerProvider.jsx` (`sendCode`, `loginWithCode`), `avalanche.routes.js` (`walletAuth=email`) và `mailer.js` (redirect chỉ tại backend). Không bấm “Gửi mã” hay tạo chữ ký trong lượt này.
 - Còn lại/bước tiếp: Vy dùng đúng hộp thư của tài khoản khách để lấy OTP; nếu không có quyền truy cập hộp thư đó, cần chọn tài khoản test có email do Vy kiểm soát trước khi thử ký.
 - Git: commit/push riêng hồ sơ J-020 trên `main`.
+
+## 2026-11-06 02:16:09 +07:00 — J-021 — Làm rõ cách Claude thấy thay đổi của Codex
+
+- Người thực hiện: AI đang làm việc với Vy.
+- Trao đổi/yêu cầu: Vy hỏi những chỉnh sửa trong phiên Codex có được Claude đọc không.
+- Kết luận: Claude mở cùng thư mục `D:\HomeStayDorm` trên máy này sẽ đọc được trạng thái file hiện tại, kể cả `.env` local nếu có quyền truy cập filesystem. Claude làm trên máy/workspace khác chỉ thấy các commit đã push lên `NhatVy177/homestay_unihack` sau khi lấy bản mới của nhánh `main`; file `.env` bị Git bỏ qua nên không theo remote. Nội dung chat không tự chuyển giữa hai AI; `AGENTS.md` và các file `spec/` là hồ sơ bàn giao cần đọc.
+- Liên quan: quy trình phối hợp AI; không đổi quyết định, scope hoặc tiến độ tính năng.
+- File và nội dung: `spec/journal.md` — ghi giải thích; không sửa code, database hoặc `.env`.
+- Kiểm tra: `git status --short --branch` sạch trên `main`, remote đúng repo, các mục J-018 đến J-020 có commit, `git check-ignore` xác nhận `.env` local bị bỏ qua, `git ls-files` xác nhận `spec/journal.md` và `spec/progress.md` được theo dõi.
+- Còn lại/bước tiếp: khi chuyển sang Claude, Vy cho Claude biết đường dẫn repo hiện tại và đề nghị đọc `AGENTS.md`, `spec/README.md`, `spec/progress.md`, `spec/journal.md` trước khi làm tiếp.
+- Git: commit/push riêng hồ sơ J-021 trên `main`.
