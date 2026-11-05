@@ -144,3 +144,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Không thêm UNIQUE ở bảng `NguoiDung`: DB local đã có 1 email trùng giữa 2 tài khoản; nhiều SP của nhân viên (đặt cọc, khách mới, admin) cập nhật email khách và sẽ lỗi khó hiểu nếu có ràng buộc.
 - Kiểm tra: áp `SP_DangKy` vào DB local; thiếu email → 50001, sai định dạng (2 kiểu) → 50001, trùng → 50002, hợp lệ → tạo được (trong transaction đã rollback, không còn dữ liệu thử). `web/backend npm test` pass; frontend build qua. Chưa thử bằng giao diện.
 - Còn lại: Vy quyết có sửa 1 email trùng và 8 tài khoản thiếu email trong DB local không (không tự sửa). Các việc của J-009 vẫn giữ nguyên.
+
+## 2026-11-06 00:39:30 +07:00 — J-011 — Kiểm tra dữ liệu phòng trống và tài khoản nhân viên để test
+
+- Người thực hiện: AI đang làm việc với Vy.
+- Trao đổi/yêu cầu: Vy cần một phòng còn trống, chi nhánh tương ứng và tài khoản nhân viên cùng chi nhánh để thuận tiện kiểm thử luồng.
+- Kết luận: truy vấn đọc trực tiếp SQL Server local `HOMEDORM4` trên instance đang được backend cấu hình; cả ba chi nhánh hoạt động đều còn phòng/giường trống. Chọn `P407` thuộc `CN0001` làm dữ liệu test sạch: phòng 2 người, trạng thái phòng `Trống`, 2/2 giường `Trống`, không có tham chiếu nghiệp vụ cũ ngoài hai bản ghi giường. Các tài khoản nhân viên hoạt động của chi nhánh đã được đối chiếu trạng thái và mật khẩu test với hash trong DB; không ghi thông tin đăng nhập vào hồ sơ.
+- Liên quan: dữ liệu test local; không đổi scope, quyết định hay tiến độ tính năng.
+- File và nội dung: `spec/journal.md` — ghi lại yêu cầu và kết quả kiểm tra; không sửa code hoặc dữ liệu SQL Server, không ghi dữ liệu cá nhân hay bí mật.
+- Kiểm tra: truy vấn `Phong`/`Giuong`/`ChiNhanh`/`LoaiPhong`, tài khoản–nhân viên–chi nhánh và metadata khóa ngoại tham chiếu `Phong`; kết nối xác nhận đúng database `HOMEDORM4`. Toàn bộ truy vấn là đọc-only.
+- Còn lại/bước tiếp: Vy có thể dùng bộ `P407`/`CN0001` và các vai trò nhân viên cùng chi nhánh được báo trong trao đổi để test; trạng thái DB có thể đổi sau khi chạy luồng.
+- Git: sẽ commit/push riêng cập nhật hồ sơ J-011 trên `main` sau khi kiểm tra diff.
