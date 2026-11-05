@@ -221,3 +221,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: đọc cấu hình chỉ dưới dạng cờ boolean; xác nhận đúng SMTP host/user/redirect và có App Password, không in bí mật; gửi một email test, kết quả `sent`; PID `node index.js` thay đổi sau khi nạp lại, API `/api/avalanche/config` trả 200; `git status` chỉ theo dõi file hồ sơ sau dọn file tạm. Chưa kiểm tra giao hàng đến Inbox hoặc email biên bản thật.
 - Còn lại/bước tiếp: Vy xác nhận đã nhận thư thử; sau đó thử lập biên bản bằng dữ liệu test để xác minh template và đường dẫn thực tế nếu cần.
 - Git: commit/push riêng cập nhật hồ sơ J-017 trên `main`.
+
+## 2026-11-06 01:52:14 +07:00 — J-018 — Vy xác nhận đã nhận email SMTP test
+
+- Người thực hiện: AI đang làm việc với Vy.
+- Trao đổi/yêu cầu: Vy xác nhận đã nhận thư thử gửi qua cấu hình SMTP local.
+- Kết luận: cấu hình Gmail SMTP đã hoạt động đầu cuối cho email test với hộp thư redirect; kết quả gửi `sent` ở J-017 và Vy xác nhận nhận thư. Chưa suy ra luồng email biên bản qua giao diện đã được kiểm thử.
+- Liên quan: Q-08, T-11; không đổi scope hay quyết định.
+- File và nội dung: `spec/progress.md` — ghi SMTP local đã kiểm tra đủ gửi/nhận; `spec/journal.md` — ghi xác nhận từ Vy. Không sửa `.env`, code hay database.
+- Kiểm tra: kết quả send qua Gmail ở J-017 và phản hồi nhận thư từ Vy; không chạy thêm email hoặc luồng biên bản.
+- Còn lại/bước tiếp: khi kiểm thử tiếp luồng bàn giao, theo dõi email mời khách xác nhận và kết quả notification trong response; mọi mail demo tiếp tục được chuyển về hộp thư test.
+- Git: commit/push hồ sơ J-018 trên `main`.

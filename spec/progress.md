@@ -1,5 +1,9 @@
 # Tiến độ và điểm tiếp tục
 
+## Xác nhận hộp thư 2026-11-06 01:52:14 +07:00 (J-018)
+
+- Vy xác nhận đã nhận email test tại hộp thư redirect. Kết hợp kết quả `status: sent` ở J-017, cấu hình Gmail SMTP local đã hoạt động đầu cuối cho thư test. Luồng phát hành biên bản thật và trạng thái thông báo UI vẫn chưa được kiểm thử/sửa trong đợt này.
+
 ## Cập nhật SMTP local 2026-11-06 01:51:12 +07:00 (J-017)
 
 - Vy đã nhập App Password vào `web/backend/.env` (file local ngoài Git). Backend gửi email test qua Gmail SMTP trả `status: sent` và có message ID; mail được chuyển hướng tới hộp thư test, **chưa có xác nhận của Vy là đã thấy thư trong Inbox/Spam**.
