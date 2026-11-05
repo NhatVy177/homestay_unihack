@@ -188,3 +188,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: đối chiếu `web/backend/.env.example` và `integrations/mail/mailer.js`; kiểm tra tài liệu Gmail chính thức về `smtp.gmail.com`, TLS/STARTTLS cổng 587 và yêu cầu App Password khi dùng xác minh hai bước.
 - Còn lại/bước tiếp: Vy tự tạo App Password trong Google Account, điền bí mật trực tiếp vào `.env`, khởi động lại backend và gửi thử tới `MAIL_REDIRECT_TO`; sau khi xác nhận SMTP hoạt động mới kiểm thử bằng biên bản.
 - Git: sẽ commit/push riêng cập nhật hồ sơ J-014 trên `main` sau khi kiểm tra diff.
+
+## 2026-11-06 01:39:27 +07:00 — J-015 — Chuẩn bị Gmail SMTP trên máy local
+
+- Người thực hiện: AI đang làm việc với Vy.
+- Trao đổi/yêu cầu: Vy nhờ cấu hình SMTP; Vy chọn tài khoản Gmail cá nhân đang dùng cho repo làm người gửi/nhận thử và hỏi có cần tạo hộp thư HomeStayDorm riêng không.
+- Kết luận: hộp thư thật cần thiết nếu gửi email thật; có thể dùng tài khoản cá nhân cho test và đổi sang hộp thư dự án khi tạo sau. Đã cấu hình Gmail STARTTLS cổng 587 và chuyển hướng mọi email demo về đúng hộp thư test; chưa có App Password nên chưa gửi email thật.
+- Liên quan: Q-08, T-11; không đổi scope hay quyết định sản phẩm.
+- File và nội dung: `web/backend/.env` (local, Git bỏ qua) — thêm SMTP host/port/auth sender và redirect, chừa trống `SMTP_PASS` để Vy nhập trực tiếp; `spec/progress.md` — ghi trạng thái chờ bí mật; `spec/journal.md` — ghi đợt cấu hình và kiểm tra. Không ghi địa chỉ email cá nhân hoặc mật khẩu vào hồ sơ phiên.
+- Kiểm tra: `git status` trước sửa sạch trên `main`, remote đúng `NhatVy177/homestay_unihack`; TCP cổng 587 tới Gmail thông; nạp `.env` qua `dotenv` xác nhận mailer ở chế độ `smtp`, cổng 587, trường `SMTP_PASS` chưa có. Chưa thử xác thực hoặc gửi email.
+- Còn lại/bước tiếp: Vy bật xác minh 2 bước và tạo App Password; nhập trực tiếp vào `SMTP_PASS` trong `.env` rồi báo để AI gửi thư test tới hộp thư redirect và khởi động lại backend nếu đang chạy.
+- Git: chỉ commit/push hồ sơ `spec/` trên `main`, file `.env` không theo Git.

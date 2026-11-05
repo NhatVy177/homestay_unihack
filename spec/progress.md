@@ -1,5 +1,10 @@
 # Tiến độ và điểm tiếp tục
 
+## Cập nhật SMTP local 2026-11-06 01:39:27 +07:00 (J-015)
+
+- Đã điền cấu hình Gmail SMTP và chuyển mọi email demo về hộp thư test trong `web/backend/.env` (file local bị Git bỏ qua). Kết nối TCP tới `smtp.gmail.com:587` thành công; đọc cấu hình qua `dotenv` xác nhận mailer dùng chế độ `smtp`.
+- Chưa có `SMTP_PASS` (App Password); **chưa gửi/nhận email thật**. Vy sẽ tự nhập App Password vào file local và báo để kiểm tra kết nối/xác thực, gửi một thư test, rồi khởi động lại backend. Không đưa giá trị bí mật vào Git hoặc journal.
+
 Cập nhật quyết định nghiệp vụ: **2026-11-05 02:13:15 +07:00**. Đối chiếu code thực tế: **2026-11-05 14:43:07 +07:00** (J-006) — xem mục “Đính chính 14:43” ngay dưới; các dòng cũ bên dưới giữ làm lịch sử.
 
 ## Cập nhật 15:29 (J-007) — triển khai D-010 → D-013
