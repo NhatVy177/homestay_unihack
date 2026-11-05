@@ -51,7 +51,7 @@ Vy đã chốt: nhân viên dẫn sinh viên xem phòng và lập biên bản tr
 | T-09 | Hồ sơ nộp và demo | Chưa bắt đầu | README setup/ghi công, video 2–3 phút, slides, kiểm tra link; Q-06/Q-07. |
 | T-10 | Tổ chức module blockchain sau khi đọc Senpai | Hoàn thành | Khung root + integration client/server, private package chưa có dependencies; 34 link local, JSON, ignore rules và diff đã kiểm tra. Commit mang mã J-004. Không đồng nghĩa hoàn thành tính năng blockchain. |
 | T-12 | Cổng ví điện tử mô phỏng cho tiền cọc (D-013) | Đang làm: code + unit test + UI smoke qua (J-007) | Còn chạy thử với phiếu cọc thật qua HTTP; đặt `PAYMENT_SIM_SECRET`. |
-| T-13 | Cấu hình Privy JWT + thử khôi phục ví (D-011) | Chưa bắt đầu | Vy tạo Privy app, chạy `npm run privy:keygen`, dán public key; thử đăng nhập lại/đổi trình duyệt vẫn cùng ví. |
+| T-13 | Cấu hình Privy JWT + thử khôi phục ví (D-011) | Đang làm (J-008, 15:44): App ID đã xác minh với Privy (app “HomeStayDorm”), đã điền `.env` local, đã tạo khóa RS256 (`web/backend/secrets/`, ngoài Git), backend ký JWT verify được | Chờ Vy bật JWT-based auth + dán public key trên dashboard (`custom_jwt_auth` đang `false`); sau đó deploy local, bật `AVALANCHE_ENABLED` và thử đăng nhập lại/đổi trình duyệt vẫn cùng ví. |
 | T-11 | Nối bàn giao Web2 → email → chữ ký Avalanche theo D-009/D-010 | Đang làm: code + test local xong (J-007); chưa E2E HTTP/Privy/Fuji | Kiểm tra luồng nhân viên lập, khách xem/yêu cầu sửa/ký hoặc mở email sau; quyền, version, trạng thái thực tế vs điện tử, receipt và chống gửi trùng. |
 
 ## Kiểm thử: phân biệt nguồn kết quả

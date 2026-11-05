@@ -102,3 +102,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Chưa kiểm tra: Privy thật, SMTP thật, E2E HTTP lập biên bản → tự phát hành với DB thật, cổng mô phỏng với phiếu cọc thật, Fuji.
 - Còn lại: T-13 (Privy), E2E local, T-08 Fuji, T-09 hồ sơ nộp. Q-01/Q-08/Q-09 vẫn mở.
 - Git: commit mã J-007 trên main, không gồm file ngoài đợt này.
+
+## 2026-11-05 15:44:12 +07:00 — J-008 — Cấu hình Privy App ID và khóa JWT trên máy local
+
+- Người thực hiện: Claude theo yêu cầu Vy.
+- Trao đổi: Vy gửi một chuỗi `0x…` tưởng là App ID; Claude kiểm tra trên Fuji (chỉ đọc) thấy đó là địa chỉ ví thường, chưa có số dư/giao dịch, không phải App ID. Vy gửi ảnh App ID đúng của app Privy “HomeStayDorm”.
+- Kiểm tra: gọi endpoint công khai của Privy với App ID → HTTP 200, đúng app “HomeStayDorm”; cấu hình hiện tại `custom_jwt_auth=false` (chưa bật JWT-based auth), `allowed_domains` trống.
+- File/cấu hình (đều nằm ngoài Git, không ghi giá trị bí mật vào hồ sơ): `web/frontend/.env` đã có sẵn đúng `VITE_PRIVY_APP_ID`; nối thêm `PRIVY_APP_ID`, `PRIVY_JWT_PRIVATE_KEY_FILE` vào `web/backend/.env`; chạy `npm run privy:keygen` tạo `web/backend/secrets/privy-jwt-private.pem`. Trong repo chỉ sửa `spec/progress.md` (T-13) và mục này.
+- Kết quả: backend ký JWT RS256 (`sub`, `iss=homestaydorm`, `aud`=App ID, hạn 10 phút), chữ ký verify được bằng JWKS, JWKS không chứa phần khóa riêng.
+- Còn lại: Vy bật JWT-based auth trên dashboard và dán public key (claim `sub`); giữ App Secret ở nơi an toàn (code không dùng tới); sau đó deploy local + bật `AVALANCHE_ENABLED` để thử luồng ví thật.
