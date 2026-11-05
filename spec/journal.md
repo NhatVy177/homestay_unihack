@@ -265,3 +265,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: `git status --short --branch` sạch trên `main`, remote đúng repo, các mục J-018 đến J-020 có commit, `git check-ignore` xác nhận `.env` local bị bỏ qua, `git ls-files` xác nhận `spec/journal.md` và `spec/progress.md` được theo dõi.
 - Còn lại/bước tiếp: khi chuyển sang Claude, Vy cho Claude biết đường dẫn repo hiện tại và đề nghị đọc `AGENTS.md`, `spec/README.md`, `spec/progress.md`, `spec/journal.md` trước khi làm tiếp.
 - Git: commit/push riêng hồ sơ J-021 trên `main`.
+
+## 2026-11-06 02:19:01 +07:00 — J-022 — Đơn giản hóa màn khách sau xác nhận (D-017); đính chính giờ J-010
+
+- Người thực hiện: Claude theo yêu cầu Vy. Từ phiên này Claude chỉ lên plan/thảo luận và viết prompt; agent khác viết code.
+- Trao đổi: Vy gửi ảnh màn khách sau khi xác nhận biên bản trên chain local: hiện chính sách, “Tải bản lưu biên bản”, thông báo “Bản lưu đã được gửi qua email” và mục “Thông tin xác thực” với 2 mã giao dịch `0x…` dài, chữ “Fuji testnet”. Vy thấy không hợp lý cho khách. Claude ban đầu nói SMTP chưa cấu hình (sai: đã được cấu hình ở J-014–J-018, Claude kiểm tra `.env` trước lúc đó), sau đó đính chính. Vy chốt: khách chỉ cần biết đã được lưu → D-017.
+- Phát hiện từ code (chỉ đọc): `HopDongXacNhanSection.jsx` viết cứng câu “đã gửi qua email” và “Fuji testnet”; receipt không có thời điểm; tab quản lý/kế toán và trang kiểm chứng **chưa** hiện mã giao dịch (Claude đã nói nhầm là có, đính chính tại đây).
+- Bằng chứng mới: ảnh của Vy cho thấy khách nhập OTP Privy → xác nhận → có receipt `HandoverProposed` + `HandoverAccepted` trên chain local 31337 (T-14, T-16).
+- Đính chính giờ: lệnh `TZ=Asia/Saigon date` trong Git Bash trên máy này trả giờ UTC. Mốc J-010/D-016/T-15 “2026-11-05 17:31:24” thực tế là **2026-11-06 00:31:24 +07:00**; câu “đính chính” về J-009 trong J-010 là sai, giữ mốc J-009 23:50 như cũ. Lần sau lấy giờ bằng PowerShell `Get-Date`.
+- File: `spec/decisions.md` (D-017, ghi chú giờ D-016), `spec/scope.md` (F-10), `hackathon/plan.md`, `spec/progress.md` (T-16), mục này. Không sửa code.
+- Còn lại: Vy đưa prompt (trong chat) cho agent code; xem lại kết quả sau.
