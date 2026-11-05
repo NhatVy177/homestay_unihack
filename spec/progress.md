@@ -1,6 +1,13 @@
 # Tiến độ và điểm tiếp tục
 
-Cập nhật quyết định nghiệp vụ: **2026-11-05 02:13:15 +07:00**. Kết quả kiểm tra code ở dưới là snapshot Codex lúc 00:50, **chưa đối chiếu code local mới của Vy**.
+Cập nhật quyết định nghiệp vụ: **2026-11-05 02:13:15 +07:00**. Đối chiếu code thực tế: **2026-11-05 14:43:07 +07:00** (J-006) — xem mục “Đính chính 14:43” ngay dưới; các dòng cũ bên dưới giữ làm lịch sử.
+
+## Đính chính 14:43 (J-006) — code đã có trong repo
+
+- Commit `fadd0ec` (01:39, trên main/origin) **đã có** `blockchain/contracts/DormSettlement.sol` (EIP-712, nonce, deadline, ERC-1271 qua SignatureChecker, không giữ tiền, ghi chú “Adapted from 09f8270”), toolchain Hardhat 3 + solc 0.8.38 + viem, scripts compile/deploy local/Fuji, evidence/confirmation dùng chung; backend `integrations/avalanche/` (relayer ký sẵn raw tx lưu trước khi broadcast, đồng bộ receipt/event, CAS), route `/api/avalanche`, migration `database/migrations/20261105_avalanche.sql`; frontend Privy (`/ho-so-xac-nhan`) và trang Verify (`/kiem-chung-avalanche`).
+- Kiểm tra lúc 14:4x: `cd blockchain && npm test` → **11 pass, 0 fail, 1 skip** (test SQL Server bị skip vì không chạy với `.env`). Chưa chạy build frontend, chưa chạy với SQL Server/Privy thật, **chưa deploy/verify Fuji**.
+- Khoảng trống so với D-009 thấy khi đọc code: contract chỉ cho `proposeHandover` một lần/hồ sơ (không có phiên bản biên bản bàn giao hay hành động “yêu cầu chỉnh sửa”); chưa có email link; portal là trang riêng có đăng nhập Privy bằng email lần hai, nhân viên nhập tay mã biên bản/chính sách/ảnh; chưa nối vào màn hợp đồng hiện có. Các đề xuất xử lý ghi ở J-006, **chưa chốt**.
+- `hackathon/plan.md` đang có thay đổi chưa commit (xóa mục “Tổ chức code đã chọn sau khi đọc Senpai”), không do phiên J-006 tạo; chờ Vy xác nhận.
 
 ## Điểm đứng hiện tại
 
@@ -22,10 +29,10 @@ Vy đã chốt: nhân viên dẫn sinh viên xem phòng và lập biên bản tr
 |---|---|---|---|
 | T-01 | Chuẩn hóa cấu trúc và gom tài liệu | Hoàn thành | `40acf39`; database/web chữ thường, 5 file hackathon gồm handoff; origin repo mới. |
 | T-02 | Thiết lập sổ làm việc và chỉ dẫn AI | Hoàn thành | 5 file spec + AGENTS và chú thích nguồn; 31 link local hợp lệ, diff tài liệu qua. Commit chứa mã J-003; kiểm tra trạng thái đồng bộ qua Git. |
-| T-03 | Kiểm tra nền Avalanche cũ để tiếp nối | Chưa bắt đầu | Q-04; so diff/đường dẫn và scope trước khi nhập. Kết quả test cũ không thay test hiện tại. |
+| T-03 | Kiểm tra nền Avalanche cũ để tiếp nối | Đã được nhập/viết lại trong `fadd0ec` (theo ghi chú contract); chưa so diff với nhánh cũ — J-006 | Q-04; so diff/đường dẫn và scope trước khi nhập. Kết quả test cũ không thay test hiện tại. |
 | T-04 | Chốt nguồn cọc/policy và dữ liệu demo | Chưa bắt đầu | Q-01/Q-02/Q-05; đã đọc calculator local, chưa chốt ý nghĩa số cọc. |
-| T-05 | Thử ví → chữ ký → relayer → receipt | Chưa bắt đầu | F-01/F-05; giải quyết Q-03, có thử khôi phục ví. |
-| T-06 | Thu gọn contract và thêm xác nhận ký | Chưa bắt đầu | F-02/F-03/F-04/F-05; bỏ bước tiền/báo trước cũ, test quyền/replay/version/số học. |
+| T-05 | Thử ví → chữ ký → relayer → receipt | Đang làm: test local qua (J-006); chưa thử Privy thật/Fuji | F-01/F-05; Q-03 nghiêng về Privy theo code, chưa thử khôi phục ví thật. |
+| T-06 | Thu gọn contract và thêm xác nhận ký | Đang làm: contract + test local có trong `fadd0ec`; thiếu phiên bản biên bản bàn giao theo D-009 | F-02/F-03/F-04/F-05; bỏ bước tiền/báo trước cũ, test quyền/replay/version/số học. |
 | T-07 | Nối UI ba vai trò, SQL, evidence và Verify | Chưa bắt đầu | F-02/F-03/F-04/F-06/F-07/F-08; cần kiểm tra SQL và receipt/event phục hồi. |
 | T-08 | Deploy, verify source và nghiệm thu Fuji | Chưa bắt đầu | F-09; chưa có deployment/tx/source verification được xác minh trong repo mới. |
 | T-09 | Hồ sơ nộp và demo | Chưa bắt đầu | README setup/ghi công, video 2–3 phút, slides, kiểm tra link; Q-06/Q-07. |

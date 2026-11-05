@@ -68,3 +68,17 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: chỉ so nội dung tài liệu; chưa chạy build/test app hay Fuji. Chưa kiểm code local mà Codex vừa hoàn thành; phải đọc source và git status trước khi sửa.
 - Bước tiếp: Codex kiểm code thực tế, triển khai phần thiếu UI khách, email, phiên bản/phản hồi, chữ ký/receipt, test quyền và trạng thái; cập nhật nhật ký.
 - Git: thay đổi tài liệu trên main bằng một commit J-005; đối chiếu SHA commit với nhánh main sau push.
+
+## 2026-11-05 14:43:07 +07:00 — J-006 — Claude đọc dự án, đối chiếu code và đánh giá plan theo góp ý BTC
+
+- Người thực hiện: Claude (Claude Code) theo yêu cầu Vy.
+- Yêu cầu: đọc hackathon/ và spec/, đánh giá việc áp dụng Avalanche trong plan đã hợp lý chưa. Vy gửi 2 ảnh chat với BTC (05/11, ~13:42–13:50): solo/nhiều project/dùng project cũ OK; README cần setup + công nghệ; tham khảo repo Senpai; ví nên nhúng trong tài khoản, không MetaMask/Core; có thể tạo token demo, ví dụ point tích điểm/hoàn phí ra point đổi quà/giảm giá; Web2 nên hoàn thiện thêm thanh toán MoMo giả lập; BTC đánh giá toàn bộ sản phẩm, Web3 chỉ cần áp dụng vừa đủ, không làm ảnh hưởng UX Web2, “người dùng không biết đây là web3”. **Vy nói rõ đây là gợi ý của BTC, chưa chốt.**
+- Kiểm tra thực tế: main = origin, HEAD `e4b5d98`; commit `fadd0ec` đã có contract/relayer/Privy/Verify (progress.md cũ ghi chưa có — đã đính chính). `blockchain: npm test` → 11 pass, 1 skip (SQL), 0 fail. Chưa build frontend, chưa chạy SQL/Privy thật, chưa Fuji.
+- Đánh giá (đề xuất của Claude, **chưa chốt**):
+  - Use case bàn giao/đối soát cọc có phiên bản + Verify là phần Web3 có ý nghĩa, đúng quy tắc không giữ tiền/không PII; chất lượng kỹ thuật contract/relayer tốt.
+  - Lệch với góp ý UX của BTC: portal riêng, đăng nhập Privy bằng email lần hai, hiện địa chỉ ví/“liên kết ví”/tx hash, bắt buộc tải file + tick “đã lưu” trước khi ký, nhân viên nhập tay mã biên bản/chính sách/ảnh. Đề xuất: Privy custom auth dùng phiên HomeStayDorm (ví tạo ngầm), nút “Xác nhận biên bản” đặt trong màn hợp đồng có sẵn, chi tiết blockchain gom vào mục “Thông tin xác thực”, phát hành on-chain tự động từ thao tác Web2, gửi bằng chứng qua email sau receipt thay cho bước tick bắt buộc.
+  - Lệch giữa D-009 và contract: biên bản bàn giao không có phiên bản/yêu cầu sửa trên chain. Đề xuất: vòng yêu cầu chỉnh sửa làm ở Web2, chỉ bản cuối khách chấp nhận mới lên chain.
+  - Scope: còn ~16 ngày, ưu tiên nối UI vào luồng Web2, deploy + verify Fuji, README/video. MoMo giả lập có thể nâng lên việc nhỏ sau khi Fuji chạy (BTC chấm cả Web2). Token point: chưa nên làm trong MVP; nếu làm thì là ưu đãi riêng, không thay tiền cọc phải hoàn bằng point.
+- File và nội dung: `spec/progress.md` — thêm mục “Đính chính 14:43” (code đã có, kết quả test, khoảng trống D-009, plan.md có thay đổi chưa commit không do phiên này), sửa trạng thái T-03/T-05/T-06; `spec/journal.md` — mục này. Không sửa plan/scope/decisions vì chưa có quyết định mới.
+- Câu hỏi chờ Vy: (1) đưa vòng sửa biên bản về Web2? (2) dùng Privy custom auth bỏ đăng nhập lần hai? (3) MoMo giả lập vào scope chính hay giữ tùy chọn? (4) point bỏ hay dự phòng? (5) thay đổi chưa commit trong `hackathon/plan.md` có phải Vy chủ động xóa?
+- Git: commit chỉ gồm 2 file spec trên, mã J-006; không gom thay đổi `hackathon/plan.md`.
