@@ -243,3 +243,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: đọc `BanGiaoPhongTab.jsx` (hai ô kiểm, nút lưu và thông báo thành công), `nhanPhong.controller.js`, `avalanche/index.js`, `service.js`, `notifications.js`, `mailer.js`; kiểm tra cờ cấu hình local không in giá trị bí mật. Chưa bấm lưu biên bản hoặc gửi mail biên bản trong lượt này.
 - Còn lại/bước tiếp: Vy có thể thử bằng hồ sơ test; đối chiếu trạng thái `xacNhanDienTu.notification` và hộp thư redirect để xác nhận mail thực tế. Sửa thông báo UI nếu Vy yêu cầu.
 - Git: commit/push riêng hồ sơ J-019 trên `main`.
+
+## 2026-11-06 02:04:42 +07:00 — J-020 — Phân biệt OTP của Privy và mail thông báo biên bản
+
+- Người thực hiện: AI đang làm việc với Vy.
+- Trao đổi/yêu cầu: Vy gửi ảnh khung “Xác nhận email trước khi ký” và hỏi chỗ gửi mã sau khi đã cấu hình SMTP.
+- Kết luận: nút “Gửi mã” gọi `useLoginWithEmail().sendCode()` của Privy từ frontend; mã 6 số đi tới email của tài khoản khách đang hiển thị, không qua `web/backend/integrations/mail/mailer.js` hay Gmail SMTP của backend. `MAIL_REDIRECT_TO` chỉ ảnh hưởng mail thông báo/nhắc do backend gửi, không chuyển hướng OTP Privy. Sau khi khách nhập đúng mã, phiên Privy/ví nhúng được chuẩn bị và app tiếp tục thao tác xác nhận biên bản đã chọn; email OTP không tự ký. Người test phải truy cập được hộp thư của tài khoản khách đó; phiên mới/hết hạn có thể cần xác thực lại.
+- Liên quan: D-015, F-01, Q-08; không đổi scope hoặc quyết định.
+- File và nội dung: `spec/journal.md` — ghi giải thích; không sửa source, `.env` hoặc database. Không lưu địa chỉ email khách xuất hiện trên ảnh.
+- Kiểm tra: đọc `HopDongXacNhanSection.jsx` (`EmailCodeGate`, `accountEmail={user.email}`, tiếp tục `pending` khi signer `ready`), `AccountSignerProvider.jsx` (`sendCode`, `loginWithCode`), `avalanche.routes.js` (`walletAuth=email`) và `mailer.js` (redirect chỉ tại backend). Không bấm “Gửi mã” hay tạo chữ ký trong lượt này.
+- Còn lại/bước tiếp: Vy dùng đúng hộp thư của tài khoản khách để lấy OTP; nếu không có quyền truy cập hộp thư đó, cần chọn tài khoản test có email do Vy kiểm soát trước khi thử ký.
+- Git: commit/push riêng hồ sơ J-020 trên `main`.
