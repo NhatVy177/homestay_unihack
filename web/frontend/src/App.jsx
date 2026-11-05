@@ -18,6 +18,7 @@ import NhanVienKeToanPage from './pages/nhanVienKeToan/NhanVienKeToanPage.jsx';
 import AdminPage from './pages/admin/AdminPage.jsx';
 const AvalanchePortal = lazy(() => import('./pages/avalanche/AvalanchePortal.jsx'));
 const AvalancheVerifyPage = lazy(() => import('./pages/avalanche/AvalancheVerifyPage.jsx'));
+const ThanhToanMoPhongPage = lazy(() => import('./pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx'));
 
 function LoadingScreen() {
   return <div className="auth-loading">Đang kiểm tra phiên đăng nhập...</div>;
@@ -66,6 +67,7 @@ export default function App() {
       <Route path="/kham-pha-phong" element={<KhamPhaPhongPage />} />
       <Route path="/ho-so-xac-nhan" element={<ProtectedRoute><Suspense fallback={<LoadingScreen />}><AvalanchePortal /></Suspense></ProtectedRoute>} />
       <Route path="/kiem-chung-avalanche" element={<Suspense fallback={<LoadingScreen />}><AvalancheVerifyPage /></Suspense>} />
+      <Route path="/thanh-toan-mo-phong/:id" element={<ProtectedRoute><CustomerOnlyRoute><Suspense fallback={<LoadingScreen />}><ThanhToanMoPhongPage /></Suspense></CustomerOnlyRoute></ProtectedRoute>} />
 
       <Route
         path="/khach-hang"

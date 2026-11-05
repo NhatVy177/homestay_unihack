@@ -1,6 +1,6 @@
 # Phạm vi chức năng hiện hành
 
-Ghi nhận ban đầu: **2026-11-05 00:38:27 +07:00**; cập nhật nghiệp vụ **2026-11-05 02:13:15 +07:00** (D-009). Tóm tắt từ [plan](../hackathon/plan.md), mục 1, 3, 4 và 8; [handoff](../hackathon/handoff.md), mục 6–9. Trạng thái triển khai xem [progress.md](progress.md).
+Ghi nhận ban đầu: **2026-11-05 00:38:27 +07:00**; cập nhật nghiệp vụ **2026-11-05 02:13:15 +07:00** (D-009) và **2026-11-05 14:58:04 +07:00** (D-010 → D-014). Tóm tắt từ [plan](../hackathon/plan.md), mục 1, 3, 4 và 8; [handoff](../hackathon/handoff.md), mục 6–9. Trạng thái triển khai xem [progress.md](progress.md).
 
 ## Mục tiêu và người dùng
 
@@ -14,14 +14,16 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 
 | Mã | Chức năng / người thao tác | Điều kiện nghiệm thu |
 |---|---|---|
-| F-01 | Ví trong tài khoản — khách thuê | Khách thiết lập ví ngay trong app; liên kết tài khoản bằng phiên hợp lệ + challenge ký một lần; thử đăng nhập lại/khôi phục. Không gửi khóa khách cho backend; thay ví không đổi người ký hồ sơ cũ. SDK và loại ví chưa chọn. |
-| F-02 | Bàn giao trực tiếp + ký điện tử — nhân viên lập, sinh viên xác nhận | Nhân viên dẫn xem phòng, lập/phát hành bản bàn giao Web2; khách xem nội dung/ảnh/chính sách/cọc trong trang hợp đồng, yêu cầu chỉnh sửa hoặc tự ký phiên bản hiện hành. Nếu chưa ký tại chỗ: email link để đăng nhập ký sau. Không có ký giấy song song trong MVP; browser hash/ký đúng snapshot, chỉ receipt/event hợp lệ mới hoàn tất điện tử. |
+| F-01 | Ví trong tài khoản — khách thuê | (D-011) Privy embedded wallet theo **chính phiên đăng nhập HomeStayDorm** (JWT-based auth), không có đăng nhập thứ hai hay popup ví; liên kết tài khoản bằng challenge ký ngầm một lần; khôi phục = đăng nhập lại cùng tài khoản (cần thử thật). Không gửi khóa khách cho backend; thay ví không đổi người ký hồ sơ cũ. |
+| F-02 | Bàn giao trực tiếp + ký điện tử — nhân viên lập, sinh viên xác nhận | Nhân viên dẫn xem phòng, lập biên bản Web2 (không còn ô ký giấy) → hệ thống **tự phát hành** bản xem vào tab Hợp đồng của khách + email. Khách yêu cầu chỉnh sửa → quản lý phát hành bản mới (**ở Web2**, giữ lịch sử, D-010) hoặc khách xác nhận → backend ghi đúng bản đó lên chain rồi khách ký ngay; sau đó bản bị khóa. Email/link không là chữ ký; browser đối chiếu nội dung đang xem với snapshot; chỉ receipt/event hợp lệ mới hoàn tất điện tử. |
 | F-03 | Lập đối soát có phiên bản — kế toán | Snapshot khoản trừ, hoàn/thu thêm dựa trên calculator Web2; lưu phiên bản/hash và kiểm tra tổng, số học. Chốt nguồn cọc thực tế trước khi nối dữ liệu; không tự sao chép toàn bộ chính sách sang Solidity. |
 | F-04 | Phản đối → sửa → đồng ý — khách/kế toán | Phản đối ràng buộc đúng bản và hash lý do; con người xem xét, tạo v2 giữ v1; khách ký đúng bản hiện hành. Chặn sửa bản đã chấp nhận và hành động sai thứ tự/quyền. |
 | F-05 | App trả gas qua relayer | Chữ ký EIP-712 ràng buộc action, hồ sơ, version/hash, nonce, deadline và domain chain/contract. Kiểm tra EOA hoặc ERC-1271 theo ví đã chọn; chặn replay/sai signer. Relayer có quyền gửi, không ký thay khách; giới hạn yêu cầu/gas. |
-| F-06 | Xuất bộ bằng chứng tại bước ký | Có nội dung, salt, mã hồ sơ, version, commitment, chain ID, contract, manifest và bản gốc file cần đối chiếu. Bản trước receipt ghi chưa xác nhận; bản sau bổ sung tx/event. Không chỉ lưu URL đính kèm có thể hết hạn. |
+| F-06 | Bộ bằng chứng (bản lưu) | Có nội dung, salt, mã hồ sơ, version, commitment, chain ID, contract và bản gốc file cần đối chiếu; không chỉ lưu URL. (D-012) Không bắt tải + tick “đã lưu” trước khi ký; bản lưu tải được bất cứ lúc nào trong hồ sơ và được gửi kèm email sau receipt. |
 | F-07 | Verify độc lập — người giữ file | File + RPC đủ để kiểm tra, không xin lại tài liệu từ API quản lý. Dùng deployment đáng tin cậy để đối chiếu contract; chỉ rõ file bị sửa/thiếu, phiên bản cũ, trạng thái hiện tại và lỗi đọc RPC. |
 | F-08 | Đồng bộ chain – SQL và trạng thái UI | Chỉ thành công sau receipt + event đúng. Gửi lặp không tạo bản ghi trùng; chain thành công/SQL lỗi có cách đọc lại để phục hồi. Lưu chain ID, contract, tx hash, log index; phân biệt đang gửi/thất bại/đã ghi nhận. |
+| F-10 | Ẩn Web3 khỏi trải nghiệm (D-012) | Xác nhận nằm trong tab Hợp đồng của khách, tab “Khách xác nhận biên bản” (quản lý), “Khách xác nhận đối soát” (kế toán). Không hiện ví/địa chỉ/tx ngoài mục thu gọn “Thông tin xác thực”; dữ liệu cọc/chính sách/biên bản/đối soát lấy tự động từ Web2. Tính năng tắt → phần xác nhận tự ẩn, Web2 chạy bình thường. |
+| F-11 | Thanh toán cọc qua ví điện tử mô phỏng (D-013) | Tạo đơn → trang cổng ghi rõ mô phỏng → IPN ký HMAC; sai chữ ký/số tiền bị từ chối; IPN lặp/đồng thời chỉ xác nhận phiếu cọc một lần; tái dùng SP Web2. Không dùng thương hiệu/API thật, không nhận tiền thật. |
 | F-09 | Triển khai và demo Fuji | Contract deploy và verify source; ABI/address/UI thống nhất; chạy luồng đầy đủ ba vai trò, có tx thật, test phù hợp, README setup và bằng chứng demo. Local pass không thay thế nghiệm thu này. |
 
 
@@ -48,7 +50,8 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 ## Ngoài MVP và phần tùy chọn
 
 - Ngoài MVP: escrow/giữ hoặc chuyển tiền, NFT, token point, L1 riêng, AI phân xử; giao dịch riêng cho báo trả/thời gian báo trước; khai báo đã trả/đã nhận tiền on-chain.
-- Tùy chọn sau khi luồng chính đạt nghiệm thu: simulator thanh toán hoặc MoMo sandbox. Ghi rõ mô phỏng hay API sandbox thật; nếu làm, kiểm tra callback đúng tiền/trạng thái và chống trùng. Chưa có task triển khai bắt buộc.
+- ~~Tùy chọn sau khi luồng chính đạt nghiệm thu: simulator thanh toán hoặc MoMo sandbox.~~ **D-013:** simulator thanh toán cọc đã vào scope chính (F-11). MoMo sandbox thật vẫn ngoài scope.
+- Token point (D-014): dự phòng, chỉ cân nhắc sau khi luồng chính đạt nghiệm thu trên Fuji.
 - Không chuyển nền SQL Server sang Supabase trong đợt chuẩn bị này.
 
 ## Điều kiện xuyên suốt

@@ -19,7 +19,9 @@ HomeStayDorm/
 └─ run.ps1         # Chạy nhanh trên PowerShell
 ```
 
-Phần Avalanche có [khung module riêng](blockchain/README.md), chưa có contract/toolchain chạy được. Ví/ký sẽ nằm ở `web/frontend/src/lib/avalanche/`; adapter/relayer sẽ nằm ở `web/backend/integrations/avalanche/`. Hai app tiếp tục dùng các lệnh chạy hiện tại; trạng thái thực tế theo [spec/progress.md](spec/progress.md).
+Phần Avalanche nằm trong [module riêng](blockchain/README.md) (contract `DormSettlement`, Hardhat 3 + solc 0.8.38 + viem). Ví nhúng/ký ở `web/frontend/src/components/xacNhan/` và `web/frontend/src/lib/avalanche/`; relayer, đồng bộ và email ở `web/backend/integrations/avalanche/`. Trạng thái thực tế (đã test gì, chưa deploy Fuji) theo [spec/progress.md](spec/progress.md).
+
+**Công nghệ:** React 18 + Vite, Node.js 24 + Express, SQL Server; Avalanche Fuji C-Chain, Solidity 0.8.38, OpenZeppelin EIP-712, viem; Privy embedded wallet (JWT-based auth); nodemailer.
 
 ## Chạy local
 
@@ -51,6 +53,18 @@ npm run dev
 
 - Frontend: `http://localhost:5173`
 - Backend: `http://localhost:5000`
+
+## Xác nhận bàn giao/đối soát trên Avalanche và thanh toán mô phỏng
+
+Luồng (D-009 → D-013 trong [spec/decisions.md](spec/decisions.md)): quản lý lập biên bản bàn giao Web2 → hệ thống tự gửi bản xem vào tab **Hợp đồng** của khách (kèm email) → khách **xác nhận** hoặc **yêu cầu chỉnh sửa** → quản lý phát hành bản mới → chỉ bản khách xác nhận được ghi lên Avalanche, khách ký bằng ví nhúng trong tài khoản, ứng dụng trả phí gas. Kế toán gửi bảng đối soát cọc; khách đồng ý hoặc phản hồi; mọi phiên bản được giữ và tự kiểm chứng được tại `/kiem-chung-avalanche`. Khi chưa cấu hình, Web2 vẫn chạy bình thường và phần xác nhận tự ẩn.
+
+1. **CSDL** (chỉ thêm bảng, cập nhật SP lập biên bản để bỏ ký giấy): `cd web/backend && npm run avalanche:db:migrate`.
+2. **Contract**: `cd blockchain && npm install && npm test`. Local: `npm run chain` (cửa sổ riêng) rồi `npm run deploy:local`. Fuji: điền `blockchain/.env` theo `.env.example` rồi `node --env-file=.env scripts/deploy.mjs fuji` (sau `npm run compile`); verify source bằng `artifacts/standard-input.json`.
+3. **Backend** `web/backend/.env`: `AVALANCHE_ENABLED=true`, `AVALANCHE_CONTRACT_ADDRESS`, khóa thử của manager/accountant/relayer (chỉ trên server). Ví nhúng: `npm run privy:keygen`, dán public key in ra vào Privy Dashboard (JWT-based auth, claim `sub`), đặt `PRIVY_APP_ID`, `PRIVY_JWT_PRIVATE_KEY_FILE`. Email: không đặt `SMTP_HOST` thì chỉ in ra console; `MAIL_REDIRECT_TO` gom email demo về một hộp thư.
+4. **Frontend** `web/frontend/.env`: `VITE_PRIVY_APP_ID`, `VITE_AVALANCHE_CONTRACT_ADDRESS`, `VITE_AVALANCHE_CHAIN_ID`.
+5. **Thanh toán cọc bằng ví điện tử (mô phỏng)**: bật mặc định; đặt `PAYMENT_SIM_SECRET` (≥ 16 ký tự). Đây là cổng tự dựng để demo, không phải API của nhà cung cấp thật và không nhận tiền thật.
+
+Kiểm thử: `cd blockchain && npm test` (contract + luồng tích hợp trên chain local), `TEST_SQL=true npm run test:sql` (cần SQL Server), `cd web/backend && npm test`, `cd web/frontend && npm run build && npm run test:avalanche-ui`.
 
 ## Tài liệu UniHack
 

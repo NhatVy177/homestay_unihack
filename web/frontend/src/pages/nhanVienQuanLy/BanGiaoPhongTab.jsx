@@ -93,7 +93,7 @@ export default function BanGiaoPhongTab() {
   const [danhSachTaiSan, setDanhSachTaiSan] = useState([]);
   const [quanLyXacNhan, setQuanLyXacNhan] = useState(true);
   const [khachCoMat, setKhachCoMat] = useState(true);
-  const [daKyBienBan, setDaKyBienBan] = useState(true);
+  // D-009/D-012: không còn ô "khách đã ký giấy"; khách xác nhận điện tử trên tài khoản sau khi lưu.
   const [ghiChuChung, setGhiChuChung] = useState('');
   const [notice, setNotice] = useState(null);
   const [successDialog, setSuccessDialog] = useState(null);
@@ -114,10 +114,9 @@ export default function BanGiaoPhongTab() {
       && danhSachTaiSan.length > 0
       && quanLyXacNhan
       && khachCoMat
-      && daKyBienBan
       && !saving
     );
-  }, [daKyBienBan, dieuKien, danhSachTaiSan.length, hopDong, isReadOnlyHandover, khachCoMat, quanLyXacNhan, saving]);
+  }, [dieuKien, danhSachTaiSan.length, hopDong, isReadOnlyHandover, khachCoMat, quanLyXacNhan, saving]);
 
   const assetNoteCount = useMemo(() => {
     return danhSachTaiSan.filter((item) => (
@@ -202,11 +201,9 @@ export default function BanGiaoPhongTab() {
         : res.data.dieuKien);
       if (res.data.hopDong?.daCoBienBanBanGiaoVao) {
         setKhachCoMat(res.data.hopDong.khachCoMat ?? true);
-        setDaKyBienBan(res.data.hopDong.daKyBienBan ?? true);
         setGhiChuChung(res.data.hopDong.ghiChuChung || '');
       } else {
         setKhachCoMat(true);
-        setDaKyBienBan(true);
         setGhiChuChung('');
       }
       setDanhSachTaiSan((res.data.danhSachTaiSan || []).map((item) => ({
@@ -240,7 +237,6 @@ export default function BanGiaoPhongTab() {
     if (isFutureDate(hopDong?.ngayBatDau)) return getFutureStartMessage(hopDong.ngayBatDau);
     if (!quanLyXacNhan) return 'Quản lý cần xác nhận đã kiểm kê tài sản bàn giao.';
     if (!khachCoMat) return 'Khách hàng không có mặt tại thời điểm bàn giao.';
-    if (!daKyBienBan) return 'Khách hàng chưa ký xác nhận biên bản.';
 
     for (const item of danhSachTaiSan) {
       const actual = item.soLuongThucTe === '' ? null : Number(item.soLuongThucTe);
@@ -270,15 +266,20 @@ export default function BanGiaoPhongTab() {
       const res = await banGiaoPhongApi.lapBienBanBanGiao({
         maHopDong: hopDong.maHopDong,
         khachCoMat,
-        daKyBienBan,
         ghiChuChung,
         danhSachTaiSan
       });
       const ketQua = res.data.ketQua;
+      const xacNhan = res.data.xacNhanDienTu;
       setSuccessDialog({
         title: 'Lập biên bản thành công',
         message: `${res.data.thongBao || 'Đã lập biên bản bàn giao.'}${ketQua?.maBienBan ? ` Mã biên bản: ${ketQua.maBienBan}.` : ''}`,
-        maBienBan: ketQua?.maBienBan || res.data.maBienBan
+        maBienBan: ketQua?.maBienBan || res.data.maBienBan,
+        xacNhan: xacNhan?.status === 'published'
+          ? 'Đã gửi bản xem cho khách qua tài khoản và email. Khách có thể xác nhận ngay trên điện thoại hoặc yêu cầu chỉnh sửa; theo dõi ở tab "Khách xác nhận biên bản".'
+          : xacNhan?.status === 'failed'
+            ? `Chưa gửi được bản xem cho khách: ${xacNhan.message} Có thể gửi lại ở tab "Khách xác nhận biên bản".`
+            : null
       });
       setDanhSachChoBanGiao((items) => items.filter((item) => item.maHopDong !== hopDong.maHopDong));
       setMaHopDong('');
@@ -288,7 +289,6 @@ export default function BanGiaoPhongTab() {
       setGhiChuChung('');
       setQuanLyXacNhan(true);
       setKhachCoMat(true);
-      setDaKyBienBan(true);
     } catch (error) {
       setNotice({ type: 'error', title: 'Không lưu được biên bản', message: getErrorMessage(error, 'Có lỗi khi lập biên bản bàn giao.') });
     } finally {
@@ -304,7 +304,6 @@ export default function BanGiaoPhongTab() {
     setGhiChuChung('');
     setQuanLyXacNhan(true);
     setKhachCoMat(true);
-    setDaKyBienBan(true);
     setNotice(null);
     setSuccessDialog(null);
   };
@@ -377,6 +376,9 @@ export default function BanGiaoPhongTab() {
                 <div style={{ marginTop: '16px', padding: '12px 14px', backgroundColor: '#f6feff', border: '1px solid #86d3da', borderRadius: '6px', color: '#00666d', fontWeight: 700 }}>
                   Mã biên bản: {successDialog.maBienBan}
                 </div>
+              )}
+              {successDialog.xacNhan && (
+                <p style={{ margin: '14px 0 0', color: '#3f494a', fontSize: '14px', lineHeight: 1.6 }}>{successDialog.xacNhan}</p>
               )}
             </div>
             <div style={{ padding: '16px 24px', borderTop: '1px solid #e1e3e4', display: 'flex', justifyContent: 'flex-end' }}>
@@ -718,8 +720,8 @@ export default function BanGiaoPhongTab() {
                         <span style={{ color: khachCoMat ? '#15803d' : '#b93c00', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '13px', backgroundColor: khachCoMat ? '#e6f6ec' : '#fff0e6', padding: '6px 12px', borderRadius: '8px' }}>
                           <Icon name={khachCoMat ? "check" : "close"} style={{ fontSize: '16px' }} /> Khách hàng {khachCoMat ? "có mặt" : "vắng mặt"}
                         </span>
-                        <span style={{ color: daKyBienBan ? '#15803d' : '#b93c00', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '13px', backgroundColor: daKyBienBan ? '#e6f6ec' : '#fff0e6', padding: '6px 12px', borderRadius: '8px' }}>
-                          <Icon name={daKyBienBan ? "assignment_turned_in" : "close"} style={{ fontSize: '16px' }} /> {daKyBienBan ? "Đã ký biên bản" : "Chưa ký biên bản"}
+                        <span style={{ color: '#2f6765', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '13px', backgroundColor: '#eef6f6', padding: '6px 12px', borderRadius: '8px' }}>
+                          <Icon name="assignment_turned_in" style={{ fontSize: '16px' }} /> {hopDong?.daKyBienBan ? 'Đã ký giấy (biên bản trước khi có xác nhận điện tử)' : 'Khách xác nhận điện tử — xem tab "Khách xác nhận biên bản"'}
                         </span>
                       </div>
                     </div>
@@ -955,15 +957,10 @@ export default function BanGiaoPhongTab() {
                       />
                       <span style={{ fontSize: '14px', color: '#191c1d' }}>Khách hàng có mặt tại thời điểm bàn giao</span>
                     </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={daKyBienBan}
-                        onChange={(event) => setDaKyBienBan(event.target.checked)}
-                        style={{ width: '20px', height: '20px', accentColor: '#00666d' }}
-                      />
-                      <span style={{ fontSize: '14px', color: '#191c1d' }}>Khách hàng đã ký xác nhận biên bản</span>
-                    </label>
+                    <p style={{ margin: 0, fontSize: '13px', color: '#3f494a', lineHeight: 1.5 }}>
+                      Không cần ký giấy. Sau khi lưu, khách nhận biên bản trong tài khoản (kèm email) để tự xác nhận
+                      hoặc yêu cầu chỉnh sửa — có thể làm ngay tại phòng trên điện thoại hoặc sau đó.
+                    </p>
                   </div>
                 </div>
               </div>

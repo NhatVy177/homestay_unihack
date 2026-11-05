@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import '../khachHang/khachHangPortal.css'; // Reuse main layout styles
@@ -6,6 +6,7 @@ import './nhanVienKeToanPortal.css'; // Use specific styles for content
 import LapPhieuDatCocTab, { Icon } from './LapPhieuDatCocTab.jsx';
 import ThuNhanPhongTab from './ThuNhanPhongTab.jsx';
 import QuyetToanTraPhongTab from './QuyetToanTraPhongTab.jsx';
+const KeToanXacNhanTab = lazy(() => import('../../components/xacNhan/KeToanXacNhanTab.jsx'));
 
 function Brand() {
   return (
@@ -45,7 +46,8 @@ export default function NhanVienKeToanPage() {
     // DC03 - kế toán chỉ tính tiền & chốt; việc lập phiếu (phòng/hình thức/giường) là của Sale ở DC02B.
     { id: 'lap-phieu', label: 'Chốt phiếu đặt cọc', icon: 'calculate' },
     { id: 'thu-nhan-phong', label: 'Thu nhận phòng', icon: 'login' },
-    { id: 'quyet-toan', label: 'Quyết toán trả phòng', icon: 'account_balance_wallet' }
+    { id: 'quyet-toan', label: 'Quyết toán trả phòng', icon: 'account_balance_wallet' },
+    { id: 'xac-nhan-doi-soat', label: 'Khách xác nhận đối soát', icon: 'receipt_long' }
   ];
 
   return (
@@ -67,7 +69,6 @@ export default function NhanVienKeToanPage() {
             </button>
           ))}
         </nav>
-        <Link className="ktp-side-item" to="/ho-so-xac-nhan">Hồ sơ xác nhận bàn giao / đối soát</Link>
       </aside>
 
       <div className="kp-app">
@@ -119,7 +120,8 @@ export default function NhanVienKeToanPage() {
           {activeTab === 'lap-phieu' && <LapPhieuDatCocTab />}
           {activeTab === 'thu-nhan-phong' && <ThuNhanPhongTab />}
           {activeTab === 'quyet-toan' && <QuyetToanTraPhongTab />}
-          {(activeTab !== 'lap-phieu' && activeTab !== 'thu-nhan-phong' && activeTab !== 'quyet-toan') && (
+          {activeTab === 'xac-nhan-doi-soat' && <Suspense fallback={null}><KeToanXacNhanTab /></Suspense>}
+          {(activeTab !== 'lap-phieu' && activeTab !== 'thu-nhan-phong' && activeTab !== 'quyet-toan' && activeTab !== 'xac-nhan-doi-soat') && (
             <div className="ktp-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <h2 style={{ color: '#6f797a' }}>Đang phát triển chức năng: {navItems.find(i => i.id === activeTab)?.label}</h2>
             </div>

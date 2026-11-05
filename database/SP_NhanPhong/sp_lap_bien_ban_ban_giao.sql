@@ -748,18 +748,14 @@ BEGIN
     SET @MaLoi = 0;
     SET @ThongBao = N'';
 
-    -- Bước 2: Kiểm tra khách có mặt và ký biên bản
+    -- Bước 2: Kiểm tra khách có mặt.
+    -- D-009/D-012 (UniHack 2026): không còn ký giấy song song. Khách xác nhận điện tử
+    -- trên tài khoản sau khi biên bản được phát hành; @DaKyBienBan chỉ còn lưu lịch sử
+    -- (biên bản cũ = 1, biên bản mới = 0) và không chặn việc lập biên bản.
     IF ISNULL(@KhachCoMat, 0) = 0
     BEGIN
         SET @MaLoi = -8;
         SET @ThongBao = N'Khách hàng không có mặt tại thời điểm bàn giao.';
-        RETURN;
-    END;
-
-    IF ISNULL(@DaKyBienBan, 0) = 0
-    BEGIN
-        SET @MaLoi = -9;
-        SET @ThongBao = N'Khách hàng chưa ký xác nhận biên bản.';
         RETURN;
     END;
 

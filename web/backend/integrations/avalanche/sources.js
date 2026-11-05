@@ -6,29 +6,64 @@ function code(value) {
   return value;
 }
 const query = (text, id) => executeQuery(text, [{ name: 'id', type: sql.VarChar(6), value: code(id) }]);
+const money = value => {
+  const n = Number(value);
+  if (!Number.isSafeInteger(n) || n < 0) throw new Error('Các khoản VND phải là số nguyên không âm.');
+  return String(n);
+};
+// D-012: the policy shown to the tenant is generated from the refund rules already stored in Web2.
+export function policyText(rules) {
+  return ['Chính sách hoàn cọc HomeStayDorm áp dụng cho hợp đồng này:',
+    ...rules.map(r => `- ${r.TenQuyDinh}: hoàn ${Number(r.TyLeHoanCoc)}% tiền cọc.`),
+    '- Các khoản tiền thuê/dịch vụ còn nợ, chi phí sửa chữa hư hỏng do khách gây ra và tiền phạt (nếu có) được trừ vào tiền cọc khi đối soát trả phòng.',
+    '- Hư hỏng đã ghi trong biên bản bàn giao lúc nhận phòng không được tính cho khách khi trả phòng.'].join('\n');
+}
 export const sqlSources = {
   async handover(id) {
     const row = (await query(`SELECT h.MaHopDong AS contractId,h.MaKhachHang AS customerId,
-      n.MaChiNhanh AS branchId
+      n.MaChiNhanh AS branchId, c.SoTienCoc AS depositVnd
       FROM dbo.BienBanBanGiao b JOIN dbo.HopDongThue h ON h.MaHopDong=b.MaHopDong
       JOIN dbo.NhanVien n ON n.MaNhanVien=b.MaNhanVienQuanLy
-      WHERE b.MaBienBan=@id AND b.LoaiBanGiao=N'Bàn giao vào'`, id)).recordset[0];
+      LEFT JOIN dbo.PhieuDatCoc c ON c.MaPhieuDatCoc=h.MaPhieuCoc
+      WHERE b.MaBienBan=@id AND b.LoaiBanGiao=N'Bàn giao vào' AND b.TrangThai=N'Đã lập'`, id)).recordset[0];
     if (!row) return null;
     const detail = await layChiTietBienBanBanGiao(id);
-    return { ...row, notes: String(detail.bienBan?.GhiChuChung || ''), inventory: detail.taiSan.map(item => ({
-      item: String(item.TenTaiSan || item.MaTaiSan), quantity: Number(item.SoLuongThucTe),
-      condition: String(item.GhiChu || 'Không có ghi chú'),
-    })) };
+    const rules = (await executeQuery('SELECT TenQuyDinh,TyLeHoanCoc FROM dbo.QuyDinhHoanCoc ORDER BY MaQuyDinhHoanCoc')).recordset;
+    return {
+      contractId: row.contractId, customerId: row.customerId, branchId: row.branchId,
+      // Q-01 still open: SoTienCoc on the deposit slip is the amount recorded by Web2, shown to the tenant before confirming.
+      depositVnd: row.depositVnd == null ? null : money(row.depositVnd),
+      policy: policyText(rules),
+      notes: String(detail.bienBan?.GhiChuChung || ''),
+      inventory: detail.taiSan.map(item => ({
+        item: String(item.TenTaiSan || item.MaTaiSan), quantity: Number(item.SoLuongThucTe),
+        condition: String(item.GhiChu || 'Không có ghi chú'),
+      })),
+    };
+  },
+  async unpublishedHandovers(branchId) {
+    return (await query(`SELECT TOP (50) b.MaBienBan AS sourceId,b.MaHopDong AS contractId,b.NgayBanGiao AS handoverDate,nd.HoTen AS customerName
+      FROM dbo.BienBanBanGiao b JOIN dbo.HopDongThue h ON h.MaHopDong=b.MaHopDong
+      JOIN dbo.NhanVien n ON n.MaNhanVien=b.MaNhanVienQuanLy
+      JOIN dbo.NguoiDung nd ON nd.MaNguoiDung=h.MaKhachHang
+      WHERE n.MaChiNhanh=@id AND b.LoaiBanGiao=N'Bàn giao vào' AND b.TrangThai=N'Đã lập'
+        AND NOT EXISTS (SELECT 1 FROM dbo.AvalancheCase a WHERE a.ContractId=b.MaHopDong)
+      ORDER BY b.MaBienBan DESC`, branchId)).recordset;
+  },
+  async contact(customerId) {
+    const row = (await query('SELECT HoTen AS name,Email AS email FROM dbo.NguoiDung WHERE MaNguoiDung=@id', customerId)).recordset[0];
+    return row ? { name: row.name, email: row.email } : null;
+  },
+  async statements(contractId) {
+    return (await query(`SELECT d.MaDoiSoat AS sourceId,d.NgayLap AS createdAt,d.TrangThai AS status,
+      d.TongKhauTru AS deductionsVnd,d.SoTienHoanThucTe AS refundDueVnd,d.SoTienKhachPhaiTT AS topUpDueVnd
+      FROM dbo.DoiSoat d JOIN dbo.PhieuTraPhong p ON p.MaPhieuTra=d.MaPhieuTra
+      WHERE p.MaHopDong=@id ORDER BY d.MaDoiSoat DESC`, contractId)).recordset;
   },
   async statement(id, agreement, version) {
     const d = (await query(`SELECT d.*,p.MaHopDong AS contractId FROM dbo.DoiSoat d
       JOIN dbo.PhieuTraPhong p ON p.MaPhieuTra=d.MaPhieuTra WHERE d.MaDoiSoat=@id`, id)).recordset[0];
     if (!d || d.contractId !== agreement.contractId) return null;
-    const money = value => {
-      const n = Number(value);
-      if (!Number.isSafeInteger(n) || n < 0) throw new Error('Các khoản VND phải là số nguyên không âm.');
-      return String(n);
-    };
     // Snapshot saved Web2 result rather than recalculating policy independently.
     if (money(d.TienCocBanDau) !== agreement.depositHeldVnd) throw new Error('Cọc trên đối soát khác cọc hai bên đã xác nhận. Cần làm rõ cọc còn giữ trước khi phát hành.');
     const items = [

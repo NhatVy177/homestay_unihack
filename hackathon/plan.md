@@ -1,6 +1,6 @@
 # HomeStayDorm × Avalanche — Kế hoạch UniHack 2026
 
-Cập nhật: **2026-11-05 02:13:15 +07:00** (quy trình bàn giao D-009; trạng thái code xem spec/progress.md).
+Cập nhật: **2026-11-05 14:58:04 +07:00** (D-010 → D-014: vòng sửa biên bản ở Web2, ví nhúng theo phiên HomeStayDorm, ẩn Web3, cổng thanh toán mô phỏng, point dự phòng; trạng thái code xem spec/progress.md). Mốc trước: 02:13:15 (D-009).
 
 > Tiếp nối **2026-11-05 00:38:27 +07:00**: repo hiện hành là `NhatVy177/homestay_unihack` (`D:\HomeStayDorm`, main lúc kiểm tra), mốc nền `40acf39`. Dùng [spec/](../spec/README.md) để theo dõi chức năng, quyết định, nhật ký và tiến độ. Phần “đã có” bên dưới nói về nhánh Avalanche cũ ở homedorm; nền đó **chưa được nhập/xác minh lại trong repo mới**. Xem [progress.md](../spec/progress.md) trước khi triển khai. Phạm vi kỹ thuật của kế hoạch này giữ nguyên; spec là bản tóm tắt và hồ sơ thực hiện, không phải kế hoạch thay thế.
 
@@ -35,6 +35,7 @@ Mã nguồn: [NhatVy177/homedorm](https://github.com/NhatVy177/homedorm). Nền 
 - Contract hiện dùng quyền qua `msg.sender`; chưa có đường xác nhận EIP-712 qua relayer. Nó vẫn có bước báo trả và khai báo/xác nhận thanh toán. Bản triển khai tiếp theo cần thu gọn các bước này theo scope mới.
 - Chưa có ví nhúng, relayer, các nút xác nhận nối SQL, xuất bằng chứng trong luồng ký, deployment Fuji hoặc verify mã nguồn trên explorer.
 - Đổi plan không đồng nghĩa các phần trên đã được xây dựng hay kiểm thử.
+- **Cập nhật 05/11 (J-006/J-007):** repo hiện hành đã có contract EIP-712 + relayer + Privy (`fadd0ec`) và luồng D-010 → D-013 (J-007). Test local/SQL/UI ghi ở spec/journal.md; **chưa deploy/verify Fuji, chưa thử Privy thật**. Các gạch đầu dòng trên mô tả nhánh cũ.
 
 ## 2. Yêu cầu từ workshop và cách học từ Senpai
 
@@ -98,6 +99,14 @@ HomeStayDorm hướng tới **sinh viên có smartphone**. Giữ nhân viên d�
 5. **Hai trạng thái riêng:** (a) bàn giao thực tế/chìa khóa do nhân viên ghi nhận; (b) xác nhận điện tử chờ ký/đang gửi/lỗi/đã ký/yêu cầu sửa. Khách có thể đã nhận phòng thực tế nhưng biên bản vẫn chờ ký; không tự động coi đã đồng ý.
 6. **Khi mạng/Privy/chain lỗi:** giữ trạng thái chưa hoàn tất, cho mở lại link và ký lại có kiểm tra receipt/chống giao dịch trùng; không tự ký. **Không xây nhánh ký giấy song song trong MVP** và không thể ghi hash tài liệu bằng ví nhân viên rồi gọi là khách đã ký.
 
+**Bổ sung D-010/D-012 (05/11, 14:58):**
+
+- Lưu biên bản Web2 → hệ thống **tự phát hành** bản xem số 1 (tài sản, ghi chú, cọc theo phiếu đặt cọc, chính sách sinh từ `QuyDinhHoanCoc`) vào tab **Hợp đồng** của khách và gửi email. Nhân viên không nhập lại mã biên bản/chính sách/cọc. Ô “khách đã ký biên bản” (giấy) bị bỏ khỏi màn và SP lập biên bản.
+- **Yêu cầu chỉnh sửa → bản mới chạy hoàn toàn ở Web2**, lịch sử bản cũ giữ trong hồ sơ (SQL). Chưa có gì lên chain trong vòng này.
+- Khách bấm **Xác nhận biên bản**: backend ghi bản hiện hành lên chain (ví vận hành trả phí), trình duyệt đối chiếu nội dung đang xem với snapshot/commitment, khách ký ngầm bằng ví nhúng, relayer gửi. Từ lúc này biên bản bị khóa. Chỉ receipt/event đúng mới chuyển “Đã xác nhận”.
+- Biên bản lập trước khi bật tính năng (hoặc gửi tự động lỗi) có nút “Gửi khách xác nhận” trong tab **Khách xác nhận biên bản** của quản lý; tab này cũng xử lý yêu cầu sửa và gửi email nhắc (không tự nhắc theo giờ — Q-09).
+- Kế toán chọn bảng đối soát Web2 có sẵn trong tab **Khách xác nhận đối soát**, không gõ tay mã.
+
 **Web2 cần bổ sung, không xây lại toàn hệ thống:** giao diện khách xem/phản hồi/ký, giao diện nhân viên phát hành/sửa/theo dõi, API quyền truy cập theo hợp đồng và phiên bản, gửi email thông báo/nhắc; tái dùng dữ liệu bàn giao và màn hợp đồng hiện có. Không đưa email, ảnh, nội dung biên bản hoặc PII lên chain. Email provider và lịch nhắc chi tiết là Q-08/Q-09.
 
 Báo trả phòng vẫn có thể diễn ra trong Web2; MVP không yêu cầu giao dịch on-chain riêng cho thời điểm báo trước. Hoàn/thu thêm tiền nằm trong luồng thanh toán Web2; trạng thái “đã xác nhận đối soát” không có nghĩa “đã nhận tiền”.
@@ -113,6 +122,7 @@ Trạng thái xác nhận: chờ xác nhận bàn giao → đã xác nhận bàn
 - Khách xem và chủ động xác nhận từng bản; khóa khách không gửi cho backend ứng dụng. UX có thể dùng bước xác nhận trong app theo SDK, không hứa tuyệt đối không có màn xác nhận bảo mật.
 - Vai trò quản lý/kế toán có thể dùng khóa thử do dịch vụ vận hành giữ, với phân quyền và nhật ký thao tác rõ. Khóa relayer dùng trả gas không được quyền ký thay khách.
 - Thử một lát cắt nhỏ: tài khoản thử → ví nhúng → ký → relayer → contract → receipt. Chọn mô hình ví và khôi phục sau thử nghiệm này, trước khi làm nhiều màn hình.
+- **Đã chọn (D-011):** Privy embedded wallet với **JWT-based auth**: backend ký JWT RS256 ngắn hạn (`sub` = mã người dùng) cho khách; Privy tạo/mở ví theo chính tài khoản HomeStayDorm, không có màn đăng nhập thứ hai; liên kết ví bằng challenge ký ngầm một lần; tắt popup ví (`showWalletUIs: false`) vì app đã hiển thị nội dung và nút quyết định. Cần cấu hình public key trong Privy Dashboard và thử khôi phục ví thật trước khi demo.
 
 ### Quy tắc chữ ký và đồng bộ
 
@@ -127,7 +137,7 @@ Trạng thái xác nhận: chờ xác nhận bàn giao → đã xác nhận bàn
 
 1. Chuẩn hóa snapshot một lần: biên bản/chính sách/bảng tiền, mã hồ sơ, phiên bản và manifest tài liệu đính kèm. Giao diện hiển thị và chữ ký dùng cùng snapshot; không gửi một hash do backend tạo mà không tự đối chiếu nội dung.
 2. Trình duyệt tính hash và kiểm tra các số tiền, sau đó cho xuất bộ bằng chứng trước hoặc ngay tại bước xác nhận. Bao gồm nội dung, salt từng tài liệu, mã hồ sơ/phiên bản, chain ID, contract và commitment; ảnh/file cần có bản gốc kèm hash, không chỉ URL có thể hết hạn.
-3. Có bước lưu bản sao và xác nhận người dùng đã lưu. Trình duyệt không đảm bảo file thực sự được lưu lâu dài; không dùng việc tự tải file làm bằng chứng rằng khách đã giữ được nó.
+3. ~~Có bước lưu bản sao và xác nhận người dùng đã lưu.~~ **Thay bởi D-012:** không bắt tải file + tick “đã lưu” trước khi ký; bản lưu luôn tải được trong hồ sơ và được **gửi qua email sau receipt** (email là nơi khách giữ bản sao). Trình duyệt/email không đảm bảo file được giữ lâu dài; không coi việc gửi là bằng chứng khách đã giữ file.
 4. Sau receipt, bổ sung tx hash/sự kiện/trạng thái và cho tải bản hoàn chỉnh. Bản trước khi gửi phải ghi rõ chưa được chain xác nhận.
 5. Verify chạy với file khách giữ và RPC. Đổi nội dung làm hash lệch; bản cũ đã bị thay thế phải hiển thị đúng lịch sử, không báo như bản hiện hành.
 
@@ -139,6 +149,8 @@ Thông tin cư trú, CCCD, tài khoản ngân hàng, ảnh và nội dung chi ti
 - Simulator tự dựng phải được gọi rõ là mô phỏng, không phải API MoMo chính thức. Nếu chọn MoMo sandbox thật, kiểm tra tài liệu, tài khoản và API thu/hoàn riêng trước khi tích hợp.
 - Nếu làm callback mô phỏng, kiểm tra mã yêu cầu, số tiền, trạng thái và chống ghi nhận hai lần; tách rõ thu tiền và hoàn tiền. Không nhận tiền hoặc thông tin thanh toán thật cho demo.
 - Chưa thêm token loyalty. Nếu làm ở giai đoạn sau, điểm thưởng là ưu đãi riêng có quy tắc tích/đổi; không dùng point thay khoản tiền cọc phải hoàn.
+- **D-013 (05/11):** cổng **ví điện tử mô phỏng** thuộc scope chính, làm nhỏ cho **thanh toán cọc**: khách chọn “Ví điện tử (mô phỏng)” → tạo đơn (`PaymentSimOrder`) → trang `/thanh-toan-mo-phong/:id` ghi rõ “MÔI TRƯỜNG MÔ PHỎNG” → IPN ký HMAC (kiểm tra chữ ký, số tiền, claim nguyên tử chống ghi nhận hai lần) → tái dùng `SP_CapNhatMinhChungThanhToanCoc` + `SP_XacNhanThanhToanCoc` để tự xác nhận phiếu cọc. Không dùng tên/logo/API của nhà cung cấp thật.
+- **D-014:** token point là dự phòng sau khi luồng chính đạt nghiệm thu trên Fuji.
 
 ## 4. Chính sách cọc và giới hạn contract
 

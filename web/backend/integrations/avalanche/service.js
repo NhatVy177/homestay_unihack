@@ -6,14 +6,25 @@ const hash = () => '0x' + randomBytes(32).toString('hex');
 const fail = (message, statusCode = 400) => { throw Object.assign(new Error(message), { statusCode }); };
 const clone = value => structuredClone(value);
 const document = payload => ({ payload, salt: hash() });
+const text = (value, max, label) => {
+  const s = String(value ?? '').trim();
+  if (s.length > max) fail(`${label} tối đa ${max} ký tự.`);
+  return s;
+};
 export function publicCase(record) {
   const copy = clone(record);
   if (copy.pending) copy.pending = { hash: copy.pending.hash, event: copy.pending.event };
   return copy;
 }
+export const currentDraft = c => c.drafts[c.drafts.length - 1];
+/**
+ * D-010: the handover is reviewed and revised in Web2 (drafts kept in SQL); only the revision the
+ * tenant confirms is proposed on-chain, immediately before the tenant signs it.
+ * D-012: emails only notify; they never change state or stand in for the tenant's signature.
+ */
 export class AvalancheService {
-  constructor({ store, sources, chain, origin, clock = () => Date.now() }) {
-    Object.assign(this, { store, sources, chain, origin, clock });
+  constructor({ store, sources, chain, origin, notify = async () => ({ status: 'skipped' }), clock = () => Date.now() }) {
+    Object.assign(this, { store, sources, chain, origin, notify, clock });
     this.tail = Promise.resolve();
   }
   // One worker per deployment: serializes operator nonces and case writes.
@@ -22,8 +33,12 @@ export class AvalancheService {
     this.tail = next.catch(() => {});
     return next;
   }
+  now() { return new Date(this.clock()).toISOString(); }
   staff(user, role) {
     if (user.vaiTro !== 'NhanVien' || user.chucVu !== role || !user.maChiNhanh) fail('Bạn không có quyền thực hiện thao tác này.', 403);
+  }
+  owner(user, c) {
+    if (user.vaiTro !== 'KhachHang' || user.maNguoiDung !== c.customerId) fail('Chỉ khách thuê của hợp đồng được thực hiện thao tác này.', 403);
   }
   async accessible(user, id) {
     const c = await this.store.getCase(id);
@@ -57,40 +72,90 @@ export class AvalancheService {
     await this.store.link(c);
     return { address: c.address };
   }
-  async create(user, input) {
+  async unpublished(user) {
+    this.staff(user, 'Quản lý');
+    return this.sources.unpublishedHandovers ? this.sources.unpublishedHandovers(user.maChiNhanh) : [];
+  }
+  /** Called automatically after the manager records the Web2 handover (and manually for older records). */
+  async publish(user, sourceId, input = {}) {
     return this.exclusive(async () => {
       this.staff(user, 'Quản lý');
-      const source = await this.sources.handover(input.sourceId);
+      const source = await this.sources.handover(sourceId);
       if (!source || source.branchId !== user.maChiNhanh) fail('Không tìm thấy biên bản trong chi nhánh.', 404);
-      const tenant = await this.store.getWallet(source.customerId);
-      if (!tenant) fail('Khách cần thiết lập xác nhận trong tài khoản trước.');
-      if (input.depositConfirmed !== true || !/^(0|[1-9][0-9]*)$/.test(input.depositHeldVnd || '') || BigInt(input.depositHeldVnd) > BigInt(Number.MAX_SAFE_INTEGER)) fail('Cần xác nhận cọc thực tế còn giữ (VND nguyên).');
-      const policy = String(input.policy || '').trim();
-      if (!policy || policy.length > 8000) fail('Cần nội dung chính sách đầu kỳ, tối đa 8000 ký tự.');
-      const attachments = validateAttachments(input.attachments || []);
+      if (!/^(0|[1-9][0-9]*)$/.test(source.depositVnd || '') || BigInt(source.depositVnd) > BigInt(Number.MAX_SAFE_INTEGER)) fail('Chưa xác định được tiền cọc của hợp đồng trong hệ thống.', 409);
+      if (!String(source.policy || '').trim()) fail('Chưa có chính sách hoàn cọc trong hệ thống.', 409);
       const id = hash();
-      const docs = {
-        policy: document({ schema: 'homestaydorm.policy.v1', text: policy }),
-        handover: document({
-          schema: 'homestaydorm.handover.v1', agreementId: id, tenant,
-          depositHeldVnd: input.depositHeldVnd, inventory: source.inventory, notes: source.notes || '', attachments,
-        }),
-      };
-      let c = await this.store.saveCase({
-        id, contractId: source.contractId, customerId: source.customerId, branchId: source.branchId,
-        sourceId: input.sourceId, depositHeldVnd: input.depositHeldVnd, tenant,
-        deployment: this.chain.deployment, handover: createEvidence(this.chain.deployment, 'handover', id, docs),
-        versions: [], state: 'draft', receipts: [],
-      });
-      return publicCase(await this.publishHandover(c));
+      let c;
+      try {
+        c = await this.store.saveCase({
+          id, contractId: source.contractId, customerId: source.customerId, branchId: source.branchId,
+          sourceId, depositHeldVnd: source.depositVnd, deployment: this.chain.deployment,
+          drafts: [this.draft(id, 1, source.depositVnd, source.policy, {
+            inventory: source.inventory, notes: source.notes || '', attachments: validateAttachments(input.attachments || []),
+          }, user)],
+          handover: null, tenant: null, state: 'review', versions: [], receipts: [], notifications: [],
+        });
+      } catch (error) {
+        if (/duplicate|unique/i.test(error.message)) fail('Hợp đồng này đã có hồ sơ xác nhận.', 409);
+        throw error;
+      }
+      c = await this.notified(c, 'handover-published');
+      return publicCase(c);
     });
   }
-  async publishHandover(c) {
-    const docs = c.handover.documents;
-    return this.submit(c, 'manager', 'proposeHandover', [
-      c.id, c.tenant, BigInt(c.depositHeldVnd), documentHash(docs.policy.payload, docs.policy.salt),
-      documentHash(docs.handover.payload, docs.handover.salt),
-    ], 'HandoverProposed', { agreementId: c.id, tenant: c.tenant }, { type: 'handover' });
+  draft(id, revision, depositHeldVnd, policyText, content, user) {
+    return {
+      revision, publishedAt: this.now(), publishedBy: user.maNguoiDung, changeRequest: null, resolution: null,
+      policy: document({ schema: 'homestaydorm.policy.v1', text: policyText }),
+      handover: document({ schema: 'homestaydorm.handover.v1', agreementId: id, revision, depositHeldVnd, ...content }),
+    };
+  }
+  async requestChange(user, id, reason) {
+    return this.exclusive(async () => {
+      const c = await this.accessible(user, id);
+      this.owner(user, c);
+      if (c.state !== 'review') fail('Biên bản không còn ở bước chờ bạn xem.', 409);
+      reason = text(reason, 2000, 'Nội dung cần chỉnh sửa');
+      if (!reason) fail('Hãy ghi rõ nội dung cần chỉnh sửa.');
+      currentDraft(c).changeRequest = { reason, at: this.now() };
+      return publicCase(await this.store.saveCase({ ...c, state: 'change-requested' }, c.revision));
+    });
+  }
+  async revise(user, id, input = {}) {
+    return this.exclusive(async () => {
+      this.staff(user, 'Quản lý');
+      let c = await this.accessible(user, id);
+      if (!['review', 'change-requested'].includes(c.state) || c.pending || c.handover) fail('Biên bản đã được khách xác nhận hoặc đang ghi nhận; không sửa được.', 409);
+      const previous = currentDraft(c), payload = previous.handover.payload;
+      const resolution = text(input.resolution, 1000, 'Nội dung đã điều chỉnh');
+      if (!resolution) fail('Hãy ghi lại nội dung đã điều chỉnh để khách xem.');
+      const inventory = input.inventory === undefined ? payload.inventory : validateInventory(input.inventory);
+      const notes = input.notes === undefined ? payload.notes : text(input.notes, 2000, 'Ghi chú chung');
+      const attachments = input.attachments === undefined ? payload.attachments : validateAttachments(input.attachments);
+      const next = this.draft(c.id, previous.revision + 1, c.depositHeldVnd, previous.policy.payload.text, { inventory, notes, attachments }, user);
+      next.resolution = resolution;
+      c = await this.store.saveCase({ ...c, drafts: [...c.drafts, next], state: 'review' }, c.revision);
+      return publicCase(await this.notified(c, 'handover-revised'));
+    });
+  }
+  async remind(user, id) {
+    this.staff(user, 'Quản lý');
+    const c = await this.accessible(user, id);
+    if (!['review', 'handover-pending', 'settlement-pending'].includes(c.state)) fail('Hồ sơ không ở bước chờ khách xác nhận.', 409);
+    return publicCase(await this.exclusive(async () => this.notified(await this.store.getCase(id), 'reminder')));
+  }
+  async notified(c, kind) {
+    let result;
+    try { result = await this.notify(kind, c); } catch (error) { result = { status: 'failed', error: String(error.message || error).slice(0, 200) }; }
+    const entry = { kind, at: this.now(), status: result?.status || 'skipped' };
+    try { return await this.store.saveCase({ ...c, notifications: [...(c.notifications || []), entry] }, c.revision); }
+    catch { return c; }
+  }
+  async statements(user, id) {
+    this.staff(user, 'Kế toán');
+    const c = await this.accessible(user, id);
+    const used = new Set(c.versions.map(v => v.sourceId));
+    return (await this.sources.statements(c.contractId)).map(s => ({ ...s, published: used.has(s.sourceId) }));
   }
   async propose(user, id, sourceId) {
     return this.exclusive(async () => {
@@ -104,51 +169,70 @@ export class AvalancheService {
       if (!payload) fail('Đối soát không thuộc hợp đồng này.', 404);
       validateStatement(payload);
       const bundle = createEvidence(c.deployment, 'settlement', id, { statement: document(payload) }, version);
-      return publicCase(await this.submit(c, 'accountant', 'proposeSettlement',
+      c = await this.submit(c, 'accountant', 'proposeSettlement',
         [id, BigInt(payload.deductionsVnd), documentHash(payload, bundle.documents.statement.salt)],
-        'SettlementProposed', { agreementId: id, version }, { type: 'settlement', bundle, sourceId }));
+        'SettlementProposed', { agreementId: id, version }, { type: 'settlement', bundle, sourceId });
+      return publicCase(await this.notified(c, 'settlement-published'));
     });
   }
-  async prepare(user, id, action, reason) {
-    let c = await this.accessible(user, id);
-    if (user.vaiTro !== 'KhachHang' || user.maNguoiDung !== c.customerId) fail('Chỉ khách của hồ sơ được ký.', 403);
-    if (c.pending) fail('Giao dịch trước đang chờ đồng bộ.', 409);
-    const a = await this.chain.read('getAgreement', [id]);
-    const version = action === 1 ? 0 : a.latestVersion;
-    if (action === 1 ? a.status !== 1 : ![2, 3].includes(action) || a.status !== 3) fail('Hành động không phù hợp trạng thái.', 409);
-    const bundle = action === 1 ? c.handover : c.versions.find(v => v.bundle.version === version)?.bundle;
-    if (!bundle) fail('Thiếu snapshot bằng chứng.', 409);
-    const commitment = action === 1 ? a.handoverCommitment : (await this.chain.read('getSettlement', [id, version])).commitment;
-    let dispute;
-    if (action === 3) {
-      if (!String(reason || '').trim() || String(reason).length > 2000) fail('Cần lý do phản đối (tối đa 2000 ký tự).');
-      dispute = document({ reason: String(reason).trim() });
-    }
-    return {
-      bundle, dispute, typedData: confirmationData(c.deployment, {
-        action, agreementId: id, version, commitment,
-        reasonHash: dispute ? documentHash(dispute.payload, dispute.salt) : zeroHash,
-        nonce: (await this.chain.read('nonces', [c.tenant])).toString(),
-        deadline: String(Math.floor(this.clock() / 1000) + 600),
-      }),
-    };
+  /** Proposes the reviewed revision on-chain (operator pays gas), then returns typed data for the tenant. */
+  async proposeReviewed(c, revision) {
+    const draft = currentDraft(c);
+    if (revision !== undefined && Number(revision) !== draft.revision) fail('Biên bản vừa được cập nhật. Hãy xem lại bản mới nhất.', 409);
+    const tenant = await this.store.getWallet(c.customerId);
+    if (!tenant) fail('Tài khoản đang được thiết lập xác nhận. Vui lòng thử lại sau giây lát.', 409);
+    const handover = { payload: { ...draft.handover.payload, tenant }, salt: draft.handover.salt };
+    const bundle = createEvidence(c.deployment, 'handover', c.id, { policy: draft.policy, handover }, undefined);
+    c = { ...c, tenant, handover: { ...bundle, revision: draft.revision } };
+    return this.submit(c, 'manager', 'proposeHandover', [
+      c.id, tenant, BigInt(c.depositHeldVnd), documentHash(draft.policy.payload, draft.policy.salt), documentHash(handover.payload, handover.salt),
+    ], 'HandoverProposed', { agreementId: c.id, tenant }, { type: 'handover' });
+  }
+  async prepare(user, id, action, reason, revision) {
+    return this.exclusive(async () => {
+      let c = await this.accessible(user, id);
+      this.owner(user, c);
+      if (c.pending) c = await this.syncRecord(c);
+      if (action === 1 && c.state === 'change-requested') fail('Bạn đã yêu cầu chỉnh sửa. Vui lòng chờ quản lý phát hành bản mới.', 409);
+      if (action === 1 && c.state === 'review') c = await this.proposeReviewed(c, revision);
+      if (action === 1 && revision !== undefined && Number(revision) !== c.handover?.revision) fail('Biên bản vừa được cập nhật. Hãy xem lại bản mới nhất.', 409);
+      const a = await this.chain.read('getAgreement', [id]);
+      const version = action === 1 ? 0 : a.latestVersion;
+      if (action === 1 ? a.status !== 1 : ![2, 3].includes(action) || a.status !== 3) fail('Hành động không phù hợp trạng thái.', 409);
+      const bundle = action === 1 ? c.handover : c.versions.find(v => v.bundle.version === version)?.bundle;
+      if (!bundle) fail('Thiếu snapshot bằng chứng.', 409);
+      const commitment = action === 1 ? a.handoverCommitment : (await this.chain.read('getSettlement', [id, version])).commitment;
+      let dispute;
+      if (action === 3) {
+        if (!String(reason || '').trim() || String(reason).length > 2000) fail('Cần lý do phản đối (tối đa 2000 ký tự).');
+        dispute = document({ reason: String(reason).trim() });
+      }
+      return {
+        bundle, dispute, typedData: confirmationData(c.deployment, {
+          action, agreementId: id, version, commitment,
+          reasonHash: dispute ? documentHash(dispute.payload, dispute.salt) : zeroHash,
+          nonce: (await this.chain.read('nonces', [c.tenant])).toString(),
+          deadline: String(Math.floor(this.clock() / 1000) + 600),
+        }),
+      };
+    });
   }
   async confirm(user, id, request) {
     return this.exclusive(async () => {
-      const c = await this.accessible(user, id);
-      if (user.vaiTro !== 'KhachHang' || c.customerId !== user.maNguoiDung) fail('Chỉ khách của hồ sơ được xác nhận.', 403);
+      let c = await this.accessible(user, id);
+      this.owner(user, c);
       if (c.pending) fail('Đang có giao dịch chờ. Hãy đồng bộ lại.', 409);
       const m = request.message;
       if (!m || m.agreementId !== id || ![1, 2, 3].includes(m.action)) fail('Dữ liệu xác nhận không hợp lệ.');
-      if (request.savedCopy !== true) fail('Hãy lưu và xác nhận đã giữ bản sao trước khi ký.');
       if (m.action === 3 && documentHash(request.dispute?.payload, request.dispute?.salt) !== m.reasonHash) fail('Lý do phản đối không khớp chữ ký.');
       const typed = confirmationData(c.deployment, m);
       if (!await this.chain.publicClient.verifyTypedData({ address: c.tenant, ...typed, signature: request.signature })) fail('Chữ ký không thuộc khách của hồ sơ.');
       const names = { 1: 'HandoverAccepted', 2: 'SettlementAccepted', 3: 'SettlementDisputed' };
       const eventArgs = { agreementId: id, ...(m.action === 1 ? { tenant: c.tenant, commitment: m.commitment } :
         { version: m.version, ...(m.action === 2 ? { commitment: m.commitment } : { reasonHash: m.reasonHash }) }) };
-      return publicCase(await this.submit(c, 'relayer', 'confirm', [m, request.signature], names[m.action], eventArgs,
-        { type: 'confirmation', action: m.action, version: m.version, dispute: request.dispute || null }));
+      c = await this.submit(c, 'relayer', 'confirm', [m, request.signature], names[m.action], eventArgs,
+        { type: 'confirmation', action: m.action, version: m.version, dispute: request.dispute || null });
+      return publicCase(await this.notified(c, { 1: 'handover-confirmed', 2: 'settlement-confirmed', 3: 'settlement-disputed' }[m.action]));
     });
   }
   async submit(c, role, name, args, event, eventArgs, effect) {
@@ -160,18 +244,14 @@ export class AvalancheService {
     return this.syncRecord(c);
   }
   async sync(user, id) {
-    return this.exclusive(async () => {
-      let c = await this.accessible(user, id);
-      if (c.state === 'draft' && !c.pending) { this.staff(user, 'Quản lý'); c = await this.publishHandover(c); }
-      else c = await this.syncRecord(c);
-      return publicCase(c);
-    });
+    return this.exclusive(async () => publicCase(await this.syncRecord(await this.accessible(user, id))));
   }
   async syncRecord(c) {
     if (!c.pending) return c;
     const receipt = await this.chain.settle(c.pending);
     if (receipt.failed) {
-      await this.store.saveCase({ ...c, pending: null, failedTransaction: receipt.hash }, c.revision);
+      const reset = c.pending.effect.type === 'handover' ? { handover: null, tenant: null } : {};
+      await this.store.saveCase({ ...c, ...reset, pending: null, failedTransaction: receipt.hash }, c.revision);
       fail('Giao dịch bị từ chối trên chain. Snapshot được giữ; tải lại trước khi gửi lại.', 409);
     }
     const e = c.pending.effect;
@@ -189,6 +269,14 @@ export class AvalancheService {
     c.receipts.push({ ...receipt, event: c.pending.event });
     return this.store.saveCase({ ...c, pending: null }, c.revision);
   }
+}
+export function validateInventory(items) {
+  if (!Array.isArray(items) || !items.length || items.length > 100) fail('Danh sách tài sản không hợp lệ.');
+  return items.map(item => {
+    const quantity = Number(item?.quantity);
+    if (!item || typeof item.item !== 'string' || !item.item.trim() || item.item.length > 200 || !Number.isSafeInteger(quantity) || quantity < 0) fail('Dòng tài sản không hợp lệ.');
+    return { item: item.item.trim(), quantity, condition: text(item.condition, 500, 'Tình trạng tài sản') || 'Không có ghi chú' };
+  });
 }
 export function validateAttachments(items) {
   if (!Array.isArray(items) || items.length > 10) fail('Tối đa 10 file đính kèm.');

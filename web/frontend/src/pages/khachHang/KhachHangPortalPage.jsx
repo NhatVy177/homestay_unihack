@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { khachMoiApi } from '../khachMoi/khachMoi.api.js';
 import { datCocApi } from '../datCoc/datCoc.api.js';
@@ -8,6 +8,10 @@ import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import '../khamPhaPhong/khamPhaPhong.css';
 import './khachHangPortal.css';
 import LichXemPhongPage from '../lichXemPhong/LichXemPhongPage.jsx';
+import { httpClient } from '../../api/httpClient.js';
+// D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
+const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
+const PORTAL_TABS = ['kham-pha', 'ho-so', 'lich-xem', 'dat-coc', 'hop-dong', 'tra-phong'];
 
 // Gốc backend để mở lại file chứng từ đã upload (DB lưu đường dẫn /uploads/chung-tu/..).
 const FILE_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
@@ -852,7 +856,12 @@ function ChiTietPhongView({ phong, onBack, onRent }) {
 
 export default function KhachHangPortalPage() {
   const { user, dangXuat } = useAuth();
-  const [activeTab, setActiveTab] = useState('kham-pha');
+  const navigate = useNavigate();
+  // Link trong email (/khach-hang?tab=hop-dong) và cổng thanh toán mô phỏng mở đúng tab.
+  const [activeTab, setActiveTab] = useState(() => {
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    return PORTAL_TABS.includes(tab) ? tab : 'kham-pha';
+  });
   const [detailPhong, setDetailPhong] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
@@ -2508,6 +2517,10 @@ export default function KhachHangPortalPage() {
                 </div>
               </div>
 
+              <Suspense fallback={null}>
+                <HopDongXacNhanSection contractId={selectedHd.MaHopDong} />
+              </Suspense>
+
               {selectedHd.taiSan && selectedHd.taiSan.length > 0 && (
                 <div className="hd-card">
                   <div className="hd-card-header">
@@ -3451,6 +3464,17 @@ export default function KhachHangPortalPage() {
     }
   }
 
+  // D-013: thanh toán cọc qua cổng ví điện tử MÔ PHỎNG (không nhận tiền thật).
+  async function thanhToanViMoPhong() {
+    if (!datCocSelected) return;
+    try {
+      const { data } = await httpClient.post(`/thanh-toan-mo-phong/dat-coc/${datCocSelected.maPhieuCoc}`);
+      navigate(`/thanh-toan-mo-phong/${data.id}`);
+    } catch (error) {
+      setToast(error?.response?.data?.message || 'Không mở được cổng thanh toán mô phỏng.');
+    }
+  }
+
   function renderDatCocList() {
     if (locks['dat-coc']) return renderLocked('dat-coc');
     if (datCocLoading) return <div className="kp-loading"><span /><p>Đang tải phiếu cọc...</p></div>;
@@ -3599,6 +3623,9 @@ export default function KhachHangPortalPage() {
                   <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={() => chonPhuongThucCoc('Tiền mặt')} style={{ backgroundColor: '#2f6765', borderColor: '#2f6765', color: '#fff' }}>
                     <Icon name="profile" /> Tiền mặt tại quầy
                   </button>
+                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={thanhToanViMoPhong} style={{ backgroundColor: '#a43c12', borderColor: '#a43c12', color: '#fff' }}>
+                    <Icon name="payment" /> Ví điện tử (mô phỏng)
+                  </button>
                 </div>
               </div>
             )}
@@ -3619,6 +3646,13 @@ export default function KhachHangPortalPage() {
                       {uploading ? 'Đang gửi...' : 'Gửi chứng từ thanh toán'}
                     </button>
                   </form>
+                </div>
+
+                <div className="dc-section-card">
+                  <p className="dc-bank-note">Không muốn tải chứng từ? Bạn có thể thanh toán nhanh qua ví điện tử (môi trường mô phỏng, không trừ tiền thật).</p>
+                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={thanhToanViMoPhong} style={{ backgroundColor: '#a43c12', borderColor: '#a43c12', color: '#fff', marginTop: 8 }}>
+                    <Icon name="payment" /> Thanh toán bằng ví điện tử (mô phỏng)
+                  </button>
                 </div>
 
                 <div className="dc-section-card">

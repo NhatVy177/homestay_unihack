@@ -48,7 +48,8 @@ async function fixture() {
   const store = new MemoryStore(), customerWallet = privateKeyToAccount(generatePrivateKey());
   let deductions = '900000';
   const sources = {
-    async handover() { return { contractId: 'HD0001', customerId: tenant.maNguoiDung, branchId: manager.maChiNhanh, inventory: [{ item: 'Nệm', quantity: 1, condition: 'Đã rách lúc nhận phòng' }] }; },
+    async handover() { return { contractId: 'HD0001', customerId: tenant.maNguoiDung, branchId: manager.maChiNhanh, depositVnd: '3000000', policy: 'Hợp đồng đủ hạn; trừ nợ và chi phí hai bên đồng ý.', notes: '', inventory: [{ item: 'Nệm', quantity: 1, condition: 'Đã rách lúc nhận phòng' }] }; },
+    async statements() { return [{ sourceId: 'DS0001' }]; },
     async statement(sourceId, c, version) {
       return { schema: 'homestaydorm.settlement.v1', agreementId: c.id, version, depositHeldVnd: c.depositHeldVnd,
         items: [{ category: 'repair', description: 'Khoản trừ đang đề xuất', amountVnd: deductions }],
@@ -56,16 +57,17 @@ async function fixture() {
         topUpDueVnd: String(Math.max(Number(deductions) - Number(c.depositHeldVnd), 0)) };
     },
   };
-  const service = new AvalancheService({ store, sources, chain, origin: 'https://local.example' });
+  const sent = [];
+  const service = new AvalancheService({ store, sources, chain, origin: 'https://local.example', notify: async (kind, c) => { sent.push({ kind, state: c.state }); return { status: 'logged' }; } });
   const challenge = await service.challenge(tenant, customerWallet.address);
   await service.link(tenant, challenge.id, await customerWallet.signMessage({ message: challenge.message }));
-  const create = () => service.create(manager, { sourceId: 'BG0001', depositHeldVnd: '3000000', policy: 'Hợp đồng đủ hạn; trừ nợ và chi phí hai bên đồng ý.', depositConfirmed: true });
+  const create = () => service.publish(manager, 'BG0001');
   const confirm = async (id, action, reason) => {
     const r = await service.prepare(tenant, id, action, reason);
     const signature = await customerWallet.signTypedData(r.typedData);
-    return service.confirm(tenant, id, { message: r.typedData.message, dispute: r.dispute, signature, savedCopy: true });
+    return service.confirm(tenant, id, { message: r.typedData.message, dispute: r.dispute, signature });
   };
-  return { ...ctx, service, store, chain, customerWallet, challenge, create, confirm, revise: value => { deductions = value; } };
+  return { ...ctx, service, store, chain, customerWallet, challenge, create, confirm, sent, revise: value => { deductions = value; } };
 }
 describe('Integrated account → tenant signature → relayer → contract → evidence (local)', () => {
   it('runs handover, dispute v1, revision v2, acceptance and independent verification without tenant gas', async () => {
@@ -73,15 +75,31 @@ describe('Integrated account → tenant signature → relayer → contract → e
     try {
       assert.equal(await c.client.getBalance({ address: c.customerWallet.address }), 0n);
       let r = await c.create();
-      assert.equal(r.state, 'handover-pending');
-      assert.equal((await verifyEvidence(c.client, c.deployment, r.handover)).accepted, false);
-      const preview = await c.service.prepare(tenant, r.id, 1);
+      assert.equal(r.state, 'review');
+      assert.equal(r.handover, null);
+      // D-010: review/change loop stays in Web2; nothing is on-chain before the tenant confirms.
+      await assert.rejects(c.chain.read('getAgreement', [r.id]));
+      r = await c.service.requestChange(tenant, r.id, 'Ghi thiếu vết ố trên tủ.');
+      assert.equal(r.state, 'change-requested');
+      await assert.rejects(c.service.prepare(tenant, r.id, 1), /chờ quản lý/);
+      r = await c.service.revise(manager, r.id, { resolution: 'Bổ sung vết ố trên tủ.', inventory: [
+        { item: 'Nệm', quantity: 1, condition: 'Đã rách lúc nhận phòng' }, { item: 'Tủ', quantity: 1, condition: 'Có vết ố' }] });
+      assert.equal(r.state, 'review'); assert.equal(r.drafts.length, 2);
+      assert.equal(r.drafts[0].changeRequest.reason, 'Ghi thiếu vết ố trên tủ.');
+      await assert.rejects(c.service.prepare(tenant, r.id, 1, undefined, 1), /bản mới nhất/);
+      assert.deepEqual(c.sent.map(s => s.kind), ['handover-published', 'handover-revised']);
+      const preview = await c.service.prepare(tenant, r.id, 1, undefined, 2);
+      assert.equal(preview.bundle.documents.handover.payload.revision, 2);
+      assert.equal(preview.bundle.documents.handover.payload.inventory.length, 2);
+      assert.equal((await verifyEvidence(c.client, c.deployment, preview.bundle)).accepted, false);
+      await assert.rejects(c.service.revise(manager, r.id, { resolution: 'Sửa sau khi đã gửi xác nhận' }));
       await checkSnapshot(c.client, c.deployment, abi, preview.bundle, preview.typedData.message);
       const alteredPreview = structuredClone(preview.bundle);
       alteredPreview.documents.handover.payload.inventory[0].condition = 'Nguyên vẹn';
       await assert.rejects(checkSnapshot(c.client, c.deployment, abi, alteredPreview, preview.typedData.message));
       r = await c.confirm(r.id, 1);
       assert.equal(r.state, 'active');
+      assert.equal(c.sent.at(-1).kind, 'handover-confirmed');
       r = await c.service.propose(accountant, r.id, 'DS0001');
       assert.equal(r.versions[0].bundle.documents.statement.payload.refundDueVnd, '2100000');
       r = await c.confirm(r.id, 3, 'Nệm đã rách trong biên bản đầu kỳ.');
@@ -106,9 +124,16 @@ describe('Integrated account → tenant signature → relayer → contract → e
     const c = await fixture();
     try {
       await assert.rejects(c.service.link(tenant, c.challenge.id, await c.customerWallet.signMessage({ message: c.challenge.message })));
-      await assert.rejects(c.service.create(accountant, {}));
-      await assert.rejects(c.service.create({ ...manager, maChiNhanh: 'CN9999' }, { sourceId: 'BG0001' }));
+      await assert.rejects(c.service.publish(accountant, 'BG0001'));
+      await assert.rejects(c.service.publish({ ...manager, maChiNhanh: 'CN9999' }, 'BG0001'));
       const r = await c.create();
+      await assert.rejects(c.create(), /đã có hồ sơ/);
+      await assert.rejects(c.service.requestChange(outsider, r.id, 'Không phải hồ sơ của tôi'));
+      await assert.rejects(c.service.requestChange(manager, r.id, 'Nhân viên tự yêu cầu sửa'));
+      await assert.rejects(c.service.revise(tenant, r.id, { resolution: 'Khách tự sửa' }));
+      await assert.rejects(c.service.revise(accountant, r.id, { resolution: 'Kế toán sửa bàn giao' }));
+      await assert.rejects(c.service.revise(manager, r.id, {}), /nội dung đã điều chỉnh/);
+      await assert.rejects(c.service.confirm(manager, r.id, { message: { action: 1, agreementId: r.id } }));
       assert.equal((await c.service.list(outsider)).length, 0);
       assert.equal((await c.service.list(tenant)).length, 1);
       await assert.rejects(c.service.prepare(outsider, r.id, 1));
@@ -174,7 +199,7 @@ describe('Integrated account → tenant signature → relayer → contract → e
       assert.equal(canonicalize({ b: 2, a: 1 }), canonicalize({ a: 1, b: 2 }));
       assert.throws(() => canonicalize({ n: 1.2 }));
       const r = await c.create();
-      const bad = structuredClone(r.handover);
+      const bad = structuredClone((await c.service.prepare(tenant, r.id, 1)).bundle);
       delete bad.documents.policy.salt;
       assert.equal((await verifyEvidence(c.client, c.deployment, bad)).valid, false);
       bad.documents.policy.salt = '0x' + 'ff'.repeat(32);
@@ -190,6 +215,26 @@ describe('Integrated account → tenant signature → relayer → contract → e
       await assert.rejects(c.confirm(r.id, 1), /ví vận hành/i);
       c.store.cases.delete('other-case');
       assert.equal((await c.confirm(r.id, 1)).state, 'active');
+    } finally { await c.close(); }
+  });
+  it('keeps email reminders and missing wallets from ever counting as a tenant confirmation', async () => {
+    const c = await fixture();
+    try {
+      let r = await c.create();
+      r = await c.service.remind(manager, r.id);
+      assert.equal(r.state, 'review');
+      assert.deepEqual(r.notifications.map(n => [n.kind, n.status]), [['handover-published', 'logged'], ['reminder', 'logged']]);
+      await assert.rejects(c.service.remind(tenant, r.id));
+      await assert.rejects(c.chain.read('getAgreement', [r.id]));
+      c.store.wallets.delete(tenant.maNguoiDung);
+      await assert.rejects(c.service.prepare(tenant, r.id, 1), /thiết lập xác nhận/);
+      assert.equal((await c.store.getCase(r.id)).state, 'review');
+      await assert.rejects(c.chain.read('getAgreement', [r.id]));
+      const failing = new AvalancheService({ store: c.store, sources: { async handover() { return { contractId: 'HD0003', customerId: 'KH0003', branchId: manager.maChiNhanh, depositVnd: '1000000', policy: 'P', inventory: [] }; } },
+        chain: c.chain, origin: 'https://local.example', notify: async () => { throw new Error('SMTP down'); } });
+      const published = await failing.publish(manager, 'BG0003');
+      assert.equal(published.state, 'review');
+      assert.equal(published.notifications.at(-1).status, 'failed');
     } finally { await c.close(); }
   });
 });

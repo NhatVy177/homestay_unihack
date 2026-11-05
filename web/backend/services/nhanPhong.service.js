@@ -367,7 +367,8 @@ export async function lapBienBanBanGiao(data = {}) {
   const maHopDong = String(data.maHopDong || data.hopDongId || '').trim();
   const maNhanVienQuanLy = String(data.maNhanVienQuanLy || '').trim();
   const khachCoMat = normalizeBoolean(data.khachCoMat);
-  const daKyBienBan = normalizeBoolean(data.daKyBienBan);
+  // D-009/D-012: không ký giấy song song; khách xác nhận điện tử trên tài khoản sau khi biên bản được phát hành.
+  const daKyBienBan = false;
   const danhSachTaiSan = Array.isArray(data.danhSachTaiSan) ? data.danhSachTaiSan : [];
 
   if (!maHopDong) {
@@ -378,9 +379,6 @@ export async function lapBienBanBanGiao(data = {}) {
   }
   if (!khachCoMat) {
     throw createServiceError('Khách hàng không có mặt tại thời điểm bàn giao. Không thể lập biên bản.');
-  }
-  if (!daKyBienBan) {
-    throw createServiceError('Khách hàng chưa ký xác nhận biên bản. Không thể lập biên bản.');
   }
   if (danhSachTaiSan.length === 0) {
     throw createServiceError('Danh sách tài sản bàn giao đang trống.');

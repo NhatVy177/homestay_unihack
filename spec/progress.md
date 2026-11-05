@@ -2,6 +2,19 @@
 
 Cập nhật quyết định nghiệp vụ: **2026-11-05 02:13:15 +07:00**. Đối chiếu code thực tế: **2026-11-05 14:43:07 +07:00** (J-006) — xem mục “Đính chính 14:43” ngay dưới; các dòng cũ bên dưới giữ làm lịch sử.
 
+## Cập nhật 15:29 (J-007) — triển khai D-010 → D-013
+
+Đã code trong repo này (chưa commit tại thời điểm viết dòng này; xem Git cho commit J-007):
+- Vòng xem/yêu cầu sửa/bản mới ở Web2; lưu biên bản Web2 tự phát hành bản xem cho khách; khách xác nhận → backend ghi bản đó lên chain rồi khách ký ngầm; không còn bắt tick “đã lưu”; email thông báo (dev-log khi chưa có SMTP).
+- Privy JWT-based auth (backend ký RS256 + JWKS, script `privy:keygen`), frontend ví nhúng không đăng nhập thứ hai, ký ngầm.
+- UI: khu xác nhận trong tab Hợp đồng của khách; tab “Khách xác nhận biên bản” (quản lý), “Khách xác nhận đối soát” (kế toán); bỏ ô “khách đã ký biên bản” ở tab bàn giao; `/ho-so-xac-nhan` dùng lại các component mới; xóa `PrivyPortal.jsx`.
+- SP05 `SP_LapBienBanBanGiaoVao` không còn chặn khi chưa ký giấy; migration `20261105b_payment_simulator.sql`; **đã chạy `avalanche:db:migrate` trên DB local HOMEDORM4** (thêm `PaymentSimOrder`, cập nhật SP05).
+- Cổng ví điện tử mô phỏng cho tiền cọc (backend + trang `/thanh-toan-mo-phong/:id` + nút trong phiếu cọc).
+
+Kiểm tra lúc 15:0x–15:2x: `blockchain npm test` 12 pass/1 skip; `TEST_SQL=true npm run test:sql` 1 pass (SQL Server thật); `web/backend npm test` 6 pass; `web/frontend npm run build` qua (cảnh báo chunk lớn có sẵn); `npm run test:avalanche-ui` PASS (Chrome headless, API giả lập trong test); truy vấn đọc `sources.js` trên DB thật đúng (cọc, chính sách, danh sách biên bản chưa gửi, đối soát).
+
+**Chưa kiểm tra:** Privy thật (cần app ID + dán public key vào dashboard), email SMTP thật, luồng lập biên bản Web2 → tự phát hành chạy qua HTTP với DB thật (sẽ tạo dữ liệu thật nên chưa chạy), cổng mô phỏng qua HTTP với phiếu cọc thật, deploy/verify Fuji.
+
 ## Đính chính 14:43 (J-006) — code đã có trong repo
 
 - Commit `fadd0ec` (01:39, trên main/origin) **đã có** `blockchain/contracts/DormSettlement.sol` (EIP-712, nonce, deadline, ERC-1271 qua SignatureChecker, không giữ tiền, ghi chú “Adapted from 09f8270”), toolchain Hardhat 3 + solc 0.8.38 + viem, scripts compile/deploy local/Fuji, evidence/confirmation dùng chung; backend `integrations/avalanche/` (relayer ký sẵn raw tx lưu trước khi broadcast, đồng bộ receipt/event, CAS), route `/api/avalanche`, migration `database/migrations/20261105_avalanche.sql`; frontend Privy (`/ho-so-xac-nhan`) và trang Verify (`/kiem-chung-avalanche`).
@@ -37,7 +50,9 @@ Vy đã chốt: nhân viên dẫn sinh viên xem phòng và lập biên bản tr
 | T-08 | Deploy, verify source và nghiệm thu Fuji | Chưa bắt đầu | F-09; chưa có deployment/tx/source verification được xác minh trong repo mới. |
 | T-09 | Hồ sơ nộp và demo | Chưa bắt đầu | README setup/ghi công, video 2–3 phút, slides, kiểm tra link; Q-06/Q-07. |
 | T-10 | Tổ chức module blockchain sau khi đọc Senpai | Hoàn thành | Khung root + integration client/server, private package chưa có dependencies; 34 link local, JSON, ignore rules và diff đã kiểm tra. Commit mang mã J-004. Không đồng nghĩa hoàn thành tính năng blockchain. |
-| T-11 | Nối bàn giao Web2 → email → chữ ký Avalanche theo D-009 | Chờ kiểm tra code local mới | Kiểm tra luồng nhân viên lập, khách xem/yêu cầu sửa/ký hoặc mở email sau; quyền, version, trạng thái thực tế vs điện tử, receipt và chống gửi trùng. |
+| T-12 | Cổng ví điện tử mô phỏng cho tiền cọc (D-013) | Đang làm: code + unit test + UI smoke qua (J-007) | Còn chạy thử với phiếu cọc thật qua HTTP; đặt `PAYMENT_SIM_SECRET`. |
+| T-13 | Cấu hình Privy JWT + thử khôi phục ví (D-011) | Chưa bắt đầu | Vy tạo Privy app, chạy `npm run privy:keygen`, dán public key; thử đăng nhập lại/đổi trình duyệt vẫn cùng ví. |
+| T-11 | Nối bàn giao Web2 → email → chữ ký Avalanche theo D-009/D-010 | Đang làm: code + test local xong (J-007); chưa E2E HTTP/Privy/Fuji | Kiểm tra luồng nhân viên lập, khách xem/yêu cầu sửa/ký hoặc mở email sau; quyền, version, trạng thái thực tế vs điện tử, receipt và chống gửi trùng. |
 
 ## Kiểm thử: phân biệt nguồn kết quả
 
@@ -50,7 +65,9 @@ Vy đã chốt: nhân viên dẫn sinh viên xem phòng và lập biên bản tr
 
 ## Bước tiếp theo cho AI
 
-**Ưu tiên theo yêu cầu mới:** đối chiếu code Codex vừa làm với D-009/F-02. Tái dùng UI, API, Privy, relayer và contract thực tế; chỉ bổ sung phần thiếu, test rồi ghi kết quả thật. Đừng coi có bản ghi BG trong SQL là có trang khách xem. Sau đó tiếp tục các nhiệm vụ dưới đây nếu chưa xong.
+**Sau J-007 (15:29):** (1) T-13 cấu hình Privy và thử thật trên localhost; (2) deploy local rồi chạy E2E HTTP với DB demo (có kế hoạch dọn dữ liệu) cho: lập biên bản → khách sửa/xác nhận → kế toán đối soát v1/v2 → Verify; (3) T-08 deploy + verify Fuji; (4) chạy thử cổng mô phỏng với phiếu cọc demo; (5) T-09 README nộp bài/video. Q-01, Q-08, Q-09 vẫn mở.
+
+**Ưu tiên theo yêu cầu mới (mốc cũ):** đối chiếu code Codex vừa làm với D-009/F-02. Tái dùng UI, API, Privy, relayer và contract thực tế; chỉ bổ sung phần thiếu, test rồi ghi kết quả thật. Đừng coi có bản ghi BG trong SQL là có trang khách xem. Sau đó tiếp tục các nhiệm vụ dưới đây nếu chưa xong.
 
 Mốc cũ (00:50): Bắt đầu T-03: đọc nhánh Avalanche cũ và đối chiếu với scope hiện hành, xác định phần tái sử dụng vào khung đã có; sau đó T-04/T-05. Di chuyển adapter phụ thuộc nghiệp vụ sang integration backend; giữ mã thuần dùng chung ở blockchain/src. Chọn toolchain sau khi rà nền cũ, rồi bổ sung dependency/lockfile, compile/test và cách nối shared vào hai app. Khi bắt tay triển khai, thử một luồng nhỏ trước khi làm nhiều màn hình; không lấy mô tả handoff làm bằng chứng đã tích hợp.
 

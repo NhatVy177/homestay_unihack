@@ -38,11 +38,17 @@ try {
     _v: 2, token: 'ui-test-only', user: { maNguoiDung: 'KHDEMO', vaiTro: 'KhachHang' },
   })));
   await page.goto(base + '/ho-so-xac-nhan', { waitUntil: 'domcontentloaded' });
-  if (privyConfigured) await page.getByRole('heading', { name: 'Bàn giao & đối soát đã xác nhận' }).waitFor();
-  await page.getByText('Chức năng xác nhận đang được chuẩn bị.', { exact: false }).waitFor();
-  assert.equal(await page.getByRole('button', { name: /Ký và/ }).count(), 0);
+  await page.getByRole('heading', { name: 'Biên bản bàn giao & đối soát' }).waitFor();
+  await page.getByText('Chưa có biên bản hay bảng đối soát nào cần bạn xem.', { exact: false }).waitFor();
+  assert.equal(await page.getByRole('button', { name: /Xác nhận biên bản/ }).count(), 0);
+  // D-013: simulated e-wallet page is clearly labelled and drives the order API only.
+  await page.route('**/api/thanh-toan-mo-phong/SIMTEST', route => route.fulfill({ json: { id: 'SIMTEST', refId: 'PC0001', amountVnd: 3000000, status: 'Pending' } }));
+  await page.goto(base + '/thanh-toan-mo-phong/SIMTEST', { waitUntil: 'domcontentloaded' });
+  await page.getByText('MÔI TRƯỜNG MÔ PHỎNG', { exact: false }).waitFor();
+  await page.getByRole('button', { name: 'Xác nhận thanh toán' }).waitFor();
+  assert.ok((await page.textContent('body')).includes('3.000.000'));
   assert.deepEqual(failures, []);
-  console.log('PASS: public Verify, missing-config feedback, protected route, authenticated missing-wallet state; no browser exceptions.');
+  console.log('PASS: public Verify, missing-config feedback, protected route, disabled confirmation state, simulated payment page; no browser exceptions.');
 } finally {
   if (browser) await browser.close();
   server.kill();

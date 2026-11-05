@@ -1,4 +1,5 @@
 import * as service from '../services/nhanPhong.service.js';
+import { onWeb2HandoverCreated } from '../integrations/avalanche/index.js';
 
 export async function getDanhSachChoNhanPhong(req, res, next) {
   try { res.json(await service.getDanhSachChoNhanPhong(req.user.maNguoiDung)); } catch (err) { next(err); }
@@ -32,7 +33,12 @@ export async function ghiNhanKhoanThuNhanPhong(req, res, next) {
   try { res.status(201).json(await service.ghiNhanKhoanThuNhanPhong({ ...req.body, maNhanVienKeToan: req.user.maNguoiDung })); } catch (err) { next(err); }
 }
 export async function lapBienBanBanGiao(req, res, next) {
-  try { res.status(201).json(await service.lapBienBanBanGiao({ ...req.body, maNhanVienQuanLy: req.user.maNguoiDung })); } catch (err) { next(err); }
+  try {
+    const result = await service.lapBienBanBanGiao({ ...req.body, maNhanVienQuanLy: req.user.maNguoiDung });
+    // D-012: phát hành bản xem cho khách xác nhận điện tử; lỗi ở bước này không làm hỏng biên bản Web2.
+    const xacNhanDienTu = await onWeb2HandoverCreated(req.user, result?.maBienBan || result?.ketQua?.maBienBan);
+    res.status(201).json({ ...result, xacNhanDienTu });
+  } catch (err) { next(err); }
 }
 export async function traCuuHopDongBanGiao(req, res, next) {
   try { res.json(await service.traCuuHopDongBanGiao(req.params.maHopDong)); } catch (err) { next(err); }

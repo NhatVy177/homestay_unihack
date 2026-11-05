@@ -11,3 +11,7 @@ uploads/chung-tu/*
 !uploads/chung-tu/.gitkeep
 uploads/chung-tu-doi-soat/*
 !uploads/chung-tu-doi-soat/.gitkeep
+
+# Khóa riêng cục bộ (Privy JWT, D-011) và hộp thư dev
+secrets/
+outbox/

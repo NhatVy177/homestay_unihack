@@ -2,15 +2,19 @@ import React, { lazy, Suspense } from 'react';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { getAuthenticatedHomePath } from '../../auth/auth.routes.js';
 import './portal.css';
-const appId = import.meta.env.VITE_PRIVY_APP_ID;
-const PrivyPortal = appId ? lazy(() => import('./PrivyPortal.jsx')) : null;
+// Trang gom hồ sơ xác nhận theo vai trò (giữ đường dẫn cũ /ho-so-xac-nhan). Luồng chính nằm trong
+// màn Hợp đồng của khách và tab của quản lý/kế toán (D-012).
+const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
+const QuanLyXacNhanTab = lazy(() => import('../../components/xacNhan/QuanLyXacNhanTab.jsx'));
+const KeToanXacNhanTab = lazy(() => import('../../components/xacNhan/KeToanXacNhanTab.jsx'));
 export default function AvalanchePortal() {
   const { user } = useAuth();
-  if (!PrivyPortal) return <main className="av-portal">
-    <a href={getAuthenticatedHomePath(user)}>← HomeStayDorm</a><h1>Hồ sơ xác nhận</h1>
-    <p>Chức năng xác nhận đang được chuẩn bị. Vui lòng thử lại sau.</p>
-    <p>Các tính năng thuê phòng vẫn dùng bình thường.</p>
-    <a href="/kiem-chung-avalanche">Kiểm chứng file đã lưu</a>
+  const body = user.vaiTro === 'KhachHang' ? <HopDongXacNhanSection emptyText="Chưa có biên bản hay bảng đối soát nào cần bạn xem." />
+    : user.chucVu === 'Quản lý' ? <QuanLyXacNhanTab /> : user.chucVu === 'Kế toán' ? <KeToanXacNhanTab />
+      : <p>Trang này dành cho khách thuê, quản lý và kế toán.</p>;
+  return <main className="av-portal">
+    <header><a href={getAuthenticatedHomePath(user)}>← Về trang của tôi</a><a href="/kiem-chung-avalanche">Kiểm chứng hồ sơ đã lưu</a></header>
+    <h1>Biên bản bàn giao & đối soát</h1>
+    <Suspense fallback={<p>Đang tải…</p>}>{body}</Suspense>
   </main>;
-  return <Suspense fallback={<p>Đang chuẩn bị xác nhận trong tài khoản…</p>}><PrivyPortal /></Suspense>;
 }
