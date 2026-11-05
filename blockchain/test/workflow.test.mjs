@@ -99,15 +99,21 @@ describe('Integrated account → tenant signature → relayer → contract → e
       await assert.rejects(checkSnapshot(c.client, c.deployment, abi, alteredPreview, preview.typedData.message));
       r = await c.confirm(r.id, 1);
       assert.equal(r.state, 'active');
+      assert.match(r.handover.confirmationReceipt.at, /^\d{4}-\d\d-\d\dT/);
+      assert.equal(r.receipts.at(-1).at, r.handover.confirmationReceipt.at);
       assert.equal(c.sent.at(-1).kind, 'handover-confirmed');
       r = await c.service.propose(accountant, r.id, 'DS0001');
       assert.equal(r.versions[0].bundle.documents.statement.payload.refundDueVnd, '2100000');
       r = await c.confirm(r.id, 3, 'Nệm đã rách trong biên bản đầu kỳ.');
+      assert.match(r.versions[0].disputeReceipt.at, /^\d{4}-\d\d-\d\dT/);
+      assert.equal(r.receipts.at(-1).at, r.versions[0].disputeReceipt.at);
       c.revise('500000');
       r = await c.service.propose(accountant, r.id, 'DS0001');
       assert.equal(r.versions.length, 2);
       r = await c.confirm(r.id, 2);
       assert.equal(r.state, 'accepted');
+      assert.match(r.versions[1].bundle.confirmationReceipt.at, /^\d{4}-\d\d-\d\dT/);
+      assert.equal(r.receipts.at(-1).at, r.versions[1].bundle.confirmationReceipt.at);
       const old = await verifyEvidence(c.client, c.deployment, r.versions[0].bundle);
       const latest = await verifyEvidence(c.client, c.deployment, r.versions[1].bundle);
       assert.equal(old.valid, true); assert.equal(old.superseded, true); assert.equal(old.disputed, true);
@@ -187,6 +193,7 @@ describe('Integrated account → tenant signature → relayer → contract → e
       assert.ok(before.pending.rawTransaction);
       const fixed = await c.service.sync(tenant, r.id);
       assert.equal(fixed.state, 'active'); assert.equal(fixed.pending, null);
+      assert.equal(fixed.receipts.at(-1).at, fixed.handover.confirmationReceipt.at);
       const count = fixed.receipts.length;
       assert.equal((await c.service.sync(tenant, r.id)).receipts.length, count);
     } finally { await c.close(); }

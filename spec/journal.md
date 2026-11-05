@@ -275,3 +275,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Đính chính giờ: lệnh `TZ=Asia/Saigon date` trong Git Bash trên máy này trả giờ UTC. Mốc J-010/D-016/T-15 “2026-11-05 17:31:24” thực tế là **2026-11-06 00:31:24 +07:00**; câu “đính chính” về J-009 trong J-010 là sai, giữ mốc J-009 23:50 như cũ. Lần sau lấy giờ bằng PowerShell `Get-Date`.
 - File: `spec/decisions.md` (D-017, ghi chú giờ D-016), `spec/scope.md` (F-10), `hackathon/plan.md`, `spec/progress.md` (T-16), mục này. Không sửa code.
 - Còn lại: Vy đưa prompt (trong chat) cho agent code; xem lại kết quả sau.
+
+## 2026-11-06 02:28:24 +07:00 — J-023 — Hiện thực D-017 và kiểm thử giao diện ba vai trò
+
+- Người thực hiện: AI đang làm việc với Vy. Giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Yêu cầu/kết luận: thực hiện D-017 từ J-022; khách chỉ thấy trạng thái xác nhận, tải/kiểm tra bản lưu. Thời điểm ghi nhận lấy từ receipt mới; receipt cũ không có `at` vẫn hiển thị. Chỉ báo email đã gửi khi thông báo mới nhất đúng loại có `status: sent`; các trạng thái khác dùng lời báo an toàn. Không đổi quyết định D-017.
+- Liên quan: F-10, T-16; nghiệm thu Fuji vẫn thuộc T-08.
+- File và nội dung: `web/backend/integrations/avalanche/service.js` thêm `at` cho receipt sau khi giao dịch hợp lệ; `blockchain/test/workflow.test.mjs` kiểm tra cùng thời điểm ở receipt xác nhận, phản hồi, đồng ý và danh sách. `web/frontend/src/components/xacNhan/HopDongXacNhanSection.jsx`, `receiptDisplay.js`, `XacThucChiTiet.jsx`, `QuanLyXacNhanTab.jsx`, `KeToanXacNhanTab.jsx`, `xacNhan.css` đổi giao diện khách, chuyển chi tiết giao dịch sang quản lý/kế toán, dịch trạng thái email. `web/frontend/src/pages/nhanVienQuanLy/BanGiaoPhongTab.jsx` chỉ nói đã gửi email nếu backend trả `notification: sent`. `web/frontend/scripts/avalanche-smoke.mjs` kiểm tra ba vai trò và receipt cũ trong trình duyệt với hồ sơ mô phỏng. `spec/scope.md`, `hackathon/plan.md` làm rõ quy tắc thiếu giờ/email; `spec/progress.md`, mục này ghi tiến độ và bằng chứng.
+- Kiểm tra: `blockchain npm test` 12 pass, 1 skip do chưa có SQL tích hợp; `web/backend npm test` 6 pass; `web/frontend npm run build` pass (cảnh báo có sẵn từ dependencies và chunk lớn); `web/frontend npm run test:avalanche-ui` pass. Browser smoke xác nhận khách không có `0x`/mục kỹ thuật, hồ sơ cũ thiếu `at` không lỗi, quản lý và kế toán hiện mã rút gọn và “Chain thử nghiệm trên máy (local)”. `git diff --check` pass.
+- Giới hạn/bước tiếp: browser smoke dùng hồ sơ mô phỏng, chưa chạy lại luồng ba vai trò với SQL thật hoặc Fuji; cần thử tích hợp sau. Không sửa `.env`, dữ liệu DB, contract, quyền hay API path.
+- Git: commit/push cùng đợt J-023 trên `main`; tra mã bằng `git log --all --grep="J-023"`.

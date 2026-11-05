@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { HandoverView, Pill } from './DocumentView.jsx';
 import { avalancheApi, dateTime, errorMessage, staffStateLabels } from '../../lib/avalanche/api.js';
+import XacThucChiTiet from './XacThucChiTiet.jsx';
 import './xacNhan.css';
 const order = { 'change-requested': 0, review: 1, 'handover-pending': 1, 'settlement-pending': 2, disputed: 2, active: 3, accepted: 4 };
+const emailStatuses = { sent: 'đã gửi', logged: 'chỉ ghi log, chưa gửi', failed: 'gửi lỗi', skipped: 'bỏ qua' };
 const readFile = file => new Promise((resolve, reject) => {
   const reader = new FileReader();
   reader.onload = () => resolve({ name: file.name, mediaType: file.type, dataBase64: String(reader.result).split(',')[1] });
@@ -36,7 +38,7 @@ export default function QuanLyXacNhanTab() {
         const draft = c.drafts?.[c.drafts.length - 1];
         return <div key={c.id} className={'xn-list-item' + (c.id === selected ? ' is-active' : '')}>
           <div><strong>Hợp đồng {c.contractId}</strong> · biên bản {c.sourceId} · bản số {c.handover?.revision ?? draft?.revision}
-            <div className="xn-muted">Phát hành {dateTime(draft?.publishedAt)}{c.notifications?.length ? ` · email gần nhất: ${dateTime(c.notifications.at(-1).at)} (${c.notifications.at(-1).status})` : ''}</div></div>
+            <div className="xn-muted">Phát hành {dateTime(draft?.publishedAt)}{c.notifications?.length ? ` · email gần nhất: ${dateTime(c.notifications.at(-1).at)} (${emailStatuses[c.notifications.at(-1).status] || c.notifications.at(-1).status})` : ''}</div></div>
           <div className="xn-actions"><Pill label={staffStateLabels[c.state]} />
             <button type="button" className="xn-btn secondary" onClick={() => setSelected(c.id === selected ? null : c.id)}>{c.id === selected ? 'Đóng' : 'Xem'}</button></div>
         </div>;
@@ -86,5 +88,6 @@ function CaseDetail({ c, busy, run }) {
     {c.drafts.length > 1 && <details className="xn-history"><summary>Lịch sử phiên bản ({c.drafts.length})</summary>
       <ol>{c.drafts.map(d => <li key={d.revision}>Bản {d.revision} ({dateTime(d.publishedAt)}){d.resolution ? ` — điều chỉnh: ${d.resolution}` : ''}{d.changeRequest ? ` — khách yêu cầu: “${d.changeRequest.reason}”` : ''}</li>)}</ol>
     </details>}
+    <XacThucChiTiet receipts={c.receipts} />
   </article>;
 }

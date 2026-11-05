@@ -276,7 +276,7 @@ export default function BanGiaoPhongTab() {
         message: `${res.data.thongBao || 'Đã lập biên bản bàn giao.'}${ketQua?.maBienBan ? ` Mã biên bản: ${ketQua.maBienBan}.` : ''}`,
         maBienBan: ketQua?.maBienBan || res.data.maBienBan,
         xacNhan: xacNhan?.status === 'published'
-          ? 'Đã gửi bản xem cho khách qua tài khoản và email. Khách có thể xác nhận ngay trên điện thoại hoặc yêu cầu chỉnh sửa; theo dõi ở tab "Khách xác nhận biên bản".'
+          ? `${xacNhan.notification === 'sent' ? 'Đã gửi biên bản vào tài khoản và đã gửi email cho khách.' : 'Đã gửi biên bản vào tài khoản khách để xác nhận.'} Khách có thể xác nhận ngay trên điện thoại hoặc yêu cầu chỉnh sửa; theo dõi ở tab "Khách xác nhận biên bản".`
           : xacNhan?.status === 'failed'
             ? `Chưa gửi được bản xem cho khách: ${xacNhan.message} Có thể gửi lại ở tab "Khách xác nhận biên bản".`
             : null

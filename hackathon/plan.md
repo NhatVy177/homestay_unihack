@@ -125,7 +125,7 @@ Trạng thái xác nhận: chờ xác nhận bàn giao → đã xác nhận bàn
 - **Đã chọn (D-011):** Privy embedded wallet với **JWT-based auth**: backend ký JWT RS256 ngắn hạn (`sub` = mã người dùng) cho khách; Privy tạo/mở ví theo chính tài khoản HomeStayDorm, không có màn đăng nhập thứ hai; liên kết ví bằng challenge ký ngầm một lần; tắt popup ví (`showWalletUIs: false`) vì app đã hiển thị nội dung và nút quyết định. Cần cấu hình public key trong Privy Dashboard và thử khôi phục ví thật trước khi demo.
 - **Tạm thay bởi D-015 (05/11, 23:50):** JWT-based auth của Privy cần gói Scale trả phí. Bản thi dùng **mã OTP email của Privy trong khung giao diện HomeStayDorm**, chỉ hiện khi khách xác nhận lần đầu (email điền sẵn từ tài khoản); ví tạo + liên kết ngầm; thao tác tự chạy tiếp sau khi nhập mã. Đã hỏi BTC về gói (Q-10). Bật lại JWT bằng `PRIVY_AUTH_MODE=jwt`.
 - **D-016 (05/11, 17:31):** form đăng ký khách bắt buộc email (đúng định dạng, không trùng tài khoản khác) để mã OTP và thông báo biên bản luôn có nơi nhận, và mỗi tài khoản có ví riêng. (Đính chính J-022: thời điểm thực tế 06/11, 00:31.)
-- **D-017 (06/11, 02:19):** giao diện khách chỉ báo “đã xác nhận lúc …, đã lưu, không sửa được” + tải bản lưu; mã giao dịch, tên mạng, link explorer chuyển sang tab quản lý/kế toán (chỗ demo phần Avalanche cho giám khảo). Thông báo email chỉ hiện khi gửi thành công.
+- **D-017 (06/11, 02:19):** giao diện khách chỉ báo “đã xác nhận lúc …, đã lưu, không sửa được” + tải bản lưu; hồ sơ cũ chưa có giờ thì bỏ phần “lúc …”. Mã giao dịch, tên mạng, link explorer chuyển sang tab quản lý/kế toán (chỗ demo phần Avalanche cho giám khảo). Thông báo email chỉ hiện khi trạng thái thông báo mới nhất là `sent`.
 
 ### Quy tắc chữ ký và đồng bộ
 

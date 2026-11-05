@@ -254,19 +254,20 @@ export class AvalancheService {
       await this.store.saveCase({ ...c, ...reset, pending: null, failedTransaction: receipt.hash }, c.revision);
       fail('Giao dịch bị từ chối trên chain. Snapshot được giữ; tải lại trước khi gửi lại.', 409);
     }
+    const recordedReceipt = { ...receipt, at: this.now() };
     const e = c.pending.effect;
-    if (e.type === 'handover') { c.handover.receipt = receipt; c.state = 'handover-pending'; }
-    if (e.type === 'settlement') { c.versions.push({ sourceId: e.sourceId, bundle: { ...e.bundle, receipt }, accepted: false }); c.state = 'settlement-pending'; }
+    if (e.type === 'handover') { c.handover.receipt = recordedReceipt; c.state = 'handover-pending'; }
+    if (e.type === 'settlement') { c.versions.push({ sourceId: e.sourceId, bundle: { ...e.bundle, receipt: recordedReceipt }, accepted: false }); c.state = 'settlement-pending'; }
     if (e.type === 'confirmation') {
-      if (e.action === 1) { c.handover.confirmationReceipt = receipt; c.state = 'active'; }
+      if (e.action === 1) { c.handover.confirmationReceipt = recordedReceipt; c.state = 'active'; }
       else {
         const v = c.versions.find(v => v.bundle.version === e.version);
         if (!v) fail('Thiếu snapshot tương ứng sự kiện.', 409);
-        if (e.action === 2) { v.accepted = true; v.bundle.confirmationReceipt = receipt; c.state = 'accepted'; }
-        else { v.dispute = e.dispute; v.disputeReceipt = receipt; c.state = 'disputed'; }
+        if (e.action === 2) { v.accepted = true; v.bundle.confirmationReceipt = recordedReceipt; c.state = 'accepted'; }
+        else { v.dispute = e.dispute; v.disputeReceipt = recordedReceipt; c.state = 'disputed'; }
       }
     }
-    c.receipts.push({ ...receipt, event: c.pending.event });
+    c.receipts.push({ ...recordedReceipt, event: c.pending.event });
     return this.store.saveCase({ ...c, pending: null }, c.revision);
   }
 }

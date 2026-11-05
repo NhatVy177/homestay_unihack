@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { SettlementView, Pill } from './DocumentView.jsx';
 import { avalancheApi, dateTime, errorMessage, money, staffStateLabels } from '../../lib/avalanche/api.js';
+import XacThucChiTiet from './XacThucChiTiet.jsx';
 import './xacNhan.css';
 /** D-012: accountant sends an existing Web2 settlement to the tenant; no IDs typed by hand. */
 export default function KeToanXacNhanTab() {
@@ -55,5 +56,6 @@ function SettlementCase({ c, busy, run }) {
         onClick={() => run(() => avalancheApi.post(`/cases/${c.id}/settlements`, { sourceId: choice }), 'Đã gửi bảng đối soát cho khách xem.')}>Gửi khách xác nhận</button></div>
     </div>}
     {c.pending && <button type="button" className="xn-btn secondary" disabled={busy} onClick={() => run(() => avalancheApi.post(`/cases/${c.id}/sync`), 'Đã cập nhật trạng thái.')}>Cập nhật trạng thái ghi nhận</button>}
+    <XacThucChiTiet receipts={c.receipts} />
   </article>;
 }
