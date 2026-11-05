@@ -1,5 +1,10 @@
 # Tiến độ và điểm tiếp tục
 
+## Cập nhật SMTP local 2026-11-06 01:51:12 +07:00 (J-017)
+
+- Vy đã nhập App Password vào `web/backend/.env` (file local ngoài Git). Backend gửi email test qua Gmail SMTP trả `status: sent` và có message ID; mail được chuyển hướng tới hộp thư test, **chưa có xác nhận của Vy là đã thấy thư trong Inbox/Spam**.
+- Đã nạp lại tiến trình backend đang chạy bằng `nodemon`; tiến trình `node index.js` có PID mới, `GET /api/avalanche/config` trả HTTP 200. Chưa chạy luồng lập biên bản thật qua giao diện hoặc kiểm tra mail đến khách thực tế. Cập nhật J-015 bên dưới là lịch sử trước khi có App Password.
+
 ## Cập nhật SMTP local 2026-11-06 01:39:27 +07:00 (J-015)
 
 - Đã điền cấu hình Gmail SMTP và chuyển mọi email demo về hộp thư test trong `web/backend/.env` (file local bị Git bỏ qua). Kết nối TCP tới `smtp.gmail.com:587` thành công; đọc cấu hình qua `dotenv` xác nhận mailer dùng chế độ `smtp`.

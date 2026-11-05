@@ -210,3 +210,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: đối chiếu tài liệu hỗ trợ chính thức của Google về App Password và xác minh hai bước; kiểm tra local `SMTP_PASS` vẫn trống, branch `main` sạch trước đợt ghi này.
 - Còn lại/bước tiếp: Vy tạo/dán App Password tại máy và báo để kiểm tra xác thực, gửi email test đến hộp thư redirect.
 - Git: commit/push cập nhật hồ sơ J-016 trên `main`.
+
+## 2026-11-06 01:51:12 +07:00 — J-017 — Kiểm tra Gmail SMTP và nạp lại backend
+
+- Người thực hiện: AI đang làm việc với Vy.
+- Trao đổi/yêu cầu: Vy báo đã nhập App Password và muốn hoàn tất cấu hình gửi mail test.
+- Kết luận: cấu hình SMTP local đã đủ trường; gửi một email thử qua `createMailer()` tới hộp thư redirect trả `status: sent`, có message ID. Đây là Gmail chấp nhận gửi; đang chờ Vy xác nhận email xuất hiện trong Inbox/Spam. Backend đang chạy bằng `nodemon` đã được nạp lại để nhận cấu hình mới.
+- Liên quan: Q-08, T-11; không đổi quyết định hay scope.
+- File và nội dung: `web/backend/.env` do Vy tự điền bí mật (Git bỏ qua); `spec/progress.md` — cập nhật kết quả SMTP và trạng thái chờ xác nhận hộp thư; `spec/journal.md` — ghi lượt kiểm tra. Tạo rồi xóa `web/backend/smtp-reload.json` tạm thời để `nodemon` nạp lại, không để lại file. Không đưa email cá nhân hoặc App Password vào hồ sơ.
+- Kiểm tra: đọc cấu hình chỉ dưới dạng cờ boolean; xác nhận đúng SMTP host/user/redirect và có App Password, không in bí mật; gửi một email test, kết quả `sent`; PID `node index.js` thay đổi sau khi nạp lại, API `/api/avalanche/config` trả 200; `git status` chỉ theo dõi file hồ sơ sau dọn file tạm. Chưa kiểm tra giao hàng đến Inbox hoặc email biên bản thật.
+- Còn lại/bước tiếp: Vy xác nhận đã nhận thư thử; sau đó thử lập biên bản bằng dữ liệu test để xác minh template và đường dẫn thực tế nếu cần.
+- Git: commit/push riêng cập nhật hồ sơ J-017 trên `main`.
