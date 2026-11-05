@@ -7,7 +7,8 @@ import { execFileSync } from "node:child_process";
 const target = process.argv[2];
 if (!["local", "fuji"].includes(target)) throw new Error("Usage: node scripts/deploy.mjs local|fuji");
 const recordPath = new URL(target === 'local' ? '../deployments/local/deployment.json' : '../deployments/fuji.json', import.meta.url);
-try { await readFile(recordPath); throw new Error(`A deployment record already exists for ${target}; preserve it before redeploying.`); }
+// Local Hardhat state is in-memory, so its record is replaced on every fresh node; Fuji records are never overwritten.
+if (target === "fuji") try { await readFile(recordPath); throw new Error(`A deployment record already exists for ${target}; preserve it before redeploying.`); }
 catch (error) { if (error.code !== "ENOENT") throw error; }
 const fuji = target === "fuji";
 const chain = fuji ? avalancheFuji : hardhat;
@@ -47,6 +48,6 @@ const deployment = {
   protocolVersion: '2', sourceVerification: 'pending',
 };
 await mkdir(new URL(target === 'local' ? "../deployments/local/" : "../deployments/", import.meta.url), { recursive: true });
-await writeFile(recordPath, JSON.stringify(deployment, null, 2) + "\n", { flag: "wx" });
+await writeFile(recordPath, JSON.stringify(deployment, null, 2) + "\n", { flag: target === "fuji" ? "wx" : "w" });
 console.log(`Deployed on chain ${chain.id}: ${receipt.contractAddress} (tx ${hash}).`);
 console.log(`Saved ${target} deployment metadata; verify source with artifacts/standard-input.json before presenting it.`);

@@ -1,13 +1,16 @@
 import { chromium } from 'playwright-core';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname, basename } from 'node:path';
 const port = 5189, base = 'http://127.0.0.1:' + port;
-const privyConfigured = process.argv.includes('--privy');
-const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'],
-  { stdio: 'ignore', windowsHide: true, env: { ...process.env, VITE_PRIVY_APP_ID: '' } });
+// Build an unconfigured copy (process env overrides .env in Vite) so the test never depends on local .env.
+const unconfigured = { ...process.env, VITE_PRIVY_APP_ID: '', VITE_AVALANCHE_CONTRACT_ADDRESS: '' };
+const outDir = await mkdtemp(join(tmpdir(), 'homedorm-smoke-dist-'));
+execFileSync(process.execPath, ['node_modules/vite/bin/vite.js', 'build', '--outDir', outDir, '--emptyOutDir', '--logLevel', 'error'], { stdio: 'inherit', env: unconfigured });
+const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--outDir', outDir, '--host', '127.0.0.1', '--port', String(port), '--strictPort'],
+  { stdio: 'ignore', windowsHide: true, env: unconfigured });
 let browser, temp;
 try {
   for (let i = 0; ; i++) {
@@ -52,6 +55,7 @@ try {
 } finally {
   if (browser) await browser.close();
   server.kill();
+  if (dirname(resolve(outDir)) === resolve(tmpdir()) && basename(outDir).startsWith('homedorm-smoke-dist-')) await rm(outDir, { recursive: true, force: true });
   if (temp) {
     if (dirname(resolve(temp)) !== resolve(tmpdir()) || !basename(temp).startsWith('homedorm-evidence-')) throw new Error('Unexpected temporary test directory');
     await rm(temp, { recursive: true });

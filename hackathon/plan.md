@@ -123,6 +123,7 @@ Trạng thái xác nhận: chờ xác nhận bàn giao → đã xác nhận bàn
 - Vai trò quản lý/kế toán có thể dùng khóa thử do dịch vụ vận hành giữ, với phân quyền và nhật ký thao tác rõ. Khóa relayer dùng trả gas không được quyền ký thay khách.
 - Thử một lát cắt nhỏ: tài khoản thử → ví nhúng → ký → relayer → contract → receipt. Chọn mô hình ví và khôi phục sau thử nghiệm này, trước khi làm nhiều màn hình.
 - **Đã chọn (D-011):** Privy embedded wallet với **JWT-based auth**: backend ký JWT RS256 ngắn hạn (`sub` = mã người dùng) cho khách; Privy tạo/mở ví theo chính tài khoản HomeStayDorm, không có màn đăng nhập thứ hai; liên kết ví bằng challenge ký ngầm một lần; tắt popup ví (`showWalletUIs: false`) vì app đã hiển thị nội dung và nút quyết định. Cần cấu hình public key trong Privy Dashboard và thử khôi phục ví thật trước khi demo.
+- **Tạm thay bởi D-015 (05/11, 23:50):** JWT-based auth của Privy cần gói Scale trả phí. Bản thi dùng **mã OTP email của Privy trong khung giao diện HomeStayDorm**, chỉ hiện khi khách xác nhận lần đầu (email điền sẵn từ tài khoản); ví tạo + liên kết ngầm; thao tác tự chạy tiếp sau khi nhập mã. Đã hỏi BTC về gói (Q-10). Bật lại JWT bằng `PRIVY_AUTH_MODE=jwt`.
 
 ### Quy tắc chữ ký và đồng bộ
 

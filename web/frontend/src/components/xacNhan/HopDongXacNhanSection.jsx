@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { createPublicClient, http } from 'viem';
 import { abi } from '@homestaydorm/settlement/abi';
 import { canonicalize, documentHash } from '@homestaydorm/settlement/evidence';
@@ -22,8 +22,36 @@ export default function HopDongXacNhanSection({ contractId, emptyText }) {
   useEffect(() => { avalancheApi.get('/config').then(setConfig).catch(() => setConfig({ enabled: false })); }, []);
   if (!config?.enabled || user?.vaiTro !== 'KhachHang') return emptyText && config ? <p className="xn-muted">{emptyText}</p> : null;
   const body = <TenantCases contractId={contractId} emptyText={emptyText} />;
-  if (!AccountSignerProvider || !config.accountWallet) return body;
-  return <Suspense fallback={body}><AccountSignerProvider appId={privyAppId}>{body}</AccountSignerProvider></Suspense>;
+  if (!AccountSignerProvider) return body;
+  return <Suspense fallback={body}>
+    <AccountSignerProvider appId={privyAppId} mode={config.walletAuth === 'jwt' ? 'jwt' : 'email'} accountEmail={user.email}>{body}</AccountSignerProvider>
+  </Suspense>;
+}
+/** D-015: one-time email code, shown only when the tenant first confirms. */
+function EmailCodeGate({ signer, onCancel }) {
+  const [email, setEmail] = useState(signer.accountEmail), [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false), [error, setError] = useState('');
+  const act = async fn => { setBusy(true); setError(''); try { await fn(); } catch (e) { setError(errorMessage(e)); } finally { setBusy(false); } };
+  return <div className="xn-form xn-gate">
+    <strong>Xác nhận email trước khi ký</strong>
+    <p className="xn-muted">Để bảo đảm đúng là bạn đang xác nhận, HomeStayDorm gửi một mã 6 số tới email của bạn. Bạn chỉ cần làm một lần trên trình duyệt này.</p>
+    {!signer.codeSentTo ? <>
+      {signer.accountEmail ? <p>Email: <strong>{signer.accountEmail}</strong></p>
+        : <label>Email nhận mã (tài khoản chưa có email)<input type="text" value={email} onChange={e => setEmail(e.target.value)} /></label>}
+      <div className="xn-actions">
+        <button type="button" className="xn-btn" disabled={busy} onClick={() => act(() => signer.sendCode(email))}>{busy ? 'Đang gửi…' : 'Gửi mã'}</button>
+        <button type="button" className="xn-btn secondary" disabled={busy} onClick={onCancel}>Hủy</button>
+      </div>
+    </> : <>
+      <label>Mã đã gửi tới {signer.codeSentTo}<input type="text" inputMode="numeric" maxLength={6} value={code} onChange={e => setCode(e.target.value.replace(/\D/g, ''))} placeholder="6 chữ số" /></label>
+      <div className="xn-actions">
+        <button type="button" className="xn-btn" disabled={busy || code.length !== 6} onClick={() => act(() => signer.verifyCode(code))}>{busy ? 'Đang kiểm tra…' : 'Xác nhận mã'}</button>
+        <button type="button" className="xn-link" disabled={busy} onClick={() => act(() => signer.sendCode(signer.codeSentTo))}>Gửi lại mã</button>
+        <button type="button" className="xn-btn secondary" disabled={busy} onClick={onCancel}>Hủy</button>
+      </div>
+    </>}
+    {error && <div className="xn-alert error">{error}</div>}
+  </div>;
 }
 function TenantCases({ contractId, emptyText }) {
   const signer = useSigner();
@@ -50,7 +78,19 @@ function TenantCase({ c, signer, reload }) {
     setBusy(label); setError(''); setNotice('');
     try { await fn(); setNotice(done); } catch (e) { setError(errorMessage(e)); } finally { setBusy(''); await reload().catch(() => {}); }
   };
-  const signReady = signer?.status === 'ready' && Boolean(trustedDeployment.address);
+  // D-015: if the email code is still needed, remember the action and resume it once ready.
+  const [pending, setPending] = useState(null);
+  const signerRef = useRef(signer);
+  signerRef.current = signer;
+  const signed = (label, fn, done) => {
+    if (signer?.status === 'needs-email') { setPending({ label, fn, done }); return; }
+    run(label, fn, done);
+  };
+  useEffect(() => {
+    if (pending && signer?.status === 'ready') { const p = pending; setPending(null); run(p.label, p.fn, p.done); }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pending, signer?.status]);
+  const signReady = ['ready', 'needs-email'].includes(signer?.status) && Boolean(trustedDeployment.address);
   async function sign(action, reasonText) {
     const next = await avalancheApi.post(`/cases/${c.id}/prepare`, { action, reason: reasonText, revision: action === 1 ? revision : undefined });
     // The browser checks that what will be signed is exactly what the tenant is looking at (D-003).
@@ -64,12 +104,12 @@ function TenantCase({ c, signer, reload }) {
     await checkSnapshot(client, trustedDeployment, abi, next.bundle, next.typedData.message);
     if (action === 3 && documentHash(next.dispute.payload, next.dispute.salt) !== next.typedData.message.reasonHash) throw new Error('Nội dung phản hồi bị thay đổi.');
     const typedData = confirmationData(trustedDeployment, next.typedData.message);
-    const signature = await signer.sign(typedData);
+    const signature = await signerRef.current.sign(typedData);
     await avalancheApi.post(`/cases/${c.id}/confirm`, { message: typedData.message, signature, dispute: next.dispute });
   }
   const signerHint = !signer ? 'Xác nhận điện tử đang được thiết lập cho hệ thống; bạn vẫn có thể gửi yêu cầu chỉnh sửa.'
     : !trustedDeployment.address ? 'Hệ thống xác thực chưa được cấu hình đầy đủ.'
-      : signer.status === 'error' ? signer.error : signer.status === 'preparing' ? 'Đang chuẩn bị xác nhận cho tài khoản của bạn…' : '';
+      : signer.status === 'error' ? signer.error : signer.status === 'preparing' && pending ? 'Đang chuẩn bị xác nhận cho tài khoản của bạn…' : '';
   const handoverLabel = c.state === 'change-requested' ? ['Đã gửi yêu cầu chỉnh sửa', 'info'] : waitingHandover ? ['Chờ bạn xác nhận', 'warn'] : ['Đã xác nhận', 'done'];
   return <article className="xn-card">
     <div className="xn-head">
@@ -82,7 +122,7 @@ function TenantCase({ c, signer, reload }) {
     {waitingHandover && !c.pending && <>
       <p className="xn-muted">Kiểm tra kỹ tài sản và tình trạng phòng. Khi bấm xác nhận, bạn đồng ý biên bản này đúng với lúc nhận phòng. Nếu có sai sót, hãy yêu cầu chỉnh sửa.</p>
       <div className="xn-actions">
-        <button type="button" className="xn-btn" disabled={!signReady || Boolean(busy)} onClick={() => run('confirm', () => sign(1), 'Đã ghi nhận bạn xác nhận biên bản bàn giao. Bản lưu đã được gửi qua email.')}>
+        <button type="button" className="xn-btn" disabled={!signReady || Boolean(busy)} onClick={() => signed('confirm', () => sign(1), 'Đã ghi nhận bạn xác nhận biên bản bàn giao. Bản lưu đã được gửi qua email.')}>
           {busy === 'confirm' ? 'Đang ghi nhận…' : 'Xác nhận biên bản'}</button>
         {c.state === 'review' && <button type="button" className="xn-btn secondary" disabled={Boolean(busy)} onClick={() => setChangeOpen(!changeOpen)}>Yêu cầu chỉnh sửa</button>}
       </div>
@@ -101,14 +141,14 @@ function TenantCase({ c, signer, reload }) {
       {latest.dispute && <div className="xn-alert info">Bạn đã phản hồi: “{latest.dispute.payload.reason}”. Kế toán sẽ xem xét và gửi phiên bản mới nếu có điều chỉnh.</div>}
       {c.state === 'settlement-pending' && !c.pending && <>
         <div className="xn-actions">
-          <button type="button" className="xn-btn" disabled={!signReady || Boolean(busy)} onClick={() => run('accept', () => sign(2), 'Đã ghi nhận bạn đồng ý đối soát.')}>{busy === 'accept' ? 'Đang ghi nhận…' : 'Đồng ý đối soát'}</button>
+          <button type="button" className="xn-btn" disabled={!signReady || Boolean(busy)} onClick={() => signed('accept', () => sign(2), 'Đã ghi nhận bạn đồng ý đối soát.')}>{busy === 'accept' ? 'Đang ghi nhận…' : 'Đồng ý đối soát'}</button>
           <button type="button" className="xn-btn secondary" disabled={Boolean(busy)} onClick={() => setDisputeOpen(!disputeOpen)}>Không đồng ý / phản hồi</button>
         </div>
         {signerHint && <p className="xn-muted">{signerHint}</p>}
         {disputeOpen && <div className="xn-form">
           <label>Lý do<textarea rows={3} maxLength={2000} value={disputeReason} onChange={e => setDisputeReason(e.target.value)} placeholder="Ví dụ: vết rách nệm đã có trong biên bản bàn giao lúc nhận phòng." /></label>
           <div className="xn-actions"><button type="button" className="xn-btn" disabled={!signReady || !disputeReason.trim() || Boolean(busy)}
-            onClick={() => run('dispute', async () => { await sign(3, disputeReason); setDisputeOpen(false); setDisputeReason(''); }, 'Đã gửi phản hồi đối soát.')}>Gửi phản hồi</button></div>
+            onClick={() => signed('dispute', async () => { await sign(3, disputeReason); setDisputeOpen(false); setDisputeReason(''); }, 'Đã gửi phản hồi đối soát.')}>Gửi phản hồi</button></div>
         </div>}
       </>}
       <p className="xn-muted">Đồng ý đối soát không có nghĩa là đã nhận tiền; việc hoàn/thu tiền thực hiện theo quy trình thanh toán của HomeStayDorm.</p>
@@ -118,6 +158,8 @@ function TenantCase({ c, signer, reload }) {
       </details>}
     </section>}
     {c.pending && <div className="xn-alert info">Đang ghi nhận thao tác gần nhất… <button type="button" className="xn-link" onClick={() => run('sync', () => avalancheApi.post(`/cases/${c.id}/sync`), 'Đã cập nhật trạng thái.')}>Cập nhật</button></div>}
+    {pending && signer?.status === 'needs-email' && <EmailCodeGate signer={signer} onCancel={() => setPending(null)} />}
+    {pending && signer?.status === 'preparing' && <div className="xn-alert info">Đang chuẩn bị xác nhận cho tài khoản của bạn…</div>}
     {error && <div className="xn-alert error" role="alert">{error}</div>}
     {notice && <div className="xn-alert ok" role="status">{notice}</div>}
     {c.drafts?.length > 1 && <details className="xn-history"><summary>Lịch sử chỉnh sửa biên bản ({c.drafts.length} bản)</summary>

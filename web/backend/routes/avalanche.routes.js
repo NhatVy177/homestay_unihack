@@ -7,8 +7,10 @@ export const router = Router();
 router.get('/config', (req, res) => {
   let deployment = null;
   try { deployment = chainConfig(); } catch { /* invalid chain id → disabled */ }
-  res.json({ enabled: avalancheEnabled(), deployment, accountWallet: configuredPrivyIssuer().enabled });
+  res.json({ enabled: avalancheEnabled(), deployment, walletAuth: walletAuth() });
 });
+// D-015: email OTP by default; 'jwt' (D-011) only when the Privy plan supports JWT-based auth.
+const walletAuth = () => process.env.PRIVY_AUTH_MODE === 'jwt' && configuredPrivyIssuer().enabled ? 'jwt' : 'email';
 // Public verification key for Privy JWT-based auth (D-011). Contains no secret.
 router.get('/privy/jwks.json', (req, res) => res.json(configuredPrivyIssuer().jwks()));
 router.use(requireAuth);
@@ -27,7 +29,10 @@ router.use((req, res, next) => {
   next();
 });
 const route = fn => async (req, res, next) => { try { res.json(await fn(getAvalancheService(), req)); } catch (error) { next(error); } };
-router.get('/privy/token', (req, res, next) => { try { res.json({ token: configuredPrivyIssuer().issue(req.user) }); } catch (error) { next(error); } });
+router.get('/privy/token', (req, res, next) => {
+  if (walletAuth() !== 'jwt') return res.status(404).json({ message: 'Chế độ đăng nhập ví theo tài khoản (JWT) chưa bật.' });
+  try { res.json({ token: configuredPrivyIssuer().issue(req.user) }); } catch (error) { next(error); }
+});
 router.get('/wallet', route((s, r) => s.store.getWallet(r.user.maNguoiDung).then(address => ({ address: address || null }))));
 router.post('/wallet/challenge', route((s, r) => s.challenge(r.user, r.body.address)));
 router.post('/wallet/link', route((s, r) => s.link(r.user, r.body.id, r.body.signature)));

@@ -111,3 +111,22 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File/cấu hình (đều nằm ngoài Git, không ghi giá trị bí mật vào hồ sơ): `web/frontend/.env` đã có sẵn đúng `VITE_PRIVY_APP_ID`; nối thêm `PRIVY_APP_ID`, `PRIVY_JWT_PRIVATE_KEY_FILE` vào `web/backend/.env`; chạy `npm run privy:keygen` tạo `web/backend/secrets/privy-jwt-private.pem`. Trong repo chỉ sửa `spec/progress.md` (T-13) và mục này.
 - Kết quả: backend ký JWT RS256 (`sub`, `iss=homestaydorm`, `aud`=App ID, hạn 10 phút), chữ ký verify được bằng JWKS, JWKS không chứa phần khóa riêng.
 - Còn lại: Vy bật JWT-based auth trên dashboard và dán public key (claim `sub`); giữ App Secret ở nơi an toàn (code không dùng tới); sau đó deploy local + bật `AVALANCHE_ENABLED` để thử luồng ví thật.
+
+## 2026-11-05 23:50:00 +07:00 — J-009 — JWT Privy cần gói trả phí; chuyển sang OTP email (D-015) và dựng môi trường test local
+
+- Người thực hiện: Claude theo yêu cầu Vy. Thời gian trên là lúc ghi; trao đổi diễn ra từ sau J-008.
+- Trao đổi: Vy không tìm thấy mục JWT trong Privy Dashboard (đã xem tab Login methods, Advanced; ô tìm kiếm có "Authentication > JWT" nhưng không mở được). Claude tra tài liệu Privy: JWT-based auth yêu cầu gói **Scale** (trả phí). Đưa 3 hướng: A OTP email (miễn phí), B nâng gói, C tự giữ khóa (không khuyên). Vy hỏi khi nào nhập email (trả lời: chỉ khi bấm xác nhận lần đầu, không đổi đăng nhập HomeStayDorm), cách trả lời giám khảo (OTP = xác thực lại trước khi ký liên quan tiền cọc; nói thật về giới hạn gói miễn phí), và đồng ý **hướng A**. Vy sẽ hỏi BTC xem có cấp gói không (Q-10; tin mẫu đã đưa trong chat). Gợi ý dashboard: bật "Disable confirmation modals", có thể tắt External wallets.
+- Kết luận: D-015 (tạm thay D-011), Q-10.
+- File và nội dung:
+  - `web/frontend/src/components/xacNhan/AccountSignerProvider.jsx`: thêm chế độ email (headless `useLoginWithEmail`, tự `createWallet` vì đăng nhập headless không tự tạo ví, liên kết ngầm, đăng xuất phiên Privy cũ khác email tài khoản khi mở trang); giữ chế độ jwt.
+  - `web/frontend/src/components/xacNhan/HopDongXacNhanSection.jsx`: khung nhập mã OTP (`EmailCodeGate`), nhớ thao tác khách vừa bấm và tự chạy tiếp khi sẵn sàng (đọc signer mới nhất qua ref); luôn bọc ví khi có App ID. `xacNhan.css`: kiểu khung mã.
+  - `web/backend/routes/avalanche.routes.js`: `/config` trả `walletAuth` ('email' mặc định, 'jwt' khi `PRIVY_AUTH_MODE=jwt` + có khóa); `/privy/token` chỉ dùng ở chế độ jwt. `web/backend/.env.example`: thêm `PRIVY_AUTH_MODE`.
+  - `blockchain/scripts/deploy.mjs`: deploy local được ghi đè bản ghi (chain local nằm trong RAM), Fuji vẫn chặn ghi đè. Mới `blockchain/scripts/ensure-local.mjs` + script `local:ensure` trong `blockchain/package.json`: chờ chain, deploy nếu chain mới, báo lỗi nếu chain đã dùng mà thiếu contract.
+  - `run.ps1`: nếu backend `.env` có `AVALANCHE_CHAIN_ID=31337` thì tự mở cửa sổ chain (khi cổng 8545 chưa mở) và chạy `local:ensure` trước khi bật backend/frontend.
+  - `web/frontend/scripts/avalanche-smoke.mjs`: tự build bản không cấu hình vào thư mục tạm (không phụ thuộc `.env` local), dọn sau khi chạy.
+  - Ngoài Git: `web/backend/.env` thêm cấu hình chain local 31337 (khóa ví dev **công khai** của Hardhat #0/#1/#3), `PRIVY_AUTH_MODE=email`, `PAYMENT_SIM_SECRET` ngẫu nhiên; `web/frontend/.env` thêm chain ID/RPC/địa chỉ contract local. Không ghi giá trị bí mật vào hồ sơ.
+  - Tài liệu: `README.md` (bước 3: OTP mặc định, JWT khi có gói, chain local), `hackathon/plan.md`, `spec/scope.md` (F-01), `spec/decisions.md`, `spec/progress.md` (T-13 tạm dừng, T-14).
+- Kiểm tra: chạy chain local + deploy ra `0x5FbDB2315678afecb367f032d93F642f64180aa3`; manager/accountant của contract khớp ví dev #0/#1; `local:ensure` nhận contract đã có; backend chạy thật: `/api/avalanche/config` → `enabled:true, walletAuth:email`, `/cases` và `/privy/token` khi chưa đăng nhập → 401, IPN chữ ký sai → 401. Sau đó tắt backend/chain. `blockchain npm test` 12 pass/1 skip; `web/backend npm test` 6 pass; frontend build qua; smoke UI PASS (sau khi sửa script).
+- Chưa kiểm tra: OTP Privy thật trên trình duyệt (cần Vy nhận mã email), luồng đầy đủ qua giao diện với DB thật, Fuji.
+- Còn lại: Vy chạy `run.ps1` và thử; nhận phản hồi BTC (Q-10); T-08 Fuji.
+- Git: commit mã J-009 trên main.
