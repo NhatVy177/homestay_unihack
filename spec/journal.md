@@ -177,3 +177,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: đối chiếu `BanGiaoPhongTab.jsx` → `POST /nhan-phong/ban-giao` → `nhanPhong.controller.js` → `onWeb2HandoverCreated` → `AvalancheService.publish/notified` → `notifications.js` → `mailer.js`; đọc cờ cấu hình hiệu lực dưới dạng boolean, xác nhận `avalancheEnabled=true`, `mailMode=dev-log`, không có SMTP/redirect.
 - Còn lại/bước tiếp: nếu cần email thật, cấu hình nhà cung cấp SMTP và hộp thư redirect dùng cho demo rồi kiểm thử bằng một biên bản/test inbox; nếu sửa UI, chỉ báo “đã gửi email” khi notification là `sent`, còn `logged/skipped/failed` phải hiển thị đúng trạng thái.
 - Git: sẽ commit/push riêng cập nhật hồ sơ J-013 trên `main` sau khi kiểm tra diff.
+
+## 2026-11-06 01:31:17 +07:00 — J-014 — Hướng dẫn cấu hình SMTP Gmail cho môi trường test
+
+- Người thực hiện: AI đang làm việc với Vy.
+- Trao đổi/yêu cầu: Vy hỏi cách cấu hình `SMTP_HOST` để hệ thống gửi email xác nhận biên bản thật.
+- Kết luận: đề xuất dùng Gmail cho test với `smtp.gmail.com`, cổng STARTTLS `587`, `SMTP_SECURE=false`; tài khoản Google phải bật xác minh hai bước và dùng App Password 16 ký tự thay cho mật khẩu đăng nhập thường. Nên đặt `MAIL_REDIRECT_TO` về hộp thư test để mọi email demo không gửi nhầm địa chỉ seed. Đây là hướng dẫn cấu hình local, chưa phải lựa chọn nhà cung cấp email production.
+- Liên quan: D-012, Q-08; không đổi scope hoặc quyết định kiến trúc.
+- File và nội dung: `spec/journal.md` — ghi hướng dẫn. Không sửa `web/backend/.env`, không nhận/ghi email, mật khẩu hay App Password.
+- Kiểm tra: đối chiếu `web/backend/.env.example` và `integrations/mail/mailer.js`; kiểm tra tài liệu Gmail chính thức về `smtp.gmail.com`, TLS/STARTTLS cổng 587 và yêu cầu App Password khi dùng xác minh hai bước.
+- Còn lại/bước tiếp: Vy tự tạo App Password trong Google Account, điền bí mật trực tiếp vào `.env`, khởi động lại backend và gửi thử tới `MAIL_REDIRECT_TO`; sau khi xác nhận SMTP hoạt động mới kiểm thử bằng biên bản.
+- Git: sẽ commit/push riêng cập nhật hồ sơ J-014 trên `main` sau khi kiểm tra diff.
