@@ -12,9 +12,14 @@ export default function ThanhToanMoPhongPage() {
   const act = async path => {
     setBusy(true); setError('');
     try { setOrder((await httpClient.post(`/thanh-toan-mo-phong/${id}/${path}`)).data); }
-    catch (e) { setError(message(e, 'Thanh toán không thành công.')); }
+    catch (e) {
+      setError(message(e, 'Thanh toán không thành công.'));
+      try { setOrder((await httpClient.get(`/thanh-toan-mo-phong/${id}`)).data); } catch { /* Keep the original error visible. */ }
+    }
     finally { setBusy(false); }
   };
+  const firstCharge = order?.purpose === 'thu-nhan-phong';
+  const description = firstCharge ? `Khoản thu kỳ đầu – hợp đồng ${order.refId}` : `Tiền cọc – phiếu ${order?.refId || ''}`;
   return <main className="tm-page">
     <div className="tm-sim-banner">MÔI TRƯỜNG MÔ PHỎNG — dùng để demo, không có tiền thật được chuyển.</div>
     <section className="tm-card">
@@ -23,7 +28,7 @@ export default function ThanhToanMoPhongPage() {
       {!order && !error && <p>Đang tải đơn thanh toán…</p>}
       {order && <>
         <dl>
-          <div><dt>Nội dung</dt><dd>Tiền cọc phiếu {order.refId}</dd></div>
+          <div><dt>Nội dung</dt><dd>{description}</dd></div>
           <div><dt>Mã đơn</dt><dd>{order.id}</dd></div>
           <div className="tm-amount"><dt>Số tiền</dt><dd>{money(order.amountVnd)}</dd></div>
         </dl>
@@ -35,11 +40,11 @@ export default function ThanhToanMoPhongPage() {
             <button type="button" className="tm-btn secondary" disabled={busy} onClick={() => act('huy')}>Hủy</button>
           </div>
         </>}
-        {order.status === 'Paid' && <div className="tm-result ok"><strong>Thanh toán thành công (mô phỏng)</strong><p>Phiếu cọc {order.refId} đã được ghi nhận thanh toán. Mã giao dịch mô phỏng: {order.transId}</p></div>}
-        {order.status === 'Cancelled' && <div className="tm-result"><strong>Đã hủy thanh toán</strong><p>Bạn có thể chọn lại phương thức thanh toán ở phiếu đặt cọc.</p></div>}
-        {['Failed', 'Processing'].includes(order.status) && <div className="tm-result"><strong>{order.status === 'Failed' ? 'Thanh toán không thành công' : 'Đang xử lý'}</strong><p>{order.lastError || 'Vui lòng kiểm tra lại phiếu đặt cọc.'}</p></div>}
+        {order.status === 'Paid' && <div className="tm-result ok"><strong>Thanh toán thành công (mô phỏng)</strong><p>{firstCharge ? `Khoản thu kỳ đầu của hợp đồng ${order.refId}` : `Phiếu cọc ${order.refId}`} đã được ghi nhận thanh toán. Mã giao dịch mô phỏng: {order.transId}</p></div>}
+        {order.status === 'Cancelled' && <div className="tm-result"><strong>Đã hủy thanh toán</strong><p>Bạn có thể mở lại khoản thanh toán trong tài khoản.</p></div>}
+        {['Failed', 'Processing'].includes(order.status) && <div className="tm-result"><strong>{order.status === 'Failed' ? 'Thanh toán không thành công' : 'Đang xử lý'}</strong><p>{order.lastError || 'Vui lòng kiểm tra lại khoản thanh toán.'}</p></div>}
       </>}
-      <Link className="tm-back" to="/khach-hang?tab=dat-coc">← Quay lại phiếu đặt cọc</Link>
+      <Link className="tm-back" to={firstCharge ? '/khach-hang?tab=hop-dong' : '/khach-hang?tab=dat-coc'}>← {firstCharge ? 'Quay lại hợp đồng' : 'Quay lại phiếu đặt cọc'}</Link>
     </section>
   </main>;
 }

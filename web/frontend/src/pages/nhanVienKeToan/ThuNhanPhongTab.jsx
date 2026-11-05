@@ -607,7 +607,11 @@ export default function ThuNhanPhongTab() {
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <Icon name="payments" style={{ fontSize: '16px', color: '#00666d' }} />
-                            <span style={{ fontSize: '13px', color: '#3f494a' }}>Thanh toán: <strong>{s.PhuongThucThanhToan || 'Chưa ghi nhận'}</strong></span>
+                            <span style={{ fontSize: '13px', color: '#3f494a' }}>Thanh toán: <strong>{s.PhuongThucThanhToan === 'Ví điện tử' ? 'Ví điện tử (mô phỏng)' : s.PhuongThucThanhToan || 'Chưa ghi nhận'}</strong></span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Icon name="person" style={{ fontSize: '16px', color: '#00666d' }} />
+                            <span style={{ fontSize: '13px', color: '#3f494a' }}>Người thu: <strong>{s.NguoiThu || 'Chưa ghi nhận'}</strong></span>
                           </div>
                         </div>
                       </div>

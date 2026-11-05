@@ -56,6 +56,12 @@ try {
   await page.getByText('MÔI TRƯỜNG MÔ PHỎNG', { exact: false }).waitFor();
   await page.getByRole('button', { name: 'Xác nhận thanh toán' }).waitFor();
   assert.ok((await page.textContent('body')).includes('3.000.000'));
+  await page.route('**/api/thanh-toan-mo-phong/SIMFIRST', route => route.fulfill({ json: {
+    id: 'SIMFIRST', purpose: 'thu-nhan-phong', refId: 'HDTEST', amountVnd: 2500000, status: 'Pending',
+  } }));
+  await page.goto(base + '/thanh-toan-mo-phong/SIMFIRST', { waitUntil: 'domcontentloaded' });
+  await page.getByText('Khoản thu kỳ đầu – hợp đồng HDTEST').waitFor();
+  await page.getByRole('link', { name: 'Quay lại hợp đồng' }).waitFor();
   // D-017: one mocked case checks the rendered customer and both staff views without SQL or secrets.
   const hash = '0x' + 'a'.repeat(64);
   const at = '2026-11-06T02:30:00.000Z';
@@ -111,8 +117,21 @@ try {
   await page.getByText('Thông tin xác thực trên Avalanche').click();
   await page.getByText('Chain thử nghiệm trên máy (local)').waitFor();
   await page.getByText('0xaaaa…aaaa').waitFor();
+  await page.route('**/api/khach-moi/tong-quan', route => route.fulfill({ json: { trangThai: { soHopDong: 1, soPhieuDatCoc: 1 } } }));
+  await page.route('**/api/khach-moi/phong-kha-dung**', route => route.fulfill({ json: [] }));
+  await page.route('**/api/khach-moi/hop-dong-dashboard**', route => route.fulfill({ json: { MaHopDong: 'HDTEST',
+    danhSachHopDong: [{ MaHopDong: 'HDTEST', TrangThai: 'Hiệu lực' }], TrangThai: 'Hiệu lực', GiaThue: 2500000 } }));
+  await page.route('**/api/thanh-toan-mo-phong/thu-nhan-phong/HDTEST', route => route.fulfill({ json: route.request().method() === 'POST'
+    ? { id: 'SIMFIRST', purpose: 'thu-nhan-phong', refId: 'HDTEST', amountVnd: 2500000, status: 'Pending' }
+    : { purpose: 'thu-nhan-phong', refId: 'HDTEST', amountVnd: 2500000, status: 'Pending' } }));
+  await openAs({ maNguoiDung: 'KHDEMO', vaiTro: 'KhachHang' });
+  await page.goto(base + '/khach-hang?tab=hop-dong', { waitUntil: 'domcontentloaded' });
+  await page.getByRole('heading', { name: 'Thanh toán khi nhận phòng' }).waitFor();
+  await page.getByRole('button', { name: 'Ví điện tử (mô phỏng)' }).click();
+  await page.waitForURL(base + '/thanh-toan-mo-phong/SIMFIRST');
+  await page.getByText('Khoản thu kỳ đầu – hợp đồng HDTEST').waitFor();
   assert.deepEqual(failures, []);
-  console.log('PASS: Verify, protected route, simulated payment, D-017 customer/staff views and old receipts; no browser exceptions.');
+  console.log('PASS: Verify, D-017 customer/staff views, D-018 first-charge payment card/gateway and old receipts; no browser exceptions.');
 } finally {
   if (browser) await browser.close();
   server.kill();

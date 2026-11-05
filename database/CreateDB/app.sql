@@ -310,7 +310,7 @@ CREATE TABLE HoaDon (
     MaHopDong           VARCHAR(6)      NOT NULL,
     MaNhanVienKeToan    VARCHAR(6),
     CONSTRAINT CHK_HD_TrangThai  CHECK (TrangThai IN (N'Chưa TT', N'Đã TT', N'Nợ', N'Tạm tính')),
-    CONSTRAINT CHK_HD_PhuongThuc CHECK (PhuongThucThanhToan IN (N'Tiền mặt', N'Chuyển khoản'))
+    CONSTRAINT CHK_HD_PhuongThuc CHECK (PhuongThucThanhToan IN (N'Tiền mặt', N'Chuyển khoản', N'Ví điện tử'))
 );
 
 -- 23. CHI TIẾT HÓA ĐƠN

@@ -6,9 +6,9 @@ const fail = (message, statusCode = 400) => { throw Object.assign(new Error(mess
 const FIELDS = ['orderId', 'amountVnd', 'resultCode', 'transId', 'responseTime'];
 export const ipnString = body => FIELDS.map(key => `${key}=${body[key]}`).join('&');
 export class PaymentSimulator {
-  constructor({ store, deposits, secret, clock = () => Date.now() }) {
+  constructor({ store, deposits, firstCharges, secret, clock = () => Date.now() }) {
     if (!secret || secret.length < 16) throw new Error('PAYMENT_SIM_SECRET must be at least 16 characters.');
-    Object.assign(this, { store, deposits, secret, clock });
+    Object.assign(this, { store, deposits, firstCharges, secret, clock });
   }
   sign(body) { return createHmac('sha256', this.secret).update(ipnString(body)).digest('hex'); }
   verify(body) {
@@ -39,6 +39,36 @@ export class PaymentSimulator {
     await this.store.create(order);
     return order;
   }
+  async firstChargeQuote(user, maHopDong) {
+    this.customer(user);
+    const id = String(maHopDong || '').trim();
+    const contract = await this.firstCharges.get(id);
+    if (!contract || contract.customerId !== user.maNguoiDung) fail('Không tìm thấy hợp đồng của bạn.', 404);
+    const base = { purpose: 'thu-nhan-phong', refId: id };
+    if (contract.status !== 'Hiệu lực') return { ...base, status: 'Unavailable' };
+    if (contract.paid) return { ...base, status: 'Paid' };
+    let amountVnd;
+    try { amountVnd = await this.firstCharges.amount(id); }
+    catch (error) {
+      if ((await this.firstCharges.get(id))?.paid) return { ...base, status: 'Paid' };
+      throw error;
+    }
+    if (!Number.isFinite(amountVnd) || amountVnd <= 0) return { ...base, status: 'Accounting' };
+    if (Math.round(amountVnd * 100) / 100 !== amountVnd) fail('Số tiền kỳ đầu không hợp lệ, vui lòng liên hệ kế toán.', 409);
+    return { ...base, status: 'Pending', amountVnd };
+  }
+  async createFirstChargeOrder(user, maHopDong) {
+    const quote = await this.firstChargeQuote(user, maHopDong);
+    if (quote.status === 'Paid') fail('Hóa đơn kỳ đầu đã được thanh toán.', 409);
+    if (quote.status === 'Accounting') fail('Khoản thu kỳ đầu không cần thanh toán qua ví, vui lòng liên hệ kế toán.', 409);
+    if (quote.status !== 'Pending') fail('Hợp đồng chưa ở trạng thái chờ thu kỳ đầu.', 409);
+    const existing = await this.store.findPending(quote.purpose, quote.refId, user.maNguoiDung);
+    if (existing && existing.amountVnd === quote.amountVnd) return existing;
+    const order = { id: 'SIM' + randomBytes(12).toString('hex').toUpperCase(), ...quote,
+      customerId: user.maNguoiDung };
+    await this.store.create(order);
+    return order;
+  }
   async getOrder(user, id) { return this.owned(user, id); }
   async cancel(user, id) {
     const order = await this.owned(user, id);
@@ -65,11 +95,18 @@ export class PaymentSimulator {
       await this.store.transition(order.id, 'Pending', 'Failed', { lastError: 'Ví mô phỏng báo thanh toán không thành công.' });
       return this.store.get(order.id);
     }
-    // Atomic claim: a repeated or concurrent IPN cannot confirm the deposit twice.
+    // Atomic claim: a repeated or concurrent IPN cannot confirm either purpose twice.
     if (!await this.store.transition(order.id, 'Pending', 'Processing')) return { ...await this.store.get(order.id), duplicate: true };
     try {
-      await this.deposits.markPaid(order.refId, `cong-thanh-toan-mo-phong:${order.id}:${body.transId}`);
-      await this.store.transition(order.id, 'Processing', 'Paid', { transId: String(body.transId) });
+      const receipt = `cong-thanh-toan-mo-phong:${order.id}:${body.transId}`;
+      if (order.purpose === 'dat-coc') {
+        await this.deposits.markPaid(order.refId, receipt);
+        await this.store.transition(order.id, 'Processing', 'Paid', { transId: String(body.transId) });
+      } else if (order.purpose === 'thu-nhan-phong') {
+        // The SQL adapter commits the invoice and Paid order together.
+        await this.firstCharges.markPaid(order, receipt, String(body.transId));
+      }
+      else fail('Loại đơn thanh toán không hợp lệ.', 409);
     } catch (error) {
       await this.store.transition(order.id, 'Processing', 'Failed', { lastError: String(error.message).slice(0, 500) });
       throw error;

@@ -302,10 +302,10 @@ BEGIN
     SET @ThongBao = N'';
 
     -- [1] Kiểm tra phương thức thanh toán hợp lệ
-    IF @PhuongThucThanhToan NOT IN (N'Tiền mặt', N'Chuyển khoản')
+    IF @PhuongThucThanhToan IS NULL OR @PhuongThucThanhToan NOT IN (N'Tiền mặt', N'Chuyển khoản', N'Ví điện tử')
     BEGIN
         SET @MaLoi = -7;
-        SET @ThongBao = N'Phương thức thanh toán không hợp lệ (Chỉ chấp nhận "Tiền mặt" hoặc "Chuyển khoản").';
+        SET @ThongBao = N'Phương thức thanh toán không hợp lệ.';
         RETURN;
     END;
 
@@ -317,8 +317,10 @@ BEGIN
         RETURN;
     END;
 
-    -- [3] Kiểm tra nhân viên kế toán tồn tại
-    IF @MaNhanVienKeToan IS NULL OR NOT EXISTS (SELECT 1 FROM NhanVien WHERE MaNhanVien = @MaNhanVienKeToan)
+    -- [3] Kế toán ghi tay phải tồn tại; cổng mô phỏng không gán sai người thu.
+    IF (@PhuongThucThanhToan = N'Ví điện tử' AND @MaNhanVienKeToan IS NOT NULL)
+       OR (@PhuongThucThanhToan <> N'Ví điện tử' AND
+           (@MaNhanVienKeToan IS NULL OR NOT EXISTS (SELECT 1 FROM NhanVien WHERE MaNhanVien = @MaNhanVienKeToan)))
     BEGIN
         SET @MaLoi = -8;
         SET @ThongBao = N'Nhân viên kế toán thực hiện không tồn tại hoặc không hợp lệ.';
@@ -685,6 +687,9 @@ BEGIN
         @TongKhoanThuDetail AS TongKhoanThu,
         CASE WHEN h.TrangThai = N'Đã TT' THEN @TongKhoanThuDetail ELSE 0.00 END AS DaThanhToan,
         h.PhuongThucThanhToan,
+        CASE WHEN h.MaNhanVienKeToan IS NULL AND h.PhuongThucThanhToan = N'Ví điện tử'
+             THEN N'Tự động (cổng thanh toán mô phỏng)'
+             ELSE h.MaNhanVienKeToan END AS NguoiThu,
         h.NgayThanhToan,
         @TienHoanCoc AS TienHoanCoc,
         @SoNguoiHuy AS SoNguoiHuy,
@@ -706,6 +711,7 @@ BEGIN
         h.TongTien, 
         h.TrangThai, 
         h.PhuongThucThanhToan, 
+        h.MaNhanVienKeToan,
         h.NgayThanhToan;
 
     -- RESULT SET 2: Chi tiết hóa đơn (Ghép động dòng tiền thuê kỳ đầu để hiển thị đồng bộ trên UI)

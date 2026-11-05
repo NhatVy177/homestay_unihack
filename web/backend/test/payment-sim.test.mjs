@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { PaymentSimulator } from '../integrations/payment-sim/service.js';
 const customer = { vaiTro: 'KhachHang', maNguoiDung: 'KH0001' };
-function fixture(deposit = {}) {
+function fixture(deposit = {}, charge = {}) {
   const orders = new Map(), calls = [];
   const store = {
     async get(id) { return orders.has(id) ? structuredClone(orders.get(id)) : null; },
@@ -24,7 +24,18 @@ function fixture(deposit = {}) {
       calls.push(['paid', id, receipt]); state.status = 'Đã TT';
     },
   };
-  return { sim: new PaymentSimulator({ store, deposits, secret: 'test-secret-0123456789' }), orders, calls, state };
+  const chargeState = { id: 'HD0001', customerId: 'KH0001', status: 'Hiệu lực', paid: false, amountVnd: 2500000, ...charge };
+  const firstCharges = {
+    async get(id) { return id === chargeState.id ? { ...chargeState } : null; },
+    async amount() { return chargeState.amountVnd; },
+    async markPaid(order, receipt, transId) {
+      if (chargeState.paid) throw Object.assign(new Error('Hóa đơn kỳ đầu đã được thanh toán bằng cách khác.'), { statusCode: 409, maLoi: -3 });
+      if (order.amountVnd < chargeState.amountVnd) throw new Error('Số tiền không còn đủ để thanh toán kỳ đầu.');
+      calls.push(['charge-paid', order.refId, order.amountVnd, receipt]); chargeState.paid = true;
+      await store.transition(order.id, 'Processing', 'Paid', { transId });
+    },
+  };
+  return { sim: new PaymentSimulator({ store, deposits, firstCharges, secret: 'test-secret-0123456789' }), orders, calls, state, chargeState };
 }
 describe('Cổng ví điện tử mô phỏng (D-013)', () => {
   it('creates one order per deposit, pays it once and confirms the deposit through Web2', async () => {
@@ -75,5 +86,41 @@ describe('Cổng ví điện tử mô phỏng (D-013)', () => {
     f.state.status = 'Hết hạn';
     await assert.rejects(f.sim.pay(customer, order.id), /Chờ TT/);
     assert.equal(f.orders.get(order.id).status, 'Failed');
+  });
+});
+
+describe('Khoản thu kỳ đầu qua ví mô phỏng (D-018)', () => {
+  it('checks owner, paid state, amount and reuses a matching pending order', async () => {
+    const f = fixture();
+    await assert.rejects(f.sim.createFirstChargeOrder({ ...customer, maNguoiDung: 'KH0002' }, 'HD0001'), e => e.statusCode === 404);
+    await assert.rejects(fixture({}, { paid: true }).sim.createFirstChargeOrder(customer, 'HD0001'), e => e.statusCode === 409);
+    await assert.rejects(fixture({}, { amountVnd: 0 }).sim.createFirstChargeOrder(customer, 'HD0001'), e => e.statusCode === 409);
+    const order = await f.sim.createFirstChargeOrder(customer, 'HD0001');
+    assert.equal(order.purpose, 'thu-nhan-phong');
+    assert.equal(order.amountVnd, 2500000);
+    assert.equal((await f.sim.createFirstChargeOrder(customer, 'HD0001')).id, order.id);
+  });
+  it('validates signed amount and settles a repeated or concurrent IPN once', async () => {
+    const f = fixture();
+    const order = await f.sim.createFirstChargeOrder(customer, 'HD0001');
+    const body = { orderId: order.id, amountVnd: order.amountVnd, resultCode: 0, transId: 'TEST1', responseTime: 1 };
+    await assert.rejects(f.sim.handleIpn({ ...body, signature: '00'.repeat(32) }), e => e.statusCode === 401);
+    const wrong = { ...body, amountVnd: 1 };
+    await assert.rejects(f.sim.handleIpn({ ...wrong, signature: f.sim.sign(wrong) }), e => e.statusCode === 400);
+    const signed = { ...body, signature: f.sim.sign(body) };
+    const results = await Promise.all([f.sim.handleIpn(signed), f.sim.handleIpn(signed)]);
+    assert.equal(results.filter(r => r.duplicate).length, 1);
+    assert.equal(f.calls.filter(c => c[0] === 'charge-paid').length, 1);
+    assert.match(f.calls.find(c => c[0] === 'charge-paid')[3], /^cong-thanh-toan-mo-phong:SIM/);
+    assert.equal((await f.sim.handleIpn(signed)).duplicate, true);
+    assert.equal(f.orders.get(order.id).status, 'Paid');
+  });
+  it('fails the order when accounting has already paid the first invoice', async () => {
+    const f = fixture();
+    const order = await f.sim.createFirstChargeOrder(customer, 'HD0001');
+    f.chargeState.paid = true;
+    await assert.rejects(f.sim.pay(customer, order.id), e => e.statusCode === 409 && e.maLoi === -3);
+    assert.equal(f.orders.get(order.id).status, 'Failed');
+    assert.equal(f.calls.filter(c => c[0] === 'charge-paid').length, 0);
   });
 });
