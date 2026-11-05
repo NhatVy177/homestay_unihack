@@ -155,3 +155,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: truy vấn `Phong`/`Giuong`/`ChiNhanh`/`LoaiPhong`, tài khoản–nhân viên–chi nhánh và metadata khóa ngoại tham chiếu `Phong`; kết nối xác nhận đúng database `HOMEDORM4`. Toàn bộ truy vấn là đọc-only.
 - Còn lại/bước tiếp: Vy có thể dùng bộ `P407`/`CN0001` và các vai trò nhân viên cùng chi nhánh được báo trong trao đổi để test; trạng thái DB có thể đổi sau khi chạy luồng.
 - Git: sẽ commit/push riêng cập nhật hồ sơ J-011 trên `main` sau khi kiểm tra diff.
+
+## 2026-11-06 00:50:54 +07:00 — J-012 — Lùi giờ lịch xem phòng DK9315-1 để kiểm thử
+
+- Người thực hiện: AI đang làm việc với Vy.
+- Trao đổi/yêu cầu: Vy gửi ảnh lịch `DK9315-1` của phòng `P102` còn ở trạng thái `Chờ xem` và cần cập nhật dữ liệu để kiểm thử bước sau giờ hẹn.
+- Kết luận: code hiện tại không có bước nhân viên xác nhận thủ công; khi tải danh sách, backend tự chuyển lịch có `ThoiGianHen <= GETDATE()` sang `Đã xem`. Theo yêu cầu của Vy, đã đổi riêng giờ hẹn `DK9315-1` từ `07:00 07/11/2026` thành khoảng 5 phút trước giờ SQL Server (`07:45 06/11/2026`), rồi chạy đúng cơ chế tự cập nhật để lịch thành `Đã xem`.
+- Liên quan: dữ liệu test local; không đổi scope, quyết định hay code.
+- File và nội dung: `spec/journal.md` — ghi lại yêu cầu và thay đổi dữ liệu; SQL Server `HOMEDORM4` — cập nhật duy nhất `LichXemPhong(MaDangKy='DK9315', STTLich=1)`.
+- Kiểm tra: cập nhật có điều kiện trong transaction yêu cầu đúng một bản ghi đang `Chờ xem` và giờ hẹn còn ở tương lai; kết quả một bản ghi đổi giờ, cơ chế `capNhatLichXemDenGioThanhDaXem` cập nhật một bản ghi; truy vấn lại xác nhận `P102 - Phòng P102`, lịch `Đã xem`, hồ sơ vẫn `Đã tiếp nhận`.
+- Còn lại/bước tiếp: Vy tải lại giao diện và tiếp tục kiểm thử luồng đặt cọc. Nếu nghiệp vụ cần nhân viên xác nhận đã xem thực tế thay vì tự động theo giờ, cần chốt thay đổi yêu cầu rồi sửa code riêng.
+- Git: sẽ commit/push riêng cập nhật hồ sơ J-012 trên `main` sau khi kiểm tra diff.
