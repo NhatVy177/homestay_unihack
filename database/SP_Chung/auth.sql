@@ -43,6 +43,13 @@ BEGIN
        OR @SDT IS NULL
         THROW 50001, N'Vui lòng nhập đầy đủ họ tên, tên đăng nhập, giới tính, số điện thoại, ngày sinh và mật khẩu.', 1;
 
+    -- D-016: email bắt buộc (mã xác nhận và thông báo biên bản gửi qua email).
+    IF @Email IS NULL
+        THROW 50001, N'Vui lòng nhập email.', 1;
+
+    IF @Email LIKE '%[ ,;]%' OR @Email NOT LIKE '_%@_%._%' OR @Email LIKE '%@%@%'
+        THROW 50001, N'Email không hợp lệ.', 1;
+
     IF LEN(@SDT) <> 10 OR @SDT LIKE '%[^0-9]%'
         THROW 50001, N'Số điện thoại phải có đúng 10 chữ số.', 1;
 
@@ -76,6 +83,16 @@ BEGIN
            )
             THROW 50006, N'Số điện thoại này đã được liên kết với một tài khoản. Vui lòng đăng nhập.', 1;
 
+        -- D-016: hai tài khoản không dùng chung email (ví xác nhận gắn với email).
+        IF EXISTS (
+            SELECT 1
+            FROM dbo.NguoiDung AS nd WITH (UPDLOCK, HOLDLOCK)
+            INNER JOIN dbo.TaiKhoan AS tk ON tk.MaNguoiDung = nd.MaNguoiDung
+            WHERE nd.Email = @Email
+              AND nd.MaNguoiDung <> ISNULL(@MaNguoiDung, '')
+        )
+            THROW 50002, N'Email này đã được dùng cho một tài khoản khác.', 1;
+
         IF @MaNguoiDung IS NULL
         BEGIN
             SELECT @SoThuTu = ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguoiDung, 3, 4))), 0) + 1
@@ -96,7 +113,7 @@ BEGIN
         ELSE
         BEGIN
             UPDATE dbo.NguoiDung
-            SET Email = COALESCE(Email, @Email)
+            SET Email = @Email
             WHERE MaNguoiDung = @MaNguoiDung;
         END;
 

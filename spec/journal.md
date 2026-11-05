@@ -130,3 +130,17 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Chưa kiểm tra: OTP Privy thật trên trình duyệt (cần Vy nhận mã email), luồng đầy đủ qua giao diện với DB thật, Fuji.
 - Còn lại: Vy chạy `run.ps1` và thử; nhận phản hồi BTC (Q-10); T-08 Fuji.
 - Git: commit mã J-009 trên main.
+
+## 2026-11-05 17:31:24 +07:00 — J-010 — Bắt buộc email khi khách đăng ký tài khoản (D-016)
+
+- Người thực hiện: Claude theo yêu cầu Vy.
+- Trao đổi: Vy hỏi form "Tạo tài khoản mới" có nên bắt buộc email. Claude đề xuất bắt buộc + đúng định dạng + không trùng (OTP và thông báo đi qua email; ví nhúng gắn với email). Vy đồng ý → D-016.
+- Đính chính: mốc `23:50:00` ở J-009 và D-015 là ghi sai; giờ máy lúc ghi J-010 là 17:31 cùng ngày, nên J-009 diễn ra trước 17:31 ngày 05/11 (không rõ giờ chính xác).
+- File và nội dung:
+  - `database/SP_Chung/auth.sql` (`SP_DangKy`): bắt buộc email, kiểm tra định dạng, chặn email đã dùng cho tài khoản khác (mã lỗi 50002 → HTTP 409); khi khách đã có hồ sơ (nhân viên tạo trước) thì email tài khoản ghi đè email cũ.
+  - `web/backend/services/auth.service.js`: kiểm tra thiếu/sai định dạng email trước khi gọi SP.
+  - `web/frontend/src/pages/TrangChu.jsx`: ô Email có dấu `*`, `required`, `maxLength=100`.
+  - Hồ sơ: `spec/decisions.md` (D-016), `spec/scope.md` (F-01), `hackathon/plan.md`, `spec/progress.md` (T-15).
+- Không thêm UNIQUE ở bảng `NguoiDung`: DB local đã có 1 email trùng giữa 2 tài khoản; nhiều SP của nhân viên (đặt cọc, khách mới, admin) cập nhật email khách và sẽ lỗi khó hiểu nếu có ràng buộc.
+- Kiểm tra: áp `SP_DangKy` vào DB local; thiếu email → 50001, sai định dạng (2 kiểu) → 50001, trùng → 50002, hợp lệ → tạo được (trong transaction đã rollback, không còn dữ liệu thử). `web/backend npm test` pass; frontend build qua. Chưa thử bằng giao diện.
+- Còn lại: Vy quyết có sửa 1 email trùng và 8 tài khoản thiếu email trong DB local không (không tự sửa). Các việc của J-009 vẫn giữ nguyên.

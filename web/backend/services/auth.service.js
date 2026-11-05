@@ -97,9 +97,15 @@ export async function dangKy(data = {}) {
   const ngaySinh = data.ngaySinh || null;
   const gioiTinh = String(data.gioiTinh || '').trim();
   const soDienThoai = String(data.soDienThoai || '').trim();
+  const email = String(data.email || '').trim();
 
-  if (!tenDangNhap || !matKhau || !xacNhanMatKhau || !hoTen || !ngaySinh || !gioiTinh || !soDienThoai) {
+  if (!tenDangNhap || !matKhau || !xacNhanMatKhau || !hoTen || !ngaySinh || !gioiTinh || !soDienThoai || !email) {
     throw createServiceError('Vui long nhap day du cac thong tin bat buoc');
+  }
+
+  // D-016: email nhận mã xác nhận và thông báo biên bản.
+  if (email.length > 100 || !/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(email)) {
+    throw createServiceError('Email không hợp lệ.');
   }
 
   if (matKhau !== xacNhanMatKhau) {
@@ -122,7 +128,7 @@ export async function dangKy(data = {}) {
       { name: 'NgaySinh', type: sql.Date, value: ngaySinh },
       { name: 'GioiTinh', type: sql.NVarChar(5), value: gioiTinh },
       { name: 'SDT', type: sql.VarChar(20), value: soDienThoai },
-      { name: 'Email', type: sql.VarChar(100), value: data.email || null }
+      { name: 'Email', type: sql.VarChar(100), value: email }
     ]);
 
     const record = result.recordset[0];

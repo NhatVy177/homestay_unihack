@@ -223,9 +223,9 @@ function AuthModal({ mode, onClose, onSwitchMode }) {
               </div>
               <div className="tc-form-row">
                 <label className="tc-form-field">
-                  <span>Email</span>
+                  <span>Email <span className="tc-required">*</span></span>
                   <input name="email" type="email" value={regForm.email} onChange={updateReg}
-                    placeholder="ban@example.com" />
+                    placeholder="ban@example.com" required maxLength={100} autoComplete="email" />
                 </label>
                 <label className="tc-form-field">
                   <span>Số điện thoại <span className="tc-required">*</span></span>
