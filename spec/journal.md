@@ -199,3 +199,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: `git status` trước sửa sạch trên `main`, remote đúng `NhatVy177/homestay_unihack`; TCP cổng 587 tới Gmail thông; nạp `.env` qua `dotenv` xác nhận mailer ở chế độ `smtp`, cổng 587, trường `SMTP_PASS` chưa có. Chưa thử xác thực hoặc gửi email.
 - Còn lại/bước tiếp: Vy bật xác minh 2 bước và tạo App Password; nhập trực tiếp vào `SMTP_PASS` trong `.env` rồi báo để AI gửi thư test tới hộp thư redirect và khởi động lại backend nếu đang chạy.
 - Git: chỉ commit/push hồ sơ `spec/` trên `main`, file `.env` không theo Git.
+
+## 2026-11-06 01:41:57 +07:00 — J-016 — Giải thích cách tạo Google App Password
+
+- Người thực hiện: AI đang làm việc với Vy.
+- Trao đổi/yêu cầu: Vy hỏi cách tạo App Password sau khi được hướng dẫn điền `SMTP_PASS`.
+- Kết luận: hướng dẫn đăng nhập đúng tài khoản Gmail đã chọn, bật xác minh hai bước trong Google Account nếu chưa bật, mở trực tiếp trang App Passwords của Google, đặt tên ứng dụng HomeStayDorm và tạo mã 16 ký tự; dán mã chỉ vào `SMTP_PASS` trong `web/backend/.env`, không gửi mã qua chat. Nếu trang App Passwords không hiện, kiểm tra các hạn chế tài khoản theo tài liệu Google.
+- Liên quan: Q-08, T-11; chưa đổi quyết định hay tính năng.
+- File và nội dung: `spec/journal.md` — ghi câu hỏi và hướng dẫn; không sửa `.env` hoặc source trong đợt này.
+- Kiểm tra: đối chiếu tài liệu hỗ trợ chính thức của Google về App Password và xác minh hai bước; kiểm tra local `SMTP_PASS` vẫn trống, branch `main` sạch trước đợt ghi này.
+- Còn lại/bước tiếp: Vy tạo/dán App Password tại máy và báo để kiểm tra xác thực, gửi email test đến hộp thư redirect.
+- Git: commit/push cập nhật hồ sơ J-016 trên `main`.
