@@ -232,3 +232,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: kết quả send qua Gmail ở J-017 và phản hồi nhận thư từ Vy; không chạy thêm email hoặc luồng biên bản.
 - Còn lại/bước tiếp: khi kiểm thử tiếp luồng bàn giao, theo dõi email mời khách xác nhận và kết quả notification trong response; mọi mail demo tiếp tục được chuyển về hộp thư test.
 - Git: commit/push hồ sơ J-018 trên `main`.
+
+## 2026-11-06 02:03:10 +07:00 — J-019 — Làm rõ nút lưu biên bản và email mời xác nhận
+
+- Người thực hiện: AI đang làm việc với Vy.
+- Trao đổi/yêu cầu: Vy gửi ảnh phần “Xác nhận bàn giao” và hỏi khi bấm xác nhận/lưu biên bản thì có email không.
+- Kết luận: hai ô kiểm là quản lý xác nhận đã kiểm kê và ghi nhận khách có mặt; khách chưa ký điện tử tại bước này. Khi bấm “Lưu biên bản”, nếu biên bản Web2 lưu thành công và hồ sơ điện tử phát hành được, backend gọi email `handover-published` mời khách đăng nhập xem/xác nhận hoặc yêu cầu sửa. Cấu hình local hiện có SMTP và `MAIL_REDIRECT_TO`, nên email demo sẽ chuyển về hộp thư test. Email có thể bị bỏ qua/thất bại nếu thiếu địa chỉ người nhận hoặc SMTP lỗi; UI hiện chỉ nhìn `status=published` để báo “đã gửi email”, chưa dùng `notification=sent`, nên không thể lấy thông báo đó làm bằng chứng email đã đến.
+- Liên quan: D-012, Q-08, T-11; không đổi scope hay quyết định.
+- File và nội dung: `spec/journal.md` — ghi giải thích từ code và cấu hình; không sửa code, `.env` hoặc database.
+- Kiểm tra: đọc `BanGiaoPhongTab.jsx` (hai ô kiểm, nút lưu và thông báo thành công), `nhanPhong.controller.js`, `avalanche/index.js`, `service.js`, `notifications.js`, `mailer.js`; kiểm tra cờ cấu hình local không in giá trị bí mật. Chưa bấm lưu biên bản hoặc gửi mail biên bản trong lượt này.
+- Còn lại/bước tiếp: Vy có thể thử bằng hồ sơ test; đối chiếu trạng thái `xacNhanDienTu.notification` và hộp thư redirect để xác nhận mail thực tế. Sửa thông báo UI nếu Vy yêu cầu.
+- Git: commit/push riêng hồ sơ J-019 trên `main`.
