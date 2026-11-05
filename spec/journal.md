@@ -166,3 +166,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: cập nhật có điều kiện trong transaction yêu cầu đúng một bản ghi đang `Chờ xem` và giờ hẹn còn ở tương lai; kết quả một bản ghi đổi giờ, cơ chế `capNhatLichXemDenGioThanhDaXem` cập nhật một bản ghi; truy vấn lại xác nhận `P102 - Phòng P102`, lịch `Đã xem`, hồ sơ vẫn `Đã tiếp nhận`.
 - Còn lại/bước tiếp: Vy tải lại giao diện và tiếp tục kiểm thử luồng đặt cọc. Nếu nghiệp vụ cần nhân viên xác nhận đã xem thực tế thay vì tự động theo giờ, cần chốt thay đổi yêu cầu rồi sửa code riêng.
 - Git: sẽ commit/push riêng cập nhật hồ sơ J-012 trên `main` sau khi kiểm tra diff.
+
+## 2026-11-06 01:25:57 +07:00 — J-013 — Làm rõ thời điểm gửi email xác nhận biên bản
+
+- Người thực hiện: AI đang làm việc với Vy.
+- Trao đổi/yêu cầu: Vy hỏi đọc code để xác định khi nào hệ thống bắt đầu gửi email mời khách xác nhận biên bản bàn giao.
+- Kết luận: email loại `handover-published` được gọi ngay sau khi quản lý lập biên bản bàn giao Web2 thành công và backend phát hành được hồ sơ xác nhận điện tử; không chờ khách xác nhận. Việc phát hành yêu cầu Avalanche integration đang bật, địa chỉ contract hợp lệ, biên bản bàn giao vào ở trạng thái `Đã lập`, đúng chi nhánh, có tiền cọc/chính sách hợp lệ và chưa có hồ sơ Avalanche trùng. Email cần khách có địa chỉ email. Môi trường local hiện bật Avalanche nhưng chưa cấu hình `SMTP_HOST`, nên mailer ở chế độ `dev-log`: chỉ in nội dung ra console, không gửi email thật. Giao diện hiện suy từ trạng thái `published` để báo “đã gửi ... email”, chưa phân biệt notification `logged/sent`, nên thông báo có thể gây hiểu nhầm.
+- Liên quan: D-012, Q-08; đây là kết quả đọc code/cấu hình, chưa chốt thay đổi yêu cầu và không sửa code.
+- File và nội dung: `spec/journal.md` — ghi lại kết quả phân tích. Không sửa source, `.env` hay dữ liệu SQL Server; không ghi giá trị cấu hình bí mật.
+- Kiểm tra: đối chiếu `BanGiaoPhongTab.jsx` → `POST /nhan-phong/ban-giao` → `nhanPhong.controller.js` → `onWeb2HandoverCreated` → `AvalancheService.publish/notified` → `notifications.js` → `mailer.js`; đọc cờ cấu hình hiệu lực dưới dạng boolean, xác nhận `avalancheEnabled=true`, `mailMode=dev-log`, không có SMTP/redirect.
+- Còn lại/bước tiếp: nếu cần email thật, cấu hình nhà cung cấp SMTP và hộp thư redirect dùng cho demo rồi kiểm thử bằng một biên bản/test inbox; nếu sửa UI, chỉ báo “đã gửi email” khi notification là `sent`, còn `logged/skipped/failed` phải hiển thị đúng trạng thái.
+- Git: sẽ commit/push riêng cập nhật hồ sơ J-013 trên `main` sau khi kiểm tra diff.
