@@ -293,3 +293,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kết luận (không phải quyết định mới, không có D-xxx): không mở rộng ví mô phỏng (D-013) sang hóa đơn kỳ đầu — để sau nếu còn thời gian. Chuẩn bị dữ liệu demo sẵn ở bước "Chờ bàn giao"; pitch mở đầu bằng nỗi đau "nhiều người chuyền tay, giấy tờ ký tay" lấy từ đề (§3.1.3 cùng xác nhận biên bản bàn giao, §3.1.4 xác nhận đối soát với khách). Ưu tiên: thử trọn luồng local → T-08 Fuji → T-09 video/slides.
 - Đối chiếu ảnh chat góp ý của BTC: ví nhúng trong tài khoản, không MetaMask/Core (đã làm: D-011/D-015); token point (D-014, dự phòng); thanh toán MoMo giả lập/API mô phỏng cho Web2 (D-013, đã có cho tiền cọc); Web3 áp dụng vừa đủ, không ảnh hưởng UX, người dùng không cần biết (D-012, D-017).
 - File: chỉ mục này.
+
+## 2026-11-06 02:36:59 +07:00 — J-025 — Chốt D-018: pitch theo đề, ví mô phỏng cho khoản thu kỳ đầu, demo từ "Chờ bàn giao"
+
+- Người thực hiện: Claude theo yêu cầu Vy (lên plan, không sửa code).
+- Trao đổi: sau J-024, Vy chọn làm cả 3 điểm Claude đề xuất trước đó (dán lại nguyên văn) → D-018, thay kết luận "không mở rộng ví mô phỏng" của J-024.
+- Phát hiện từ code (chỉ đọc) để viết prompt: khoản thu kỳ đầu ghi bằng `SP_GhiNhanKhoanThuNhanPhong` (`database/SP_NhanPhong/sp_ghi_nhan_khoan_thu_nhan_phong.sql`): bắt buộc `@MaNhanVienKeToan` tồn tại, phương thức chỉ "Tiền mặt"/"Chuyển khoản", tự tạo hóa đơn kỳ đầu, chặn ghi lần hai (-3), số tiền có thể trừ hoàn cọc giường bị hủy. Số tiền tính bằng `SP_TinhKhoanThuNhanPhong`. Cổng mô phỏng hiện chỉ có loại `dat-coc` (`web/backend/integrations/payment-sim/`), `RefId` dài 6 ký tự (vừa mã hợp đồng). Điểm vướng: không có kế toán khi khách tự trả → prompt yêu cầu agent đề xuất cách ghi không gán sai người thu trước khi sửa SP.
+- File: `spec/decisions.md` (D-018), `spec/scope.md` (F-11), `hackathon/plan.md`, `spec/progress.md` (T-09, T-17), mục này. Không sửa code.
+- Còn lại: Vy đưa prompt T-17 (trong chat) cho agent code. Kịch bản dữ liệu demo (điểm 3) làm sau khi T-17 xong, vì khi đó khách tự trả được cọc và kỳ đầu nên tạo hợp đồng "Chờ bàn giao" qua giao diện rất nhanh.

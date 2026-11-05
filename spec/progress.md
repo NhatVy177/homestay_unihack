@@ -62,7 +62,8 @@ Vy đã chốt: nhân viên dẫn sinh viên xem phòng và lập biên bản tr
 | T-06 | Thu gọn contract và thêm xác nhận ký | Đang làm: contract + test local có trong `fadd0ec`; thiếu phiên bản biên bản bàn giao theo D-009 | F-02/F-03/F-04/F-05; bỏ bước tiền/báo trước cũ, test quyền/replay/version/số học. |
 | T-07 | Nối UI ba vai trò, SQL, evidence và Verify | Chưa bắt đầu | F-02/F-03/F-04/F-06/F-07/F-08; cần kiểm tra SQL và receipt/event phục hồi. |
 | T-08 | Deploy, verify source và nghiệm thu Fuji | Chưa bắt đầu | F-09; chưa có deployment/tx/source verification được xác minh trong repo mới. |
-| T-09 | Hồ sơ nộp và demo | Chưa bắt đầu | README setup/ghi công, video 2–3 phút, slides, kiểm tra link; Q-06/Q-07. |
+| T-09 | Hồ sơ nộp và demo | Chưa bắt đầu | README setup/ghi công, video 2–3 phút, slides, kiểm tra link; Q-06/Q-07. (D-018) Pitch mở bằng nỗi đau trong đề đồ án; video bắt đầu từ hợp đồng chuẩn bị sẵn ở "Chờ bàn giao". |
+| T-17 | Ví mô phỏng cho khoản thu kỳ đầu (D-018) | Chưa bắt đầu: prompt cho agent code đưa Vy ở J-025 | Agent code làm theo prompt; Claude xem lại khi Vy yêu cầu. |
 | T-10 | Tổ chức module blockchain sau khi đọc Senpai | Hoàn thành | Khung root + integration client/server, private package chưa có dependencies; 34 link local, JSON, ignore rules và diff đã kiểm tra. Commit mang mã J-004. Không đồng nghĩa hoàn thành tính năng blockchain. |
 | T-12 | Cổng ví điện tử mô phỏng cho tiền cọc (D-013) | Đang làm: code + unit test + UI smoke qua (J-007) | Còn chạy thử với phiếu cọc thật qua HTTP; đặt `PAYMENT_SIM_SECRET`. |
 | T-14 | Ví nhúng bằng OTP email (D-015) + môi trường test local | Đang làm (J-009, 23:50): code xong; `.env` local trỏ chain Hardhat 31337; `run.ps1` tự mở chain + deploy; backend chạy thật báo `enabled:true, walletAuth:email`; test 12+6 pass, build + smoke qua | **Vy chạy `run.ps1` và thử trên trình duyệt**: lập biên bản → khách nhập OTP → xác nhận. Chưa ai thử OTP Privy thật. |
