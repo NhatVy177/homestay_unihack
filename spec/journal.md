@@ -285,3 +285,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: `blockchain npm test` 12 pass, 1 skip do chưa có SQL tích hợp; `web/backend npm test` 6 pass; `web/frontend npm run build` pass (cảnh báo có sẵn từ dependencies và chunk lớn); `web/frontend npm run test:avalanche-ui` pass. Browser smoke xác nhận khách không có `0x`/mục kỹ thuật, hồ sơ cũ thiếu `at` không lỗi, quản lý và kế toán hiện mã rút gọn và “Chain thử nghiệm trên máy (local)”. `git diff --check` pass.
 - Giới hạn/bước tiếp: browser smoke dùng hồ sơ mô phỏng, chưa chạy lại luồng ba vai trò với SQL thật hoặc Fuji; cần thử tích hợp sau. Không sửa `.env`, dữ liệu DB, contract, quyền hay API path.
 - Git: commit/push cùng đợt J-023 trên `main`; tra mã bằng `git log --all --grep="J-023"`.
+
+## 2026-11-06 02:34:43 +07:00 — J-024 — Giữ luồng Web2, không mở rộng thanh toán mô phỏng; đối chiếu góp ý BTC
+
+- Người thực hiện: Claude theo yêu cầu Vy (chỉ thảo luận, không sửa code).
+- Trao đổi: Vy gửi đề đồ án môn PTTK HTTT (nguồn gốc luồng nhiều vai trò: sale → kế toán → quản lý) và hỏi có nên tối ưu luồng đăng ký/đặt cọc/nhận phòng. Claude đề xuất không viết lại Web2; giải thích hai kiểu thanh toán ngoài đời (chuyển khoản tay cần người đối chiếu; cổng thanh toán tự xác nhận qua IPN) nên giữ cả hai như hiện tại là hợp lý. Vy chốt làm đơn giản: không làm thêm vào luồng Web2 lúc này.
+- Kết luận (không phải quyết định mới, không có D-xxx): không mở rộng ví mô phỏng (D-013) sang hóa đơn kỳ đầu — để sau nếu còn thời gian. Chuẩn bị dữ liệu demo sẵn ở bước "Chờ bàn giao"; pitch mở đầu bằng nỗi đau "nhiều người chuyền tay, giấy tờ ký tay" lấy từ đề (§3.1.3 cùng xác nhận biên bản bàn giao, §3.1.4 xác nhận đối soát với khách). Ưu tiên: thử trọn luồng local → T-08 Fuji → T-09 video/slides.
+- Đối chiếu ảnh chat góp ý của BTC: ví nhúng trong tài khoản, không MetaMask/Core (đã làm: D-011/D-015); token point (D-014, dự phòng); thanh toán MoMo giả lập/API mô phỏng cho Web2 (D-013, đã có cho tiền cọc); Web3 áp dụng vừa đủ, không ảnh hưởng UX, người dùng không cần biết (D-012, D-017).
+- File: chỉ mục này.
