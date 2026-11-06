@@ -12,6 +12,7 @@ package-lock.json.bak
 dist/
 build/
 out/
+demo-screenshots/
 
 # Logs
 logs/

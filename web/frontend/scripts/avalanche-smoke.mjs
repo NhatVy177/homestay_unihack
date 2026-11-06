@@ -1,7 +1,7 @@
 import { chromium } from 'playwright-core';
 import { spawn, execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname, basename } from 'node:path';
 import { emailNotice, receiptTime } from '../src/components/xacNhan/receiptDisplay.js';
@@ -28,7 +28,12 @@ try {
     executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe',
     headless: true,
   });
-  const page = await browser.newPage();
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const capture = async name => {
+    if (!process.env.HOMEDORM_CAPTURE_DIR) return;
+    await mkdir(process.env.HOMEDORM_CAPTURE_DIR, { recursive: true });
+    await page.screenshot({ path: join(process.env.HOMEDORM_CAPTURE_DIR, name), fullPage: true });
+  };
   const failures = [];
   page.on('pageerror', error => failures.push(error.message));
   await page.goto(base + '/kiem-chung-avalanche', { waitUntil: 'domcontentloaded' });
@@ -56,12 +61,14 @@ try {
   await page.getByText('MÔI TRƯỜNG MÔ PHỎNG', { exact: false }).waitFor();
   await page.getByRole('button', { name: 'Xác nhận thanh toán' }).waitFor();
   assert.ok((await page.textContent('body')).includes('3.000.000'));
+  await capture('01-cong-tien-coc.png');
   await page.route('**/api/thanh-toan-mo-phong/SIMFIRST', route => route.fulfill({ json: {
     id: 'SIMFIRST', purpose: 'thu-nhan-phong', refId: 'HDTEST', amountVnd: 2500000, status: 'Pending',
   } }));
   await page.goto(base + '/thanh-toan-mo-phong/SIMFIRST', { waitUntil: 'domcontentloaded' });
   await page.getByText('Khoản thu kỳ đầu – hợp đồng HDTEST').waitFor();
   await page.getByRole('link', { name: 'Quay lại hợp đồng' }).waitFor();
+  await capture('02-cong-khoan-thu-ky-dau.png');
   // D-017: one mocked case checks the rendered customer and both staff views without SQL or secrets.
   const hash = '0x' + 'a'.repeat(64);
   const at = '2026-11-06T02:30:00.000Z';
@@ -98,6 +105,7 @@ try {
   await page.getByRole('button', { name: 'Tải bản lưu biên bản' }).waitFor();
   assert.equal(await page.locator('.xn-tech').count(), 0);
   assert.equal((await page.locator('.xn-card').textContent()).includes('0x'), false);
+  await capture('03-khach-da-xac-nhan.png');
   shownCases = [structuredClone(caseData)];
   delete shownCases[0].handover.confirmationReceipt.at;
   delete shownCases[0].versions[0].bundle.confirmationReceipt.at;
@@ -112,21 +120,26 @@ try {
   await page.getByText('Chain thử nghiệm trên máy (local)').waitFor();
   await page.getByText('0xaaaa…aaaa').waitFor();
   assert.equal(await page.getByText('Xem trên Snowtrace ↗').count(), 0);
+  await capture('04-quan-ly-thong-tin-xac-thuc.png');
   await openAs({ maNguoiDung: 'NV-DEMO', vaiTro: 'NhanVien', chucVu: 'Kế toán' });
   await page.getByRole('button', { name: 'Xem', exact: true }).click();
   await page.getByText('Thông tin xác thực trên Avalanche').click();
   await page.getByText('Chain thử nghiệm trên máy (local)').waitFor();
   await page.getByText('0xaaaa…aaaa').waitFor();
+  await capture('05-ke-toan-thong-tin-xac-thuc.png');
   await page.route('**/api/khach-moi/tong-quan', route => route.fulfill({ json: { trangThai: { soHopDong: 1, soPhieuDatCoc: 1 } } }));
   await page.route('**/api/khach-moi/phong-kha-dung**', route => route.fulfill({ json: [] }));
   await page.route('**/api/khach-moi/hop-dong-dashboard**', route => route.fulfill({ json: { MaHopDong: 'HDTEST',
-    danhSachHopDong: [{ MaHopDong: 'HDTEST', TrangThai: 'Hiệu lực' }], TrangThai: 'Hiệu lực', GiaThue: 2500000 } }));
+    danhSachHopDong: [{ MaHopDong: 'HDTEST', TrangThai: 'Hiệu lực' }], TrangThai: 'Hiệu lực',
+    TenPhong: 'Phòng demo', TenLoaiPhong: 'Studio', TenChiNhanh: 'Chi nhánh demo',
+    MaPhieuCoc: 'PCTEST', KyThanhToan: 'Hàng tháng', SoTienCoc: 3000000, GiaThue: 2500000 } }));
   await page.route('**/api/thanh-toan-mo-phong/thu-nhan-phong/HDTEST', route => route.fulfill({ json: route.request().method() === 'POST'
     ? { id: 'SIMFIRST', purpose: 'thu-nhan-phong', refId: 'HDTEST', amountVnd: 2500000, status: 'Pending' }
     : { purpose: 'thu-nhan-phong', refId: 'HDTEST', amountVnd: 2500000, status: 'Pending' } }));
   await openAs({ maNguoiDung: 'KHDEMO', vaiTro: 'KhachHang' });
   await page.goto(base + '/khach-hang?tab=hop-dong', { waitUntil: 'domcontentloaded' });
   await page.getByRole('heading', { name: 'Thanh toán khi nhận phòng' }).waitFor();
+  await capture('06-hop-dong-khoan-thu-ky-dau.png');
   await page.getByRole('button', { name: 'Ví điện tử (mô phỏng)' }).click();
   await page.waitForURL(base + '/thanh-toan-mo-phong/SIMFIRST');
   await page.getByText('Khoản thu kỳ đầu – hợp đồng HDTEST').waitFor();
