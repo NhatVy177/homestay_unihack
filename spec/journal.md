@@ -419,3 +419,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Giải đáp biên nhận: app đã có "Giấy biên nhận đặt cọc thuê nhà" in từ modal "Ghi nhận chứng từ thanh toán" của sale khi chọn Tiền mặt (`DatCocTab.jsx`, `handleInPhieuDatCoc`): số phiếu, ngày/nơi lập, bên A (khách: tên, năm sinh, CCCD, địa chỉ, SĐT), bên B (công ty, người đại diện = sale, SĐT chi nhánh), số tiền bằng số và chữ, phòng/giường, giữ chỗ đến ngày, ngày dự kiến nhận phòng, lập 2 bản, chữ ký hai bên.
 - Phát hiện khi rà code: đăng nhập chưa hỗ trợ quay lại trang yêu cầu sau khi đăng nhập; `PhieuDangKy` chưa có thời điểm gửi yêu cầu (chỉ có `NgayDangKy` kiểu DATE) nên cần cột mới cho hạn 12 giờ; luồng cọc chưa gửi email nào.
 - File: `spec/decisions.md` (D-023), `spec/scope.md` (F-13), `hackathon/plan.md` (D-022, D-023 + hạn mềm 10/11), `spec/progress.md` (T-19), mục này.
+
+## 2026-11-07 00:33:52 +07:00 — J-038 — Đánh giá luồng đặt cọc D-023, bổ sung báo quản lý và thứ tự công bằng
+
+- Người thực hiện: Claude theo yêu cầu Vy (đánh giá, không sửa code).
+- Trao đổi: Vy hỏi luồng D-023 có hợp lý không (Vy muốn đánh giá trước; Claude đã viết prompt ở J-037 trước khi đánh giá — nhận sai thứ tự). Claude đánh giá hợp lý, chỉ ra 2 lỗ hổng: quản lý không được báo khi có yêu cầu mới (khách có thể chờ tới 12 giờ rồi bị hủy chỉ vì quản lý không biết); chưa có thứ tự công bằng khi nhiều sale xin cùng phòng. Điểm nhỏ để sau: thời gian chờ tối đa 12 + 24 giờ; trường hợp sale báo đã thu tiền mặt mà quỹ không khớp (có thể thêm nút "Quỹ không khớp" sau). Vy đồng ý vá 2 lỗ hổng → bổ sung vào D-023.
+- Ghi nhận: lúc ghi, working tree đã có thay đổi chưa commit của Codex cho T-19 (SP/migration/route thu tiền mặt, nộp quỹ, email, tác vụ yêu cầu quá hạn, returnPath). Claude không chạm các file đó; đoạn bổ sung đưa Vy gửi Codex trong chat.
+- File: `spec/decisions.md` (bổ sung D-023), `spec/progress.md` (T-19), mục này.
