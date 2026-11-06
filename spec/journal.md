@@ -411,3 +411,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Rà soát code (chỉ đọc): luồng hiện tại 7 bước — sale gửi yêu cầu → quản lý duyệt nhận cọc → sale lập phiếu (chọn hình thức/giường, giường "Giữ chỗ") → hệ thống tự chốt (D-021) → khách trả ví / chuyển khoản tay (tải ảnh) / tiền mặt tại quầy (sale in phiếu ký, tải ảnh) → quản lý "Duyệt thanh toán" → tác vụ nền `datCocHetHan.service.js` tự hủy quá hạn. Phát hiện: luồng cọc không gửi email nào (mailer chỉ dùng cho Avalanche); màn chuyển khoản không có nội dung chuyển khoản chuẩn; phòng chưa được giữ trong lúc chờ quản lý duyệt.
 - Đề xuất đưa Vy (chưa chốt) trong chat; chờ Vy chọn.
 - File: `spec/decisions.md` (D-022), mục này.
+
+## 2026-11-07 00:15:56 +07:00 — J-037 — Chốt luồng đặt cọc mới (D-023) và soạn prompt cho Codex
+
+- Người thực hiện: Claude theo yêu cầu Vy (lên plan, không sửa code).
+- Trao đổi: Vy muốn giữ quản lý duyệt cọc (nhiều sale có thể xin cùng phòng); sau khi quản lý duyệt thì email cho sale (thông tin phiếu) và khách (thông tin phiếu + link thanh toán qua đăng nhập); nếu quản lý không duyệt thì hủy yêu cầu và email cho cả hai. Claude bổ sung: sale phải chọn hình thức + giường ngay khi gửi yêu cầu để có phiếu lúc duyệt; yêu cầu trùng giường tự bị từ chối; đề xuất tiền mặt cách A/B. Vy chọn: từ chối → hồ sơ quay về sale chọn phòng khác; tự hủy sau 12 giờ; tiền mặt cách A (hỏi thêm nút ở đâu, biên nhận là gì); yêu cầu ghi lại các việc và viết prompt chi tiết cho Codex (gồm cả các mục nhỏ đã đề xuất).
+- Giải đáp biên nhận: app đã có "Giấy biên nhận đặt cọc thuê nhà" in từ modal "Ghi nhận chứng từ thanh toán" của sale khi chọn Tiền mặt (`DatCocTab.jsx`, `handleInPhieuDatCoc`): số phiếu, ngày/nơi lập, bên A (khách: tên, năm sinh, CCCD, địa chỉ, SĐT), bên B (công ty, người đại diện = sale, SĐT chi nhánh), số tiền bằng số và chữ, phòng/giường, giữ chỗ đến ngày, ngày dự kiến nhận phòng, lập 2 bản, chữ ký hai bên.
+- Phát hiện khi rà code: đăng nhập chưa hỗ trợ quay lại trang yêu cầu sau khi đăng nhập; `PhieuDangKy` chưa có thời điểm gửi yêu cầu (chỉ có `NgayDangKy` kiểu DATE) nên cần cột mới cho hạn 12 giờ; luồng cọc chưa gửi email nào.
+- File: `spec/decisions.md` (D-023), `spec/scope.md` (F-13), `hackathon/plan.md` (D-022, D-023 + hạn mềm 10/11), `spec/progress.md` (T-19), mục này.
