@@ -35,11 +35,11 @@ export const sqlDeposits = {
     return r && { id: r.MaPhieuDatCoc, customerId: r.MaKhachHang, amountVnd: Number(r.SoTienCoc), status: r.TrangThaiThanhToan,
       accountantId: r.MaNhanVienKeToan, expiresAt: r.ThoiHanThanhToan };
   },
-  async chooseTransfer(id) {
-    await executeProcedure('dbo.SP_ChonPhuongThucThanhToanCoc', [v('PhieuId', sql.NVarChar(30), id), v('PhuongThucThanhToan', sql.NVarChar(20), 'Chuyển khoản')]);
-  },
   // Reuse the existing Web2 procedures: record the gateway receipt as the payment proof, then confirm it.
+  // The method is written only now, once the wallet payment succeeded (J-035): an abandoned order
+  // must not lock the slip to "Chuyển khoản" and block a cash payment at the counter.
   async markPaid(id, receipt) {
+    await executeProcedure('dbo.SP_ChonPhuongThucThanhToanCoc', [v('PhieuId', sql.NVarChar(30), id), v('PhuongThucThanhToan', sql.NVarChar(20), 'Chuyển khoản')]);
     await executeProcedure('dbo.SP_CapNhatMinhChungThanhToanCoc', [v('PhieuId', sql.NVarChar(30), id), v('ChungTuThanhToan', sql.NVarChar(500), receipt)]);
     await executeProcedure('dbo.SP_XacNhanThanhToanCoc', [v('PhieuId', sql.NVarChar(30), id), v('HopLe', sql.Bit, true),
       v('GhiChu', sql.NVarChar(sql.MAX), null), v('QuanLyXacNhanThanhToanId', sql.NVarChar(20), null)]);

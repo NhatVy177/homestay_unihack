@@ -18,7 +18,6 @@ function fixture(deposit = {}, charge = {}) {
   const state = { id: 'PC0001', customerId: 'KH0001', amountVnd: 3000000, status: 'Chờ TT', accountantId: 'NV0002', expiresAt: new Date(Date.now() + 3600000), ...deposit };
   const deposits = {
     async get(id) { return id === state.id ? { ...state } : null; },
-    async chooseTransfer(id) { calls.push(['choose', id]); },
     async markPaid(id, receipt) {
       if (state.status !== 'Chờ TT') throw Object.assign(new Error('Phiếu đặt cọc không ở trạng thái "Chờ TT".'), { statusCode: 409 });
       calls.push(['paid', id, receipt]); state.status = 'Đã TT';
@@ -43,6 +42,8 @@ describe('Cổng ví điện tử mô phỏng (D-013)', () => {
     const order = await f.sim.createDepositOrder(customer, 'PC0001');
     assert.equal(order.amountVnd, 3000000);
     assert.equal((await f.sim.createDepositOrder(customer, 'PC0001')).id, order.id);
+    // J-035: opening the wallet writes nothing to the deposit slip (no method lock before payment).
+    assert.deepEqual(f.calls, []);
     const paid = await f.sim.pay(customer, order.id);
     assert.equal(paid.status, 'Paid');
     assert.equal(f.state.status, 'Đã TT');

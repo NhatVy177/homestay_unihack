@@ -33,7 +33,7 @@ export class PaymentSimulator {
     if (!Number.isSafeInteger(deposit.amountVnd) || deposit.amountVnd <= 0) fail('Số tiền cọc không hợp lệ.', 409);
     const existing = await this.store.findPending('dat-coc', deposit.id, user.maNguoiDung);
     if (existing && existing.amountVnd === deposit.amountVnd) return existing;
-    await this.deposits.chooseTransfer(deposit.id);
+    // J-035: không ghi phương thức lúc mở ví; khách đổi ý vẫn trả tiền mặt/chuyển khoản tay được.
     const order = { id: 'SIM' + randomBytes(12).toString('hex').toUpperCase(), purpose: 'dat-coc', refId: deposit.id,
       customerId: user.maNguoiDung, amountVnd: deposit.amountVnd, status: 'Pending' };
     await this.store.create(order);
