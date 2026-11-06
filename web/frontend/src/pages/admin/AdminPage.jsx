@@ -2989,9 +2989,9 @@ function SettingsView() {
           <label className="admin-note" style={{ cursor: 'pointer' }}>
             <input type="checkbox" checked={tuDongDuyetCoc} onChange={e => setTuDongDuyetCoc(e.target.checked)} />
             <span>
-              <strong>Tự động duyệt nhận cọc và chốt phiếu cọc.</strong> Phòng còn phù hợp thì hệ thống tự duyệt thay quản lý;
-              phiếu cọc sale lập được tự chốt thay kế toán (tiền cọc = 2 tháng tiền thuê × số giường, hệ thống tự tính).
-              Trường hợp không tự duyệt được vẫn chờ nhân viên như cũ. Tắt để quay về duyệt tay hoàn toàn.
+              <strong>Tự động chốt phiếu cọc.</strong> Phiếu cọc sale lập được tự chốt thay kế toán (tiền cọc = 2 tháng tiền thuê × số giường,
+              hệ thống tự tính, người chốt ghi là "Hệ thống tự động"). Quản lý vẫn duyệt nhận cọc như cũ.
+              Không chốt tự động được thì phiếu vẫn chờ kế toán. Tắt để kế toán chốt tay hoàn toàn.
             </span>
           </label>
         )}

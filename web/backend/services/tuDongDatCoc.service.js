@@ -1,13 +1,13 @@
 import { executeProcedure, executeQuery, sql } from '../database/connection.js';
 
-// D-019: hệ thống tự làm hai bước duyệt cọc chỉ để chuyền tay (quản lý "Duyệt nhận cọc" khi phòng
-// còn phù hợp, kế toán "Chốt phiếu đặt cọc" khi tiền cọc đã do trigger tính). Bước nào hệ thống
-// không làm được thì để nguyên cho nhân viên duyệt tay như cũ; không bao giờ tự từ chối hay hủy.
+// D-019/D-020: hệ thống chỉ tự "Chốt phiếu đặt cọc" thay kế toán, vì tiền cọc là công thức cố định
+// (2 tháng x số giường) đã do trigger tính. KHÔNG tự duyệt nhận cọc: bước đó là quản lý kiểm tra
+// tình trạng thực tế của phòng (đề §3.1.2). Không chốt được thì để kế toán chốt tay như cũ.
 export const MA_HE_THONG = 'NVAUTO';
-export const MA_THAM_SO = 'TU_DONG_DUYET_COC';
+export const MA_THAM_SO = 'TU_DONG_DUYET_COC'; // tên cũ giữ nguyên; nay chỉ điều khiển việc tự chốt phiếu cọc
 
-// Lỗi nghiệp vụ nghĩa là "để người duyệt"; lỗi khác vẫn không làm hỏng thao tác của sale.
-const LOI_DE_NGUOI_DUYET = new Set([50205, 50208, 50209, 50271, 50272, 50273]);
+// Lỗi nghiệp vụ nghĩa là "để người chốt"; lỗi khác vẫn không làm hỏng thao tác của sale.
+const LOI_DE_NGUOI_DUYET = new Set([50271, 50272, 50273]);
 
 export function createTuDongDatCoc({ exec, query, log = console }) {
   async function dangBat() {
@@ -36,13 +36,6 @@ export function createTuDongDatCoc({ exec, query, log = console }) {
 
   return {
     dangBat,
-    // Sau khi sale gửi yêu cầu đặt cọc: SP tự kiểm tra phòng còn trống, đủ chỗ, đúng giới tính.
-    duyetNhanCoc: maDangKy => chay('duyệt nhận cọc', () => exec('dbo.SP_XacNhanKhaNangNhanCoc', [
-      { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
-      { name: 'MaQuanLy', type: sql.VarChar(6), value: MA_HE_THONG },
-      { name: 'DuocNhanCoc', type: sql.Bit, value: 1 },
-      { name: 'LyDo', type: sql.NVarChar(sql.MAX), value: null }
-    ])),
     // Sau khi sale lập phiếu cọc: chốt để phiếu tới khách và hạn 24 giờ bắt đầu.
     chotPhieu: maPhieuDatCoc => chay('chốt phiếu cọc', () => exec('dbo.SP_ChotPhieuDatCoc', [
       { name: 'MaPhieuDatCoc', type: sql.VarChar(6), value: maPhieuDatCoc },

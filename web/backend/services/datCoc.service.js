@@ -208,10 +208,9 @@ export async function guiYeuCauDatCoc(data = {}) {
       { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
       { name: 'MaNhanVienSale', type: sql.VarChar(6), value: maNhanVienSale }
     ]);
-    const yeuCau = result.recordset[0] || null;
-    // D-019: phòng còn phù hợp thì hệ thống tự duyệt nhận cọc; không phù hợp thì chờ quản lý.
-    if (yeuCau) yeuCau.tuDong = await tuDongDatCoc.duyetNhanCoc(maDangKy);
-    return yeuCau;
+    // D-020: quản lý vẫn là người duyệt nhận cọc (kiểm tra tình trạng thực tế của phòng, đề §3.1.2);
+    // màn "Duyệt nhận cọc" đã hiện sẵn kết luận "đủ/không đủ điều kiện" do hệ thống tính.
+    return result.recordset[0] || null;
   } catch (error) {
     mapDatabaseError(error, {
       50201: 404,

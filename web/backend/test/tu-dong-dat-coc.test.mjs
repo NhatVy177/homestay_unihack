@@ -16,29 +16,31 @@ const setup = ({ flag = '1', fail } = {}) => {
   return { auto, calls };
 };
 
-test('D-019: tắt hoặc chưa có tham số/tài khoản hệ thống thì không gọi SP nào', async () => {
+test('D-020: hệ thống không có thao tác tự duyệt nhận cọc, quản lý luôn là người duyệt', () => {
+  const { auto } = setup();
+  assert.equal(auto.duyetNhanCoc, undefined);
+});
+
+test('D-019: tắt hoặc chưa có tham số/tài khoản hệ thống thì không chốt phiếu', async () => {
   for (const flag of ['0', null]) {
     const { auto, calls } = setup({ flag });
-    assert.deepEqual(await auto.duyetNhanCoc('DK0001'), { trangThai: 'tat' });
     assert.deepEqual(await auto.chotPhieu('DC0001'), { trangThai: 'tat' });
     assert.equal(calls.length, 0);
   }
 });
 
-test('D-019: bật thì duyệt và chốt đứng tên tài khoản hệ thống, không bao giờ từ chối hay hủy', async () => {
+test('D-019: bật thì chốt phiếu đứng tên tài khoản hệ thống, không bao giờ hủy phiếu', async () => {
   const { auto, calls } = setup();
-  assert.deepEqual(await auto.duyetNhanCoc('DK0001'), { trangThai: 'da-tu-dong' });
   assert.deepEqual(await auto.chotPhieu('DC0001'), { trangThai: 'da-tu-dong' });
   assert.deepEqual(calls, [
-    { name: 'dbo.SP_XacNhanKhaNangNhanCoc', params: { MaDangKy: 'DK0001', MaQuanLy: MA_HE_THONG, DuocNhanCoc: 1, LyDo: null } },
     { name: 'dbo.SP_ChotPhieuDatCoc', params: { MaPhieuDatCoc: 'DC0001', MaNhanVienKeToan: MA_HE_THONG, Chot: 1, LyDo: null } },
   ]);
 });
 
-test('D-019: phòng không còn phù hợp hoặc lỗi bất kỳ thì để nhân viên duyệt tay, không làm hỏng thao tác của sale', async () => {
-  const notAvailable = Object.assign(new Error('Phòng không đủ chỗ trống cho số người dự kiến ở.'), { number: 50209 });
-  const { auto } = setup({ fail: notAvailable });
-  assert.deepEqual(await auto.duyetNhanCoc('DK0001'), { trangThai: 'cho-duyet-tay', lyDo: notAvailable.message });
+test('D-019: không chốt được hoặc lỗi bất kỳ thì để kế toán chốt tay, không làm hỏng thao tác của sale', async () => {
+  const expired = Object.assign(new Error('Phiếu đặt cọc đã quá hạn chốt và bị hủy tự động.'), { number: 50273 });
+  const { auto } = setup({ fail: expired });
+  assert.deepEqual(await auto.chotPhieu('DC0001'), { trangThai: 'cho-duyet-tay', lyDo: expired.message });
   const { auto: broken } = setup({ fail: new Error('mất kết nối') });
   assert.equal((await broken.chotPhieu('DC0001')).trangThai, 'cho-duyet-tay');
   const failingQuery = createTuDongDatCoc({ log: quiet, query: async () => { throw new Error('x'); }, exec: async () => assert.fail('không được gọi SP') });
