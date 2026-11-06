@@ -368,3 +368,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra trước: lịch còn `Chờ xem`, giờ hẹn ở tương lai khoảng 8 giờ, hồ sơ `Đã tiếp nhận`, có một phòng xem. Code scheduler chỉ chuyển khi `ThoiGianHen <= GETDATE()`. Thủ tục `SP_DanhSachPhongDaXem` đang triển khai trong HOMEDORM4 thiếu đoạn tự cập nhật có trong file repo, nhưng service backend vẫn gọi repository cập nhật trước khi đọc danh sách.
 - Thao tác: hai lần thử gọi thủ tục sau khi lùi giờ hẹn đã rollback vì kiểm tra đầu ra không đạt; không để lại thay đổi. Lần cuối trong một transaction, chỉ lùi giờ hẹn của lịch test về 5 phút trước thời điểm SQL hiện tại và cập nhật `TrangThai` theo đúng điều kiện scheduler; commit khi phòng xem được trả về với `daXem=1`.
 - Kiểm tra sau: lịch `Đã xem`, giờ hẹn đã qua, phòng liên quan vẫn `Trống`; hồ sơ vẫn `Đã tiếp nhận` và xuất hiện trong danh sách đặt cọc của Sale. Bước tiếp theo trên giao diện: chọn phòng đã xem rồi gửi yêu cầu đặt cọc. Chỉ cập nhật `spec/journal.md` và `spec/progress.md`; không sửa source, `.env` hoặc hồ sơ khách khác.
+
+## 2026-11-06 23:14:52 +07:00 — J-033 — Gỡ yêu cầu đặt cọc của tài khoản test
+
+- Người thực hiện: AI đang làm việc với Vy; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Yêu cầu: Vy muốn xóa yêu cầu đặt cọc của tài khoản test để tiếp tục thử luồng. Không dùng mật khẩu được nêu trong hội thoại, không ghi thông tin nhận dạng hay mật khẩu vào hồ sơ.
+- Kiểm tra trước: tài khoản có đúng một hồ sơ đăng ký ở `Xác nhận cọc`, một lịch `Đã xem`, một phòng đã chọn; chưa có bản ghi `PhieuDatCoc` hay đơn thanh toán cọc. Yêu cầu cọc ở giai đoạn này được thể hiện bằng trạng thái của `PhieuDangKy`, chưa có phiếu cọc riêng để xóa.
+- Thao tác: trong transaction `SERIALIZABLE` trên HOMEDORM4, kiểm tra chủ tài khoản/trạng thái và không có phiếu cọc, rồi đưa đúng một `PhieuDangKy` về `Đã tiếp nhận`. Giữ lịch xem và phòng đã chọn để có thể gửi lại yêu cầu cọc.
+- Kiểm tra sau: transaction commit; hồ sơ `Đã tiếp nhận`, một lịch `Đã xem`, một phòng đã chọn, không có phiếu cọc. Không đổi tài khoản, phòng, source hay `.env`.
+- File: `spec/progress.md` cập nhật trạng thái dữ liệu demo; `spec/journal.md` ghi thao tác và kiểm tra. Còn lại: Vy tải lại màn Sale và gửi yêu cầu cọc lần nữa khi cần.
