@@ -403,3 +403,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File và nội dung: `web/backend/integrations/payment-sim/service.js` (bỏ ghi phương thức khi tạo đơn), `web/backend/integrations/payment-sim/sql.js` (ghi "Chuyển khoản" trong `markPaid`, ngay trước ghi chứng từ và xác nhận; bỏ hàm `chooseTransfer`), `web/backend/test/payment-sim.test.mjs` (kiểm tra tạo đơn không ghi gì vào phiếu), `spec/progress.md` (T-12).
 - Kiểm tra: `SP_ChonPhuongThucThanhToanCoc` cho chọn lại, `SP_CapNhatMinhChungThanhToanCoc`/`SP_XacNhanThanhToanCoc` không bắt buộc phương thức. SQL thật trong transaction rồi rollback trên DC0001 (đặt phương thức NULL → chọn → ghi chứng từ → xác nhận) ra "Chuyển khoản"/"Đã TT"; sau rollback giữ nguyên. `web/backend npm test` 14 pass/1 skip. Tự hủy sau 24 giờ đã có tác vụ nền `datCocHetHan.service.js`.
 - Còn lại: DC0001 vẫn đang khóa "Chuyển khoản" do lần mở ví trước khi sửa; Vy chưa chọn tạo phiếu mới hay mở khóa trong DB local, Claude không tự sửa dữ liệu.
+
+## 2026-11-07 00:01:17 +07:00 — J-036 — Bỏ ràng buộc theo đề (D-022); rà soát luồng đặt cọc để đề xuất
+
+- Người thực hiện: Claude theo yêu cầu Vy (thảo luận, chưa sửa code).
+- Trao đổi: Vy chốt từ nay không cần giống đề, chỉ cần hợp lý và thuận tiện cho cả người thuê lẫn bên cho thuê → D-022. Vy dán lại §3.1.2 và yêu cầu Claude đọc kỹ luồng đặt cọc, đưa mọi đề xuất hợp lý.
+- Rà soát code (chỉ đọc): luồng hiện tại 7 bước — sale gửi yêu cầu → quản lý duyệt nhận cọc → sale lập phiếu (chọn hình thức/giường, giường "Giữ chỗ") → hệ thống tự chốt (D-021) → khách trả ví / chuyển khoản tay (tải ảnh) / tiền mặt tại quầy (sale in phiếu ký, tải ảnh) → quản lý "Duyệt thanh toán" → tác vụ nền `datCocHetHan.service.js` tự hủy quá hạn. Phát hiện: luồng cọc không gửi email nào (mailer chỉ dùng cho Avalanche); màn chuyển khoản không có nội dung chuyển khoản chuẩn; phòng chưa được giữ trong lúc chờ quản lý duyệt.
+- Đề xuất đưa Vy (chưa chốt) trong chat; chờ Vy chọn.
+- File: `spec/decisions.md` (D-022), mục này.
