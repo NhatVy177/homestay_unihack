@@ -360,3 +360,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Thao tác: trong một transaction SQL trên HOMEDORM4, xác nhận tài khoản khớp email và chưa có hồ sơ giao dịch mới; xóa đúng một `TaiKhoan`, một `KhachHang` và một `NguoiDung` tương ứng. Không xóa các tài khoản khách khác, nhân viên hay dữ liệu phòng. Không sửa `.env` hoặc source.
 - Kiểm tra: transaction commit; hai biến thể đuôi email xuất hiện trong trao đổi đều không có tài khoản trong DB; tên đăng nhập và số điện thoại trên form đều còn khả dụng; 44/44 phòng vẫn `Trống`. `spec/progress.md` cập nhật đính chính trạng thái dữ liệu local.
 - Còn lại/bước tiếp: Vy có thể đăng ký lại; nếu form vẫn báo trùng sau khi tải lại trang, cần kiểm tra request thực gửi và DB mà backend đang kết nối.
+
+## 2026-11-06 16:08:33 +07:00 — J-032 — Chuyển lịch xem phòng test sang Đã xem
+
+- Người thực hiện: AI đang làm việc với Vy; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Yêu cầu: Vy muốn lịch hẹn của hồ sơ test mới chuyển `Đã xem` để tiếp tục luồng đặt cọc. Không ghi tên, email, số điện thoại hoặc mã khách vào hồ sơ làm việc.
+- Kiểm tra trước: lịch còn `Chờ xem`, giờ hẹn ở tương lai khoảng 8 giờ, hồ sơ `Đã tiếp nhận`, có một phòng xem. Code scheduler chỉ chuyển khi `ThoiGianHen <= GETDATE()`. Thủ tục `SP_DanhSachPhongDaXem` đang triển khai trong HOMEDORM4 thiếu đoạn tự cập nhật có trong file repo, nhưng service backend vẫn gọi repository cập nhật trước khi đọc danh sách.
+- Thao tác: hai lần thử gọi thủ tục sau khi lùi giờ hẹn đã rollback vì kiểm tra đầu ra không đạt; không để lại thay đổi. Lần cuối trong một transaction, chỉ lùi giờ hẹn của lịch test về 5 phút trước thời điểm SQL hiện tại và cập nhật `TrangThai` theo đúng điều kiện scheduler; commit khi phòng xem được trả về với `daXem=1`.
+- Kiểm tra sau: lịch `Đã xem`, giờ hẹn đã qua, phòng liên quan vẫn `Trống`; hồ sơ vẫn `Đã tiếp nhận` và xuất hiện trong danh sách đặt cọc của Sale. Bước tiếp theo trên giao diện: chọn phòng đã xem rồi gửi yêu cầu đặt cọc. Chỉ cập nhật `spec/journal.md` và `spec/progress.md`; không sửa source, `.env` hoặc hồ sơ khách khác.
