@@ -1,5 +1,10 @@
 # Tiến độ và điểm tiếp tục
 
+## Dữ liệu demo local 2026-11-06 15:32:58 +07:00 (J-030)
+
+- Theo yêu cầu Vy, HOMEDORM4 đã được dọn hồ sơ giao dịch để làm trống toàn bộ 44 phòng và 138 giường. Các bảng đăng ký, cọc, hợp đồng, hóa đơn, trả phòng, đối soát và hồ sơ xác nhận Avalanche trong SQL đều 0 bản ghi; 3 chi nhánh, 61 khách hàng, 69 tài khoản và dữ liệu danh mục vẫn giữ. Muốn thử lại luồng đầy đủ cần tạo đăng ký/cọc/hợp đồng mới.
+- Bản sao lưu SQL đã `RESTORE VERIFYONLY` thành công trước khi dọn: `D:\sql\MSSQL16.SQLEXPRESS04\MSSQL\Backup\HOMEDORM4_before_demo_room_reset_20261106T083034.bak`. File upload local còn tồn tại được sao lưu riêng trong `%LOCALAPPDATA%\HomeStayDormBackups\20261106T083034_uploads`. Lịch sử chain local không bị xóa.
+
 ## Xác nhận hộp thư 2026-11-06 01:52:14 +07:00 (J-018)
 
 - Vy xác nhận đã nhận email test tại hộp thư redirect. Kết hợp kết quả `status: sent` ở J-017, cấu hình Gmail SMTP local đã hoạt động đầu cuối cho thư test. Luồng phát hành biên bản thật và trạng thái thông báo UI vẫn chưa được kiểm thử/sửa trong đợt này.
