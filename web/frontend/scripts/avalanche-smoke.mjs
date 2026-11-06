@@ -151,9 +151,13 @@ try {
   await page.route('**/api/dat-coc/cho-xac-nhan', route => route.fulfill({ json: [
     { maDangKy: 'DKD001', hoTen: 'Khách mẫu 1', maPhong: 'P102', tenPhong: 'Phòng P102',
       trangThai: 'Chờ xác nhận cọc', guiLuc: '2026-11-07T01:00:00Z', phutDaCho: 120,
+      ngayDangKy: '2026-11-07', soDienThoai: '0900000000', tenNhanVienSale: 'Sale mẫu',
+      hinhThucThue: 'Ghép giường', danhSachGiuong: 'G01', sucChuaToiDa: 2, soChoTrong: 2,
       yeuCauCungPhong: 2, laYeuCauDau: true, coTheNhanCoc: true, soNam: 1, soNu: 0 },
     { maDangKy: 'DKD002', hoTen: 'Khách mẫu 2', maPhong: 'P102', tenPhong: 'Phòng P102',
       trangThai: 'Chờ xác nhận cọc', guiLuc: '2026-11-07T01:01:00Z', phutDaCho: 119,
+      ngayDangKy: '2026-11-07', soDienThoai: '0900000001', tenNhanVienSale: 'Sale mẫu',
+      hinhThucThue: 'Ghép giường', danhSachGiuong: 'G01', sucChuaToiDa: 2, soChoTrong: 2,
       yeuCauCungPhong: 2, laYeuCauDau: false, coTheNhanCoc: true, soNam: 1, soNu: 0 },
   ] }));
   uiUser = { maNguoiDung: 'NV-DEMO', vaiTro: 'NhanVien', chucVu: 'Quản lý' };
@@ -161,10 +165,11 @@ try {
   await page.goto(base + '/nhan-vien-quan-ly?tab=xac-nhan-nhan-phong', { waitUntil: 'domcontentloaded' });
   await page.getByText('Yêu cầu gửi trước').waitFor();
   await page.getByText('Đã chờ 2 giờ 0 phút').waitFor();
+  await capture('07-hang-doi-coc.png');
   await page.locator('tr').filter({ hasText: 'DKD002' }).getByRole('button', { name: 'Xử lý' }).click();
   await page.getByText('Lý do duyệt yêu cầu gửi sau').waitFor();
   assert.equal(await page.getByRole('button', { name: 'Xác nhận', exact: true }).isDisabled(), true);
-  await capture('07-duyet-coc-vuot-luot.png');
+  await capture('08-duyet-coc-vuot-luot.png');
   assert.deepEqual(failures, []);
   console.log('PASS: Verify, D-017 views, D-018 gateway, D-023 manager FIFO; no browser exceptions.');
 } finally {
