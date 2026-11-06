@@ -1,5 +1,11 @@
 import * as service from '../services/datCoc.service.js';
 import { publicUrlFor } from '../middleware/upload.middleware.js';
+import { tuDongDatCoc } from '../services/tuDongDatCoc.service.js';
+
+export async function getCauHinhTuDong(req, res, next) {
+  // D-021: màn kế toán ẩn tab "Chốt phiếu đặt cọc" khi hệ thống đang tự chốt.
+  try { res.json({ tuDongChotPhieu: await tuDongDatCoc.dangBat() }); } catch (err) { next(err); }
+}
 
 export async function createPhieuDatCoc(req, res, next) {
   // DC02B - Sale lập phiếu cọc. Mã nhân viên lấy từ phiên đăng nhập, không nhận từ body.

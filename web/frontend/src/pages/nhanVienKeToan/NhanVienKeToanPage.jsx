@@ -6,6 +6,7 @@ import './nhanVienKeToanPortal.css'; // Use specific styles for content
 import LapPhieuDatCocTab, { Icon } from './LapPhieuDatCocTab.jsx';
 import ThuNhanPhongTab from './ThuNhanPhongTab.jsx';
 import QuyetToanTraPhongTab from './QuyetToanTraPhongTab.jsx';
+import { datCocApi } from '../datCoc/datCoc.api.js';
 const KeToanXacNhanTab = lazy(() => import('../../components/xacNhan/KeToanXacNhanTab.jsx'));
 
 function Brand() {
@@ -30,7 +31,19 @@ export default function NhanVienKeToanPage() {
   const { user, dangXuat } = useAuth();
   const [activeTab, setActiveTab] = useState('lap-phieu');
   const [showDropdown, setShowDropdown] = useState(false);
+  // D-021: hệ thống tự chốt phiếu cọc thì kế toán không còn việc ở tab "Chốt phiếu đặt cọc".
+  const [tuDongChotPhieu, setTuDongChotPhieu] = useState(false);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    datCocApi.getCauHinhTuDong()
+      .then(({ data }) => {
+        if (!data?.tuDongChotPhieu) return;
+        setTuDongChotPhieu(true);
+        setActiveTab((tab) => (tab === 'lap-phieu' ? 'thu-nhan-phong' : tab));
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -48,7 +61,7 @@ export default function NhanVienKeToanPage() {
     { id: 'thu-nhan-phong', label: 'Thu nhận phòng', icon: 'login' },
     { id: 'quyet-toan', label: 'Quyết toán trả phòng', icon: 'account_balance_wallet' },
     { id: 'xac-nhan-doi-soat', label: 'Khách xác nhận đối soát', icon: 'receipt_long' }
-  ];
+  ].filter((item) => !(tuDongChotPhieu && item.id === 'lap-phieu'));
 
   return (
     <div className="kp-page kh-page">

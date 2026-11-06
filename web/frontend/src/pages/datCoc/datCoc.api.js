@@ -21,6 +21,8 @@ export const datCocApi = {
   getDanhSachChoLapPhieu: () => httpClient.get('/dat-coc/cho-lap-phieu'),
   // DC03 - phiếu Sale đã lập, chờ Kế toán tính tiền và chốt
   getDanhSachChoTinhTien: () => httpClient.get('/dat-coc/cho-tinh-tien'),
+  // D-021: hệ thống có đang tự chốt phiếu cọc không (ẩn tab chốt của kế toán khi bật).
+  getCauHinhTuDong: () => httpClient.get('/dat-coc/cau-hinh-tu-dong'),
   // DC03 - Kế toán chốt ({ chot: true }) hoặc hủy ({ chot: false, lyDo: '...' }) phiếu cọc
   chotPhieuDatCoc: (id, data) => httpClient.put(`/dat-coc/${id}/chot`, data),
   getGiuongTrong: (maPhong) => httpClient.get('/dat-coc/giuong-trong', { params: { maPhong } }),

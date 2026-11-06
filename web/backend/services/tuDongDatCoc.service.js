@@ -26,8 +26,7 @@ export function createTuDongDatCoc({ exec, query, log = console }) {
   async function chay(buoc, fn) {
     if (!await dangBat()) return { trangThai: 'tat' };
     try {
-      await fn();
-      return { trangThai: 'da-tu-dong' };
+      return { trangThai: 'da-tu-dong', ...(await fn()) };
     } catch (error) {
       if (!LOI_DE_NGUOI_DUYET.has(error.number)) log.error(`[tu-dong-dat-coc] ${buoc} lỗi, chờ duyệt tay:`, error.message);
       return { trangThai: 'cho-duyet-tay', lyDo: error.message };
@@ -37,12 +36,17 @@ export function createTuDongDatCoc({ exec, query, log = console }) {
   return {
     dangBat,
     // Sau khi sale lập phiếu cọc: chốt để phiếu tới khách và hạn 24 giờ bắt đầu.
-    chotPhieu: maPhieuDatCoc => chay('chốt phiếu cọc', () => exec('dbo.SP_ChotPhieuDatCoc', [
-      { name: 'MaPhieuDatCoc', type: sql.VarChar(6), value: maPhieuDatCoc },
-      { name: 'MaNhanVienKeToan', type: sql.VarChar(6), value: MA_HE_THONG },
-      { name: 'Chot', type: sql.Bit, value: 1 },
-      { name: 'LyDo', type: sql.NVarChar(sql.MAX), value: null }
-    ]))
+    // Trả số tiền cọc và hạn thanh toán để sale báo khách ngay (đề §3.1.2).
+    chotPhieu: maPhieuDatCoc => chay('chốt phiếu cọc', async () => {
+      const result = await exec('dbo.SP_ChotPhieuDatCoc', [
+        { name: 'MaPhieuDatCoc', type: sql.VarChar(6), value: maPhieuDatCoc },
+        { name: 'MaNhanVienKeToan', type: sql.VarChar(6), value: MA_HE_THONG },
+        { name: 'Chot', type: sql.Bit, value: 1 },
+        { name: 'LyDo', type: sql.NVarChar(sql.MAX), value: null }
+      ]);
+      const phieu = result?.recordset?.[0];
+      return phieu ? { soTienCoc: Number(phieu.soTienCoc), thoiHanThanhToan: phieu.thoiHanThanhToan } : {};
+    })
   };
 }
 

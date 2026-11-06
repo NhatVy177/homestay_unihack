@@ -16,6 +16,8 @@ router.get('/cho-xac-nhan', controller.getDanhSachChoXacNhan);
 router.get('/cho-lap-phieu', controller.getDanhSachChoLapPhieu);
 // DC03 - phiếu Sale đã lập, chờ Kế toán tính tiền và chốt.
 router.get('/cho-tinh-tien', controller.getDanhSachChoTinhTien);
+// D-021: hệ thống có đang tự chốt phiếu cọc không.
+router.get('/cau-hinh-tu-dong', controller.getCauHinhTuDong);
 router.get('/giuong-trong', controller.getGiuongTrong);
 // DC01 - các phòng khách đã xem, để Sale chọn phòng chốt.
 router.get('/phong-da-xem', controller.getPhongDaXem);

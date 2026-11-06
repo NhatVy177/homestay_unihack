@@ -211,9 +211,14 @@ export default function LapPhieuCocTab() {
       });
       setSelected(null);
       await loadDanhSach();
-      // D-019: hệ thống tự chốt thì phiếu đã tới khách, hạn thanh toán 24 giờ bắt đầu.
-      setResult(data?.tuDong?.trangThai === 'da-tu-dong'
-        ? { type: 'success', title: 'Đã lập và chốt phiếu cọc.', message: 'Hệ thống đã tự tính và chốt tiền cọc. Khách có thể thanh toán ngay (hạn 24 giờ).' }
+      // D-021: hệ thống tự tính và chốt thì sale báo khách số tiền ngay; hạn thanh toán 24 giờ bắt đầu.
+      const tuDong = data?.tuDong;
+      setResult(tuDong?.trangThai === 'da-tu-dong'
+        ? {
+            type: 'success',
+            title: 'Đã lập phiếu cọc và gửi khách thanh toán.',
+            message: `${Number.isFinite(tuDong.soTienCoc) ? `Tiền cọc ${tuDong.soTienCoc.toLocaleString('vi-VN')}đ. ` : ''}Khách thanh toán trong 24 giờ trên ứng dụng hoặc tại quầy.`
+          }
         : { type: 'success', title: 'Đã gửi phiếu cho kế toán.' });
     } catch {
       setResult({ type: 'error', title: 'Lập phiếu thất bại.' });

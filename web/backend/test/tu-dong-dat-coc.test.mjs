@@ -37,6 +37,16 @@ test('D-019: bật thì chốt phiếu đứng tên tài khoản hệ thống, k
   ]);
 });
 
+test('D-021: tự chốt trả số tiền cọc và hạn thanh toán để sale báo khách ngay', async () => {
+  const han = new Date('2026-11-08T06:21:00Z');
+  const auto = createTuDongDatCoc({
+    log: quiet,
+    query: async () => ({ recordset: [{ giaTri: '1' }] }),
+    exec: async () => ({ recordset: [{ soTienCoc: '4400000.00', thoiHanThanhToan: han }] }),
+  });
+  assert.deepEqual(await auto.chotPhieu('DC0001'), { trangThai: 'da-tu-dong', soTienCoc: 4400000, thoiHanThanhToan: han });
+});
+
 test('D-019: không chốt được hoặc lỗi bất kỳ thì để kế toán chốt tay, không làm hỏng thao tác của sale', async () => {
   const expired = Object.assign(new Error('Phiếu đặt cọc đã quá hạn chốt và bị hủy tự động.'), { number: 50273 });
   const { auto } = setup({ fail: expired });
