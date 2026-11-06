@@ -4,6 +4,7 @@
 
 - Theo yêu cầu Vy, HOMEDORM4 đã được dọn hồ sơ giao dịch để làm trống toàn bộ 44 phòng và 138 giường. Các bảng đăng ký, cọc, hợp đồng, hóa đơn, trả phòng, đối soát và hồ sơ xác nhận Avalanche trong SQL đều 0 bản ghi; 3 chi nhánh, 61 khách hàng, 69 tài khoản và dữ liệu danh mục vẫn giữ. Muốn thử lại luồng đầy đủ cần tạo đăng ký/cọc/hợp đồng mới.
 - Bản sao lưu SQL đã `RESTORE VERIFYONLY` thành công trước khi dọn: `D:\sql\MSSQL16.SQLEXPRESS04\MSSQL\Backup\HOMEDORM4_before_demo_room_reset_20261106T083034.bak`. File upload local còn tồn tại được sao lưu riêng trong `%LOCALAPPDATA%\HomeStayDormBackups\20261106T083034_uploads`. Lịch sử chain local không bị xóa.
+- Đính chính 2026-11-06 15:47:06 +07:00 (J-031): sau mốc J-030, email test của Vy được đăng ký lại nên phát sinh một tài khoản khách mới. Theo phản hồi của Vy, đã xóa tài khoản này cùng người dùng/khách hàng tương ứng. Kiểm tra email, tên đăng nhập và số điện thoại trên form đều không còn bị chiếm; 44 phòng vẫn `Trống`. Số lượng khách hàng/tài khoản hiện tại giảm 1 so với ảnh chụp trạng thái J-030.
 
 ## Xác nhận hộp thư 2026-11-06 01:52:14 +07:00 (J-018)
 
