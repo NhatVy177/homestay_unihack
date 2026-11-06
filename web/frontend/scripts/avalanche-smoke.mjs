@@ -5,6 +5,10 @@ import { mkdir, mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname, basename } from 'node:path';
 import { emailNotice, receiptTime } from '../src/components/xacNhan/receiptDisplay.js';
+import { safeNextPath } from '../src/auth/returnPath.js';
+assert.equal(safeNextPath('/khach-hang?tab=dat-coc&phieu=DC0001'), '/khach-hang?tab=dat-coc&phieu=DC0001');
+for (const outside of ['//example.invalid', 'https://example.invalid', 'http:example.invalid', '/\\example.invalid'])
+  assert.equal(safeNextPath(outside), null);
 assert.equal(receiptTime('2026-11-06T02:30:00.000Z'), '09:30, 06/11/2026');
 assert.equal(receiptTime(undefined), '');
 assert.equal(emailNotice({ notifications: [{ kind: 'handover-confirmed', status: 'sent' }] }, 'handover-confirmed', 'sent', 'fallback'), 'sent');
@@ -44,7 +48,7 @@ try {
   await page.locator('#evidence-file').setInputFiles(evidence);
   await page.getByText('Ứng dụng chưa cấu hình contract Avalanche để kiểm chứng.').waitFor();
   await page.goto(base + '/ho-so-xac-nhan', { waitUntil: 'domcontentloaded' });
-  await page.waitForURL(base + '/');
+  await page.waitForURL(base + '/?next=%2Fho-so-xac-nhan');
   await page.route('**/api/auth/toi', route => route.fulfill({ json: { maNguoiDung: 'KHDEMO', vaiTro: 'KhachHang', hoTen: 'Khách thử' } }));
   await page.route('**/api/avalanche/config', route => route.fulfill({ json: { enabled: false } }));
   // Auth UI test only: simulated session, not an authentication bypass in the app.
@@ -143,8 +147,26 @@ try {
   await page.getByRole('button', { name: 'Ví điện tử (mô phỏng)' }).click();
   await page.waitForURL(base + '/thanh-toan-mo-phong/SIMFIRST');
   await page.getByText('Khoản thu kỳ đầu – hợp đồng HDTEST').waitFor();
+  // D-023: manager queue marks FIFO and requires an explanation for later requests.
+  await page.route('**/api/dat-coc/cho-xac-nhan', route => route.fulfill({ json: [
+    { maDangKy: 'DKD001', hoTen: 'Khách mẫu 1', maPhong: 'P102', tenPhong: 'Phòng P102',
+      trangThai: 'Chờ xác nhận cọc', guiLuc: '2026-11-07T01:00:00Z', phutDaCho: 120,
+      yeuCauCungPhong: 2, laYeuCauDau: true, coTheNhanCoc: true, soNam: 1, soNu: 0 },
+    { maDangKy: 'DKD002', hoTen: 'Khách mẫu 2', maPhong: 'P102', tenPhong: 'Phòng P102',
+      trangThai: 'Chờ xác nhận cọc', guiLuc: '2026-11-07T01:01:00Z', phutDaCho: 119,
+      yeuCauCungPhong: 2, laYeuCauDau: false, coTheNhanCoc: true, soNam: 1, soNu: 0 },
+  ] }));
+  uiUser = { maNguoiDung: 'NV-DEMO', vaiTro: 'NhanVien', chucVu: 'Quản lý' };
+  await page.evaluate(value => localStorage.setItem('happyroom_session', JSON.stringify({ _v: 2, token: 'ui-test-only', user: value })), uiUser);
+  await page.goto(base + '/nhan-vien-quan-ly?tab=xac-nhan-nhan-phong', { waitUntil: 'domcontentloaded' });
+  await page.getByText('Yêu cầu gửi trước').waitFor();
+  await page.getByText('Đã chờ 2 giờ 0 phút').waitFor();
+  await page.locator('tr').filter({ hasText: 'DKD002' }).getByRole('button', { name: 'Xử lý' }).click();
+  await page.getByText('Lý do duyệt yêu cầu gửi sau').waitFor();
+  assert.equal(await page.getByRole('button', { name: 'Xác nhận', exact: true }).isDisabled(), true);
+  await capture('07-duyet-coc-vuot-luot.png');
   assert.deepEqual(failures, []);
-  console.log('PASS: Verify, D-017 customer/staff views, D-018 first-charge payment card/gateway and old receipts; no browser exceptions.');
+  console.log('PASS: Verify, D-017 views, D-018 gateway, D-023 manager FIFO; no browser exceptions.');
 } finally {
   if (browser) await browser.close();
   server.kill();

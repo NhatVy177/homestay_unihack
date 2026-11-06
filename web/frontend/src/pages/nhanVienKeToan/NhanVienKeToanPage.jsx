@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import '../khachHang/khachHangPortal.css'; // Reuse main layout styles
 import './nhanVienKeToanPortal.css'; // Use specific styles for content
-import LapPhieuDatCocTab, { Icon } from './LapPhieuDatCocTab.jsx';
+import { Icon } from './LapPhieuDatCocTab.jsx';
+import XacNhanThanhToanTab from '../nhanVienQuanLy/XacNhanThanhToanTab.jsx';
+import TienMatChoNopQuyTab from './TienMatChoNopQuyTab.jsx';
 import ThuNhanPhongTab from './ThuNhanPhongTab.jsx';
 import QuyetToanTraPhongTab from './QuyetToanTraPhongTab.jsx';
-import { datCocApi } from '../datCoc/datCoc.api.js';
 const KeToanXacNhanTab = lazy(() => import('../../components/xacNhan/KeToanXacNhanTab.jsx'));
 
 function Brand() {
@@ -29,21 +30,9 @@ function firstName(name = '') {
 
 export default function NhanVienKeToanPage() {
   const { user, dangXuat } = useAuth();
-  const [activeTab, setActiveTab] = useState('lap-phieu');
+  const [activeTab, setActiveTab] = useState('xac-nhan-tien-ve');
   const [showDropdown, setShowDropdown] = useState(false);
-  // D-021: hệ thống tự chốt phiếu cọc thì kế toán không còn việc ở tab "Chốt phiếu đặt cọc".
-  const [tuDongChotPhieu, setTuDongChotPhieu] = useState(false);
   const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    datCocApi.getCauHinhTuDong()
-      .then(({ data }) => {
-        if (!data?.tuDongChotPhieu) return;
-        setTuDongChotPhieu(true);
-        setActiveTab((tab) => (tab === 'lap-phieu' ? 'thu-nhan-phong' : tab));
-      })
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -56,12 +45,12 @@ export default function NhanVienKeToanPage() {
   }, []);
 
   const navItems = [
-    // DC03 - kế toán chỉ tính tiền & chốt; việc lập phiếu (phòng/hình thức/giường) là của Sale ở DC02B.
-    { id: 'lap-phieu', label: 'Chốt phiếu đặt cọc', icon: 'calculate' },
+    { id: 'xac-nhan-tien-ve', label: 'Xác nhận tiền về', icon: 'payments' },
+    { id: 'nop-quy', label: 'Tiền mặt chờ nộp quỹ', icon: 'account_balance' },
     { id: 'thu-nhan-phong', label: 'Thu nhận phòng', icon: 'login' },
     { id: 'quyet-toan', label: 'Quyết toán trả phòng', icon: 'account_balance_wallet' },
     { id: 'xac-nhan-doi-soat', label: 'Khách xác nhận đối soát', icon: 'receipt_long' }
-  ].filter((item) => !(tuDongChotPhieu && item.id === 'lap-phieu'));
+  ];
 
   return (
     <div className="kp-page kh-page">
@@ -130,11 +119,12 @@ export default function NhanVienKeToanPage() {
         </header>
 
         <main className="kp-main" style={{ padding: 0 }}>
-          {activeTab === 'lap-phieu' && <LapPhieuDatCocTab />}
+          {activeTab === 'xac-nhan-tien-ve' && <XacNhanThanhToanTab />}
+          {activeTab === 'nop-quy' && <TienMatChoNopQuyTab />}
           {activeTab === 'thu-nhan-phong' && <ThuNhanPhongTab />}
           {activeTab === 'quyet-toan' && <QuyetToanTraPhongTab />}
           {activeTab === 'xac-nhan-doi-soat' && <Suspense fallback={null}><KeToanXacNhanTab /></Suspense>}
-          {(activeTab !== 'lap-phieu' && activeTab !== 'thu-nhan-phong' && activeTab !== 'quyet-toan' && activeTab !== 'xac-nhan-doi-soat') && (
+          {(activeTab !== 'xac-nhan-tien-ve' && activeTab !== 'nop-quy' && activeTab !== 'thu-nhan-phong' && activeTab !== 'quyet-toan' && activeTab !== 'xac-nhan-doi-soat') && (
             <div className="ktp-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <h2 style={{ color: '#6f797a' }}>Đang phát triển chức năng: {navItems.find(i => i.id === activeTab)?.label}</h2>
             </div>

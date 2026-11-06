@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useAuth } from '../../auth/AuthContext.jsx';
 import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
 import { datCocApi } from '../datCoc/datCoc.api.js';
 import ResultModal from '../../components/common/ResultModal.jsx';
@@ -31,7 +30,7 @@ const pageBtnStyle = (active, disabled) => ({
   fontSize: '13px', fontWeight: 600
 });
 
-// DC05 - Xác nhận thanh toán cọc (tác nhân: Nhân viên quản lý).
+// Kế toán đối chiếu chứng từ chuyển khoản trước khi xác nhận tiền về.
 // GUI: HienThi() = loadDanhSach() -> getDanhSachChoXacNhanThanhToan() -> SP_DanhSachChoXacNhanThanhToan.
 // GUI: btnXacNhan_Click() -> xacNhanThanhToan() -> SP_XacNhanThanhToanCoc.
 
@@ -48,7 +47,6 @@ const FILE_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').
 const anhUrl = (path) => (path ? `${FILE_BASE}${path}` : null);
 
 export default function XacNhanThanhToanTab() {
-  const { user } = useAuth();
 
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -148,7 +146,6 @@ export default function XacNhanThanhToanTab() {
       await datCocApi.xacNhanThanhToan(selected.maPhieuDatCoc, {
         hopLe,
         ghiChu: hopLe ? null : lyDo.trim(),
-        quanLyXacNhanThanhToanId: user?.maNguoiDung
       });
       setSelected(null);
       await loadDanhSach();

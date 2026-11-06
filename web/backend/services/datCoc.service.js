@@ -3,6 +3,7 @@ import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import { capNhatLichXemDenGioThanhDaXem } from '../repositories/lichXemPhong.repository.js';
 import { attachPaymentAccount } from '../config/payment.js';
 import { tuDongDatCoc } from './tuDongDatCoc.service.js';
+import { notifyDeposit } from '../integrations/mail/datCocNotifications.js';
 
 function handleDatabaseError(error) {
   mapDatabaseError(error, {
@@ -25,9 +26,11 @@ export async function getDanhSachChoGhiNhanChungTu(maNhanVien) {
   return attachPaymentAccount(result.recordset || []);
 }
 
-export async function getDanhSachChoXacNhanThanhToan(maNhanVien) {
+export async function getDanhSachChoXacNhanThanhToan(user) {
+  if (user?.vaiTro !== 'NhanVien' || user?.chucVu !== 'Kế toán')
+    throw createServiceError('Chỉ kế toán được xác nhận tiền chuyển khoản', 403);
   const result = await executeProcedure('dbo.SP_DanhSachChoXacNhanThanhToan', [
-    { name: 'MaNhanVien', type: sql.VarChar(6), value: String(maNhanVien || '').trim() }
+    { name: 'MaNhanVien', type: sql.VarChar(6), value: user.maNguoiDung }
   ]);
   return result.recordset;
 }
@@ -195,28 +198,40 @@ export async function getPhieuDatCoc(maNhanVienSale) {
   return attachPaymentAccount(result.recordset || []);
 }
 
-export async function guiYeuCauDatCoc(data = {}) {
+export async function guiYeuCauDatCoc(user, data = {}) {
+  if (user?.vaiTro !== 'NhanVien' || user?.chucVu !== 'Sale')
+    throw createServiceError('Chỉ Sale được gửi yêu cầu cọc', 403);
   const maDangKy = String(data.maDangKy || '').trim();
-  const maNhanVienSale = String(data.maNhanVienSale || '').trim();
+  const maNhanVienSale = user.maNguoiDung;
   if (!maDangKy || !maNhanVienSale) {
     throw createServiceError('Thiếu mã phiếu đăng ký hoặc mã nhân viên');
   }
+  const hinhThucThue = String(data.hinhThucThue || '').trim();
+  const giuongs = Array.isArray(data.giuongs) ? data.giuongs.map(String).join(',') : String(data.giuongs || '').trim();
+  if (!['Nguyên phòng', 'Ghép giường'].includes(hinhThucThue))
+    throw createServiceError('Chọn hình thức thuê nguyên phòng hoặc ghép giường');
+  if (hinhThucThue === 'Ghép giường' && !giuongs)
+    throw createServiceError('Chọn giường cho khách');
 
   try {
     await capNhatLichXemDenGioThanhDaXem({ maDangKy });
-    const result = await executeProcedure('dbo.SP_GuiYeuCauDatCoc', [
+    const result = await executeProcedure('dbo.SP_GuiYeuCauCocKemLuaChon', [
       { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
-      { name: 'MaNhanVienSale', type: sql.VarChar(6), value: maNhanVienSale }
+      { name: 'MaNhanVienSale', type: sql.VarChar(6), value: maNhanVienSale },
+      { name: 'HinhThucThue', type: sql.NVarChar(20), value: hinhThucThue },
+      { name: 'DanhSachGiuong', type: sql.NVarChar(100), value: hinhThucThue === 'Ghép giường' ? giuongs : null }
     ]);
     // D-020: quản lý vẫn là người duyệt nhận cọc (kiểm tra tình trạng thực tế của phòng, đề §3.1.2);
     // màn "Duyệt nhận cọc" đã hiện sẵn kết luận "đủ/không đủ điều kiện" do hệ thống tính.
-    return result.recordset[0] || null;
+    const row = result.recordsets.at(-1)?.[0] || null;
+    if (row) await notifyDeposit('request', maDangKy);
+    return row;
   } catch (error) {
     mapDatabaseError(error, {
       50201: 404,
       50202: 409,
       50203: 404,
-      50258: 409   // chưa chốt phòng khách muốn thuê
+      50258: 409, 50301: 400, 50302: 403, 50303: 422, 50304: 422, 50305: 409, 50315: 403
     });
   }
 }
@@ -253,23 +268,42 @@ export async function getDanhSachChoXacNhan(maNhanVien) {
   return result.recordset;
 }
 
-export async function xacNhanKhaNangNhanCoc(id, data = {}) {
+export async function xacNhanKhaNangNhanCoc(user, id, data = {}) {
+  if (user?.vaiTro !== 'NhanVien' || user?.chucVu !== 'Quản lý')
+    throw createServiceError('Chỉ quản lý được duyệt yêu cầu cọc', 403);
   const maDangKy = String(id || '').trim();
-  const maQuanLy = String(data.maQuanLy || '').trim();
+  const maQuanLy = user.maNguoiDung;
   if (!maDangKy || !maQuanLy) {
     throw createServiceError('Thiếu mã phiếu đăng ký hoặc mã quản lý');
   }
 
   try {
+    if (data.duocNhanCoc) {
+      const result = await executeProcedure('dbo.SP_DuyetVaPhatHanhPhieuCoc', [
+        { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
+        { name: 'MaQuanLy', type: sql.VarChar(6), value: maQuanLy },
+        { name: 'LyDoVuotLuot', type: sql.NVarChar(500), value: String(data.lyDoVuotLuot || '').trim() || null },
+      ]);
+      const phieu = result.recordsets.at(-2)?.[0];
+      const rejected = result.recordsets.at(-1) || [];
+      if (!phieu?.maPhieuDatCoc) throw new Error('Phiếu cọc chưa được phát hành');
+      const email = await notifyDeposit('issued', phieu.maPhieuDatCoc);
+      for (const other of rejected) await notifyDeposit('rejected', other.maDangKy, other.lyDo);
+      return { ...phieu, trangThaiDangKy: 'Xác nhận cọc', email };
+    }
     const result = await executeProcedure('dbo.SP_XacNhanKhaNangNhanCoc', [
-      { name: 'MaDangKy',    type: sql.VarChar(6),          value: maDangKy },
-      { name: 'MaQuanLy',    type: sql.VarChar(6),          value: maQuanLy },
-      { name: 'DuocNhanCoc', type: sql.Bit,                 value: data.duocNhanCoc ? 1 : 0 },
-      { name: 'LyDo',        type: sql.NVarChar(sql.MAX),   value: data.lyDo || null }
+      { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
+      { name: 'MaQuanLy', type: sql.VarChar(6), value: maQuanLy },
+      { name: 'DuocNhanCoc', type: sql.Bit, value: 0 },
+      { name: 'LyDo', type: sql.NVarChar(sql.MAX), value: data.lyDo || null }
     ]);
-    return result.recordset[0] || null;
+    const row = result.recordset[0] || null;
+    await notifyDeposit('rejected', maDangKy, data.lyDo);
+    return row;
   } catch (error) {
-    mapDatabaseError(error, { 50204: 404, 50205: 409, 50206: 404, 50207: 400, 50208: 422, 50209: 422 });
+    mapDatabaseError(error, { 50204: 404, 50205: 409, 50206: 404, 50207: 400, 50208: 422, 50209: 422,
+      50215: 409, 50216: 422, 50217: 422, 50218: 409, 50219: 422, 50306: 403, 50307: 409, 50308: 409,
+      50312: 400, 50313: 403 });
   }
 }
 
@@ -385,17 +419,92 @@ export async function chonPhuongThucCoc(user, id, data = {}) {
 }
 
 
-export async function xacNhanThanhToanCoc(id, data = {}) {
+export async function xacNhanThanhToanCoc(user, id, data = {}) {
+  if (user?.vaiTro !== 'NhanVien' || user?.chucVu !== 'Kế toán')
+    throw createServiceError('Chỉ kế toán được xác nhận tiền chuyển khoản', 403);
   try {
+    const pool = await getPool();
+    const existing = await pool.request().input('id', sql.VarChar(6), id).query(`
+      SELECT PhuongThucThanhToan FROM dbo.PhieuDatCoc WHERE MaPhieuDatCoc=@id`);
+    if (existing.recordset[0]?.PhuongThucThanhToan !== 'Chuyển khoản')
+      throw createServiceError('Chỉ xác nhận chứng từ chuyển khoản tại đây', 409);
     const result = await executeProcedure('dbo.SP_XacNhanThanhToanCoc', [
       { name: 'PhieuId', type: sql.NVarChar(30), value: String(id || '').trim() },
       { name: 'HopLe', type: sql.Bit, value: Boolean(data.hopLe) },
       { name: 'GhiChu', type: sql.NVarChar(sql.MAX), value: data.ghiChu || null },
-      { name: 'QuanLyXacNhanThanhToanId', type: sql.NVarChar(20), value: data.quanLyXacNhanThanhToanId || null }
+      { name: 'QuanLyXacNhanThanhToanId', type: sql.NVarChar(20), value: user.maNguoiDung }
     ]);
-
-    return result.recordset[0] || null;
+    const row = result.recordset[0] || null;
+    if (data.hopLe && row?.trangThaiThanhToan === 'Đã TT') await notifyDeposit('paid', String(id));
+    return row;
   } catch (error) {
     handleDatabaseError(error);
   }
+}
+
+export async function thuTienMatCoc(user, id, chungTuThanhToan) {
+  if (user?.vaiTro !== 'NhanVien' || user?.chucVu !== 'Sale')
+    throw createServiceError('Chỉ Sale được xác nhận đã thu tiền mặt', 403);
+  if (!chungTuThanhToan) throw createServiceError('Cần tải ảnh biên nhận đã ký');
+  const maPhieu = String(id || '').trim();
+  const tx = new sql.Transaction(await getPool());
+  await tx.begin(sql.ISOLATION_LEVEL.SERIALIZABLE);
+  try {
+    const owned = await new sql.Request(tx).input('id', sql.VarChar(6), maPhieu)
+      .input('sale', sql.VarChar(6), user.maNguoiDung).query(`
+        SELECT 1 FROM dbo.PhieuDatCoc d JOIN dbo.PhieuDangKy p
+          ON p.MaDangKy=d.MaPhieuYeuCauDangKy
+        WHERE d.MaPhieuDatCoc=@id AND p.MaNhanVienSale=@sale
+          AND d.TrangThaiCoc=N'Hiệu lực' AND d.TrangThaiThanhToan=N'Chờ TT'`);
+    if (!owned.recordset.length) throw createServiceError('Phiếu cọc không chờ thu hoặc không thuộc Sale này', 409);
+    const call = (name, args) => {
+      const request = new sql.Request(tx);
+      for (const [key, type, value] of args) request.input(key, type, value);
+      return request.execute(name);
+    };
+    await call('dbo.SP_ChonPhuongThucThanhToanCoc', [
+      ['PhieuId', sql.NVarChar(30), maPhieu], ['PhuongThucThanhToan', sql.NVarChar(20), 'Tiền mặt']]);
+    await call('dbo.SP_CapNhatMinhChungThanhToanCoc', [
+      ['PhieuId', sql.NVarChar(30), maPhieu], ['ChungTuThanhToan', sql.NVarChar(500), chungTuThanhToan]]);
+    await call('dbo.SP_XacNhanThanhToanCoc', [
+      ['PhieuId', sql.NVarChar(30), maPhieu], ['HopLe', sql.Bit, true],
+      ['GhiChu', sql.NVarChar(sql.MAX), null], ['QuanLyXacNhanThanhToanId', sql.NVarChar(20), user.maNguoiDung]]);
+    await tx.commit();
+    const email = await notifyDeposit('paid', maPhieu);
+    return { maPhieuDatCoc: maPhieu, trangThaiThanhToan: 'Đã TT', email };
+  } catch (error) {
+    await tx.rollback().catch(() => {});
+    throw error;
+  }
+}
+
+export async function tienMatChoNopQuy(user) {
+  if (user?.vaiTro !== 'NhanVien' || user?.chucVu !== 'Kế toán')
+    throw createServiceError('Chỉ kế toán được xem tiền mặt chờ nộp quỹ', 403);
+  const pool = await getPool();
+  const result = await pool.request().input('staff', sql.VarChar(6), user.maNguoiDung).query(`
+    SELECT d.MaPhieuDatCoc AS maPhieuDatCoc,d.SoTienCoc AS soTienCoc,
+      d.ThoiGianXacNhanTT AS thuLuc,d.DaNopQuy AS daNopQuy,
+      nd.HoTen AS hoTen,p.MaPhong AS maPhong
+    FROM dbo.PhieuDatCoc d JOIN dbo.ChiTietDatCoc c ON c.MaPhieuDatCoc=d.MaPhieuDatCoc
+    JOIN dbo.Phong p ON p.MaPhong=c.MaPhong
+    JOIN dbo.NguoiDung nd ON nd.MaNguoiDung=d.MaKhachHang
+    JOIN dbo.NhanVien nv ON nv.MaNhanVien=@staff
+    WHERE p.MaChiNhanh=nv.MaChiNhanh AND d.PhuongThucThanhToan=N'Tiền mặt'
+      AND d.TrangThaiThanhToan=N'Đã TT' AND d.DaNopQuy=0
+    GROUP BY d.MaPhieuDatCoc,d.SoTienCoc,d.ThoiGianXacNhanTT,d.DaNopQuy,nd.HoTen,p.MaPhong
+    ORDER BY d.ThoiGianXacNhanTT`);
+  return result.recordset;
+}
+
+export async function ghiNhanNopQuyCoc(user, id) {
+  if (user?.vaiTro !== 'NhanVien' || user?.chucVu !== 'Kế toán')
+    throw createServiceError('Chỉ kế toán được xác nhận nộp quỹ', 403);
+  try {
+    const result = await executeProcedure('dbo.SP_GhiNhanNopQuyCoc', [
+      { name: 'MaPhieu', type: sql.VarChar(6), value: String(id || '').trim() },
+      { name: 'MaKeToan', type: sql.VarChar(6), value: user.maNguoiDung },
+    ]);
+    return result.recordset[0] || null;
+  } catch (error) { mapDatabaseError(error, { 50310: 403, 50311: 409, 50314: 403 }); }
 }

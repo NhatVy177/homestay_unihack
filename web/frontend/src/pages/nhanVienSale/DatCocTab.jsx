@@ -6,7 +6,6 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 import ResultModal from '../../components/common/ResultModal.jsx';
 import SoNguoiBadge from '../../components/common/SoNguoiBadge.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
-import LapPhieuCocTab from './LapPhieuCocTab.jsx';
 
 // Hiển thị phòng/giường gọn theo dữ liệu trả về từ SP_DanhSachDatCocSale.
 // 1 phiếu = 1 phòng -> bảng chỉ cần tên phòng; mã giường là chi tiết, xem trong modal.
@@ -166,6 +165,18 @@ export default function DatCocTab() {
   const [loadingPhong, setLoadingPhong] = useState(false);
   const [phongChot, setPhongChot] = useState('');   // maPhong đang chốt
   const [savingPhong, setSavingPhong] = useState(false);
+  const [hinhThucYeuCau, setHinhThucYeuCau] = useState('Nguyên phòng');
+  const [giuongTrong, setGiuongTrong] = useState([]);
+  const [giuongChon, setGiuongChon] = useState([]);
+  useEffect(() => {
+    if (!showSendModal || !phongChot) { setGiuongTrong([]); return; }
+    let active = true;
+    setGiuongChon([]);
+    datCocApi.getGiuongTrong(phongChot)
+      .then(({ data }) => { if (active) setGiuongTrong(data || []); })
+      .catch(() => { if (active) setGiuongTrong([]); });
+    return () => { active = false; };
+  }, [showSendModal, phongChot]);
 
   // Tầng GUI - HienThi(): tải danh sách hồ sơ "Đã tiếp nhận" cần gửi yêu cầu đặt cọc.
   const [yeuCauList, setYeuCauList] = useState([]);
@@ -207,6 +218,7 @@ export default function DatCocTab() {
 
   const handleChonPhuongThuc = async (phuongThuc) => {
     if (!selectedPhieu) return;
+    if (phuongThuc === 'Tiền mặt') { setCtPhuongThuc(phuongThuc); return; }
     setSubmitting(true);
     try {
       await datCocApi.chonPhuongThuc(selectedPhieu.maPhieuDatCoc, { phuongThucThanhToan: phuongThuc });
@@ -273,7 +285,7 @@ export default function DatCocTab() {
       <div class="frow"><span class="lab">Đại diện</span>: ${blank(user?.hoTen, 180)}</div>
       <div class="frow"><span class="lab">Số điện thoại</span>: ${blank(p.sdtChiNhanh, 130)}</div>
       <div class="frow" style="margin-top:12px">Bên B nhận của bên A số tiền đặt cọc: <span class="money">${soTien}</span> đồng (bằng chữ: <span class="fill">${bangChu}</span> đồng) để thuê ${blank(phong, 150)} tại: ${blank(diaChiNha, 220)}.</div>
-      <div class="frow">Bên B giữ chỗ cho bên A đến ngày ${blank(ngayDMY(p.thoiHanThanhToan), 100)}; trong thời gian đó hai bên tiến hành ký hợp đồng thuê.</div>
+      <div class="frow">Bên B xác nhận đã nhận tiền cọc từ bên A. Hai bên tiếp tục thủ tục ký hợp đồng thuê theo thỏa thuận.</div>
       <div class="frow">Ngày dự kiến ký hợp đồng / nhận phòng: ${blank(ngayDMY(p.thoiGianNhanPhong), 100)}.</div>
       <div class="frow" style="margin-top:8px;font-size:13px">Hai bên cam kết minh mẫn, tự nguyện; bên B đã nhận đủ số tiền trên. Biên bản lập thành 02 bản có giá trị pháp lý như nhau.</div>
       <div class="signs">
@@ -306,11 +318,13 @@ export default function DatCocTab() {
       // Gửi multipart: chỉ file chứng từ (ảnh/PDF). DB chỉ lưu ĐƯỜNG DẪN file.
       const fd = new FormData();
       fd.append('file', ctFile);
-      await datCocApi.capNhatMinhChung(selectedPhieu.maPhieuDatCoc, fd);
+      if (ctPhuongThuc === 'Tiền mặt') await datCocApi.thuTienMat(selectedPhieu.maPhieuDatCoc, fd);
+      else await datCocApi.capNhatMinhChung(selectedPhieu.maPhieuDatCoc, fd);
       setShowUploadModal(false);
       setSelectedPhieu(null);
       await loadChungTu();
-      setResult({ type: 'success', title: 'Gửi thành công!', message: 'Chứng từ đã gửi đến Quản lý.' });
+      setResult({ type: 'success', title: ctPhuongThuc === 'Tiền mặt' ? 'Đã xác nhận thu tiền mặt.' : 'Gửi thành công!',
+        message: ctPhuongThuc === 'Tiền mặt' ? 'Phiếu đã thanh toán. Kế toán sẽ theo dõi nộp quỹ.' : 'Chứng từ đã gửi đến Kế toán.' });
     } catch {
       setResult({ type: 'error', title: 'Gửi thất bại.' });
     } finally {
@@ -485,9 +499,14 @@ export default function DatCocTab() {
   // Tầng GUI - btnGui_Click(): gọi service guiYeuCauDatCoc qua API.
   const handleGuiYeuCau = async () => {
     if (!selectedItem) return;
+    if (hinhThucYeuCau === 'Ghép giường' && giuongChon.length !== Number(selectedItem.soNguoiDuKienO)) {
+      setResult({ type: 'error', title: 'Chọn đủ giường cho số người dự kiến ở.' });
+      return;
+    }
     setSubmitting(true);
     try {
-      await datCocApi.guiYeuCauDatCoc({ maDangKy: selectedItem.maDangKy });
+      await datCocApi.guiYeuCauDatCoc({ maDangKy: selectedItem.maDangKy,
+        hinhThucThue: hinhThucYeuCau, giuongs: hinhThucYeuCau === 'Ghép giường' ? giuongChon : [] });
       setShowSendModal(false);
       setSelectedItem(null);
       await loadYeuCau();
@@ -576,14 +595,6 @@ export default function DatCocTab() {
         >
           Gửi yêu cầu đặt cọc
         </div>
-        {/* DC02B - Sale lập phiếu cọc (hình thức thuê + giường là thứ phải trao đổi với khách,
-            mà người gặp khách là Sale). Sale KHÔNG thấy tiền — kế toán chốt tiền ở DC03. */}
-        <div
-          onClick={() => setActiveSubTab('lap-phieu')}
-          style={{ paddingBottom: '12px', cursor: 'pointer', fontWeight: activeSubTab === 'lap-phieu' ? '600' : '500', color: activeSubTab === 'lap-phieu' ? '#2f6765' : '#6f797a', borderBottom: activeSubTab === 'lap-phieu' ? '2px solid #2f6765' : '2px solid transparent' }}
-        >
-          Lập phiếu đặt cọc
-        </div>
         <div
           onClick={() => setActiveSubTab('ghi-nhan-chung-tu')}
           style={{ paddingBottom: '12px', cursor: 'pointer', fontWeight: activeSubTab === 'ghi-nhan-chung-tu' ? '600' : '500', color: activeSubTab === 'ghi-nhan-chung-tu' ? '#2f6765' : '#6f797a', borderBottom: activeSubTab === 'ghi-nhan-chung-tu' ? '2px solid #2f6765' : '2px solid transparent' }}
@@ -592,7 +603,6 @@ export default function DatCocTab() {
         </div>
       </div>
 
-      {activeSubTab === 'lap-phieu' && <LapPhieuCocTab />}
 
       {activeSubTab === 'gui-yeu-cau' && (
         <section>
@@ -668,7 +678,7 @@ export default function DatCocTab() {
                     </td>
                     <td className="text-center">
                       {action === 'gui' && (
-                        <button className="ktp-btn-action-fill" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={() => { setSelectedItem(item); setEditingInfo(false); setShowRejectPanel(false); setLyDoTuChoi(''); setShowSendModal(true); loadPhongDaXem(item.maDangKy); }}>
+                        <button className="ktp-btn-action-fill" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={() => { setSelectedItem(item); setHinhThucYeuCau('Nguyên phòng'); setGiuongChon([]); setEditingInfo(false); setShowRejectPanel(false); setLyDoTuChoi(''); setShowSendModal(true); loadPhongDaXem(item.maDangKy); }}>
                           Gửi yêu cầu
                         </button>
                       )}
@@ -990,6 +1000,27 @@ export default function DatCocTab() {
                       Phòng mờ là phòng khách chưa xem (lịch chưa ở trạng thái &quot;Đã xem&quot;) — không chốt được.
                     </p>
                   )}
+                  {phongChot && (
+                    <div style={{ marginTop: 14, display: 'grid', gap: 8 }}>
+                      <strong>Hình thức thuê và giường đề nghị</strong>
+                      <label><input type="radio" checked={hinhThucYeuCau === 'Nguyên phòng'}
+                        onChange={() => { setHinhThucYeuCau('Nguyên phòng'); setGiuongChon([]); }} /> Nguyên phòng</label>
+                      <label><input type="radio" checked={hinhThucYeuCau === 'Ghép giường'}
+                        disabled={khacGioiOf(selectedItem)} onChange={() => setHinhThucYeuCau('Ghép giường')} /> Ghép giường</label>
+                      {hinhThucYeuCau === 'Ghép giường' && (
+                        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                          {giuongTrong.map((g) => <label key={g.maGiuong}>
+                            <input type="checkbox" checked={giuongChon.includes(g.maGiuong)}
+                              disabled={!giuongChon.includes(g.maGiuong) && giuongChon.length >= Number(selectedItem.soNguoiDuKienO)}
+                              onChange={() => setGiuongChon((current) => current.includes(g.maGiuong)
+                                ? current.filter(x => x !== g.maGiuong) : [...current, g.maGiuong])} /> {g.maGiuong}
+                          </label>)}
+                          <small>Đã chọn {giuongChon.length}/{selectedItem.soNguoiDuKienO} giường</small>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {!selectedItem.email && <p style={{ color: '#b45309' }}>Khách chưa có email, hãy báo khách trực tiếp.</p>}
                 </div>
               )}
             </div>
@@ -1014,7 +1045,7 @@ export default function DatCocTab() {
                     style={{ border: '1px solid #b91c1c', borderRadius: '8px', padding: '10px 20px', color: '#b91c1c', backgroundColor: '#fff' }}>Từ chối</button>
                   {/* Chưa chốt phòng thì không gửi được: Quản lý (DC02) cần biết duyệt phòng nào. */}
                   <button className="ktp-btn-submit" onClick={handleGuiYeuCau}
-                    disabled={submitting || savingPhong || !phongChot}
+                    disabled={submitting || savingPhong || !phongChot || (hinhThucYeuCau === 'Ghép giường' && giuongChon.length !== Number(selectedItem.soNguoiDuKienO))}
                     title={!phongChot ? 'Cần chọn phòng khách chốt thuê trước khi gửi' : ''}>
                     {submitting ? 'Đang gửi...' : 'Gửi'}
                   </button>
@@ -1085,6 +1116,10 @@ export default function DatCocTab() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}><span style={{ color: '#6f797a' }}>Ngân hàng</span><b>{selectedPaymentAccount.nganHang}</b></div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}><span style={{ color: '#6f797a' }}>Số tài khoản</span><b>{selectedPaymentAccount.soTaiKhoan}</b></div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}><span style={{ color: '#6f797a' }}>Chủ tài khoản</span><b style={{ textAlign: 'right' }}>{selectedPaymentAccount.chuTaiKhoan}</b></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+                          <span>Nội dung chuyển khoản</span><b>{selectedPhieu.maPhieuDatCoc} {selectedPhieu.soDienThoai || ''}</b>
+                          <button type="button" onClick={() => navigator.clipboard.writeText(`${selectedPhieu.maPhieuDatCoc} ${selectedPhieu.soDienThoai || ''}`.trim())}>Sao chép</button>
+                        </div>
                       </div>
                     )}
                     {ctPhuongThuc === 'Tiền mặt' && (
@@ -1163,7 +1198,7 @@ export default function DatCocTab() {
             <div className="ktp-modal-footer" style={{ borderTop: '1px solid #eceeef', paddingTop: '16px', paddingBottom: '20px', paddingRight: '24px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <button className="ktp-btn-action" onClick={() => setShowUploadModal(false)} disabled={submitting} style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#3f494a', padding: '10px 28px' }}>Hủy</button>
               <button className="ktp-btn-action-fill" onClick={handleGhiNhanChungTu} disabled={submitting} style={{ padding: '10px 28px' }}>
-                {submitting ? 'Đang gửi...' : 'Gửi chứng từ'}
+                    {submitting ? 'Đang gửi...' : ctPhuongThuc === 'Tiền mặt' ? 'Xác nhận đã thu tiền mặt' : 'Gửi chứng từ'}
               </button>
             </div>
           </div>

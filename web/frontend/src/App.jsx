@@ -29,7 +29,7 @@ function ProtectedRoute({ children }) {
   const location = useLocation();
 
   if (isLoading) return <LoadingScreen />;
-  if (!user) return <Navigate to="/" state={{ from: location }} replace />;
+  if (!user) return <Navigate to={`/?next=${encodeURIComponent(location.pathname + location.search + location.hash)}`} state={{ from: location }} replace />;
   return children;
 }
 

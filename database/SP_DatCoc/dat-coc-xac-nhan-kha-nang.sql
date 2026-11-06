@@ -30,6 +30,22 @@ BEGIN
         pdk.TrangThai       AS trangThai,      -- để frontend tô badge + phân nhóm
         pdk.GhiChuSale      AS ghiChuSale,     -- lý do (khi trạng thái = 'Từ chối')
         pdk.MaNhanVienSale  AS maNhanVienSale,
+        yc.HinhThucThue    AS hinhThucThue,
+        yc.DanhSachGiuong  AS danhSachGiuong,
+        yc.GuiLuc          AS guiLuc,
+        CASE WHEN yc.GuiLuc IS NULL THEN NULL
+          ELSE DATEDIFF(MINUTE,yc.GuiLuc,GETDATE()) END AS phutDaCho,
+        CASE WHEN pdk.TrangThai=N'Chờ xác nhận cọc' AND yc.GuiLuc IS NOT NULL
+          AND NOT EXISTS (SELECT 1 FROM dbo.PhieuDangKy px
+            JOIN dbo.YeuCauDatCocChiTiet yx ON yx.MaDangKy=px.MaDangKy
+            JOIN dbo.ChiTietXemPhong cx ON cx.MaDangKy=px.MaDangKy AND cx.KhachChon=1
+            WHERE px.TrangThai=N'Chờ xác nhận cọc' AND cx.MaPhong=phong.maPhong
+              AND (yx.GuiLuc<yc.GuiLuc OR (yx.GuiLuc=yc.GuiLuc AND px.MaDangKy<pdk.MaDangKy)))
+          THEN CAST(1 AS bit) ELSE CAST(0 AS bit) END AS laYeuCauDau,
+        (SELECT COUNT(*) FROM dbo.ChiTietXemPhong cx
+          JOIN dbo.PhieuDangKy px ON px.MaDangKy=cx.MaDangKy
+          WHERE cx.MaPhong=phong.maPhong AND cx.KhachChon=1
+            AND px.TrangThai=N'Chờ xác nhận cọc') AS yeuCauCungPhong,
         ndSale.HoTen        AS tenNhanVienSale,
         pdk.SoNam           AS soNam,
         pdk.SoNu            AS soNu,
@@ -50,6 +66,12 @@ BEGIN
         CASE
             WHEN pdk.TrangThai <> N'Chờ xác nhận cọc' THEN CAST(NULL AS BIT)
             WHEN phong.maPhong IS NULL THEN CAST(0 AS BIT)
+            WHEN yc.HinhThucThue=N'Nguyên phòng' AND g.soChoTrong<g.tongGiuong THEN CAST(0 AS BIT)
+            WHEN yc.HinhThucThue=N'Ghép giường' AND pdk.SoNam>0 AND pdk.SoNu>0 THEN CAST(0 AS BIT)
+            WHEN yc.HinhThucThue=N'Ghép giường' AND EXISTS (
+              SELECT 1 FROM STRING_SPLIT(COALESCE(yc.DanhSachGiuong,N''),N',') b
+              LEFT JOIN dbo.Giuong gb ON gb.MaPhong=phong.maPhong AND gb.MaGiuong=TRIM(b.value)
+              WHERE gb.MaGiuong IS NULL OR gb.TinhTrang<>N'Trống') THEN CAST(0 AS BIT)
             -- Nhóm khác giới -> nguyên phòng -> phòng phải trống hoàn toàn + đủ sức chứa
             WHEN pdk.SoNam > 0 AND pdk.SoNu > 0 AND g.soChoTrong < g.tongGiuong THEN CAST(0 AS BIT)
             WHEN pdk.SoNam > 0 AND pdk.SoNu > 0 AND pdk.SoNguoiDuKienO > lp.SucChuaToiDa THEN CAST(0 AS BIT)
@@ -63,6 +85,12 @@ BEGIN
         CASE
             WHEN pdk.TrangThai <> N'Chờ xác nhận cọc' THEN NULL
             WHEN phong.maPhong IS NULL THEN N'Hồ sơ chưa chốt phòng. Sale cần chọn phòng khách muốn thuê.'
+            WHEN yc.HinhThucThue=N'Nguyên phòng' AND g.soChoTrong<g.tongGiuong THEN N'Phòng không còn trống hoàn toàn.'
+            WHEN yc.HinhThucThue=N'Ghép giường' AND pdk.SoNam>0 AND pdk.SoNu>0 THEN N'Nhóm khác giới cần thuê nguyên phòng.'
+            WHEN yc.HinhThucThue=N'Ghép giường' AND EXISTS (
+              SELECT 1 FROM STRING_SPLIT(COALESCE(yc.DanhSachGiuong,N''),N',') b
+              LEFT JOIN dbo.Giuong gb ON gb.MaPhong=phong.maPhong AND gb.MaGiuong=TRIM(b.value)
+              WHERE gb.MaGiuong IS NULL OR gb.TinhTrang<>N'Trống') THEN N'Giường đã chọn không còn trống.'
             WHEN pdk.SoNam > 0 AND pdk.SoNu > 0 AND g.soChoTrong < g.tongGiuong
                 THEN N'Nhóm có cả nam và nữ phải thuê nguyên phòng: phòng chưa hoàn toàn trống.'
             WHEN pdk.SoNam > 0 AND pdk.SoNu > 0 AND pdk.SoNguoiDuKienO > lp.SucChuaToiDa
@@ -79,6 +107,7 @@ BEGIN
     INNER JOIN dbo.KhachHang AS kh ON kh.MaKhachHang = pdk.MaKhachHang
     INNER JOIN dbo.NguoiDung AS nd ON nd.MaNguoiDung  = kh.MaKhachHang
     LEFT JOIN dbo.NguoiDung AS ndSale ON ndSale.MaNguoiDung = pdk.MaNhanVienSale
+    LEFT JOIN dbo.YeuCauDatCocChiTiet AS yc ON yc.MaDangKy=pdk.MaDangKy
     -- PHÒNG KHÁCH CHỐT (DC01), không còn TOP 1 phòng đã xem
     OUTER APPLY (
         SELECT TOP 1 ctxp.MaPhong AS maPhong
@@ -213,7 +242,7 @@ BEGIN
 
             UPDATE dbo.PhieuDangKy
             SET TrangThai  = CASE WHEN @ConPhongKhac = 1
-                                  THEN N'Chờ tiếp nhận'   -- quay lại DC01
+                                  THEN N'Đã tiếp nhận'   -- quay lại DC01
                                   ELSE N'Từ chối'         -- hết phòng -> đóng hồ sơ
                              END,
                 GhiChuSale = @LyDo

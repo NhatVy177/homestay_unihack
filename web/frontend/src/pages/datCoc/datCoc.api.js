@@ -2,6 +2,9 @@ import { httpClient } from '../../api/httpClient.js';
 
 export const datCocApi = {
   getAll: () => httpClient.get('/dat-coc'),
+  thuTienMat: (id, formData) => httpClient.post(`/dat-coc/${id}/thu-tien-mat`, formData, { headers: { 'Content-Type': undefined } }),
+  tienMatChoNopQuy: () => httpClient.get('/dat-coc/tien-mat-cho-nop-quy'),
+  ghiNhanNopQuy: (id) => httpClient.put(`/dat-coc/${id}/nop-quy`),
   create: (data) => httpClient.post('/dat-coc', data),
   xacNhanKhaNang: (id, data) => httpClient.put(`/dat-coc/${id}/xac-nhan-kha-nang-nhan-coc`, data),
   phatHanhThanhToan: (id, data) => httpClient.put(`/dat-coc/${id}/phat-hanh-thanh-toan`, data),

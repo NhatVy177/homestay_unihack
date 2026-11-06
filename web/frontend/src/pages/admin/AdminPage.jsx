@@ -2904,8 +2904,6 @@ function SettingsView() {
     chuKyIncremental: 'Hàng ngày',
     thuMucLuuTru: 'C:\\SQLBackups'
   });
-  // D-019: null = máy chủ chưa có tham số (chưa chạy migration) -> ẩn công tắc.
-  const [tuDongDuyetCoc, setTuDongDuyetCoc] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -2919,8 +2917,6 @@ function SettingsView() {
           chuKyIncremental: data.backup?.chuKyIncremental || 'Hàng ngày',
           thuMucLuuTru: data.backup?.thuMucLuuTru || 'C:\\SQLBackups'
         });
-        const thamSo = (data.parameters || []).find(p => p.maThamSo === 'TU_DONG_DUYET_COC');
-        setTuDongDuyetCoc(thamSo ? ['1', 'true'].includes(String(thamSo.giaTri).toLowerCase()) : null);
       } catch (err) {
         console.error(err);
       }
@@ -2935,7 +2931,7 @@ function SettingsView() {
   const handleSave = async () => {
     try {
       setIsSubmitting(true);
-      await adminApi.updateSettings(tuDongDuyetCoc === null ? form : { ...form, tuDongDuyetCoc });
+      await adminApi.updateSettings(form);
       alert('Lưu thay đổi thành công!');
     } catch (err) {
       alert(err.message);
@@ -2985,16 +2981,6 @@ function SettingsView() {
             />
           </label>
         </div>
-        {tuDongDuyetCoc !== null && (
-          <label className="admin-note" style={{ cursor: 'pointer' }}>
-            <input type="checkbox" checked={tuDongDuyetCoc} onChange={e => setTuDongDuyetCoc(e.target.checked)} />
-            <span>
-              <strong>Tự động chốt phiếu cọc.</strong> Phiếu cọc sale lập được tự chốt thay kế toán (tiền cọc = 2 tháng tiền thuê × số giường,
-              hệ thống tự tính, người chốt ghi là "Hệ thống tự động"). Quản lý vẫn duyệt nhận cọc như cũ.
-              Không chốt tự động được thì phiếu vẫn chờ kế toán. Tắt để kế toán chốt tay hoàn toàn.
-            </span>
-          </label>
-        )}
         <div className="admin-note">
           <Icon name="info" />
           <span>Các thay đổi cấu hình nên được ghi nhật ký để truy vết người cập nhật và thời điểm cập nhật.</span>

@@ -1,6 +1,7 @@
 import * as service from '../services/datCoc.service.js';
 import { publicUrlFor } from '../middleware/upload.middleware.js';
 import { tuDongDatCoc } from '../services/tuDongDatCoc.service.js';
+import { unlink } from 'node:fs/promises';
 
 export async function getCauHinhTuDong(req, res, next) {
   // D-021: màn kế toán ẩn tab "Chốt phiếu đặt cọc" khi hệ thống đang tự chốt.
@@ -23,7 +24,7 @@ export async function getPhieuDatCoc(req, res, next) {
   try { res.json(await service.getPhieuDatCoc(req.user.maNguoiDung)); } catch (err) { next(err); }
 }
 export async function xacNhanKhaNangNhanCoc(req, res, next) {
-  try { res.json(await service.xacNhanKhaNangNhanCoc(req.params.id, req.body)); } catch (err) { next(err); }
+  try { res.json(await service.xacNhanKhaNangNhanCoc(req.user, req.params.id, req.body)); } catch (err) { next(err); }
 }
 export async function phatHanhYeuCauThanhToanCoc(req, res, next) {
   try { res.json(await service.phatHanhYeuCauThanhToanCoc(req.params.id, req.body)); } catch (err) { next(err); }
@@ -52,11 +53,10 @@ export async function chonPhuongThucCoc(req, res, next) {
 }
 
 export async function xacNhanThanhToanCoc(req, res, next) {
-  try { res.json(await service.xacNhanThanhToanCoc(req.params.id, req.body)); } catch (err) { next(err); }
+  try { res.json(await service.xacNhanThanhToanCoc(req.user, req.params.id, req.body)); } catch (err) { next(err); }
 }
 export async function guiYeuCauDatCoc(req, res, next) {
-  // maNhanVienSale lấy từ phiên đăng nhập (req.user), không nhận từ body để đúng phân quyền vai trò.
-  try { res.status(200).json(await service.guiYeuCauDatCoc({ ...req.body, maNhanVienSale: req.user.maNguoiDung })); } catch (err) { next(err); }
+  try { res.status(200).json(await service.guiYeuCauDatCoc(req.user, req.body)); } catch (err) { next(err); }
 }
 export async function capNhatThongTinCaNhan(req, res, next) {
   // DC01 (A4) - Sale chỉnh sửa thông tin cá nhân/liên hệ/giấy tờ khách hàng trước khi gửi yêu cầu.
@@ -85,5 +85,21 @@ export async function getDanhSachChoGhiNhanChungTu(req, res, next) {
   try { res.json(await service.getDanhSachChoGhiNhanChungTu(req.user.maNguoiDung)); } catch (err) { next(err); }
 }
 export async function getDanhSachChoXacNhanThanhToan(req, res, next) {
-  try { res.json(await service.getDanhSachChoXacNhanThanhToan(req.user.maNguoiDung)); } catch (err) { next(err); }
+  try { res.json(await service.getDanhSachChoXacNhanThanhToan(req.user)); } catch (err) { next(err); }
+}
+
+export async function thuTienMat(req, res, next) {
+  try {
+    const path = req.file ? publicUrlFor(req.file.filename) : null;
+    res.json(await service.thuTienMatCoc(req.user, req.params.id, path));
+  } catch (err) {
+    if (req.file?.path) await unlink(req.file.path).catch(() => {});
+    next(err);
+  }
+}
+export async function tienMatChoNopQuy(req, res, next) {
+  try { res.json(await service.tienMatChoNopQuy(req.user)); } catch (err) { next(err); }
+}
+export async function ghiNhanNopQuy(req, res, next) {
+  try { res.json(await service.ghiNhanNopQuyCoc(req.user, req.params.id)); } catch (err) { next(err); }
 }

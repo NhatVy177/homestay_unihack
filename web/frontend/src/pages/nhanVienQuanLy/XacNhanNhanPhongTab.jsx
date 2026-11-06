@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useAuth } from '../../auth/AuthContext.jsx';
 import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
 import { datCocApi } from '../datCoc/datCoc.api.js';
 import ResultModal from '../../components/common/ResultModal.jsx';
@@ -20,6 +19,8 @@ const formatNgay = (v) => {
   const d = new Date(v);
   return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('vi-VN');
 };
+const thoiGianCho = (item) => item.phutDaCho == null ? null
+  : `Đã chờ ${Math.max(0, Math.floor(Number(item.phutDaCho) / 60))} giờ ${Math.max(0, Number(item.phutDaCho) % 60)} phút`;
 
 // Nguồn cấu hình DUY NHẤT cho trạng thái phiếu ở màn Quản lý duyệt.
 const STATUS_CONFIG = {
@@ -50,7 +51,6 @@ const pageBtnStyle = (active, disabled) => ({
 });
 
 export default function XacNhanNhanPhongTab() {
-  const { user } = useAuth();
 
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -102,11 +102,13 @@ export default function XacNhanNhanPhongTab() {
   // "Chờ duyệt" -> cũ nhất trước (FIFO, hồ sơ chờ lâu xử lý trước); các nhóm khác -> mới nhất trước.
   const filteredList = useMemo(() => {
     const arr = statusFilter === 'all' ? baseFiltered : baseFiltered.filter((it) => it.trangThai === statusFilter);
-    const fifo = statusFilter === 'Chờ xác nhận cọc';
     return [...arr].sort((a, b) => {
-      const da = a.ngayDangKy ? new Date(a.ngayDangKy).getTime() : 0;
-      const db = b.ngayDangKy ? new Date(b.ngayDangKy).getTime() : 0;
-      return fifo ? da - db : db - da;
+      const pa = a.trangThai === 'Chờ xác nhận cọc';
+      const pb = b.trangThai === 'Chờ xác nhận cọc';
+      if (pa !== pb) return pa ? -1 : 1;
+      const da = a.guiLuc ? new Date(a.guiLuc).getTime() : (a.ngayDangKy ? new Date(a.ngayDangKy).getTime() : 0);
+      const db = b.guiLuc ? new Date(b.guiLuc).getTime() : (b.ngayDangKy ? new Date(b.ngayDangKy).getTime() : 0);
+      return pa ? da - db : db - da;
     });
   }, [baseFiltered, statusFilter]);
 
@@ -141,6 +143,8 @@ export default function XacNhanNhanPhongTab() {
     }
   };
   const readOnly = !!(selected && selected.trangThai && selected.trangThai !== 'Chờ xác nhận cọc');
+  const canApproveLater = selected?.trangThai === 'Chờ xác nhận cọc'
+    && selected.yeuCauCungPhong >= 2 && selected.laYeuCauDau === false;
 
   const handleSubmit = async () => {
     if (!selected) return;
@@ -149,12 +153,16 @@ export default function XacNhanNhanPhongTab() {
       setResult({ type: 'error', title: 'Chưa nhập lý do từ chối.' });
       return;
     }
+    if (duocNhanCoc && canApproveLater && !lyDo.trim()) {
+      setResult({ type: 'error', title: 'Cần nhập lý do duyệt yêu cầu gửi sau.' });
+      return;
+    }
     setSubmitting(true);
     try {
       const { data } = await datCocApi.xacNhanKhaNang(selected.maDangKy, {
-        maQuanLy: user?.maNguoiDung,
         duocNhanCoc,
-        lyDo: duocNhanCoc ? null : lyDo.trim()
+        lyDo: duocNhanCoc ? null : lyDo.trim(),
+        lyDoVuotLuot: duocNhanCoc && canApproveLater ? lyDo.trim() : null
       });
       setSelected(null);
       await loadDanhSach();
@@ -165,11 +173,11 @@ export default function XacNhanNhanPhongTab() {
       setResult({
         type: 'success',
         title: duocNhanCoc
-          ? 'Đã chấp nhận.'
+          ? `Đã duyệt và phát hành phiếu ${data?.maPhieuDatCoc || ''}.`
           : (conPhongKhac ? 'Đã trả hồ sơ về Sale chọn phòng khác.' : 'Đã từ chối hồ sơ.')
       });
-    } catch {
-      setResult({ type: 'error', title: 'Thao tác thất bại.' });
+    } catch (error) {
+      setResult({ type: 'error', title: 'Thao tác thất bại.', message: error.response?.data?.message || error.message });
     } finally {
       setSubmitting(false);
     }
@@ -225,8 +233,15 @@ export default function XacNhanNhanPhongTab() {
                   <td><span style={{ fontWeight: '700', color: '#00666d' }}>{item.maDangKy}</span></td>
                   <td><p style={{ margin: 0, fontWeight: '600', fontSize: '14px', color: '#191c1d' }}>{item.hoTen}</p></td>
                   <td style={{ fontSize: '14px', color: '#414753' }}>{item.soDienThoai || '—'}</td>
-                  <td style={{ fontSize: '14px', color: '#414753' }}>{moTaPhong(item)}</td>
-                  <td style={{ fontSize: '14px', color: '#414753' }}>{formatNgay(item.ngayDangKy)}</td>
+                  <td style={{ fontSize: '14px', color: '#414753' }}>{moTaPhong(item)}
+                    {item.trangThai === 'Chờ xác nhận cọc' && item.yeuCauCungPhong >= 2 &&
+                      <small style={{ display: 'block', color: '#b45309' }}>Phòng {item.maPhong} có {item.yeuCauCungPhong} yêu cầu</small>}
+                    {item.trangThai === 'Chờ xác nhận cọc' && item.yeuCauCungPhong >= 2 && item.laYeuCauDau &&
+                      <small style={{ display: 'block', color: '#00666d', fontWeight: 700 }}>Yêu cầu gửi trước</small>}
+                  </td>
+                  <td style={{ fontSize: '14px', color: '#414753' }}>{formatNgay(item.ngayDangKy)}
+                    {item.trangThai === 'Chờ xác nhận cọc' && <small style={{ display: 'block' }}>{thoiGianCho(item)}</small>}
+                  </td>
                   <td className="text-center"><StatusBadge trangThai={item.trangThai} /></td>
                   <td className="text-center">
                     {action === 'xu-ly' ? (
@@ -279,6 +294,7 @@ export default function XacNhanNhanPhongTab() {
                 {/* Dòng tóm tắt */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '24px', fontSize: '13px', color: '#6f797a', borderBottom: '1px solid #e1e3e4', paddingBottom: '16px' }}>
                   <span>Ngày đăng ký: <strong style={{ color: '#191c1d' }}>{formatNgay(selected.ngayDangKy)}</strong></span>
+                  {selected.trangThai === 'Chờ xác nhận cọc' && <span>{thoiGianCho(selected)}</span>}
                   <span>Sale phụ trách: <strong style={{ color: '#191c1d' }}>{selected.tenNhanVienSale || selected.maNhanVienSale || '—'}</strong>{selected.tenNhanVienSale && selected.maNhanVienSale ? ` (${selected.maNhanVienSale})` : ''}</span>
                 </div>
 
@@ -325,6 +341,8 @@ export default function XacNhanNhanPhongTab() {
                           )}
                           <span>Sức chứa: <strong style={{ color: '#191c1d' }}>{selected.sucChuaToiDa ?? 0}</strong></span>
                           <span>Trống: <strong style={{ color: '#191c1d' }}>{selected.soChoTrong ?? 0}</strong> giường</span>
+                          <span>Hình thức: <strong>{selected.hinhThucThue || '—'}</strong></span>
+                          {selected.danhSachGiuong && <span>Giường đã chọn: <strong>{selected.danhSachGiuong}</strong></span>}
                         </div>
                       </div>
 
@@ -395,18 +413,18 @@ export default function XacNhanNhanPhongTab() {
                       </div>
                     </div>
 
-                    {decision === 'tu-choi' && (
+                    {(decision === 'tu-choi' || (decision === 'xac-nhan' && canApproveLater)) && (
                       <div style={{ backgroundColor: '#f8f9fa', border: '1px solid #e1e3e4', borderRadius: '8px', padding: '16px' }}>
-                        <label style={{ display: 'block', fontWeight: '700', color: '#191c1d', marginBottom: '8px', fontSize: '13px' }}>Lý do từ chối <span style={{ color: '#ba1a1a' }}>*</span></label>
+                        <label style={{ display: 'block', fontWeight: '700', color: '#191c1d', marginBottom: '8px', fontSize: '13px' }}>{decision === 'tu-choi' ? 'Lý do từ chối' : 'Lý do duyệt yêu cầu gửi sau'} <span style={{ color: '#ba1a1a' }}>*</span></label>
                         <textarea
                           value={lyDo}
                           onChange={(e) => setLyDo(e.target.value)}
                           style={{ width: '100%', border: '1px solid #bec8c9', borderRadius: '8px', padding: '12px', fontSize: '14px', boxSizing: 'border-box', minHeight: '80px', resize: 'vertical' }}
-                          placeholder="Ví dụ: Phòng đã được khách khác cọc trước đó."
+                          placeholder={decision === 'tu-choi' ? 'Ví dụ: Phòng đã được khách khác cọc trước đó.' : 'Ví dụ: Khách gửi trước đã đổi nhu cầu thuê.'}
                         ></textarea>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#6f797a', fontSize: '12px', marginTop: '8px' }}>
                           <Icon name="info" style={{ fontSize: '16px' }} />
-                          <span>Lý do từ chối sẽ được gửi cho nhân viên sale để thông báo lại cho khách hàng.</span>
+                          <span>{decision === 'tu-choi' ? 'Lý do từ chối sẽ được gửi cho Sale và khách.' : 'Nếu yêu cầu khác bị từ chối tự động, lý do này sẽ được gửi cho Sale và khách.'}</span>
                         </div>
                       </div>
                     )}
@@ -418,7 +436,7 @@ export default function XacNhanNhanPhongTab() {
             <div className="ktp-modal-footer" style={{ borderTop: '1px solid #e1e3e4', backgroundColor: '#f8f9fa', padding: '16px 24px', display: 'flex', gap: '12px', justifyContent: 'flex-end', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
               <button className="ktp-btn-cancel" onClick={() => setSelected(null)} disabled={submitting} style={{ border: '1px solid #bec8c9', padding: '10px 24px', backgroundColor: '#ffffff', borderRadius: '8px', fontWeight: '600' }}>Đóng</button>
               {!readOnly && (
-                <button className="ktp-btn-submit" onClick={handleSubmit} disabled={submitting || (decision === 'tu-choi' && !lyDo.trim())} style={{ padding: '10px 24px', backgroundColor: '#3b8280', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: '600', opacity: (submitting || (decision === 'tu-choi' && !lyDo.trim())) ? 0.6 : 1, cursor: (submitting || (decision === 'tu-choi' && !lyDo.trim())) ? 'not-allowed' : 'pointer' }}>
+                <button className="ktp-btn-submit" onClick={handleSubmit} disabled={submitting || ((decision === 'tu-choi' || canApproveLater) && !lyDo.trim())} style={{ padding: '10px 24px', backgroundColor: '#3b8280', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: '600', opacity: (submitting || ((decision === 'tu-choi' || canApproveLater) && !lyDo.trim())) ? 0.6 : 1, cursor: (submitting || ((decision === 'tu-choi' || canApproveLater) && !lyDo.trim())) ? 'not-allowed' : 'pointer' }}>
                   {submitting ? 'Đang xử lý...' : 'Xác nhận'}
                 </button>
               )}

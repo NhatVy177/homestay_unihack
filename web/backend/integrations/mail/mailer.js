@@ -13,10 +13,10 @@ export function createMailer(env = process.env, transport) {
   const from = env.MAIL_FROM || 'HomeStayDorm <no-reply@homestaydorm.local>';
   return {
     mode,
-    async send({ to, subject, text, attachments = [] }) {
+    async send({ to, subject, text, html, attachments = [] }) {
       const recipient = env.MAIL_REDIRECT_TO || to;
       if (!recipient) return { status: 'skipped' };
-      const info = await transport.sendMail({ from, to: recipient, subject, text, attachments });
+      const info = await transport.sendMail({ from, to: recipient, subject, text, html, attachments });
       if (mode === 'dev-log') console.info('[mail:dev-log] %s\n%s\n(đính kèm: %d)', subject, text, attachments.length);
       return { status: mode === 'dev-log' ? 'logged' : 'sent', messageId: info.messageId };
     },

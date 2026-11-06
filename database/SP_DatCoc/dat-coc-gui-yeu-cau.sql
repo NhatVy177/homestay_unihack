@@ -58,7 +58,7 @@ BEGIN
     INNER JOIN dbo.KhachHang AS kh ON kh.MaKhachHang = pdk.MaKhachHang
     INNER JOIN dbo.NguoiDung AS nd ON nd.MaNguoiDung  = kh.MaKhachHang
     -- PHÒNG KHÁCH CHỐT (DC01) — không còn đoán bằng TOP 1 phòng đã xem nữa.
-    -- NULL nếu Sale chưa chốt phòng (hồ sơ mới, đang 'Chờ tiếp nhận').
+    -- NULL nếu Sale chưa chốt phòng (hồ sơ mới, đang 'Đã tiếp nhận').
     OUTER APPLY (
         SELECT TOP 1
             ctxp.MaPhong    AS maPhong,
@@ -71,7 +71,7 @@ BEGIN
         WHERE ctxp.MaDangKy = pdk.MaDangKy AND ctxp.KhachChon = 1
     ) AS phong
     -- Chi nhánh của hồ sơ: suy từ BẤT KỲ phòng nào khách đã xem (không phụ thuộc phòng chốt,
-    -- vì hồ sơ 'Chờ tiếp nhận' chưa chốt phòng nhưng vẫn phải hiện cho Sale đúng chi nhánh).
+    -- vì hồ sơ 'Đã tiếp nhận' chưa chốt phòng nhưng vẫn phải hiện cho Sale đúng chi nhánh).
     OUTER APPLY (
         SELECT TOP 1 p2.MaChiNhanh
         FROM dbo.ChiTietXemPhong AS c2
@@ -91,14 +91,18 @@ BEGIN
         WHERE MaPhieuYeuCauDangKy = pdk.MaDangKy
         ORDER BY ThoiDiemDatCoc DESC
     ) AS pdc
-    WHERE pdk.TrangThai IN (N'Chờ tiếp nhận', N'Chờ xác nhận cọc', N'Xác nhận cọc', N'Từ chối')
+    WHERE pdk.TrangThai IN (N'Đã tiếp nhận', N'Chờ xác nhận cọc', N'Xác nhận cọc', N'Từ chối')
       AND (
-        pdk.TrangThai = N'Chờ tiếp nhận'
+        pdk.TrangThai = N'Đã tiếp nhận'
         OR pdk.MaNhanVienSale = @MaNhanVienSale
       )
       AND (cn.MaChiNhanh IS NULL OR cn.MaChiNhanh = @MaChiNhanh)
-      -- CHỈ PHIẾU TRONG NGÀY: Sale xử lý yêu cầu phát sinh trong ngày làm việc.
-      AND pdk.NgayDangKy = CAST(GETDATE() AS DATE)
+      -- Yêu cầu có thể chờ quản lý qua nửa đêm; kết quả từ chối cũng cần hiện
+      -- để Sale liên hệ khách sau khi tác vụ 12 giờ chạy.
+      AND (pdk.NgayDangKy = CAST(GETDATE() AS DATE)
+        OR pdk.TrangThai = N'Chờ xác nhận cọc'
+        OR EXISTS (SELECT 1 FROM dbo.YeuCauDatCocChiTiet y
+          WHERE y.MaDangKy=pdk.MaDangKy AND y.GuiLuc>=DATEADD(DAY,-2,GETDATE())))
     ORDER BY pdk.MaDangKy DESC;
 END;
 GO
@@ -193,7 +197,7 @@ BEGIN
     -- đổi giữa chừng sẽ khiến duyệt một đằng, dữ liệu một nẻo.
     IF NOT EXISTS (
         SELECT 1 FROM dbo.PhieuDangKy
-        WHERE MaDangKy = @MaDangKy AND TrangThai = N'Chờ tiếp nhận'
+        WHERE MaDangKy = @MaDangKy AND TrangThai = N'Đã tiếp nhận'
     )
         THROW 50202, N'Hồ sơ đã gửi yêu cầu, không đổi được phòng.', 1;
 
@@ -257,7 +261,7 @@ GO
 -- DC01 (A4) - SP_CapNhatThongTinCaNhanKhachHang
 -- Sale chỉnh sửa thông tin cá nhân/liên hệ/giấy tờ của khách hàng
 -- trước khi gửi yêu cầu đặt cọc. Chỉ cho sửa khi phiếu còn ở
--- "Chờ tiếp nhận" (đúng phạm vi DC01, trước khi gửi yêu cầu).
+-- "Đã tiếp nhận" (đúng phạm vi DC01, trước khi gửi yêu cầu).
 -- KHÔNG đụng ThoiHanThue/ThoiGianDuKienVaoO (ngoài phạm vi SP này).
 -- ============================================================
 IF OBJECT_ID(N'dbo.SP_CapNhatThongTinCaNhanKhachHang', N'P') IS NULL
@@ -281,9 +285,9 @@ BEGIN
 
     IF NOT EXISTS (
         SELECT 1 FROM dbo.PhieuDangKy
-        WHERE MaDangKy = @MaDangKy AND TrangThai = N'Chờ tiếp nhận'
+        WHERE MaDangKy = @MaDangKy AND TrangThai = N'Đã tiếp nhận'
     )
-        THROW 50261, N'Phiếu đăng ký không ở trạng thái "Chờ tiếp nhận", không thể chỉnh sửa thông tin.', 1;
+        THROW 50261, N'Phiếu đăng ký không ở trạng thái "Đã tiếp nhận", không thể chỉnh sửa thông tin.', 1;
 
     SET @GioiTinh = NULLIF(LTRIM(RTRIM(@GioiTinh)), N'');
     IF @GioiTinh IS NOT NULL AND @GioiTinh NOT IN (N'Nam', N'Nữ')
@@ -319,7 +323,7 @@ GO
 
 -- ============================================================
 -- SP_GuiYeuCauDatCoc
--- Sale chuyển PhieuDangKy từ "Chờ tiếp nhận" → "Chờ xác nhận cọc".
+-- Sale chuyển PhieuDangKy từ "Đã tiếp nhận" → "Chờ xác nhận cọc".
 -- ============================================================
 IF OBJECT_ID(N'dbo.SP_GuiYeuCauDatCoc', N'P') IS NULL
     EXEC(N'CREATE PROCEDURE dbo.SP_GuiYeuCauDatCoc AS BEGIN SET NOCOUNT ON; RETURN 0; END;');
@@ -344,9 +348,9 @@ BEGIN
 
     IF NOT EXISTS (
         SELECT 1 FROM dbo.PhieuDangKy
-        WHERE MaDangKy = @MaDangKy AND TrangThai = N'Chờ tiếp nhận'
+        WHERE MaDangKy = @MaDangKy AND TrangThai = N'Đã tiếp nhận'
     )
-        THROW 50202, N'Phiếu đăng ký không ở trạng thái "Chờ tiếp nhận".', 1;
+        THROW 50202, N'Phiếu đăng ký không ở trạng thái "Đã tiếp nhận".', 1;
 
     IF NOT EXISTS (SELECT 1 FROM dbo.NhanVien WHERE MaNhanVien = @MaNhanVienSale)
         THROW 50203, N'Không tìm thấy nhân viên sale.', 1;

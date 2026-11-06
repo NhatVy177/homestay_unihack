@@ -68,7 +68,8 @@ BEGIN
          AND pdc.GhiChu IS NULL)
        OR pdc.TrangThaiThanhToan IN (N'Đã TT', N'Hết hạn')
     )
-      -- Phiếu kế toán chưa chốt thì không bao giờ có chứng từ hợp lệ (guard 50275).
+      AND pdc.PhuongThucThanhToan=N'Chuyển khoản'
+      -- Phiếu chưa chốt thì không bao giờ có chứng từ hợp lệ (guard 50275).
       -- Loại luôn để phiếu Sale lập rồi bỏ quên (hết hạn chờ chốt) không lẫn vào lịch sử của Quản lý.
       AND pdc.MaNhanVienKeToan IS NOT NULL
       AND (p.MaChiNhanh IS NULL OR p.MaChiNhanh = @MaChiNhanh)

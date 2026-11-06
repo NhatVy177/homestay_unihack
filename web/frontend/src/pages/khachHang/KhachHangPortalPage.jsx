@@ -887,6 +887,12 @@ export default function KhachHangPortalPage() {
   const [datCocList, setDatCocList] = useState(null);
   const [datCocLoading, setDatCocLoading] = useState(false);
   const [datCocSelected, setDatCocSelected] = useState(null);
+  const [depositClock, setDepositClock] = useState(Date.now());
+  useEffect(() => {
+    if (activeTab !== 'dat-coc') return undefined;
+    const timer = setInterval(() => setDepositClock(Date.now()), 30000);
+    return () => clearInterval(timer);
+  }, [activeTab]);
   const [uploadForm, setUploadForm] = useState({ maGiaoDich: '', ngayGiaoDich: '', nganHang: '', ghiChu: '', fileBase64: '', fileName: '' });
   const [uploading, setUploading] = useState(false);
   const [profileFilter, setProfileFilter] = useState('Tất cả');
@@ -3409,7 +3415,9 @@ export default function KhachHangPortalPage() {
       setDatCocList(deposits);
       setDatCocSelected((current) => {
         if (!deposits.length) return null;
-        return deposits.find((item) => item.maPhieuCoc === current?.maPhieuCoc) || deposits[0];
+        const requested = new URLSearchParams(window.location.search).get('phieu');
+        return deposits.find((item) => item.maPhieuCoc === requested)
+          || deposits.find((item) => item.maPhieuCoc === current?.maPhieuCoc) || deposits[0];
       });
     } catch {
       setDatCocList([]);
@@ -3533,9 +3541,16 @@ export default function KhachHangPortalPage() {
     const showDoiSoatPaymentCoc = (laHoanCocDoiSoatCoc || laThuThemDoiSoatCoc) && (!daGuiPhuongThucDoiSoatCoc || canUploadThuThemProofAgainCoc);
     const showDatCocSide = (isSent && minhChung) || isExpired;
     const taiKhoanThanhToan = getPaymentAccount(phieu);
+    const transferContent = `${phieu.maPhieuCoc} ${phieu.sdtKhachHang || ''}`.trim();
+    // SQL DATETIME in the current API is serialized with a Z suffix despite storing local +07 time.
+    const deadlineMs = phieu.thoiHanThanhToan ? new Date(phieu.thoiHanThanhToan).getTime() - 7 * 60 * 60 * 1000 : 0;
+    const remainingMinutes = Math.max(0, Math.ceil((deadlineMs - depositClock) / 60000));
 
     return (
       <section className="dc-detail">
+        {(isWaiting || isRejected) && !!deadlineMs && <div className="dc-banner dc-banner-info">
+          <Icon name="schedule" /> <strong>Còn {Math.floor(remainingMinutes / 60)} giờ {remainingMinutes % 60} phút để thanh toán</strong>
+        </div>}
         {/* Banners */}
         {isExpired && (
           <div className="dc-banner dc-banner-danger">
@@ -3664,6 +3679,8 @@ export default function KhachHangPortalPage() {
                     <div><span>Ngân hàng</span><strong>{taiKhoanThanhToan.nganHang}</strong></div>
                     <div><span>Số tài khoản</span><strong>{taiKhoanThanhToan.soTaiKhoan}</strong></div>
                     <div><span>Chủ tài khoản</span><strong>{taiKhoanThanhToan.chuTaiKhoan}</strong></div>
+                    <div><span>Nội dung chuyển khoản</span><strong>{transferContent}</strong>
+                      <button type="button" onClick={() => navigator.clipboard.writeText(transferContent)}>Sao chép</button></div>
                   </div>
                 </div>
               </>

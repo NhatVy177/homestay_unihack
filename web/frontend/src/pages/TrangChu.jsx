@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { getAuthenticatedHomePath } from '../auth/auth.routes.js';
+import { safeNextPath } from '../auth/returnPath.js';
 import { httpClient } from '../api/httpClient.js';
 import '../styles/TrangChu.css';
 
@@ -112,7 +113,10 @@ function AuthModal({ mode, onClose, onSwitchMode }) {
     try {
       const user = await dangNhap(loginForm);
       onClose();
-      navigate(location.state?.from?.pathname || getAuthenticatedHomePath(user), { replace: true });
+      const requested = new URLSearchParams(location.search).get('next');
+      const from = location.state?.from;
+      const statePath = from ? `${from.pathname || ''}${from.search || ''}${from.hash || ''}` : '';
+      navigate(safeNextPath(requested) || safeNextPath(statePath) || getAuthenticatedHomePath(user), { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Không thể đăng nhập lúc này.');
     } finally { setLoading(false); }
@@ -701,9 +705,17 @@ function FooterPublic({ onOpenAuth }) {
 // ────────────────────────────────────────────────────────────
 export default function TrangChu() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, isLoading } = useAuth();
   const [rooms, setRooms] = useState([]);
   const [loadingRooms, setLoadingRooms] = useState(true);
   const [authModal, setAuthModal] = useState(null); // null | 'login' | 'register'
+  useEffect(() => {
+    const next = safeNextPath(new URLSearchParams(location.search).get('next'));
+    if (!next || isLoading) return;
+    if (user) navigate(next, { replace: true });
+    else setAuthModal('login');
+  }, [location.search, isLoading, user, navigate]);
 
   const openAuth = useCallback((mode) => setAuthModal(mode), []);
   const closeAuth = useCallback(() => setAuthModal(null), []);

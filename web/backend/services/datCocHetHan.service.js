@@ -1,4 +1,5 @@
 import { executeQuery, executeProcedure } from '../database/connection.js';
+import { notifyDeposit } from '../integrations/mail/datCocNotifications.js';
 
 // Luồng đặt cọc có 2 cửa sổ 24h (chờ kế toán chốt, chờ khách thanh toán) -- quét thường
 // xuyên hơn hoá đơn định kỳ (chu kỳ dài hơn nhiều) để giường/phòng không bị "Giữ chỗ" treo lâu.
@@ -22,6 +23,17 @@ export async function nhaChoCocHetHan() {
   const soPhieu = countResult.recordset?.[0]?.soPhieu || 0;
 
   await executeProcedure('dbo.SP_NhaChoCocHetHan');
+  // SP may also have run from another request. Sweep cancelled slips to avoid missing email.
+  const expired = (await executeQuery(`SELECT MaPhieuDatCoc AS id FROM dbo.PhieuDatCoc
+    WHERE TrangThaiThanhToan=N'Hết hạn' AND TrangThaiCoc=N'Đã hủy'
+      AND MaNhanVienKeToan IS NOT NULL AND ThoiHanThanhToan<GETDATE()`)).recordset;
+  for (const { id } of expired) {
+    await notifyDeposit('expired', id);
+  }
+  const reminders = (await executeQuery(`SELECT MaPhieuDatCoc AS id FROM dbo.PhieuDatCoc
+    WHERE TrangThaiThanhToan=N'Chờ TT' AND TrangThaiCoc=N'Hiệu lực'
+      AND MaNhanVienKeToan IS NOT NULL AND ThoiHanThanhToan BETWEEN GETDATE() AND DATEADD(HOUR,3,GETDATE())`)).recordset;
+  for (const { id } of reminders) await notifyDeposit('reminder', id);
   return soPhieu;
 }
 

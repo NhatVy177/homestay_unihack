@@ -10,6 +10,7 @@
     "avalanche:db:check": "node scripts/avalanche-db.mjs check",
     "avalanche:db:migrate": "node scripts/avalanche-db.mjs migrate",
     "auto-deposit:db:migrate": "node scripts/auto-deposit-db.mjs",
+    "deposit-flow:db:migrate": "node scripts/deposit-flow-db.mjs",
     "test": "node --test test/*.test.mjs",
     "privy:keygen": "node scripts/privy-jwt-keygen.mjs"
   },

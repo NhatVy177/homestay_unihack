@@ -6,9 +6,9 @@ const fail = (message, statusCode = 400) => { throw Object.assign(new Error(mess
 const FIELDS = ['orderId', 'amountVnd', 'resultCode', 'transId', 'responseTime'];
 export const ipnString = body => FIELDS.map(key => `${key}=${body[key]}`).join('&');
 export class PaymentSimulator {
-  constructor({ store, deposits, firstCharges, secret, clock = () => Date.now() }) {
+  constructor({ store, deposits, firstCharges, secret, clock = () => Date.now(), notifyDepositPaid = async () => {} }) {
     if (!secret || secret.length < 16) throw new Error('PAYMENT_SIM_SECRET must be at least 16 characters.');
-    Object.assign(this, { store, deposits, firstCharges, secret, clock });
+    Object.assign(this, { store, deposits, firstCharges, secret, clock, notifyDepositPaid });
   }
   sign(body) { return createHmac('sha256', this.secret).update(ipnString(body)).digest('hex'); }
   verify(body) {
@@ -102,6 +102,8 @@ export class PaymentSimulator {
       if (order.purpose === 'dat-coc') {
         await this.deposits.markPaid(order.refId, receipt);
         await this.store.transition(order.id, 'Processing', 'Paid', { transId: String(body.transId) });
+        try { await this.notifyDepositPaid(order.refId); }
+        catch (error) { console.warn('[deposit-mail] paid:', error.message); }
       } else if (order.purpose === 'thu-nhan-phong') {
         // The SQL adapter commits the invoice and Paid order together.
         await this.firstCharges.markPaid(order, receipt, String(body.transId));
