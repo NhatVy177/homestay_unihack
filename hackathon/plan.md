@@ -6,7 +6,7 @@ Cập nhật: **2026-11-05 14:58:04 +07:00** (D-010 → D-014: vòng sửa biên
 
 Bối cảnh lịch sử: [handoff.md](handoff.md). Quy trình bàn giao điện tử D-009 bên dưới là quyết định mới nhất của Vy, ưu tiên khi mâu thuẫn với mô tả cũ. Cập nhật tài liệu không chứng minh code đã triển khai.
 
-Quy ước làm việc theo yêu cầu Vy: sau mỗi đợt thay đổi hoàn tất, kiểm tra phù hợp, commit với danh tính Git `NhatVy177` và push lên đúng repo/nhánh đang làm; báo lại liên kết và commit đã push. Nếu push thất bại, báo rõ trạng thái để tránh nhầm với bản đã có trên GitHub.
+Quy ước làm việc theo yêu cầu mới nhất của Vy: sau mỗi đợt thay đổi hoàn tất, kiểm tra phù hợp, commit với danh tính Git `NhatVy177` trên nhánh làm việc riêng và chỉ push nhánh đó lên repo hiện hành. Báo tên nhánh, commit, nội dung push và file đã sửa để Vy tự kiểm tra; Vy tự quyết định merge. Không push trực tiếp lên `main` hoặc tự merge. Nếu push thất bại, báo rõ trạng thái để tránh nhầm với bản đã có trên GitHub.
 
 Đây là bản kế hoạch hiện hành để Vy chia sẻ và triển khai. Bản này hợp nhất phản hồi BTC, hai lần phản biện của Claude và trạng thái mã nguồn; thay thế những lựa chọn scope cũ còn mâu thuẫn. Lịch sử đã commit vẫn nằm trong Git. Tài liệu nền: [README.md](README.md), [Unihack_Context.md](Unihack_Context.md), [Proposal.md](Proposal.md).
 
