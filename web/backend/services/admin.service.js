@@ -524,7 +524,17 @@ export async function updateSettings(data, user = {}) {
         { name: 'AdminId', type: sql.VarChar(6), value: user.maNguoiDung || null }
       ]);
     }
-    
+
+    // D-019: công tắc tự động duyệt nhận cọc + chốt phiếu cọc.
+    if (typeof data.tuDongDuyetCoc === 'boolean') {
+      await executeProcedure('dbo.SP_Admin_CauHinhThamSo', [
+        { name: 'ThaoTac', type: sql.NVarChar(20), value: 'CAP_NHAT' },
+        { name: 'MaThamSo', type: sql.VarChar(50), value: 'TU_DONG_DUYET_COC' },
+        { name: 'GiaTri', type: sql.NVarChar(255), value: data.tuDongDuyetCoc ? '1' : '0' },
+        { name: 'AdminId', type: sql.VarChar(6), value: user.maNguoiDung || null }
+      ]);
+    }
+
     await executeProcedure('dbo.SP_Admin_CauHinhSaoLuu', [
       { name: 'ChuKyFull', type: sql.NVarChar(20), value: data.chuKyFull || null },
       { name: 'ChuKyIncremental', type: sql.NVarChar(20), value: data.chuKyIncremental || null },

@@ -487,11 +487,14 @@ export default function DatCocTab() {
     if (!selectedItem) return;
     setSubmitting(true);
     try {
-      await datCocApi.guiYeuCauDatCoc({ maDangKy: selectedItem.maDangKy });
+      const { data } = await datCocApi.guiYeuCauDatCoc({ maDangKy: selectedItem.maDangKy });
       setShowSendModal(false);
       setSelectedItem(null);
       await loadYeuCau();
-      setResult({ type: 'success', title: 'Gửi thành công!', message: 'Yêu cầu đã gửi đến Quản lý.' });
+      // D-019: phòng còn phù hợp thì hệ thống đã tự duyệt nhận cọc.
+      setResult(data?.tuDong?.trangThai === 'da-tu-dong'
+        ? { type: 'success', title: 'Đã duyệt nhận cọc!', message: 'Phòng còn phù hợp nên hệ thống tự duyệt. Bạn có thể lập phiếu cọc ngay.' }
+        : { type: 'success', title: 'Gửi thành công!', message: 'Yêu cầu đã gửi đến Quản lý.' });
     } catch {
       setResult({ type: 'error', title: 'Gửi thất bại.' });
     } finally {

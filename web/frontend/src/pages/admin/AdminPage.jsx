@@ -2904,6 +2904,8 @@ function SettingsView() {
     chuKyIncremental: 'Hàng ngày',
     thuMucLuuTru: 'C:\\SQLBackups'
   });
+  // D-019: null = máy chủ chưa có tham số (chưa chạy migration) -> ẩn công tắc.
+  const [tuDongDuyetCoc, setTuDongDuyetCoc] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -2917,6 +2919,8 @@ function SettingsView() {
           chuKyIncremental: data.backup?.chuKyIncremental || 'Hàng ngày',
           thuMucLuuTru: data.backup?.thuMucLuuTru || 'C:\\SQLBackups'
         });
+        const thamSo = (data.parameters || []).find(p => p.maThamSo === 'TU_DONG_DUYET_COC');
+        setTuDongDuyetCoc(thamSo ? ['1', 'true'].includes(String(thamSo.giaTri).toLowerCase()) : null);
       } catch (err) {
         console.error(err);
       }
@@ -2931,7 +2935,7 @@ function SettingsView() {
   const handleSave = async () => {
     try {
       setIsSubmitting(true);
-      await adminApi.updateSettings(form);
+      await adminApi.updateSettings(tuDongDuyetCoc === null ? form : { ...form, tuDongDuyetCoc });
       alert('Lưu thay đổi thành công!');
     } catch (err) {
       alert(err.message);
@@ -2981,6 +2985,16 @@ function SettingsView() {
             />
           </label>
         </div>
+        {tuDongDuyetCoc !== null && (
+          <label className="admin-note" style={{ cursor: 'pointer' }}>
+            <input type="checkbox" checked={tuDongDuyetCoc} onChange={e => setTuDongDuyetCoc(e.target.checked)} />
+            <span>
+              <strong>Tự động duyệt nhận cọc và chốt phiếu cọc.</strong> Phòng còn phù hợp thì hệ thống tự duyệt thay quản lý;
+              phiếu cọc sale lập được tự chốt thay kế toán (tiền cọc = 2 tháng tiền thuê × số giường, hệ thống tự tính).
+              Trường hợp không tự duyệt được vẫn chờ nhân viên như cũ. Tắt để quay về duyệt tay hoàn toàn.
+            </span>
+          </label>
+        )}
         <div className="admin-note">
           <Icon name="info" />
           <span>Các thay đổi cấu hình nên được ghi nhật ký để truy vết người cập nhật và thời điểm cập nhật.</span>

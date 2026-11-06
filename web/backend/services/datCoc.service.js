@@ -2,6 +2,7 @@ import { executeProcedure, getPool, sql } from '../database/connection.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import { capNhatLichXemDenGioThanhDaXem } from '../repositories/lichXemPhong.repository.js';
 import { attachPaymentAccount } from '../config/payment.js';
+import { tuDongDatCoc } from './tuDongDatCoc.service.js';
 
 function handleDatabaseError(error) {
   mapDatabaseError(error, {
@@ -114,7 +115,10 @@ export async function createPhieuDatCoc(user, data = {}) {
       { name: 'HinhThucThue',    type: sql.NVarChar(20),      value: hinhThucThue },
       { name: 'DanhSachGiuong',  type: sql.NVarChar(sql.MAX), value: laGhep ? giuongs : null }
     ]);
-    return result.recordset[0] || null;
+    const phieu = result.recordset[0] || null;
+    // D-019: tiền cọc đã do trigger tính -> hệ thống tự chốt thay bước kế toán (nếu đang bật).
+    if (phieu?.maPhieuDatCoc) phieu.tuDong = await tuDongDatCoc.chotPhieu(phieu.maPhieuDatCoc);
+    return phieu;
   } catch (error) {
     mapDatabaseError(error, {
       50210: 404,   // không tìm thấy hồ sơ
@@ -204,7 +208,10 @@ export async function guiYeuCauDatCoc(data = {}) {
       { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
       { name: 'MaNhanVienSale', type: sql.VarChar(6), value: maNhanVienSale }
     ]);
-    return result.recordset[0] || null;
+    const yeuCau = result.recordset[0] || null;
+    // D-019: phòng còn phù hợp thì hệ thống tự duyệt nhận cọc; không phù hợp thì chờ quản lý.
+    if (yeuCau) yeuCau.tuDong = await tuDongDatCoc.duyetNhanCoc(maDangKy);
+    return yeuCau;
   } catch (error) {
     mapDatabaseError(error, {
       50201: 404,

@@ -311,3 +311,19 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Rà soát báo cáo: truy vấn hiện có không nối HoaDon với NhanVien bằng INNER JOIN nên hóa đơn người thu NULL không mất khỏi danh sách. Bộ lọc `PhuongThucThanhToan = N'Chuyển khoản'` ở `database/SP_TraPhong/00_All_SP_TraPhong_AIO.sql` áp cho bảng DoiSoat/thu thêm lúc trả phòng, không phải hóa đơn kỳ đầu; giữ nguyên. Các kiểm tra phương thức nhân viên nhập tay ở Web2 vẫn chỉ nhận tiền mặt/chuyển khoản.
 - Còn lại: chưa chạy trọn IPN qua HTTP trên hợp đồng thật; cần nghiệm thu với dữ liệu test có thể hoàn tác và xác nhận nút Bàn giao trên giao diện quản lý. Không sửa `.env`, dữ liệu DB hiện có, contract hay phần Avalanche.
 - Git: commit/push trong đợt J-026 trên `main`; tra mã bằng `git log --all --grep="J-026"`.
+
+## 2026-11-06 10:45:10 +07:00 — J-027 — Tự động duyệt nhận cọc và chốt phiếu cọc (D-019)
+
+- Người thực hiện: Claude, theo yêu cầu Vy làm trực tiếp (Codex đang làm ví kỳ đầu, J-026).
+- Trao đổi: Vy thấy luồng đồ án quá nhiều bước chuyền tay, còn 15 ngày. Claude liệt kê ~14 lần nhân viên bấm duyệt theo các tab, đề xuất tự động các bước chỉ để chuyền tay, giữ bước cần người thật, công tắc bật/tắt và lịch 15 ngày. Vy đồng ý và giao làm 2 bước duyệt cọc + tài khoản "Hệ thống tự động" → D-019.
+- File và nội dung:
+  - Mới `database/migrations/20261106c_auto_deposit.sql`: tạo `NVAUTO` "Hệ thống tự động" (NguoiDung + NhanVien, chi nhánh đầu tiên, chức vụ Admin, không có TaiKhoan) và tham số `TU_DONG_DUYET_COC`=1; chạy lại an toàn.
+  - `database/SP_Admin/admin.sql`: `SP_Admin_DanhSachNhanVien` ẩn `NVAUTO`.
+  - Mới `web/backend/scripts/auto-deposit-db.mjs` + script `npm run auto-deposit:db:migrate` (`web/backend/package.json`): áp migration và batch SP trên. Tách khỏi `avalanche-db.mjs` vì lúc làm Codex đang sửa file đó.
+  - Mới `web/backend/services/tuDongDatCoc.service.js`: đọc công tắc (thiếu tham số/tài khoản → tắt), gọi `SP_XacNhanKhaNangNhanCoc` / `SP_ChotPhieuDatCoc` với `NVAUTO`; lỗi nghiệp vụ hoặc lỗi khác → trả "chờ duyệt tay", không ném lỗi. `web/backend/services/datCoc.service.js`: nối sau `SP_GuiYeuCauDatCoc` và `SP_LapPhieuDatCoc`, trả thêm `tuDong`.
+  - `web/backend/services/admin.service.js` + `web/frontend/src/pages/admin/AdminPage.jsx`: công tắc trong "Cấu hình hệ thống" (ẩn nếu DB chưa có tham số).
+  - `web/frontend/src/pages/nhanVienSale/DatCocTab.jsx`, `LapPhieuCocTab.jsx`: thông báo cho sale khi đã được tự duyệt/tự chốt.
+  - Mới `web/backend/test/tu-dong-dat-coc.test.mjs` (3 test). Hồ sơ: `spec/decisions.md` (D-019), `spec/scope.md` (F-12), `hackathon/plan.md` (D-019 + lịch 15 ngày), `spec/progress.md` (T-18), `README.md` (bước 6).
+- Kiểm tra: unit test 3 pass; migration áp vào HOMEDORM4 hai lần, kết quả `taiKhoanHeThong=1`, `tuDongDuyetCoc=1`. SQL thật trong transaction đã rollback: hồ sơ "Chờ xác nhận cọc" có sẵn bị 50209 (phòng không đủ chỗ) → để quản lý duyệt; dựng tạm phòng trống → "Xác nhận cọc"; phiếu cọc đặt về chưa chốt → chốt đứng tên "Hệ thống tự động", hạn 1440 phút; `SP_Admin_DanhSachNhanVien` tìm `NVAUTO` → 0 dòng. `web/backend npm test` 12 pass/1 skip (test SQL của Codex cần `TEST_SQL`); frontend build qua.
+- Sự cố: một lệnh Edit báo lỗi hook nhưng thực tế đã chạy, làm `package.json` lặp một dòng script; đã sửa trước khi commit. `web/backend/package-lock.json` chỉ khác ký tự xuống dòng, không đưa vào commit.
+- Còn lại: chưa bấm thử qua giao diện sale/quản lý/kế toán với hồ sơ thật. Theo lịch, từ ngày 4 chuyển sang E2E local rồi Fuji.

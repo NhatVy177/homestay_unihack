@@ -203,7 +203,7 @@ export default function LapPhieuCocTab() {
     }
     setSubmitting(true);
     try {
-      await datCocApi.create({
+      const { data } = await datCocApi.create({
         maDangKy: selected.maDangKy,
         hinhThucThue: isGhep ? 'Ghép giường' : 'Nguyên phòng',
         // KHÔNG gửi maPhong: SP tự lấy phòng khách đã chốt ở DC01.
@@ -211,7 +211,10 @@ export default function LapPhieuCocTab() {
       });
       setSelected(null);
       await loadDanhSach();
-      setResult({ type: 'success', title: 'Đã gửi phiếu cho kế toán.' });
+      // D-019: hệ thống tự chốt thì phiếu đã tới khách, hạn thanh toán 24 giờ bắt đầu.
+      setResult(data?.tuDong?.trangThai === 'da-tu-dong'
+        ? { type: 'success', title: 'Đã lập và chốt phiếu cọc.', message: 'Hệ thống đã tự tính và chốt tiền cọc. Khách có thể thanh toán ngay (hạn 24 giờ).' }
+        : { type: 'success', title: 'Đã gửi phiếu cho kế toán.' });
     } catch {
       setResult({ type: 'error', title: 'Lập phiếu thất bại.' });
     } finally {

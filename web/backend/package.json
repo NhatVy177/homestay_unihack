@@ -9,6 +9,7 @@
     "start": "node index.js",
     "avalanche:db:check": "node scripts/avalanche-db.mjs check",
     "avalanche:db:migrate": "node scripts/avalanche-db.mjs migrate",
+    "auto-deposit:db:migrate": "node scripts/auto-deposit-db.mjs",
     "test": "node --test test/*.test.mjs",
     "privy:keygen": "node scripts/privy-jwt-keygen.mjs"
   },

@@ -669,6 +669,7 @@ BEGIN
     INNER JOIN dbo.ChiNhanh AS cn ON cn.MaChiNhanh = nv.MaChiNhanh
     LEFT JOIN dbo.TaiKhoan AS tk ON tk.MaNguoiDung = nv.MaNhanVien
     WHERE (@MaNhanVien IS NULL OR nv.MaNhanVien = @MaNhanVien)
+      AND nv.MaNhanVien <> 'NVAUTO' -- D-019: tài khoản hệ thống, không phải nhân viên thật
       AND (@MaChiNhanh IS NULL OR nv.MaChiNhanh = @MaChiNhanh)
       AND (@ChucVu IS NULL OR nv.ChucVu = @ChucVu)
       AND (@TrangThaiTaiKhoan IS NULL OR tk.TrangThai = @TrangThaiTaiKhoan)
