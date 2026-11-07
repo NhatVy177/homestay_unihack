@@ -4,7 +4,7 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 import '../khachHang/khachHangPortal.css'; // Reuse main layout styles
 import '../nhanVienKeToan/nhanVienKeToanPortal.css'; // Use specific styles for content
 import './nhanVienQuanLy.css';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import XacNhanNhanPhongTab from './XacNhanNhanPhongTab.jsx';
 import DuyetCuTruTab from './DuyetCuTruTab.jsx';
 import BanGiaoPhongTab from './BanGiaoPhongTab.jsx';
@@ -30,7 +30,12 @@ function firstName(name = '') {
 
 export default function NhanVienQuanLyPage() {
   const { user, dangXuat } = useAuth();
-  const [activeTab, setActiveTab] = useState('xac-nhan-nhan-phong');
+  const [activeTab, setActiveTab] = useState(() => {
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    return ['xac-nhan-nhan-phong', 'duyet-cu-tru', 'lap-bien-ban-ban-giao',
+      'lap-bien-ban-kiem-tra-phong', 'xac-nhan-dien-tu'].includes(tab)
+      ? tab : 'xac-nhan-nhan-phong';
+  });
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 

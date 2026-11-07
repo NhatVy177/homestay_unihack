@@ -29,6 +29,8 @@ BEGIN
         nd.NgaySinh             AS ngaySinh,       -- biên nhận: sinh năm bên A
         nd.GioiTinh             AS gioiTinh,
         nd.SDT                  AS soDienThoai,
+        CASE WHEN NULLIF(TRIM(nd.Email),'') IS NULL THEN CAST(1 AS bit)
+          ELSE CAST(0 AS bit) END AS khachThieuEmail,
         kh.CCCD                 AS cccd,           -- biên nhận: CMND/CCCD bên A
         ctdc.MaPhong            AS maPhong,
         ctdc.MaGiuong           AS maGiuong,

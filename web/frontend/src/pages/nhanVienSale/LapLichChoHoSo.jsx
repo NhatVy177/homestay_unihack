@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import { lichXemPhongApi } from '../lichXemPhong/lichXemPhong.api.js';
 
 function formatMoney(value) {

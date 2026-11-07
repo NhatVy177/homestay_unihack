@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import '../khachHang/khachHangPortal.css'; // Reuse main layout styles
 import './nhanVienKeToanPortal.css'; // Use specific styles for content
-import { Icon } from './LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import XacNhanThanhToanTab from '../nhanVienQuanLy/XacNhanThanhToanTab.jsx';
 import TienMatChoNopQuyTab from './TienMatChoNopQuyTab.jsx';
 import ThuNhanPhongTab from './ThuNhanPhongTab.jsx';

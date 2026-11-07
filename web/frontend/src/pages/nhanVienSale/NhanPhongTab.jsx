@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import { cuTruApi } from '../nhanPhong/cuTru.api.js';
 import '../nhanPhong/cuTru.css';
 
@@ -139,6 +139,7 @@ function normalizePhieu(row = {}) {
   return {
     maPhieuDatCoc: pick(row, 'maPhieuDatCoc', 'MaPhieuDatCoc'),
     maHoSoCuTru: pick(row, 'maHoSoCuTru', 'MaHoSoCuTru', null),
+    maNhanVienQuanLy: pick(row, 'maNhanVienQuanLy', 'MaNhanVienQuanLy', null),
     maPhieuYeuCauDangKy: pick(row, 'maPhieuYeuCauDangKy', 'MaPhieuYeuCauDangKy'),
     hoTenKhachHang: pick(row, 'hoTenKhachHang', 'HoTenKhachHang'),
     ngaySinh: pick(row, 'ngaySinh', 'NgaySinh'),
@@ -274,6 +275,7 @@ export default function NhanPhongTab() {
       setNote(pick(hoSo, 'ghiChuSale', 'GhiChuSale', ''));
       setReviewInfo({
         trangThaiHoSo: pick(hoSo, 'trangThaiHoSo', 'TrangThaiHoSo', phieu.trangThaiHoSo),
+        maNhanVienQuanLy: pick(hoSo, 'maNhanVienQuanLy', 'MaNhanVienQuanLy', null),
         ghiChuQuanLy: pick(hoSo, 'ghiChuQuanLy', 'GhiChuQuanLy', ''),
         ngayDuyet: pick(hoSo, 'ngayDuyet', 'NgayDuyet', '')
       });
@@ -345,14 +347,13 @@ export default function NhanPhongTab() {
         danhSachThanhVien: members
       });
       const maHoSo = saveRes.data?.hoSo?.maHoSoCuTru || saveRes.data?.hoSo?.MaHoSoCuTru || selectedPhieu.maHoSoCuTru;
-      if (maHoSo) {
-        await cuTruApi.guiDuyetHoSoCuTru(maHoSo);
-      }
+      const review = maHoSo ? (await cuTruApi.guiDuyetHoSoCuTru(maHoSo)).data : null;
       setSuccessInfo({
         maPhieuDatCoc: selectedPhieu.maPhieuDatCoc,
         hoTenKhachHang: selectedPhieu.hoTenKhachHang,
         viTriThue: selectedPhieu.viTriThue,
-        soNguoi: members.length
+        soNguoi: members.length,
+        trangThaiHoSo: review?.TrangThaiHoSo || review?.trangThaiHoSo || 'Chờ duyệt cư trú'
       });
       setSelectedPhieu(null);
       loadData(searchText);
@@ -539,7 +540,7 @@ export default function NhanPhongTab() {
               {reviewInfo && reviewInfo.trangThaiHoSo !== 'Chờ duyệt cư trú' && (
                 <section className={`residence-feedback-panel ${reviewInfo.trangThaiHoSo === 'Từ chối cư trú' ? 'is-danger' : 'is-warning'}`}>
                   <div>
-                    <span>Phản hồi của quản lý</span>
+                    <span>{reviewInfo.maNhanVienQuanLy === 'NVAUTO' ? 'Hệ thống tự động' : 'Phản hồi của quản lý'}</span>
                     <strong>{reviewInfo.trangThaiHoSo}</strong>
                   </div>
                   <p>{reviewInfo.ghiChuQuanLy || 'Quản lý chưa nhập ghi chú chi tiết.'}</p>
@@ -695,7 +696,9 @@ export default function NhanPhongTab() {
               <Icon name="check" style={{ fontSize: '32px' }} />
             </div>
             <h3 className="residence-success-title">Ghi nhận cư trú thành công</h3>
-            <p className="residence-success-text">Hệ thống đã lập và gửi hồ sơ cư trú của khách hàng cho quản lý duyệt.</p>
+            <p className="residence-success-text">{successInfo.trangThaiHoSo === 'Đã duyệt cư trú'
+              ? 'Hồ sơ đạt đủ điều kiện và đã được Hệ thống tự động duyệt.'
+              : 'Hồ sơ có thông tin cần kiểm tra và đã chuyển cho quản lý duyệt.'}</p>
             
             <div className="residence-success-details">
               <div className="residence-success-row">
@@ -717,7 +720,7 @@ export default function NhanPhongTab() {
               <div className="residence-success-row">
                 <span className="residence-success-label">Trạng thái duyệt</span>
                 <span className="residence-success-value">
-                  <StatusBadge value="Chờ duyệt cư trú" />
+                  <StatusBadge value={successInfo.trangThaiHoSo} />
                 </span>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Icon } from './LapPhieuDatCocTab';
+import { Icon } from '../../components/common/Icon.jsx';
 import { thuNhanPhongApi } from './thuNhanPhong.api.js';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 

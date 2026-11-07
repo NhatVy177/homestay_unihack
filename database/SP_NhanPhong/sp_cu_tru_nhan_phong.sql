@@ -41,6 +41,7 @@ BEGIN
         pdc.MaPhieuDatCoc,
         hs.MaHoSoCuTru,
         pdc.MaPhieuYeuCauDangKy,
+        hs.MaNhanVienQuanLy,
         nd.HoTen AS HoTenKhachHang,
         nd.NgaySinh,
         nd.GioiTinh AS GioiTinhKhachHang,
@@ -103,7 +104,7 @@ BEGIN
           OR nd.SDT LIKE @TuKhoaLike
       )
     GROUP BY
-        pdc.MaPhieuDatCoc, hs.MaHoSoCuTru, pdc.MaPhieuYeuCauDangKy,
+        pdc.MaPhieuDatCoc, hs.MaHoSoCuTru, pdc.MaPhieuYeuCauDangKy, hs.MaNhanVienQuanLy,
         nd.HoTen, nd.NgaySinh, nd.GioiTinh, nd.SDT, nd.Email,
         kh.CCCD, kh.QuocTich, pdk.SoNguoiDuKienO, pdk.SoNam, pdk.SoNu,
         pdk.ThoiHanThue, pdk.KhuVucMongMuon,
@@ -137,11 +138,21 @@ BEGIN
     IF EXISTS (SELECT 1 FROM dbo.HopDongThue WHERE MaPhieuCoc = @MaPhieuDatCoc)
         THROW 50011, N'Phiếu đặt cọc đã lập hợp đồng, không thể ghi nhận thông tin cư trú.', 1;
 
+    IF EXISTS (SELECT 1 FROM dbo.HoSoCuTru WHERE MaPhieuDatCoc=@MaPhieuDatCoc
+      AND TrangThaiHoSo IN (N'Chờ duyệt cư trú',N'Đã duyệt cư trú'))
+        THROW 50020, N'Hồ sơ đã gửi duyệt hoặc đã duyệt, không thể ghi đè.', 1;
+
     IF @DaDoiChieuGiayTo = 0
         THROW 50012, N'Cần đối chiếu giấy tờ tùy thân trước khi lưu hồ sơ.', 1;
 
     IF ISJSON(@DanhSachThanhVienJson) <> 1
         THROW 50013, N'Danh sách thành viên cư trú không hợp lệ.', 1;
+
+    IF EXISTS (SELECT 1 FROM OPENJSON(@DanhSachThanhVienJson) WITH (
+        HoTen NVARCHAR(100) '$.hoTen', CCCD VARCHAR(20) '$.cccd', GioiTinh NVARCHAR(4) '$.gioiTinh'
+      ) WHERE NULLIF(LTRIM(RTRIM(HoTen)),N'') IS NULL
+        OR NULLIF(LTRIM(RTRIM(CCCD)),'') IS NULL OR GioiTinh NOT IN (N'Nam',N'Nữ') OR GioiTinh IS NULL)
+        THROW 50021, N'Thành viên cư trú thiếu họ tên, CCCD hoặc giới tính hợp lệ.', 1;
 
     BEGIN TRAN;
 
@@ -171,7 +182,9 @@ BEGIN
             DaDoiChieuGiayTo = @DaDoiChieuGiayTo,
             NgayCapNhat = GETDATE(),
             GhiChuSale = @GhiChu,
-            GhiChuQuanLy = NULL
+            GhiChuQuanLy = NULL,
+            MaNhanVienQuanLy = NULL,
+            NgayDuyet = NULL
         WHERE MaHoSoCuTru = @MaHoSoCuTru;
 
         DELETE FROM dbo.ThanhVienHopDong WHERE MaHoSoCuTru = @MaHoSoCuTru;
@@ -234,18 +247,83 @@ CREATE OR ALTER PROCEDURE dbo.SP_GuiDuyetHoSoCuTru
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+    BEGIN TRAN;
 
-    UPDATE dbo.HoSoCuTru
-    SET TrangThaiHoSo = N'Chờ duyệt cư trú',
-        NgayGuiDuyet = GETDATE(),
-        GhiChuQuanLy = NULL
-    WHERE MaHoSoCuTru = @MaHoSoCuTru
-      AND TrangThaiHoSo IN (N'Chưa cập nhật', N'Từ chối cư trú');
+    DECLARE @MaPhieuDatCoc VARCHAR(6), @HinhThucThue NVARCHAR(30),
+            @GioiTinhChoPhep NVARCHAR(30), @SucChua INT, @SoGiuong INT,
+            @SoThanhVien INT, @LyDo NVARCHAR(500) = N'';
+    SELECT @MaPhieuDatCoc=hs.MaPhieuDatCoc, @HinhThucThue=pdc.HinhThucThue
+    FROM dbo.HoSoCuTru hs WITH (UPDLOCK, HOLDLOCK)
+    JOIN dbo.PhieuDatCoc pdc ON pdc.MaPhieuDatCoc=hs.MaPhieuDatCoc
+    WHERE hs.MaHoSoCuTru=@MaHoSoCuTru
+      AND hs.TrangThaiHoSo IN (N'Chưa cập nhật', N'Từ chối cư trú')
+      AND hs.DaDoiChieuGiayTo=1;
+    IF @MaPhieuDatCoc IS NULL
+    BEGIN
+        ROLLBACK;
+        THROW 50015, N'Hồ sơ cư trú chưa đối chiếu CCCD hoặc không thể gửi duyệt.', 1;
+    END
 
-    IF @@ROWCOUNT = 0
-        THROW 50015, N'Hồ sơ cư trú không ở trạng thái có thể gửi duyệt.', 1;
+    SELECT @GioiTinhChoPhep=MIN(p.GioiTinhChoPhep),
+           @SucChua=MIN(lp.SucChuaToiDa),
+           @SoGiuong=COUNT(DISTINCT c.MaGiuong)
+    FROM dbo.ChiTietDatCoc c
+    JOIN dbo.Phong p ON p.MaPhong=c.MaPhong
+    JOIN dbo.LoaiPhong lp ON lp.MaLoaiPhong=p.MaLoaiPhong
+    WHERE c.MaPhieuDatCoc=@MaPhieuDatCoc;
+    SELECT @SoThanhVien=COUNT(*) FROM dbo.ThanhVienHopDong WHERE MaHoSoCuTru=@MaHoSoCuTru;
 
-    SELECT * FROM dbo.HoSoCuTru WHERE MaHoSoCuTru = @MaHoSoCuTru;
+    IF @SoThanhVien=0 OR EXISTS (
+        SELECT 1 FROM dbo.ThanhVienHopDong WHERE MaHoSoCuTru=@MaHoSoCuTru
+          AND (NULLIF(LTRIM(RTRIM(HoTen)),N'') IS NULL OR NgaySinh IS NULL
+            OR GioiTinh NOT IN (N'Nam',N'Nữ') OR NULLIF(LTRIM(RTRIM(CCCD)),'') IS NULL
+            OR NULLIF(LTRIM(RTRIM(SDT)),'') IS NULL OR NULLIF(LTRIM(RTRIM(QuocTich)),N'') IS NULL)
+    ) SET @LyDo += N'Thông tin thành viên chưa đầy đủ; ';
+    IF @SucChua IS NULL OR @SoThanhVien > CASE WHEN @HinhThucThue=N'Nguyên phòng' THEN @SucChua ELSE @SoGiuong END
+        SET @LyDo += N'Số người vượt số giường đã cọc hoặc sức chứa phòng; ';
+    IF @GioiTinhChoPhep NOT IN (N'Không phân biệt',N'Nam và Nữ') AND EXISTS (
+        SELECT 1 FROM dbo.ThanhVienHopDong
+        WHERE MaHoSoCuTru=@MaHoSoCuTru AND GioiTinh<>@GioiTinhChoPhep
+    ) SET @LyDo += N'Giới tính không khớp quy định phòng; ';
+    IF EXISTS (
+        SELECT CCCD FROM dbo.ThanhVienHopDong WHERE MaHoSoCuTru=@MaHoSoCuTru
+        GROUP BY CCCD HAVING COUNT(*)>1
+    ) SET @LyDo += N'CCCD trùng trong hồ sơ; ';
+    IF EXISTS (
+        SELECT 1 FROM dbo.ThanhVienHopDong tv
+        JOIN dbo.ThanhVienHopDong otherTv ON otherTv.CCCD=tv.CCCD AND otherTv.MaThanhVien<>tv.MaThanhVien
+        JOIN dbo.HopDongThue hd ON hd.MaHopDong=otherTv.MaHopDong AND hd.TrangThai=N'Hiệu lực'
+        WHERE tv.MaHoSoCuTru=@MaHoSoCuTru AND otherTv.TrangThai=N'Đang ở'
+    ) SET @LyDo += N'CCCD đang ở hợp đồng hiệu lực khác; ';
+    IF EXISTS (
+        SELECT 1 FROM dbo.ThanhVienHopDong WHERE MaHoSoCuTru=@MaHoSoCuTru
+          AND (QuocTich<>N'Việt Nam' OR QuocTich IS NULL)
+    ) SET @LyDo += N'Quốc tịch cần quản lý kiểm tra; ';
+    IF EXISTS (
+        SELECT 1 FROM dbo.ThanhVienHopDong WHERE MaHoSoCuTru=@MaHoSoCuTru
+          AND (NgaySinh IS NULL OR DATEADD(YEAR,18,NgaySinh)>CONVERT(date,GETDATE()))
+    ) SET @LyDo += N'Có thành viên chưa đủ 18 tuổi; ';
+
+    IF @LyDo=N''
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM dbo.NhanVien WHERE MaNhanVien='NVAUTO')
+        BEGIN
+            ROLLBACK;
+            THROW 50019, N'Chạy npm run auto-deposit:db:migrate trước.', 1;
+        END
+        UPDATE dbo.ThanhVienHopDong SET TrangThai=N'Đủ điều kiện', LyDoTuChoi=NULL
+        WHERE MaHoSoCuTru=@MaHoSoCuTru;
+        UPDATE dbo.HoSoCuTru SET TrangThaiHoSo=N'Đã duyệt cư trú',
+            MaNhanVienQuanLy='NVAUTO', NgayGuiDuyet=GETDATE(), NgayDuyet=GETDATE(), GhiChuQuanLy=NULL
+        WHERE MaHoSoCuTru=@MaHoSoCuTru;
+    END
+    ELSE
+        UPDATE dbo.HoSoCuTru SET TrangThaiHoSo=N'Chờ duyệt cư trú',
+            NgayGuiDuyet=GETDATE(), GhiChuQuanLy=LEFT(@LyDo,500)
+        WHERE MaHoSoCuTru=@MaHoSoCuTru;
+    COMMIT;
+    SELECT * FROM dbo.HoSoCuTru WHERE MaHoSoCuTru=@MaHoSoCuTru;
 END
 GO
 
@@ -263,6 +341,7 @@ BEGIN
     SELECT
         hs.MaHoSoCuTru,
         hs.MaPhieuDatCoc,
+        hs.MaNhanVienQuanLy,
         nd.HoTen AS HoTenKhachHang,
         nd.SDT,
         pdc.HinhThucThue,
@@ -313,7 +392,7 @@ BEGIN
           OR nd.SDT LIKE @TuKhoaLike
       )
     GROUP BY
-        hs.MaHoSoCuTru, hs.MaPhieuDatCoc, nd.HoTen, nd.SDT,
+        hs.MaHoSoCuTru, hs.MaPhieuDatCoc, hs.MaNhanVienQuanLy, nd.HoTen, nd.SDT,
         pdc.HinhThucThue, hs.TrangThaiHoSo, hs.NgayCapNhat, hs.GhiChuSale,
         p.MaPhong
     ORDER BY hs.NgayCapNhat DESC;

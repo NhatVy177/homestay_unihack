@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Icon } from './LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import { doiSoatApi } from './doiSoat.api.js';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 

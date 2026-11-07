@@ -6,9 +6,9 @@ const fail = (message, statusCode = 400) => { throw Object.assign(new Error(mess
 const FIELDS = ['orderId', 'amountVnd', 'resultCode', 'transId', 'responseTime'];
 export const ipnString = body => FIELDS.map(key => `${key}=${body[key]}`).join('&');
 export class PaymentSimulator {
-  constructor({ store, deposits, firstCharges, secret, clock = () => Date.now(), notifyDepositPaid = async () => {} }) {
+  constructor({ store, deposits, firstCharges, secret, clock = () => Date.now(), notifyDepositPaid = async () => {}, notifyFirstChargePaid = async () => {} }) {
     if (!secret || secret.length < 16) throw new Error('PAYMENT_SIM_SECRET must be at least 16 characters.');
-    Object.assign(this, { store, deposits, firstCharges, secret, clock, notifyDepositPaid });
+    Object.assign(this, { store, deposits, firstCharges, secret, clock, notifyDepositPaid, notifyFirstChargePaid });
   }
   sign(body) { return createHmac('sha256', this.secret).update(ipnString(body)).digest('hex'); }
   verify(body) {
@@ -107,6 +107,8 @@ export class PaymentSimulator {
       } else if (order.purpose === 'thu-nhan-phong') {
         // The SQL adapter commits the invoice and Paid order together.
         await this.firstCharges.markPaid(order, receipt, String(body.transId));
+        try { await this.notifyFirstChargePaid(order.refId); }
+        catch (error) { console.warn('[checkin-mail] first-charge-paid:', error.message); }
       }
       else fail('Loại đơn thanh toán không hợp lệ.', 409);
     } catch (error) {

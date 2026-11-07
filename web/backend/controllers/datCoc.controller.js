@@ -1,25 +1,7 @@
 import * as service from '../services/datCoc.service.js';
 import { publicUrlFor } from '../middleware/upload.middleware.js';
-import { tuDongDatCoc } from '../services/tuDongDatCoc.service.js';
 import { unlink } from 'node:fs/promises';
 
-export async function getCauHinhTuDong(req, res, next) {
-  // D-021: màn kế toán ẩn tab "Chốt phiếu đặt cọc" khi hệ thống đang tự chốt.
-  try { res.json({ tuDongChotPhieu: await tuDongDatCoc.dangBat() }); } catch (err) { next(err); }
-}
-
-export async function createPhieuDatCoc(req, res, next) {
-  // DC02B - Sale lập phiếu cọc. Mã nhân viên lấy từ phiên đăng nhập, không nhận từ body.
-  try { res.status(201).json(await service.createPhieuDatCoc(req.user, req.body)); } catch (err) { next(err); }
-}
-export async function getDanhSachChoTinhTien(req, res, next) {
-  // DC03 - phiếu Sale đã lập, chờ kế toán tính tiền và chốt.
-  try { res.json(await service.getDanhSachChoTinhTien(req.user)); } catch (err) { next(err); }
-}
-export async function chotPhieuDatCoc(req, res, next) {
-  // DC03 - kế toán chốt hoặc hủy phiếu cọc.
-  try { res.json(await service.chotPhieuDatCoc(req.user, req.params.id, req.body)); } catch (err) { next(err); }
-}
 export async function getPhieuDatCoc(req, res, next) {
   try { res.json(await service.getPhieuDatCoc(req.user.maNguoiDung)); } catch (err) { next(err); }
 }
@@ -64,9 +46,6 @@ export async function capNhatThongTinCaNhan(req, res, next) {
 }
 export async function getDanhSachChoXacNhan(req, res, next) {
   try { res.json(await service.getDanhSachChoXacNhan(req.user.maNguoiDung)); } catch (err) { next(err); }
-}
-export async function getDanhSachChoLapPhieu(req, res, next) {
-  try { res.json(await service.getDanhSachChoLapPhieu(req.user.maNguoiDung)); } catch (err) { next(err); }
 }
 export async function getGiuongTrong(req, res, next) {
   try { res.json(await service.getGiuongTrong(req.query.maPhong)); } catch (err) { next(err); }

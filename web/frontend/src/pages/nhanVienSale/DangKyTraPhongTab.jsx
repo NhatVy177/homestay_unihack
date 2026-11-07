@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { dangKyTraPhongApi } from './dangKyTraPhong.api.js';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import './dangKyTraPhongTab.css';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

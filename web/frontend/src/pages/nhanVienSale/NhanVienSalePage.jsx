@@ -11,7 +11,7 @@ import LapHopDongTab from './LapHopDongTab.jsx';
 import TraCuuPhongTab from './TraCuuPhongTab.jsx';
 import DangKyTraPhongTab from './DangKyTraPhongTab.jsx';
 import NhanPhongTab from './NhanPhongTab.jsx';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 
 function Brand() {
   return (

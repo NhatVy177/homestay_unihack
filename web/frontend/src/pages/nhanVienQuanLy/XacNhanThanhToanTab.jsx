@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import { datCocApi } from '../datCoc/datCoc.api.js';
 import ResultModal from '../../components/common/ResultModal.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';

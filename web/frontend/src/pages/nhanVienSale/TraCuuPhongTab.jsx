@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import { dangKyThueApi } from '../dangKyThue/dangKyThue.api.js';
 
 export default function TraCuuPhongTab() {

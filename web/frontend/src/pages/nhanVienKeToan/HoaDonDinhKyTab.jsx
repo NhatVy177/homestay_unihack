@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Icon } from './LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 
 export default function HoaDonDinhKyTab() {
   const [modalType, setModalType] = useState(null); // 'chua-lap', 'da-lap', null

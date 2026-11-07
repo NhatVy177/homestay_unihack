@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import { datCocApi } from '../datCoc/datCoc.api.js';
 import { dangKyThueApi } from '../dangKyThue/dangKyThue.api.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
@@ -663,7 +663,10 @@ export default function DatCocTab() {
                 return (
                   <tr key={item.maDangKy}>
                     <td style={{ fontWeight: '600', color: '#2f6765' }}>{item.maDangKy}</td>
-                    <td style={{ color: '#191c1d' }}>{item.hoTen}</td>
+                    <td style={{ color: '#191c1d' }}>{item.hoTen}
+                      {item.maPhieuDatCoc && item.khachThieuEmail &&
+                        <small style={{ display: 'block', color: '#b45309' }}>Khách chưa có email, hãy báo khách trực tiếp.</small>}
+                    </td>
                     <td style={{ color: '#191c1d' }}>{item.soDienThoai}</td>
                     <td>
                       <SoNguoiBadge
@@ -769,6 +772,9 @@ export default function DatCocTab() {
                     <td>
                       <div style={{ fontWeight: '600', color: '#191c1d' }}>{item.hoTen}</div>
                       <div style={{ fontSize: '12px', color: '#6f797a' }}>{item.soDienThoai || ''}</div>
+                      {item.khachThieuEmail && <small style={{ display: 'block', color: '#b45309' }}>
+                        Khách chưa có email, hãy báo khách trực tiếp.
+                      </small>}
                     </td>
                     <td>
                       <div style={{ backgroundColor: '#e0e3e3', padding: '4px 8px', borderRadius: '4px', display: 'inline-block', fontSize: '12px', fontWeight: '600' }}>{moTaPhong(item)}</div>

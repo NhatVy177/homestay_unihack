@@ -976,7 +976,7 @@ export default function KhachHangPortalPage() {
 
   useEffect(() => {
     if (activeTab === 'hop-dong') {
-      loadHopDongDashboard(null, true);
+      loadHopDongDashboard(new URLSearchParams(window.location.search).get('hopDong'), true);
     } else if (activeTab === 'tra-phong') {
       loadHopDongDashboard(null, false);
     }

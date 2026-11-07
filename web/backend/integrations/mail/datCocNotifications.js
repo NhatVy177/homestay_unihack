@@ -15,7 +15,7 @@ async function details(id) {
     s.HoTen AS sale,s.Email AS emailSale,COALESCE(y.MaPhong,ph.MaPhong) AS maPhong,
     COALESCE(d.HinhThucThue,y.HinhThucThue) AS hinhThucThue,
     y.DanhSachGiuong AS giuongYeuCau,y.GuiLuc AS guiLuc,d.SoTienCoc AS soTienCoc,
-    d.ThoiHanThanhToan AS thoiHanThanhToan,
+    d.ThoiHanThanhToan AS thoiHanThanhToan,d.ThoiGianNhanPhong AS thoiGianNhanPhong,
     (SELECT STRING_AGG(CONVERT(nvarchar(3),c2.MaGiuong),N', ')
       FROM dbo.ChiTietDatCoc c2 WHERE c2.MaPhieuDatCoc=d.MaPhieuDatCoc AND c2.MaGiuong IS NOT NULL) AS giuongs
     FROM dbo.PhieuDangKy p JOIN dbo.NguoiDung nd ON nd.MaNguoiDung=p.MaKhachHang
@@ -99,7 +99,7 @@ export function createDepositNotifier({ load = details, loadManagers = managers,
       const account = `Ngân hàng: ${bank.nganHang}\nSố tài khoản: ${bank.soTaiKhoan}\nChủ tài khoản: ${bank.chuTaiKhoan}\nNội dung chuyển khoản: ${transfer}`;
       const body = kind === 'issued' ? `Yêu cầu cọc đã được duyệt và phiếu đã phát hành.\n${summary}`
         : kind === 'rejected' ? `Yêu cầu cọc chưa được chấp nhận. Lý do: ${reason || 'Phòng/giường không còn phù hợp'}. Sale sẽ liên hệ đề xuất phòng khác.\nMã hồ sơ: ${row.maDangKy}`
-          : kind === 'paid' ? `HomeStayDorm đã ghi nhận thanh toán cọc thành công.\n${summary}`
+          : kind === 'paid' ? `HomeStayDorm đã ghi nhận thanh toán cọc thành công.\n${summary}\nLịch nhận phòng: ${dateTime(row.thoiGianNhanPhong)}.\nKhi đến nhận phòng, vui lòng mang CCCD gốc của tất cả thành viên cư trú để Sale đối chiếu.`
             : kind === 'reminder' ? `Còn không quá 3 giờ để thanh toán phiếu cọc.\n${summary}`
               : `Phiếu cọc đã quá hạn 24 giờ và bị hủy.\n${summary}`;
       const results = {};

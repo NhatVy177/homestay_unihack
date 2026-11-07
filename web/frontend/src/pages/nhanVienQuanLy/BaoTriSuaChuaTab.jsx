@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../nhanVienKeToan/nhanVienKeToanPortal.css'; // Use existing styles
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 
 export default function BaoTriSuaChuaTab() {
   const [activeSubTab, setActiveSubTab] = useState('cho-tiep-nhan');
