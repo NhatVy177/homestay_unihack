@@ -1,5 +1,27 @@
 # Tiến độ và điểm tiếp tục
 
+## Hướng luồng D-026 (bàn với Claude 2026-11-10, J-047)
+
+Danh sách này giữ **mọi hướng** đã bàn để không bị quên sau Fuji. Cột "Trạng thái": *Đã chốt* = có trong D-026; *Đề xuất* = Claude đề xuất, Vy chưa chốt; *Không làm* = đã bàn và bỏ. Cột "Lịch" là đề xuất, chưa chốt.
+
+| # | Hướng | Trạng thái | Lịch đề xuất |
+|---|---|---|---|
+| 1 | Mỗi hồ sơ một buổi xem nhiều phòng; Sale chỉ ghi trạng thái buổi; nút "Không thuê nữa" | Đã chốt | T-22, song song giao diện đợt 2 (12–13/11), nhánh riêng, không đụng blockchain |
+| 2 | Khách tự gửi giữ chỗ trên web (Sale gửi thay), lời nhắn "chờ quản lý xác nhận" | Đã chốt | T-22 |
+| 3 | Bị từ chối/quá 12 giờ/hết hạn → hồ sơ về "Đã xem" | Đã chốt | T-22 |
+| 4 | Khách tự khai người ở; ô đối chiếu CCCD gốc chuyển sang màn lập hợp đồng | Đã chốt | T-22 |
+| 5 | Thành viên bị loại: nhả giường ngay, hoàn 80% trừ vào kỳ đầu; phần dư/cả nhóm bị loại do kế toán chi | Đã chốt | T-22 |
+| 6 | Đổi đại diện bằng email mời tạo tài khoản; tạm thời Sale lập hồ sơ mới | Đã chốt, làm sau cùng | Sau mục 1–5; nếu trễ thì giữ cách tạm |
+| 7 | Chính sách hoàn cọc (80/50/70/100%) hiện trên phiếu cọc và email; lưu phiên bản chính sách để ghi lên chuỗi lúc bàn giao | Đề xuất | T-22 (nhỏ) |
+| 8 | Điều khoản hợp đồng (mã HĐ, giá thuê, kỳ hạn, tiền cọc, phiên bản chính sách) vào gói bằng chứng bàn giao; không sửa contract | Đề xuất | Trước Fuji (12–13/11) |
+| 9 | Mốc chuỗi 3 "đóng hồ sơ": kế toán ghi số tiền thực hoàn/thu + hash chứng từ, trạng thái Đã đóng. Phải sửa contract + test, xong trước deploy Fuji 14/11. **Lưu ý:** ngược ghi chú plan §3 "contract MVP không cần `PaymentReported`/`Closed`" và quyết định 04/11 giữ tiền ở Web2 — cần Vy quyết rõ | Đề xuất | 12–13/11, nhánh riêng |
+| 10 | Màn kiểm tra trả phòng hiện cạnh nhau tình trạng lúc bàn giao vào và hiện tại | Đề xuất | Giao diện đợt 2 |
+| 11 | Thẻ lịch xem của khách có thanh tiến trình Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ | Đề xuất | Giao diện đợt 2 / T-22 |
+| 12 | Bàn tiếp giai đoạn 5–9: hợp đồng và kỳ đầu, bàn giao, đang ở, trả phòng/đối soát, thanh toán cuối | Đang bàn | Bàn xong trước 12/11 để kịp giao việc |
+| 13 | Ghi kết quả xem từng phòng; hạn chờ 7 ngày/tự đóng hồ sơ sau buổi xem; kế toán lập phiếu cọc tay | Không làm | — |
+
+Thứ tự cắt nếu trễ (đề xuất): giữ 1–5 và 7–8; mục 9 chỉ làm nếu kịp trước 14/11; mục 6 giữ cách tạm; mục 10–11 làm trong phạm vi giao diện đợt 2.
+
 ## Đợt giao diện 1 — T-21 / D-025 (2026-11-10)
 
 - Hoàn thành code và kiểm tra local trên `feat/ui-refresh-1`, gốc `origin/main` ở `43c60b1` (merge PR #1, đã chứa T-20 `66bce65` và hồ sơ `a0a5482`). J-044 là lần dừng trước khi main được merge; Vy đã xác nhận merge và cho tiếp tục ở J-045. Chờ Vy xem nhánh, không tự merge main.
@@ -79,6 +101,7 @@ Vy đã chốt: nhân viên dẫn sinh viên xem phòng và lập biên bản tr
 | T-06 | Thu gọn contract và thêm xác nhận ký | Đang làm: contract + test local có trong `fadd0ec`; thiếu phiên bản biên bản bàn giao theo D-009 | F-02/F-03/F-04/F-05; bỏ bước tiền/báo trước cũ, test quyền/replay/version/số học. |
 | T-07 | Nối UI ba vai trò, SQL, evidence và Verify | Chưa bắt đầu | F-02/F-03/F-04/F-06/F-07/F-08; cần kiểm tra SQL và receipt/event phục hồi. |
 | T-08 | Deploy, verify source và nghiệm thu Fuji | Chưa bắt đầu | F-09; chưa có deployment/tx/source verification được xác minh trong repo mới. |
+| T-22 | Luồng trước nhận phòng gọn hơn (D-026, F-15) | Chưa bắt đầu. Đã chốt mục 1–6 ở "Hướng luồng D-026"; mục 7–12 đang bàn/đề xuất | Lịch đề xuất 12–13/11 trên nhánh riêng, song song giao diện đợt 2; chưa có prompt Codex. |
 | T-21 | Giao diện đợt 1 (D-025) | Hoàn thành code và kiểm tra local trên `feat/ui-refresh-1` (J-045): tokens, 7 component chung, khung mọi vai trò, menu mobile; build pass, backend 25 pass/1 skip, smoke UI pass; 14 cặp ảnh, không tràn ngang toàn trang/JS exception. | Ảnh màn bảo vệ dùng API/phiên giả lập; chờ Vy duyệt nhánh. Đợt 2 ngày 12–13/11 rà nội dung/form/bảng/badge và dữ liệu demo; Fuji 14–17/11 chưa làm. |
 | T-20 | Nhận phòng: duyệt cư trú theo ngoại lệ + email (D-024) | Code và kiểm thử local hoàn thành trên nhánh `feat/t20-checkin-deposit-fixes` (J-042): SP tự duyệt bằng `NVAUTO` hoặc chuyển quản lý kèm lý do; quản lý duyệt được một phần; 5 email mốc nhận phòng và mail ngoại lệ, chống gửi trùng theo lần gửi duyệt. `residence-flow:db:migrate` áp thành công; `residence-flow:db:verify` qua 3 ca SQL rollback (tự duyệt, ngoại lệ, quản lý duyệt một phần); backend 25 pass/1 skip; frontend build + browser smoke qua; blockchain 12 pass/1 skip. | Cần E2E HTTP/SMTP thật với tài khoản demo; email/unit và UI/API mock chưa thay thế nghiệm thu tích hợp. Chưa thử Fuji. |
 | T-09 | Hồ sơ nộp và demo | Chưa bắt đầu. Kịch bản video 2:50 đề xuất ở J-041 (chờ Vy chốt) | README setup/ghi công, video 2–3 phút, slides, kiểm tra link; Q-06/Q-07. (D-018) Pitch mở bằng nỗi đau trong đề đồ án; video bắt đầu từ hợp đồng chuẩn bị sẵn ở "Chờ bàn giao". |

@@ -113,6 +113,10 @@ Báo trả phòng vẫn có thể diễn ra trong Web2; MVP không yêu cầu gi
 
 Trạng thái xác nhận: chờ xác nhận bàn giao → đã xác nhận bàn giao → chờ xác nhận đối soát ↔ phản đối/phiên bản mới → đã thống nhất đối soát. **Nhận phòng thực tế/đã giao chìa khóa là trạng thái Web2 riêng, không suy ra từ chữ ký trên chain.** Contract bản MVP không cần bước `PaymentReported` hay `Closed` chứng minh thanh toán. Việc chỉnh bản đã chấp nhận cần quy trình đồng thuận mới; không cho ghi đè trong MVP.
 
+### Luồng trước nhận phòng gọn hơn — D-026 (10/11/2026)
+
+Vy bàn lại luồng theo D-022 (hợp lý ngoài thực tế), tham khảo dự án nhóm Hằng: khách tự làm nhiều hơn nhưng giữ quản lý duyệt. Đã chốt: một buổi xem nhiều phòng, chỉ ghi trạng thái buổi; khách tự gửi giữ chỗ trên web (Sale gửi thay khi cần), quản lý duyệt rồi hệ thống tự tạo phiếu như D-023; bị từ chối/hết hạn → hồ sơ về "Đã xem"; khách tự khai người ở, xem CCCD gốc lúc ký hợp đồng giấy; thành viên bị loại → nhả giường, hoàn 80% trừ vào kỳ đầu; đổi đại diện qua email mời tạo tài khoản (sau cùng). Chi tiết ở D-026/F-15. Danh sách đầy đủ các hướng còn chờ chốt (gồm mốc chuỗi 3 "đóng hồ sơ" — mâu thuẫn với ghi chú "không cần `Closed`" ở trên, cần Vy quyết) và lịch đề xuất nằm ở `spec/progress.md` mục "Hướng luồng D-026". Đây không phải kế hoạch song song.
+
 ### Ví nhúng và app trả phí: mục tiêu của bản thi
 
 - Ví nhúng giải quyết việc cài ví; relayer giải quyết việc khách phải có AVAX. Đây là hai phần khác nhau và đều cần thử trên Fuji.
