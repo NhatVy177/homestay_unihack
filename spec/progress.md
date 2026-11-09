@@ -12,13 +12,14 @@ Danh sách này giữ **mọi hướng** đã bàn để không bị quên sau F
 | 4 | Khách tự khai người ở; ô đối chiếu CCCD gốc chuyển sang màn lập hợp đồng | Đã chốt | T-22 |
 | 5 | Thành viên bị loại: nhả giường ngay, hoàn 80% trừ vào kỳ đầu; phần dư/cả nhóm bị loại do kế toán chi | Đã chốt | T-22 |
 | 6 | Đổi đại diện bằng email mời tạo tài khoản; tạm thời Sale lập hồ sơ mới | Đã chốt, làm sau cùng | Sau mục 1–5; nếu trễ thì giữ cách tạm |
-| 7 | Chính sách hoàn cọc (80/50/70/100%) hiện trên phiếu cọc và email; lưu phiên bản chính sách để ghi lên chuỗi lúc bàn giao | Đề xuất | T-22 (nhỏ) |
+| 7 | Chính sách hoàn cọc (80/50/70/100%) hiện trên phiếu cọc và email; lưu phiên bản chính sách để ghi lên chuỗi lúc bàn giao | Đã chốt (D-031) | T-22 (nhỏ) |
 | 8 | Điều khoản hợp đồng (mã HĐ, giá thuê, kỳ hạn, tiền cọc, phiên bản chính sách) + mã băm bản chụp hợp đồng đã ký vào gói bằng chứng bàn giao; không sửa contract | Đã chốt (D-027) | Trước Fuji (12–13/11) |
 | 8a | Hợp đồng "Chờ ký" + email xem trước; trả kỳ đầu trước (vẫn cho trả tại quầy); ký giấy + đối chiếu CCCD + bàn giao trong một lần đến; CCCD không khớp → khai lại, giữ/hoàn tiền kỳ đầu; Sale tải bản chụp hợp đồng đã ký | Đã chốt (D-027) | T-22 |
-| 9 | Mốc chuỗi 3 "đóng hồ sơ": kế toán ghi số tiền thực hoàn/thu + hash chứng từ, trạng thái Đã đóng. Phải sửa contract + test, xong trước deploy Fuji 14/11. **Lưu ý:** ngược ghi chú plan §3 "contract MVP không cần `PaymentReported`/`Closed`" và quyết định 04/11 giữ tiền ở Web2 — cần Vy quyết rõ | Đề xuất | 12–13/11, nhánh riêng |
+| 9 | Mốc chuỗi 3 "đóng hồ sơ": kế toán ghi số tiền thực hoàn/thu + hash chứng từ, trạng thái Đã đóng. Phải sửa contract + test, xong trước deploy Fuji 14/11. **Lưu ý:** ngược ghi chú plan §3 "contract MVP không cần `PaymentReported`/`Closed`" và quyết định 04/11 giữ tiền ở Web2. **Vy chọn không làm trong bản thi (D-031)**: thay bằng gói bằng chứng cuối trên Web2 có chứng từ chi/thu + email cho khách; chuỗi dừng ở mốc 2 | Để sau bản thi (D-031) | Sau 21/11 |
+| 9a | Gói bằng chứng cuối khi tự thanh lý: thêm mã băm chứng từ chi hoàn/thu thêm, số tiền, thời điểm; email cho khách; không sửa contract | Đã chốt (D-031) | T-22 |
 | 10 | Màn kiểm tra trả phòng hiện cạnh nhau tình trạng lúc bàn giao vào và hiện tại | Đã chốt (D-030) | Giao diện đợt 2 |
-| 11 | Thẻ lịch xem của khách có thanh tiến trình Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ | Đề xuất | Giao diện đợt 2 / T-22 |
-| 12 | Bàn tiếp giai đoạn 9: chỉ còn quyết mốc chuỗi 3 (mục 9); giai đoạn 5–8 đã chốt ở D-027 → D-030 | Đang bàn | Bàn xong trước 12/11 để kịp giao việc |
+| 11 | Thẻ lịch xem của khách có thanh tiến trình Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ | Đã chốt (D-031) | Giao diện đợt 2 |
+| 12 | Bàn lại toàn bộ luồng giai đoạn 1–9 | Xong (D-026 → D-031) | Bước tiếp: prompt Codex T-22 |
 | 20 | Hệ thống tự soạn bản nháp đối soát (chính sách đã khóa + khoản dự kiến trừ + kết quả kiểm tra), kế toán rà và gửi | Đã chốt (D-030) | T-22 |
 | 21 | Thu thêm qua ví mô phỏng, trả trước khi thanh lý | Đã chốt (D-030) | T-22 |
 | 22 | Khách không phản hồi đối soát: nhắc 24/72 giờ, quá 7 ngày "Quá hạn phản hồi", không tự chấp nhận thay | Đã chốt (D-030) | T-22 |
@@ -31,7 +32,7 @@ Danh sách này giữ **mọi hướng** đã bàn để không bị quên sau F
 | 16 | Giữ OTP; kích hoạt xác nhận điện tử ngay sau khi trả cọc; nút gửi lại mã + nhắc thư rác; kiểm thời hạn phiên Privy ở đợt Fuji; tiếp tục hỏi BTC Q-08 để bật D-011 | Đã chốt (D-028) | Giao diện + T-22; thử phiên ở Fuji 14–17/11 |
 | 13 | Ghi kết quả xem từng phòng; hạn chờ 7 ngày/tự đóng hồ sơ sau buổi xem; kế toán lập phiếu cọc tay | Không làm | — |
 
-Thứ tự cắt nếu trễ (đề xuất): giữ 1–5 và 7–8; mục 9 chỉ làm nếu kịp trước 14/11; mục 6 giữ cách tạm; mục 10–11 làm trong phạm vi giao diện đợt 2.
+Thứ tự cắt nếu trễ (đề xuất): giữ 1–5 và 7–8; mục 9 đã để sau bản thi (D-031); mục 6 giữ cách tạm; mục 10–11 làm trong phạm vi giao diện đợt 2.
 
 ## Đợt giao diện 1 — T-21 / D-025 (2026-11-10)
 

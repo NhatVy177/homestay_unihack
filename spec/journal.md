@@ -538,3 +538,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Claude đề xuất học ý "tự thanh lý khi tiền xong" nhưng tách 3 trường hợp, chữ ký mốc 2 thay biên bản trả phòng giấy. Vy chốt cùng 4 điểm giai đoạn 8 ("có").
 - File: `spec/decisions.md` (D-030), `spec/scope.md` (F-04), `spec/progress.md` (mục 10 đã chốt, thêm 20–23, mục 12 chỉ còn mốc 3), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
 - Việc còn lại: Vy quyết mốc chuỗi 3 (mục 9) và hai đề xuất nhỏ (mục 7, 11); sau đó Claude viết prompt Codex cho T-22.
+
+## 2026-11-10 02:39:33 +07:00 — J-052 — Chốt đóng hồ sơ, không thêm mốc chuỗi 3 (D-031)
+
+- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Claude so sánh A (mốc chuỗi 3, sửa contract trước 14/11) và B (gói bằng chứng cuối trên Web2, không sửa contract), khuyên B vì số tiền đã chi vẫn do kế toán tự khai và rủi ro lịch; khuyên có mục 7 (chính sách hoàn cọc trên phiếu/email cọc) và mục 11 (thanh tiến trình thẻ lịch xem). Vy: "chốt theo những gì bạn đề xuất".
+- File: `spec/decisions.md` (D-031; ghi chú D-030 trỏ sang D-031), `spec/scope.md` (F-15, F-04), `spec/progress.md` (mục 7, 11 đã chốt; mục 9 để sau bản thi; thêm 9a; mục 12 xong), `hackathon/plan.md` (§3 đoạn D-026), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
+- Việc còn lại: Claude viết prompt Codex cho T-22; Vy merge `feat/ui-refresh-1` rồi `docs/d026-flow-redesign`.
