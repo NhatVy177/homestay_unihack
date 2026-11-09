@@ -1,3 +1,4 @@
+import OverviewCards from '../../components/common/OverviewCards.jsx';
 import React, { useState, useEffect } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { thuNhanPhongApi } from './thuNhanPhong.api.js';
@@ -284,31 +285,37 @@ export default function ThuNhanPhongTab() {
 
 
       {/* Table */}
-      <section className="ktp-table-section tnp-table-card">
-        <div style={{ backgroundColor: '#f4f7f7', padding: '16px', borderRadius: '8px', display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '20px' }}>
-          <div style={{ flex: '2 1 240px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#191c1d', marginBottom: '8px' }}>Tìm kiếm</label>
-            <input
+      <>
+<OverviewCards items={[{ key: 'all', label: 'Tất cả' }, ...TNP_STATUS_ORDER.map((s) => ({ key: s, label: TNP_STATUS_CONFIG[s].chip }))]} counts={statusCounts} />
+<div className="ui-list-toolbar">
+          <label className="ui-list-search">
+            <span className="ui-search-label">Tìm kiếm</span>
+            <Icon name="search" />
+<input
               type="text"
               value={tuKhoa}
               onChange={(e) => { setTuKhoa(e.target.value); loadContracts({ tuKhoa: e.target.value }); }}
               placeholder="Mã hợp đồng, tên khách hàng, SĐT..."
               className="ktp-input"
-              style={{ width: '100%', backgroundColor: '#fff' }}
-            />
-          </div>
-          {tuKhoa && (
-            <button type="button" onClick={() => { setTuKhoa(''); loadContracts({ tuKhoa: '' }); }} className="ktp-btn-cancel" style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#3f494a', padding: '9px 16px', fontSize: '13px' }}>Xóa lọc</button>
-          )}
-        </div>
 
-        <StatusFilterTabs
+            />
+          </label>
+          {tuKhoa && (
+            <button type="button" onClick={() => { setTuKhoa(''); loadContracts({ tuKhoa: '' }); }} className="ktp-btn-cancel" >Xóa lọc</button>
+          )}
+
+<StatusFilterTabs
           className="status-pill-tabs-offset"
           items={[{ key: 'all', label: 'Tất cả' }, ...TNP_STATUS_ORDER.map((s) => ({ key: s, label: TNP_STATUS_CONFIG[s].chip }))]}
           activeKey={trangThai}
           counts={statusCounts}
           onChange={setTrangThai}
         />
+</div>
+<section className="ktp-table-section tnp-table-card ui-list-table-card">
+
+
+
 
         {loading && <div className="tnp-state tnp-state-loading">Đang tải dữ liệu...</div>}
         {errorMsg && <div className="tnp-state tnp-state-error">{errorMsg}</div>}
@@ -379,6 +386,7 @@ export default function ThuNhanPhongTab() {
           </div>
         )}
       </section>
+</>
 
       {/* Modal Overlay for Thu Nhận Phòng */}
       {modalType && (

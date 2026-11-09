@@ -78,6 +78,12 @@ Vy chọn `D:\Nam4\Contest\Homestay-Dorm` làm mẫu cho cách trình bày, khô
 | Hộp thoại/nút | Thẻ trắng góc 20px, tiêu đề có biểu tượng trong ô nền dịu; nút đóng độc lập. Nội dung dài cuộn trong modal, giữ thanh thao tác thấy được; nút chính sage, nút hủy viền, thao tác nguy hiểm giữ màu danger; nút thường cao tối thiểu 44px. |
 | Mức áp dụng đã làm | Lớp dùng chung nối các class form/modal hiện có; làm cụ thể form Sale “Tạo phiếu mới cho khách vãng lai”, đăng nhập/đăng ký và phần trình bày form Admin. Các form chuyên biệt và inline style còn lại tiếp tục rà đợt 2, không mặc định đã đồng bộ mọi tab. |
 
+### Tổng quan và thanh tìm kiếm danh sách — D-033
+
+- Thẻ số liệu: nền trắng, viền nhẹ, góc 20px; hàng icon/nhãn nhỏ ở trên, số lớn ở dưới, màu semantic theo trạng thái. Dữ liệu lấy đúng `items/counts` của bộ lọc hiện có; Admin giữ nguyên cả số liệu và ghi chú. Không đưa số liệu mẫu vào ứng dụng và không thêm quy tắc tổng hợp nghiệp vụ.
+- Thanh tìm kiếm: một thẻ trắng chứa ô dạng viên có icon, tiếp theo là bộ lọc trạng thái dạng viên có số trong ngoặc; nút xóa lọc và các bộ chọn ngày/trạng thái riêng vẫn hoạt động như cũ. Desktop tự phân bổ chỗ, mobile xuống hàng; bảng dài cuộn trong thẻ, không làm rộng toàn trang.
+- Áp dụng cho các danh sách Sale/Quản lý/Kế toán đang có bộ lọc và số đếm, cùng kiểu thẻ tổng quan/lọc Admin. Trang không có số đếm hoặc không có tìm kiếm trước đó không được thêm số liệu hay control không có xử lý. Không đổi API, phép lọc, handler, native controls, trạng thái hoặc quyền thao tác.
+
 Không đưa CCCD, địa chỉ, tài khoản ngân hàng, ảnh hoặc nội dung biên bản lên chain. Chain chỉ giữ ID khó đoán, ví, commitment, version/state và số tiền tối thiểu cần thiết. Không khẳng định hash/salt bảo đảm ẩn danh hoặc chữ ký tự chứng minh hiệu lực pháp lý.
 
 Kiểm thử cần phủ sai quyền/chữ ký, replay/hết hạn/sai domain, sai version/hash, tổng tiền và làm tròn, sửa file/thiếu salt/ảnh, relayer timeout/gas, SQL lệch chain và khôi phục ví. Ghi kết quả thực tế ở nhật ký; chưa có kết quả cho bộ yêu cầu này trong repo hiện hành.

@@ -36,6 +36,9 @@ Thứ tự cắt nếu trễ (đề xuất): giữ 1–5 và 7–8; mục 9 đã
 
 ## Đợt giao diện 1 — T-21 / D-025 (2026-11-10)
 
+- Bổ sung theo ảnh tổng quan/tìm kiếm Vy gửi (D-033/J-056): thêm `OverviewCards` dùng cùng `items/counts` với chip trạng thái, tách thanh tìm kiếm/lọc và bảng; đồng bộ 15 file màn hình Sale/Quản lý/Kế toán, thẻ tổng quan/lọc Admin qua CSS. Không đổi logic nghiệp vụ/handler/control; các quyết định luồng D-026–D-031 chưa được triển khai trong đợt UI này.
+- Kiểm tra mới J-056: frontend build pass, backend 25 pass/1 skip SQL, smoke Avalanche UI pass; 44 ảnh trước và 44 ảnh sau (22 màn/tab × 1440px/390px) trong `.ui-screens/lists-{before,after}/`. Sau sửa 44/44 không lỗi JS/cuộn ngang toàn trang; ca cư trú có dữ liệu giả xác nhận số 3/1/1/1 và tìm kiếm/lọc vẫn đúng. Đối chiếu AST 15 file: logic ngoài JSX, 412 handler và 110 input/select/textarea giữ nguyên ngoài style/class. Sửa thêm overflow có sẵn ở thanh bước Hợp đồng mobile (bản trước rộng 565px trên viewport 390px), nay cuộn trong thẻ. Kết quả UI dùng mock, không nghiệm thu tài khoản/SQL/SMTP/Privy/Fuji thật.
+
 - Hoàn thành code và kiểm tra local trên `feat/ui-refresh-1`, gốc `origin/main` ở `43c60b1` (merge PR #1, đã chứa T-20 `66bce65` và hồ sơ `a0a5482`). J-044 là lần dừng trước khi main được merge; Vy đã xác nhận merge và cho tiếp tục ở J-045. Chờ Vy xem nhánh, không tự merge main.
 - Lịch mới: giao diện đợt 1 ngày 10–11/11; đợt 2 ngày 12–13/11, hạn chót 13/11; Fuji 14–17/11; hồ sơ/nộp 18–20/11. Lịch này thay thứ tự ưu tiên cũ bên dưới theo D-025.
 - Tokens/lớp chung, 7 component chung, khung nhân viên/Admin/khách/trang chủ/đăng nhập đã đổi tông; thêm chip chi nhánh, tên vai trò và menu mobile mở/đóng bằng nút/nền/Escape. Không đổi nghiệp vụ/API/SP/dữ liệu. Đã chạy frontend build pass (cảnh báo thư viện/size chunk), backend 25 pass/1 skip SQL và smoke Avalanche UI pass; `git diff --check` pass.

@@ -1,3 +1,4 @@
+import OverviewCards from '../../components/common/OverviewCards.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { cuTruApi } from '../nhanPhong/cuTru.api.js';
@@ -299,27 +300,31 @@ export default function DuyetCuTruTab() {
 
 
 
-      <section className="ktp-table-section">
-        <div style={{ padding: '20px 22px' }}>
-          <div style={{ backgroundColor: '#f4f7f7', padding: '16px', borderRadius: '8px', display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '20px' }}>
-            <div style={{ flex: '2 1 240px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#191c1d', marginBottom: '8px' }}>Tìm kiếm</label>
-              <input
+      <>
+<OverviewCards items={[
+              { key: 'all', label: 'Tất cả' },
+              { key: 'Chờ duyệt cư trú', label: 'Chờ duyệt' },
+              { key: 'Đã duyệt cư trú', label: 'Đã duyệt' },
+              { key: 'Từ chối cư trú', label: 'Từ chối' }
+            ]} counts={statusCounts} />
+<div className="ui-list-toolbar">
+            <label className="ui-list-search">
+              <span className="ui-search-label">Tìm kiếm</span>
+              <Icon name="search" />
+<input
                 type="text"
                 value={searchText}
                 onChange={(event) => { setSearchText(event.target.value); loadData(event.target.value); }}
                 placeholder="Nhập mã hồ sơ, mã phiếu, tên khách"
                 className="ktp-input"
-                style={{ width: '100%', backgroundColor: '#fff' }}
-              />
-            </div>
-            {searchText && (
-              <button type="button" onClick={() => { setSearchText(''); loadData(''); }} className="ktp-btn-cancel" style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#3f494a', padding: '9px 16px', fontSize: '13px' }}>Xóa lọc</button>
-            )}
-          </div>
 
-          {/* Bộ lọc trạng thái dạng chip */}
-          <StatusFilterTabs
+              />
+            </label>
+            {searchText && (
+              <button type="button" onClick={() => { setSearchText(''); loadData(''); }} className="ktp-btn-cancel" >Xóa lọc</button>
+            )}
+
+<StatusFilterTabs
             items={[
               { key: 'all', label: 'Tất cả' },
               { key: 'Chờ duyệt cư trú', label: 'Chờ duyệt' },
@@ -330,7 +335,9 @@ export default function DuyetCuTruTab() {
             counts={statusCounts}
             onChange={setStatusFilter}
           />
-        </div>
+</div>
+<section className="ktp-table-section ui-list-table-card">
+
 
         <div className="residence-table-head">
           <div>
@@ -390,6 +397,7 @@ export default function DuyetCuTruTab() {
           </table>
         </div>
       </section>
+</>
 
       {selected && (
         <div className="ktp-modal-overlay" onClick={() => setSelected(null)}>
