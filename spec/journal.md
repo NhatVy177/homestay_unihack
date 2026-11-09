@@ -571,3 +571,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Nguyên nhân: PR `feat/ui-refresh-1` báo xung đột `spec/decisions.md`, `spec/journal.md` vì hai bên cùng dùng D-026, J-047, J-048 (Codex: icon/form; Claude: luồng mới, đã vào main qua PR #2).
 - Xử lý: giữ nguyên D-026…D-031 và J-047…J-052 đã ở main; **đánh số lại phần của Codex** thành D-032 (quy chuẩn icon/form), J-053, J-054 và sửa các chỗ nhắc tới trong `hackathon/plan.md`, `spec/progress.md`, `spec/scope.md`. Nội dung không đổi. Mục J-053/J-054 nằm sau J-052 dù giờ ghi sớm hơn (giữ giờ gốc). Không sửa code.
 - Việc còn lại: Vy merge PR.
+
+## 2026-11-10 02:48:53 +07:00 — J-056 — T-22: khách tự giữ chỗ (backend)
+
+- Người thực hiện: Claude, theo yêu cầu Vy ("bạn triển khai code trước, chia việc với Codex"): Claude làm backend/DB, Codex làm giao diện. Nhánh `feat/t22-backend` (worktree `D:\HomeStayDorm-t22`, gốc `origin/main` `dcc1a59`).
+- Code: `database/SP_DatCoc/khach-giu-cho-20261110.sql` (`SP_KhachGiuCho`: kiểm tra hồ sơ của khách, tái dùng `SP_ChonPhongKhachChot` + `SP_GuiYeuCauCocKemLuaChon`, Sale phụ trách là Sale đã tiếp nhận, lỗi thì trả lại lựa chọn phòng cũ); `services/datCoc.service.js` (`khachGiuCho`, kèm lời nhắn chờ quản lý tối đa 12 giờ); `controllers/datCoc.controller.js`, `routes/datCoc.routes.js` (`POST /api/dat-coc/khach-giu-cho`); `scripts/khach-giu-cho-db.mjs` và script npm; `test/customer-hold.test.mjs`.
+- Kiểm tra: backend `node --test` 27 pass/1 skip/0 fail (test mới chỉ kiểm tra vai trò và dữ liệu vào). **Chưa chạy SP lên DB nên chưa thử đường đi thật.**
+- Việc còn lại: Vy đồng ý chạy migration SP lên HOMEDORM4 rồi thử thật; các mục T-22 tiếp theo.

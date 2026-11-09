@@ -129,6 +129,43 @@ export async function guiYeuCauDatCoc(user, data = {}) {
   }
 }
 
+// D-026: khách tự gửi "Giữ chỗ"; vẫn phải chờ quản lý xác nhận (tối đa 12 giờ, D-023).
+export async function khachGiuCho(user, data = {}) {
+  if (user?.vaiTro !== 'KhachHang')
+    throw createServiceError('Chỉ khách hàng được tự gửi giữ chỗ', 403);
+  const maDangKy = String(data.maDangKy || '').trim();
+  const maPhong = String(data.maPhong || '').trim();
+  const hinhThucThue = String(data.hinhThucThue || '').trim();
+  const giuongs = Array.isArray(data.giuongs) ? data.giuongs.map(String).join(',') : String(data.giuongs || '').trim();
+  if (!maDangKy || !maPhong) throw createServiceError('Thiếu mã hồ sơ hoặc mã phòng');
+  if (!['Nguyên phòng', 'Ghép giường'].includes(hinhThucThue))
+    throw createServiceError('Chọn hình thức thuê nguyên phòng hoặc ghép giường');
+  if (hinhThucThue === 'Ghép giường' && !giuongs)
+    throw createServiceError('Chọn giường');
+
+  try {
+    const result = await executeProcedure('dbo.SP_KhachGiuCho', [
+      { name: 'MaKhachHang', type: sql.VarChar(6), value: user.maNguoiDung },
+      { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
+      { name: 'MaPhong', type: sql.VarChar(4), value: maPhong },
+      { name: 'HinhThucThue', type: sql.NVarChar(20), value: hinhThucThue },
+      { name: 'DanhSachGiuong', type: sql.NVarChar(100), value: hinhThucThue === 'Ghép giường' ? giuongs : null }
+    ]);
+    const row = result.recordsets.at(-1)?.[0] || null;
+    if (row) await notifyDeposit('request', maDangKy);
+    return {
+      ...row,
+      thongBao: 'Phòng chưa được giữ cho đến khi quản lý chi nhánh xác nhận (tối đa 12 giờ).'
+    };
+  } catch (error) {
+    mapDatabaseError(error, {
+      50201: 404, 50202: 409, 50256: 422, 50257: 409, 50259: 409,
+      50258: 409, 50301: 400, 50302: 403, 50303: 422, 50304: 422, 50305: 409, 50315: 403,
+      50320: 404, 50321: 409
+    });
+  }
+}
+
 export async function capNhatThongTinCaNhan(maDangKy, data = {}) {
   const ma = String(maDangKy || '').trim();
   if (!ma) {

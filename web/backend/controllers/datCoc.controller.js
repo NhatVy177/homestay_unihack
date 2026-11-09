@@ -5,6 +5,9 @@ import { unlink } from 'node:fs/promises';
 export async function getPhieuDatCoc(req, res, next) {
   try { res.json(await service.getPhieuDatCoc(req.user.maNguoiDung)); } catch (err) { next(err); }
 }
+export async function khachGiuCho(req, res, next) {
+  try { res.status(201).json(await service.khachGiuCho(req.user, req.body)); } catch (err) { next(err); }
+}
 export async function xacNhanKhaNangNhanCoc(req, res, next) {
   try { res.json(await service.xacNhanKhaNangNhanCoc(req.user, req.params.id, req.body)); } catch (err) { next(err); }
 }
