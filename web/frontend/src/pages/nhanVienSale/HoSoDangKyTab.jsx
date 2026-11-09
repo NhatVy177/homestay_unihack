@@ -1051,32 +1051,35 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
       {/* MODAL TẠO PHIẾU KHÁCH VÃNG LAI */}
       {showCreateModal && (
         <div className="ktp-modal-overlay" onClick={resetCreateForm}>
-          <div className="ktp-modal" onClick={(e) => e.stopPropagation()} style={{ width: '800px', maxWidth: '95vw', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
-            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#2f6765', color: '#ffffff' }}>
-              <h3 style={{ fontSize: '20px', margin: 0, color: '#ffffff' }}>Tạo phiếu mới cho khách vãng lai</h3>
-              <button className="ktp-modal-close" onClick={resetCreateForm} style={{ color: '#ffffff' }}><Icon name="close" /></button>
+          <div className="ktp-modal ui-registration-form" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="ui-registration-title">
+            <div className="ktp-modal-header">
+              <div className="ui-dialog-heading">
+                <span className="ui-heading-symbol"><Icon name="person_add" /></span>
+                <h3 id="ui-registration-title">Tạo phiếu mới cho khách vãng lai</h3>
+              </div>
+              <button className="ktp-modal-close" onClick={resetCreateForm} aria-label="Đóng"><Icon name="close" /></button>
             </div>
 
             <div className="ktp-modal-body" style={{ padding: '24px', flex: 1, minHeight: 0, overflowY: 'auto', display: 'block' }}>
               {/* Stepper */}
-              <div style={{ display: 'flex', marginBottom: '24px', borderBottom: '2px solid #e9ecef', paddingBottom: '16px' }}>
-                <div style={{ flex: 1, textAlign: 'center', fontWeight: createStep === 1 ? 'bold' : 'normal', color: createStep === 1 ? '#2f6765' : '#6f797a' }}>
+              <div className="ui-form-stepper">
+                <div className={createStep === 1 ? 'is-active' : ''} aria-current={createStep === 1 ? 'step' : undefined}>
                   1. Thông tin khách hàng
                 </div>
-                <div style={{ flex: 1, textAlign: 'center', fontWeight: createStep === 2 ? 'bold' : 'normal', color: createStep === 2 ? '#2f6765' : '#6f797a' }}>
+                <div className={createStep === 2 ? 'is-active' : ''} aria-current={createStep === 2 ? 'step' : undefined}>
                   2. Nhu cầu thuê
                 </div>
               </div>
 
               {createStep === 1 && (
-                <div className="ktp-grid-2" style={{ gap: '20px' }}>
+                <div className="ktp-grid-2 ui-form-grid">
                   <div>
-                    <label className="ktp-filter-label">Họ tên *</label>
+                    <label className="ktp-filter-label">Họ tên <span className="ui-required">*</span></label>
                     <input className={`ktp-input ${createErrors.hoTen ? 'is-invalid' : ''}`} type="text" value={createForm.hoTen} onChange={e => setCreateForm({...createForm, hoTen: e.target.value})} />
                     {createErrors.hoTen && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.hoTen}</span>}
                   </div>
                   <div>
-                    <label className="ktp-filter-label">SĐT *</label>
+                    <label className="ktp-filter-label">SĐT <span className="ui-required">*</span></label>
                     <input
                       className={`ktp-input ${createSdtError ? 'is-invalid' : ''}`}
                       type="text"
@@ -1092,7 +1095,7 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
                     {createDuplicateChecking.sdt && !createSdtError && <span style={{ display: 'block', marginTop: '4px', color: '#6f797a', fontSize: '12px' }}>Đang kiểm tra SĐT...</span>}
                   </div>
                   <div>
-                    <label className="ktp-filter-label">CCCD *</label>
+                    <label className="ktp-filter-label">CCCD <span className="ui-required">*</span></label>
                     <input
                       className={`ktp-input ${createCccdError ? 'is-invalid' : ''}`}
                       type="text"
@@ -1108,7 +1111,7 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
                     {createDuplicateChecking.cccd && !createCccdError && <span style={{ display: 'block', marginTop: '4px', color: '#6f797a', fontSize: '12px' }}>Đang kiểm tra CCCD...</span>}
                   </div>
                   <div>
-                    <label className="ktp-filter-label">Ngày sinh *</label>
+                    <label className="ktp-filter-label">Ngày sinh <span className="ui-required">*</span></label>
                     <input className={`ktp-input ${createErrors.ngaySinh ? 'is-invalid' : ''}`} type="date" max={getMaxBirthDate()} value={createForm.ngaySinh} onChange={e => setCreateForm({...createForm, ngaySinh: e.target.value})} />
                     {createErrors.ngaySinh && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.ngaySinh}</span>}
                   </div>
@@ -1131,7 +1134,7 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
               )}
 
               {createStep === 2 && (
-                <div className="ktp-grid-2" style={{ gap: '20px' }}>
+                <div className="ktp-grid-2 ui-form-grid">
                   <div>
                     <label className="ktp-filter-label">Giới tính thuê</label>
                     <select
@@ -1155,17 +1158,17 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
                   {createForm.gioiTinhO === 'Khác' && (
                     <>
                       <div>
-                        <label className="ktp-filter-label">Số lượng nam *</label>
+                        <label className="ktp-filter-label">Số lượng nam <span className="ui-required">*</span></label>
                         <input className={`ktp-input ${createErrors.gioiTinhO ? 'is-invalid' : ''}`} type="number" min="0" value={createForm.soNam} onChange={e => setCreateForm({...createForm, soNam: e.target.value})} />
                       </div>
                       <div>
-                        <label className="ktp-filter-label">Số lượng nữ *</label>
+                        <label className="ktp-filter-label">Số lượng nữ <span className="ui-required">*</span></label>
                         <input className={`ktp-input ${createErrors.gioiTinhO ? 'is-invalid' : ''}`} type="number" min="0" value={createForm.soNu} onChange={e => setCreateForm({...createForm, soNu: e.target.value})} />
                       </div>
                     </>
                   )}
                   <div>
-                    <label className="ktp-filter-label">Số người ở *</label>
+                    <label className="ktp-filter-label">Số người ở <span className="ui-required">*</span></label>
                     <input
                       className={`ktp-input ${createErrors.soNguoi ? 'is-invalid' : ''}`}
                       type="number"
@@ -1185,7 +1188,7 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
                     {createErrors.soNguoi && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.soNguoi}</span>}
                   </div>
                   <div>
-                    <label className="ktp-filter-label">Khu vực *</label>
+                    <label className="ktp-filter-label">Khu vực <span className="ui-required">*</span></label>
                     <input
                       className={`ktp-input ${createErrors.khuVuc ? 'is-invalid' : ''}`}
                       type="text"
@@ -1204,7 +1207,7 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
                     {createErrors.khuVuc && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.khuVuc}</span>}
                   </div>
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <label className="ktp-filter-label">Loại phòng *</label>
+                    <label className="ktp-filter-label">Loại phòng <span className="ui-required">*</span></label>
                     <select
                       className={`ktp-input ${createErrors.loaiPhong ? 'is-invalid' : ''}`}
                       value={createForm.loaiPhong}
@@ -1223,17 +1226,17 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
                     {createErrors.loaiPhong && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.loaiPhong}</span>}
                   </div>
                   <div>
-                    <label className="ktp-filter-label">Mức giá mong muốn *</label>
+                    <label className="ktp-filter-label">Mức giá mong muốn <span className="ui-required">*</span></label>
                     <input className={`ktp-input ${createErrors.mucGia ? 'is-invalid' : ''}`} type="text" inputMode="numeric" placeholder="VD: 3.000.000" value={createForm.mucGia} onChange={e => setCreateForm({...createForm, mucGia: e.target.value})} />
                     {createErrors.mucGia && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.mucGia}</span>}
                   </div>
                   <div>
-                    <label className="ktp-filter-label">Thời gian dự kiến dọn vào *</label>
+                    <label className="ktp-filter-label">Thời gian dự kiến dọn vào <span className="ui-required">*</span></label>
                     <input className={`ktp-input ${createErrors.ngayVao ? 'is-invalid' : ''}`} type="date" min={getMinMoveInDate()} value={createForm.ngayVao} onChange={e => setCreateForm({...createForm, ngayVao: e.target.value})} />
                     {createErrors.ngayVao && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.ngayVao}</span>}
                   </div>
                   <div>
-                    <label className="ktp-filter-label">Thời hạn thuê (tháng) *</label>
+                    <label className="ktp-filter-label">Thời hạn thuê (tháng) <span className="ui-required">*</span></label>
                     <input className={`ktp-input ${createErrors.thoiHan ? 'is-invalid' : ''}`} type="number" min="1" value={createForm.thoiHan} onChange={e => setCreateForm({...createForm, thoiHan: e.target.value})} />
                     {createErrors.thoiHan && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.thoiHan}</span>}
                   </div>
@@ -1246,7 +1249,7 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
               )}
             </div>
 
-            <div className="ktp-modal-footer" style={{ flex: '0 0 auto', borderTop: '1px solid #e1e6e6', padding: '16px 24px', justifyContent: 'flex-end', gap: '12px' }}>
+            <div className="ktp-modal-footer">
               {createStep === 1 ? (
                 <>
                   <button className="ktp-btn-cancel" onClick={resetCreateForm}>Hủy</button>

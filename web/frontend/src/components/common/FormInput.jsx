@@ -1,7 +1,7 @@
 import React from 'react';
 export default function FormInput({ label, required = false, ...props }) {
   return (
-    <label className="form-control">
+    <label className="form-control ui-form-field">
       <span>
         {label}
         {required && <strong className="required-mark"> *</strong>}

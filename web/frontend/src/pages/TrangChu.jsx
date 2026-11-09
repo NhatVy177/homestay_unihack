@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthContext.jsx';
 import { getAuthenticatedHomePath } from '../auth/auth.routes.js';
 import { safeNextPath } from '../auth/returnPath.js';
 import { httpClient } from '../api/httpClient.js';
+import { Icon } from '../components/common/Icon.jsx';
 import '../styles/TrangChu.css';
 
 // ── Ảnh placeholder theo loại phòng ─────────────────────────
@@ -169,19 +170,25 @@ function AuthModal({ mode, onClose, onSwitchMode }) {
           {mode === 'login' && (
             <form className="tc-modal-form" onSubmit={handleLogin}>
               <div className="tc-modal-header">
-                <span className="tc-modal-emoji">👋</span>
+                <span className="tc-modal-emoji ui-auth-symbol"><Icon name="login" /></span>
                 <h2>Chào mừng trở lại</h2>
                 <p>Đăng nhập để quản lý thuê phòng của bạn.</p>
               </div>
               <label className="tc-form-field">
                 <span>Tên đăng nhập</span>
-                <input name="tenDangNhap" value={loginForm.tenDangNhap} onChange={updateLogin}
-                  placeholder="kh0001" required autoComplete="username" />
+                <span className="ui-field-control">
+                  <Icon name="person" />
+                  <input name="tenDangNhap" value={loginForm.tenDangNhap} onChange={updateLogin}
+                    placeholder="kh0001" required autoComplete="username" />
+                </span>
               </label>
               <label className="tc-form-field">
                 <span>Mật khẩu</span>
-                <input name="matKhau" type="password" value={loginForm.matKhau} onChange={updateLogin}
-                  placeholder="••••••••" required autoComplete="current-password" />
+                <span className="ui-field-control">
+                  <Icon name="lock" />
+                  <input name="matKhau" type="password" value={loginForm.matKhau} onChange={updateLogin}
+                    placeholder="••••••••" required autoComplete="current-password" />
+                </span>
               </label>
               <button className="tc-modal-submit" type="submit" disabled={loading}>
                 {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
@@ -197,7 +204,7 @@ function AuthModal({ mode, onClose, onSwitchMode }) {
           {mode === 'register' && (
             <form className="tc-modal-form" onSubmit={handleRegister}>
               <div className="tc-modal-header">
-                <span className="tc-modal-emoji">🏠</span>
+                <span className="tc-modal-emoji ui-auth-symbol"><Icon name="home" /></span>
                 <h2>Tạo tài khoản mới</h2>
                 <p>Đăng ký để tìm phòng và quản lý hợp đồng dễ dàng.</p>
               </div>
