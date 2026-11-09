@@ -508,3 +508,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Vy yêu cầu ghi lại toàn bộ hướng để không quên sau Fuji: thêm bảng "Hướng luồng D-026" vào `spec/progress.md` (đã chốt / đề xuất / không làm, lịch đề xuất) và T-22. Đề xuất mốc chuỗi 3 "đóng hồ sơ" ngược ghi chú plan §3 và quyết định 04/11 giữ tiền ở Web2 — đánh dấu cần Vy quyết.
 - File: `spec/decisions.md` (D-026), `spec/scope.md` (F-14 chú thích, F-15), `hackathon/plan.md` (§3 mục D-026), `spec/progress.md` (bảng hướng, T-22), `spec/journal.md`. Không sửa code. Làm trong worktree riêng `D:\HomeStayDorm-d026`, nhánh `docs/d026-flow-redesign` tách từ `origin/feat/ui-refresh-1` để không chạm thư mục Codex đang dùng.
 - Việc còn lại: bàn tiếp giai đoạn 5–9; Vy chốt các mục đề xuất 7–11; viết prompt Codex cho T-22 (và mục 9 nếu chốt) trước 12/11.
+
+## 2026-11-10 02:14:34 +07:00 — J-048 — Chốt giai đoạn hợp đồng và kỳ đầu (D-027)
+
+- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Claude đề xuất gom ký hợp đồng, đối chiếu CCCD gốc và bàn giao vào một lần đến; kỳ đầu trả trước online, vẫn cho trả tại quầy; Sale tải bản chụp hợp đồng đã ký để băm vào gói bằng chứng bàn giao. Vy chốt cả ba ("chốt").
+- File: `spec/decisions.md` (D-027), `spec/scope.md` (F-15), `spec/progress.md` (mục 8 chuyển "Đã chốt", thêm 8a, mục 12 còn giai đoạn 6–9). Không sửa code. Cùng nhánh `docs/d026-flow-redesign`.
+- Việc còn lại: bàn giai đoạn 6 (bàn giao) → 9; chốt mục 7, 9, 10, 11.
