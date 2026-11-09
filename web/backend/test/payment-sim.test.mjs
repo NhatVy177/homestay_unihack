@@ -34,7 +34,8 @@ function fixture(deposit = {}, charge = {}) {
       await store.transition(order.id, 'Processing', 'Paid', { transId });
     },
   };
-  return { sim: new PaymentSimulator({ store, deposits, firstCharges, secret: 'test-secret-0123456789' }), orders, calls, state, chargeState };
+  return { sim: new PaymentSimulator({ store, deposits, firstCharges, secret: 'test-secret-0123456789',
+    notifyFirstChargePaid: async id => calls.push(['charge-email', id]) }), orders, calls, state, chargeState };
 }
 describe('Cổng ví điện tử mô phỏng (D-013)', () => {
   it('creates one order per deposit, pays it once and confirms the deposit through Web2', async () => {
@@ -112,6 +113,7 @@ describe('Khoản thu kỳ đầu qua ví mô phỏng (D-018)', () => {
     const results = await Promise.all([f.sim.handleIpn(signed), f.sim.handleIpn(signed)]);
     assert.equal(results.filter(r => r.duplicate).length, 1);
     assert.equal(f.calls.filter(c => c[0] === 'charge-paid').length, 1);
+    assert.deepEqual(f.calls.filter(c => c[0] === 'charge-email'), [['charge-email', 'HD0001']]);
     assert.match(f.calls.find(c => c[0] === 'charge-paid')[3], /^cong-thanh-toan-mo-phong:SIM/);
     assert.equal((await f.sim.handleIpn(signed)).duplicate, true);
     assert.equal(f.orders.get(order.id).status, 'Paid');

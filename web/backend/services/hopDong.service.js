@@ -1,6 +1,7 @@
 import * as repository from '../repositories/hopDong.repository.js';
 import { PhieuDatCocDTO, DichVuDTO, ThanhVienHopDongDTO, HopDongThueDTO } from '../models/hopDong.dto.js';
 import { createServiceError } from './serviceErrors.js';
+import { notifyNhanPhong } from '../integrations/mail/nhanPhongNotifications.js';
 
 /**
  * Business Logic Layer (BUS) for HopDongThue feature.
@@ -217,7 +218,9 @@ export async function lapHopDongThue(data = {}, currentUser = {}) {
   }
 
   // 6. Fetch full contract details after success
-  return await layChiTietHopDongThue(dbResult.maHopDong);
+  const detail = await layChiTietHopDongThue(dbResult.maHopDong);
+  await notifyNhanPhong('contract-created', dbResult.maHopDong);
+  return detail;
 }
 
 export async function layChiTietHopDongThue(maHopDong) {

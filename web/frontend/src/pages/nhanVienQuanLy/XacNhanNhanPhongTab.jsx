@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import { datCocApi } from '../datCoc/datCoc.api.js';
 import ResultModal from '../../components/common/ResultModal.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
@@ -174,7 +174,9 @@ export default function XacNhanNhanPhongTab() {
         type: 'success',
         title: duocNhanCoc
           ? `Đã duyệt và phát hành phiếu ${data?.maPhieuDatCoc || ''}.`
-          : (conPhongKhac ? 'Đã trả hồ sơ về Sale chọn phòng khác.' : 'Đã từ chối hồ sơ.')
+          : (conPhongKhac ? 'Đã trả hồ sơ về Sale chọn phòng khác.' : 'Đã từ chối hồ sơ.'),
+        message: duocNhanCoc && data?.email?.khachThieuEmail
+          ? 'Khách chưa có email, hãy báo khách trực tiếp.' : undefined
       });
     } catch (error) {
       setResult({ type: 'error', title: 'Thao tác thất bại.', message: error.response?.data?.message || error.message });

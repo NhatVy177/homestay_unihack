@@ -3,6 +3,7 @@ import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as thuNhanPhongRepository from '../repositories/thuNhanPhong.repository.js';
 import * as banGiaoRepository from '../repositories/banGiao.repository.js';
 import * as cuTruRepository from '../repositories/cuTru.repository.js';
+import { notifyNhanPhong } from '../integrations/mail/nhanPhongNotifications.js';
 import {
   HopDongBanGiaoDTO,
   KetQuaLapBienBanBanGiaoDTO,
@@ -160,7 +161,9 @@ export async function guiDuyetHoSoCuTru(maHoSoCuTru) {
   }
 
   try {
-    return await cuTruRepository.guiDuyetHoSoCuTru(cleanId);
+    const result = await cuTruRepository.guiDuyetHoSoCuTru(cleanId);
+    if (result?.TrangThaiHoSo === 'Chờ duyệt cư trú') await notifyNhanPhong('residence-review', cleanId);
+    return result;
   } catch (error) {
     handleDatabaseError(error);
   }
@@ -207,15 +210,21 @@ export async function duyetHoSoCuTru(data = {}) {
   if (ketQua === 'Từ chối cư trú' && !String(data.ghiChuQuanLy || '').trim()) {
     throw createServiceError('Vui lòng nhập ghi chú khi từ chối hồ sơ.');
   }
+  if (danhSachKetQuaThanhVien.some(item => item.trangThaiDuyet === 'Bị từ chối' && !String(item.lyDoTuChoi || '').trim())) {
+    throw createServiceError('Vui lòng nhập lý do cho từng thành viên bị từ chối.');
+  }
 
   try {
-    return await cuTruRepository.duyetHoSoCuTru({
+    const result = await cuTruRepository.duyetHoSoCuTru({
       maHoSoCuTru,
       maNhanVienQuanLy,
       ketQua,
       ghiChuQuanLy: data.ghiChuQuanLy || null,
       danhSachKetQuaThanhVien
     });
+    if (result.thanhVien.some(item => item.TrangThai === 'Bị từ chối'))
+      await notifyNhanPhong('member-rejected', maHoSoCuTru);
+    return result;
   } catch (error) {
     handleDatabaseError(error);
   }
@@ -335,7 +344,9 @@ export async function ghiNhanThuDauKy(data = {}) {
       throw createServiceError(result.thongBao, 400);
     }
 
-    return new KetQuaThanhToanDTO(result);
+    const response = new KetQuaThanhToanDTO(result);
+    if (result.maLoi === 0) await notifyNhanPhong('first-charge-paid', maHopDong);
+    return response;
   } catch (error) {
     handleDatabaseError(error);
   }

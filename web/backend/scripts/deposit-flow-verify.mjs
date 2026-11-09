@@ -4,6 +4,15 @@ import { getPool, sql } from '../database/connection.js';
 import { managers } from '../integrations/mail/datCocNotifications.js';
 
 const pool = await getPool();
+const room = (await pool.request().query(`SELECT TOP (1) p.MaPhong
+  FROM dbo.Phong p JOIN dbo.Giuong g ON g.MaPhong=p.MaPhong
+  WHERE p.MaChiNhanh='CN0001' AND NOT EXISTS (
+    SELECT 1 FROM dbo.PhieuDangKy d JOIN dbo.ChiTietXemPhong c ON c.MaDangKy=d.MaDangKy
+    WHERE d.TrangThai=N'Chờ xác nhận cọc' AND c.KhachChon=1 AND c.MaPhong=p.MaPhong)
+  GROUP BY p.MaPhong
+  HAVING COUNT(*)>=2 AND COUNT(*)=SUM(CASE WHEN g.TinhTrang=N'Trống' THEN 1 ELSE 0 END)
+  ORDER BY p.MaPhong`)).recordset[0]?.MaPhong;
+assert.ok(room, 'Need an empty branch-1 room without pending requests');
 const request = tx => new sql.Request(tx);
 async function seed(tx, id, customer, room) {
   await request(tx).input('id', sql.VarChar(6), id)
@@ -52,12 +61,15 @@ async function run(name, fn) {
 
 try {
   await run('approve + duplicate rejection + cash + fund idempotency', async tx => {
-    await seed(tx, 'DK9998', 'KH9998', 'P102');
-    await seed(tx, 'DK9999', 'KH9999', 'P102');
-    const beds = (await request(tx).query(`SELECT MaGiuong FROM dbo.Giuong WHERE MaPhong='P102' ORDER BY MaGiuong`)).recordset;
+    await seed(tx, 'DK9998', 'KH9998', room);
+    await seed(tx, 'DK9999', 'KH9999', room);
+    const beds = (await request(tx).query(`SELECT MaGiuong FROM dbo.Giuong WHERE MaPhong='${room}' ORDER BY MaGiuong`)).recordset;
     assert.equal(beds.length, 2);
     await send(tx, 'DK9998', beds[0].MaGiuong);
     await send(tx, 'DK9999', beds[0].MaGiuong);
+    const order = (await request(tx).query(`SELECT MaDangKy,GuiLuc FROM dbo.YeuCauDatCocChiTiet
+      WHERE MaDangKy IN ('DK9998','DK9999') ORDER BY GuiLuc,MaDangKy`)).recordset;
+    assert.equal(order[0].MaDangKy, 'DK9998');
     const recipients = await managers('DK9998', (statement, params) => {
       const req = request(tx);
       for (const p of params) req.input(p.name, p.type, p.value);
@@ -103,9 +115,9 @@ try {
   });
 
   await run('later request needs reason; auto-rejection carries it', async tx => {
-    await seed(tx, 'DK9998', 'KH9998', 'P102');
-    await seed(tx, 'DK9999', 'KH9999', 'P102');
-    const bed = (await request(tx).query(`SELECT TOP 1 MaGiuong FROM dbo.Giuong WHERE MaPhong='P102' ORDER BY MaGiuong`)).recordset[0].MaGiuong;
+    await seed(tx, 'DK9998', 'KH9998', room);
+    await seed(tx, 'DK9999', 'KH9999', room);
+    const bed = (await request(tx).query(`SELECT TOP 1 MaGiuong FROM dbo.Giuong WHERE MaPhong='${room}' ORDER BY MaGiuong`)).recordset[0].MaGiuong;
     await send(tx, 'DK9998', bed);
     await send(tx, 'DK9999', bed);
     // A savepoint cannot survive XACT_ABORT/THROW in the procedure, so check the
@@ -119,8 +131,8 @@ try {
   });
 
   await run('12-hour expiry only once', async tx => {
-    await seed(tx, 'DK9998', 'KH9998', 'P103');
-    await seed(tx, 'DK9999', 'KH9999', 'P103');
+    await seed(tx, 'DK9998', 'KH9998', room);
+    await seed(tx, 'DK9999', 'KH9999', room);
     await send(tx, 'DK9998');
     await send(tx, 'DK9999');
     await request(tx).query(`UPDATE dbo.YeuCauDatCocChiTiet SET GuiLuc=DATEADD(HOUR,-13,GETDATE()) WHERE MaDangKy='DK9998'`);
@@ -136,11 +148,11 @@ try {
   await tx.begin(sql.ISOLATION_LEVEL.SERIALIZABLE);
   let failed = false;
   try {
-    await seed(tx, 'DK9998', 'KH9998', 'P102');
-    const bed = (await request(tx).query(`SELECT TOP 1 MaGiuong FROM dbo.Giuong WHERE MaPhong='P102' ORDER BY MaGiuong`)).recordset[0].MaGiuong;
+    await seed(tx, 'DK9998', 'KH9998', room);
+    const bed = (await request(tx).query(`SELECT TOP 1 MaGiuong FROM dbo.Giuong WHERE MaPhong='${room}' ORDER BY MaGiuong`)).recordset[0].MaGiuong;
     await send(tx, 'DK9998', bed);
     await request(tx).input('bed', sql.VarChar(3), bed)
-      .query(`UPDATE dbo.Giuong SET TinhTrang=N'Giữ chỗ' WHERE MaPhong='P102' AND MaGiuong=@bed`);
+      .query(`UPDATE dbo.Giuong SET TinhTrang=N'Giữ chỗ' WHERE MaPhong='${room}' AND MaGiuong=@bed`);
     await approve(tx, 'DK9998');
   } catch (error) {
     failed = /giường|chỗ|phòng/i.test(error.message);
@@ -154,9 +166,9 @@ try {
   await fairnessTx.begin(sql.ISOLATION_LEVEL.SERIALIZABLE);
   let reasonRequired = false;
   try {
-    await seed(fairnessTx, 'DK9998', 'KH9998', 'P102');
-    await seed(fairnessTx, 'DK9999', 'KH9999', 'P102');
-    const bed = (await request(fairnessTx).query(`SELECT TOP 1 MaGiuong FROM dbo.Giuong WHERE MaPhong='P102' ORDER BY MaGiuong`)).recordset[0].MaGiuong;
+    await seed(fairnessTx, 'DK9998', 'KH9998', room);
+    await seed(fairnessTx, 'DK9999', 'KH9999', room);
+    const bed = (await request(fairnessTx).query(`SELECT TOP 1 MaGiuong FROM dbo.Giuong WHERE MaPhong='${room}' ORDER BY MaGiuong`)).recordset[0].MaGiuong;
     await send(fairnessTx, 'DK9998', bed);
     await send(fairnessTx, 'DK9999', bed);
     await approve(fairnessTx, 'DK9999');

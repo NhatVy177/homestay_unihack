@@ -61,7 +61,7 @@ BEGIN
     THROW 50306, N'Chỉ quản lý được duyệt yêu cầu cọc.', 1;
   DECLARE @Rejected TABLE (MaDangKy varchar(6) PRIMARY KEY, LyDo nvarchar(1000));
   DECLARE @MaPhong varchar(4), @Sale varchar(6), @HinhThuc nvarchar(20), @Giuong nvarchar(100),
-    @GuiLuc datetime, @LockResult int, @Phieu varchar(6), @RoomLock varchar(30),
+    @GuiLuc datetime2, @LockResult int, @Phieu varchar(6), @RoomLock varchar(30),
     @AutoReason nvarchar(1000);
   BEGIN TRY
     BEGIN TRAN;
@@ -82,7 +82,7 @@ BEGIN
     IF EXISTS (SELECT 1 FROM dbo.PhieuDangKy p
       JOIN dbo.YeuCauDatCocChiTiet y ON y.MaDangKy=p.MaDangKy
       JOIN dbo.ChiTietXemPhong c ON c.MaDangKy=p.MaDangKy AND c.KhachChon=1
-      WHERE p.TrangThai=N'Chờ xác nhận cọc' AND c.MaPhong=@MaPhong
+      WHERE p.TrangThai=N'Chờ xác nhận cọc' AND c.MaPhong=@MaPhong AND p.MaDangKy<>@MaDangKy
         AND (y.GuiLuc<@GuiLuc OR (y.GuiLuc=@GuiLuc AND p.MaDangKy<@MaDangKy)))
       AND NULLIF(TRIM(COALESCE(@LyDoVuotLuot,N'')),N'') IS NULL
       THROW 50312, N'Yêu cầu này không gửi trước trong phòng. Hãy nhập lý do duyệt vượt lượt.', 1;
@@ -157,28 +157,44 @@ AS
 BEGIN
   SET NOCOUNT ON; SET XACT_ABORT ON;
   DECLARE @Ids TABLE (MaDangKy varchar(6) PRIMARY KEY);
+  DECLARE @Failed TABLE (MaDangKy varchar(6) PRIMARY KEY, ErrorNumber int, ErrorMessage nvarchar(2048));
+  DECLARE @Candidates TABLE (MaDangKy varchar(6) PRIMARY KEY, GuiLuc datetime2);
+  DECLARE @Tried TABLE (MaDangKy varchar(6) PRIMARY KEY);
+  INSERT @Candidates(MaDangKy,GuiLuc)
+    SELECT p.MaDangKy,y.GuiLuc FROM dbo.PhieuDangKy p
+    JOIN dbo.YeuCauDatCocChiTiet y ON y.MaDangKy=p.MaDangKy
+    WHERE p.TrangThai=N'Chờ xác nhận cọc' AND y.GuiLuc<=DATEADD(HOUR,-12,GETDATE());
   DECLARE @Ma varchar(6);
-  WHILE 1=1
+  WHILE EXISTS (SELECT 1 FROM @Candidates c WHERE NOT EXISTS
+    (SELECT 1 FROM @Tried t WHERE t.MaDangKy=c.MaDangKy))
   BEGIN
+    SELECT TOP (1) @Ma=c.MaDangKy FROM @Candidates c
+      WHERE NOT EXISTS (SELECT 1 FROM @Tried t WHERE t.MaDangKy=c.MaDangKy)
+      ORDER BY c.GuiLuc,c.MaDangKy;
+    INSERT @Tried VALUES(@Ma);
     BEGIN TRY
       BEGIN TRAN;
-      SELECT TOP (1) @Ma=p.MaDangKy FROM dbo.PhieuDangKy p WITH (UPDLOCK,HOLDLOCK)
-      JOIN dbo.YeuCauDatCocChiTiet y ON y.MaDangKy=p.MaDangKy
-      WHERE p.TrangThai=N'Chờ xác nhận cọc' AND y.GuiLuc<=DATEADD(HOUR,-12,GETDATE())
-      ORDER BY y.GuiLuc,p.MaDangKy;
-      IF @Ma IS NULL BEGIN COMMIT; BREAK; END;
-      EXEC dbo.SP_XacNhanKhaNangNhanCoc @MaDangKy=@Ma,@MaQuanLy='NVAUTO',
-        @DuocNhanCoc=0,@LyDo=N'Quản lý chưa xử lý trong 12 giờ';
-      INSERT @Ids VALUES(@Ma);
+      IF EXISTS (SELECT 1 FROM dbo.PhieuDangKy p WITH (UPDLOCK,HOLDLOCK)
+        JOIN dbo.YeuCauDatCocChiTiet y ON y.MaDangKy=p.MaDangKy
+        WHERE p.MaDangKy=@Ma AND p.TrangThai=N'Chờ xác nhận cọc'
+          AND y.GuiLuc<=DATEADD(HOUR,-12,GETDATE()))
+      BEGIN
+        EXEC dbo.SP_XacNhanKhaNangNhanCoc @MaDangKy=@Ma,@MaQuanLy='NVAUTO',
+          @DuocNhanCoc=0,@LyDo=N'Quản lý chưa xử lý trong 12 giờ';
+        INSERT @Ids VALUES(@Ma);
+      END
       COMMIT;
-      SET @Ma=NULL;
     END TRY
     BEGIN CATCH
       IF XACT_STATE()<>0 ROLLBACK;
-      THROW;
+      INSERT @Failed VALUES(@Ma,ERROR_NUMBER(),ERROR_MESSAGE());
     END CATCH;
   END
-  SELECT MaDangKy AS maDangKy FROM @Ids;
+  SELECT MaDangKy AS maDangKy,N'rejected' AS outcome,
+    CAST(NULL AS int) AS errorNumber,CAST(NULL AS nvarchar(2048)) AS errorMessage FROM @Ids
+  UNION ALL
+  SELECT MaDangKy AS maDangKy,N'failed' AS outcome,ErrorNumber AS errorNumber,
+    ErrorMessage AS errorMessage FROM @Failed;
 END;
 GO
 

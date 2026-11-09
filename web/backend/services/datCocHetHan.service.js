@@ -12,28 +12,29 @@ function getIntervalMs() {
   return Number.isFinite(configured) && configured > 0 ? configured : DEFAULT_INTERVAL_MS;
 }
 
-export async function nhaChoCocHetHan() {
+export async function nhaChoCocHetHan({ query = executeQuery, execute = executeProcedure, notify = notifyDeposit } = {}) {
   // Đếm TRƯỚC ở phía Node bằng 1 câu SELECT riêng. SP_NhaChoCocHetHan CỐ Ý không trả recordset:
   // nó được EXEC lồng bên trong nhiều SP khác của luồng đặt cọc (xem ghi chú trong dat-coc.sql),
   // nên không thể thêm SELECT vào đó mà không làm sai lệch result.recordset ở các nơi gọi khác.
-  const countResult = await executeQuery(`
+  const countResult = await query(`
     SELECT COUNT(*) AS soPhieu FROM dbo.PhieuDatCoc
     WHERE TrangThaiThanhToan = N'Chờ TT' AND ThoiHanThanhToan < GETDATE();
   `);
   const soPhieu = countResult.recordset?.[0]?.soPhieu || 0;
 
-  await executeProcedure('dbo.SP_NhaChoCocHetHan');
+  await execute('dbo.SP_NhaChoCocHetHan');
   // SP may also have run from another request. Sweep cancelled slips to avoid missing email.
-  const expired = (await executeQuery(`SELECT MaPhieuDatCoc AS id FROM dbo.PhieuDatCoc
+  const expired = (await query(`SELECT MaPhieuDatCoc AS id FROM dbo.PhieuDatCoc
     WHERE TrangThaiThanhToan=N'Hết hạn' AND TrangThaiCoc=N'Đã hủy'
-      AND MaNhanVienKeToan IS NOT NULL AND ThoiHanThanhToan<GETDATE()`)).recordset;
+      AND MaNhanVienKeToan IS NOT NULL
+      AND ThoiHanThanhToan BETWEEN DATEADD(HOUR,-48,GETDATE()) AND GETDATE()`)).recordset;
   for (const { id } of expired) {
-    await notifyDeposit('expired', id);
+    await notify('expired', id);
   }
-  const reminders = (await executeQuery(`SELECT MaPhieuDatCoc AS id FROM dbo.PhieuDatCoc
+  const reminders = (await query(`SELECT MaPhieuDatCoc AS id FROM dbo.PhieuDatCoc
     WHERE TrangThaiThanhToan=N'Chờ TT' AND TrangThaiCoc=N'Hiệu lực'
       AND MaNhanVienKeToan IS NOT NULL AND ThoiHanThanhToan BETWEEN GETDATE() AND DATEADD(HOUR,3,GETDATE())`)).recordset;
-  for (const { id } of reminders) await notifyDeposit('reminder', id);
+  for (const { id } of reminders) await notify('reminder', id);
   return soPhieu;
 }
 

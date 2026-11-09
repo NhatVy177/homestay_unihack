@@ -5,7 +5,6 @@ export const datCocApi = {
   thuTienMat: (id, formData) => httpClient.post(`/dat-coc/${id}/thu-tien-mat`, formData, { headers: { 'Content-Type': undefined } }),
   tienMatChoNopQuy: () => httpClient.get('/dat-coc/tien-mat-cho-nop-quy'),
   ghiNhanNopQuy: (id) => httpClient.put(`/dat-coc/${id}/nop-quy`),
-  create: (data) => httpClient.post('/dat-coc', data),
   xacNhanKhaNang: (id, data) => httpClient.put(`/dat-coc/${id}/xac-nhan-kha-nang-nhan-coc`, data),
   phatHanhThanhToan: (id, data) => httpClient.put(`/dat-coc/${id}/phat-hanh-thanh-toan`, data),
   // formData: FormData gồm file ảnh + các trường giao dịch (multipart)
@@ -20,14 +19,6 @@ export const datCocApi = {
   // DC01 (A4) - Sale chỉnh sửa thông tin cá nhân/liên hệ/giấy tờ khách hàng trước khi gửi yêu cầu.
   capNhatThongTinCaNhan: (maDangKy, data) => httpClient.put(`/dat-coc/gui-yeu-cau/${maDangKy}/thong-tin-ca-nhan`, data),
   getDanhSachChoXacNhan: () => httpClient.get('/dat-coc/cho-xac-nhan'),
-  // DC02B - hồ sơ Quản lý đã duyệt, chờ Sale lập phiếu cọc
-  getDanhSachChoLapPhieu: () => httpClient.get('/dat-coc/cho-lap-phieu'),
-  // DC03 - phiếu Sale đã lập, chờ Kế toán tính tiền và chốt
-  getDanhSachChoTinhTien: () => httpClient.get('/dat-coc/cho-tinh-tien'),
-  // D-021: hệ thống có đang tự chốt phiếu cọc không (ẩn tab chốt của kế toán khi bật).
-  getCauHinhTuDong: () => httpClient.get('/dat-coc/cau-hinh-tu-dong'),
-  // DC03 - Kế toán chốt ({ chot: true }) hoặc hủy ({ chot: false, lyDo: '...' }) phiếu cọc
-  chotPhieuDatCoc: (id, data) => httpClient.put(`/dat-coc/${id}/chot`, data),
   getGiuongTrong: (maPhong) => httpClient.get('/dat-coc/giuong-trong', { params: { maPhong } }),
   // DC01 - các phòng khách đã xem (để Sale chốt phòng khách muốn thuê)
   getPhongDaXem: (maDangKy) => httpClient.get('/dat-coc/phong-da-xem', { params: { maDangKy } }),

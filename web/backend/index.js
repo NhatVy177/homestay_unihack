@@ -28,6 +28,7 @@ import doiSoatRoutes from './routes/doiSoat.routes.js';
 import { startHoaDonQuaHanScheduler } from './services/hoaDonQuaHan.service.js';
 import { startDatCocHetHanScheduler } from './services/datCocHetHan.service.js';
 import { startYeuCauCocQuaHanScheduler } from './services/yeuCauCocQuaHan.service.js';
+import { startNhacThuDauKyScheduler } from './services/nhacThuDauKy.service.js';
 import { startLichXemPhongDenGioScheduler } from './services/lichXemPhongDenGio.service.js';
 import hopDongRoutes from './routes/hopDong.routes.js';
 import avalancheRoutes from './routes/avalanche.routes.js';
@@ -102,6 +103,7 @@ async function start() {
     startHoaDonQuaHanScheduler();
     startDatCocHetHanScheduler();
     startYeuCauCocQuaHanScheduler();
+    startNhacThuDauKyScheduler();
     startLichXemPhongDenGioScheduler();
   });
 

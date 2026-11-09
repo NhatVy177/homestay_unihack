@@ -170,8 +170,36 @@ try {
   await page.getByText('Lý do duyệt yêu cầu gửi sau').waitFor();
   assert.equal(await page.getByRole('button', { name: 'Xác nhận', exact: true }).isDisabled(), true);
   await capture('08-duyet-coc-vuot-luot.png');
+  // D-024: the manager email deep link opens the exception queue and allows a partial approval.
+  await page.route('**/api/nhan-phong/cu-tru/cho-duyet**', route => route.fulfill({ json: [{
+    maHoSoCuTru: 'CTDEMO', maPhieuDatCoc: 'DCDEMO', hoTenKhachHang: 'Khách mẫu',
+    viTriThue: 'Phòng mẫu', hinhThucThue: 'Ghép giường', gioiTinhChoPhep: 'Nam',
+    soGiuongDaCoc: 2, sucChuaToiDa: 2, trangThaiHoSo: 'Chờ duyệt cư trú',
+    ghiChuQuanLy: 'Quốc tịch cần quản lý kiểm tra',
+  }] }));
+  await page.route('**/api/nhan-phong/cu-tru/ho-so/CTDEMO', route => route.fulfill({ json: {
+    hoSo: { maHoSoCuTru: 'CTDEMO', maPhieuDatCoc: 'DCDEMO', hoTenKhachHang: 'Khách mẫu',
+      viTriThue: 'Phòng mẫu', hinhThucThue: 'Ghép giường', gioiTinhChoPhep: 'Nam',
+      soGiuongDaCoc: 2, sucChuaToiDa: 2, trangThaiHoSo: 'Chờ duyệt cư trú',
+      ghiChuQuanLy: 'Quốc tịch cần quản lý kiểm tra' },
+    thanhVien: [
+      { maThanhVien: 'TVDE01', hoTen: 'Người đủ điều kiện', ngaySinh: '2000-01-01',
+        gioiTinh: 'Nam', cccd: '099999999991', sdt: '0900000001', quocTich: 'Việt Nam', trangThai: 'Chờ duyệt' },
+      { maThanhVien: 'TVDE02', hoTen: 'Người cần xét', ngaySinh: '2000-01-01',
+        gioiTinh: 'Nam', cccd: '099999999992', sdt: '0900000002', quocTich: 'Khác', trangThai: 'Chờ duyệt' },
+    ],
+  } }));
+  await page.goto(base + '/nhan-vien-quan-ly?tab=duyet-cu-tru', { waitUntil: 'domcontentloaded' });
+  await page.getByRole('heading', { name: 'Hồ sơ cư trú cần duyệt' }).waitFor();
+  await page.locator('tr').filter({ hasText: 'CTDEMO' }).getByRole('button', { name: 'Duyệt' }).click();
+  await page.getByText('Lý do cần quản lý kiểm tra').waitFor();
+  const reviewer = page.locator('.residence-review-card').last();
+  await reviewer.locator('select').selectOption({ label: 'Bị từ chối' });
+  await reviewer.locator('input').fill('Quốc tịch cần kiểm tra');
+  assert.equal(await page.locator('.residence-decision-grid').getByRole('button', { name: 'Duyệt cư trú' }).isDisabled(), false);
+  await capture('09-duyet-cu-tru-theo-ngoai-le.png');
   assert.deepEqual(failures, []);
-  console.log('PASS: Verify, D-017 views, D-018 gateway, D-023 manager FIFO; no browser exceptions.');
+  console.log('PASS: Verify, D-017 views, D-018 gateway, D-023 FIFO, D-024 residence exception; no browser exceptions.');
 } finally {
   if (browser) await browser.close();
   server.kill();

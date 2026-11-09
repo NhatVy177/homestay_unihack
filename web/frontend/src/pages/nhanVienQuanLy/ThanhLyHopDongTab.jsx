@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 
 export default function ThanhLyHopDongTab() {
   const [modalType, setModalType] = useState(null);

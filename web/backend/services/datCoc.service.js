@@ -2,7 +2,6 @@ import { executeProcedure, getPool, sql } from '../database/connection.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import { capNhatLichXemDenGioThanhDaXem } from '../repositories/lichXemPhong.repository.js';
 import { attachPaymentAccount } from '../config/payment.js';
-import { tuDongDatCoc } from './tuDongDatCoc.service.js';
 import { notifyDeposit } from '../integrations/mail/datCocNotifications.js';
 
 function handleDatabaseError(error) {
@@ -35,14 +34,6 @@ export async function getDanhSachChoXacNhanThanhToan(user) {
   return result.recordset;
 }
 
-export async function getDanhSachChoLapPhieu(maNhanVien) {
-  const result = await executeProcedure('dbo.SP_DanhSachChoLapPhieuDatCoc', [
-    { name: 'MaNhanVien', type: sql.VarChar(6), value: String(maNhanVien || '').trim() }
-  ]);
-  return result.recordset;
-}
-
-// DC01 - Các phòng khách ĐÃ XEM của hồ sơ; Sale chốt 1 phòng trong số này.
 export async function getPhongDaXem(maDangKy) {
   const ma = String(maDangKy || '').trim();
   if (!ma) throw createServiceError('Thiếu mã phiếu đăng ký');
@@ -84,106 +75,6 @@ export async function chonPhongKhachChot(user, maDangKy, maPhong) {
   }
 }
 
-// DC02B - SALE lập phiếu đặt cọc (không phải kế toán).
-// Hình thức thuê và giường là thứ phải trao đổi với khách, mà người gặp khách là Sale.
-//
-// PHÒNG KHÔNG TRUYỀN TỪ ĐÂY: SP tự lấy phòng khách đã chốt ở DC01 (ChiTietXemPhong.KhachChon),
-// nên không thể lập phiếu cho phòng khác với phòng Quản lý đã duyệt ở DC02.
-// SP cũng KHÔNG trả về số tiền -> Sale không thấy tiền. Tiền do kế toán chốt ở DC03.
-export async function createPhieuDatCoc(user, data = {}) {
-  if (!user || user.vaiTro !== 'NhanVien' || user.chucVu !== 'Sale') {
-    throw createServiceError('Chỉ nhân viên Sale được lập phiếu đặt cọc', 403);
-  }
-
-  const maDangKy = String(data.maDangKy || '').trim();
-  if (!maDangKy) throw createServiceError('Thiếu mã phiếu đăng ký');
-
-  const hinhThucThue = String(data.hinhThucThue || '').trim();
-  if (!['Nguyên phòng', 'Ghép giường'].includes(hinhThucThue)) {
-    throw createServiceError('Hình thức thuê không hợp lệ (chỉ "Nguyên phòng" hoặc "Ghép giường")');
-  }
-
-  const laGhep = hinhThucThue === 'Ghép giường';
-  const giuongs = Array.isArray(data.giuongs)
-    ? data.giuongs.filter(Boolean).map((g) => String(g).trim()).join(',')
-    : String(data.giuongs || '').trim();
-
-  if (laGhep && !giuongs) throw createServiceError('Chưa chọn giường nào để ghép');
-
-  try {
-    await capNhatLichXemDenGioThanhDaXem({ maDangKy });
-    const result = await executeProcedure('dbo.SP_LapPhieuDatCoc', [
-      { name: 'MaDangKy',        type: sql.VarChar(6),        value: maDangKy },
-      { name: 'MaNhanVienSale',  type: sql.VarChar(6),        value: user.maNguoiDung },
-      { name: 'HinhThucThue',    type: sql.NVarChar(20),      value: hinhThucThue },
-      { name: 'DanhSachGiuong',  type: sql.NVarChar(sql.MAX), value: laGhep ? giuongs : null }
-    ]);
-    const phieu = result.recordset[0] || null;
-    // D-019: tiền cọc đã do trigger tính -> hệ thống tự chốt thay bước kế toán (nếu đang bật).
-    if (phieu?.maPhieuDatCoc) phieu.tuDong = await tuDongDatCoc.chotPhieu(phieu.maPhieuDatCoc);
-    return phieu;
-  } catch (error) {
-    mapDatabaseError(error, {
-      50210: 404,   // không tìm thấy hồ sơ
-      50211: 409,   // hồ sơ chưa được quản lý duyệt
-      50212: 409,   // hồ sơ đã có phiếu cọc còn hiệu lực
-      50213: 404,   // không tìm thấy nhân viên sale
-      50214: 422,   // hồ sơ chưa chốt phòng
-      50215: 409,   // giường/phòng không còn trống
-      50216: 422,   // nhóm khác giới không được ghép giường
-      50217: 422,   // số giường ≠ số người
-      50218: 409,   // phòng đã khóa sang giới khác
-      50219: 422,   // vượt sức chứa
-      50251: 400,   // hình thức thuê không hợp lệ
-      50252: 400    // danh sách giường không hợp lệ
-    });
-  }
-}
-
-// DC03 - Danh sách phiếu Sale đã lập, chờ KẾ TOÁN tính tiền và chốt.
-export async function getDanhSachChoTinhTien(user) {
-  if (!user || user.vaiTro !== 'NhanVien' || user.chucVu !== 'Kế toán') {
-    throw createServiceError('Chức năng này chỉ dành cho nhân viên kế toán', 403);
-  }
-  const result = await executeProcedure('dbo.SP_DanhSachChoTinhTienCoc', [
-    { name: 'MaNhanVien', type: sql.VarChar(6), value: user.maNguoiDung }
-  ]);
-  return result.recordset;
-}
-
-// DC03 - Kế toán CHỐT (hoặc HỦY) phiếu cọc do Sale lập.
-// Chốt xong mới gán MaNhanVienKeToan -> phiếu tới tay khách và đồng hồ 24h bắt đầu chạy.
-export async function chotPhieuDatCoc(user, id, data = {}) {
-  if (!user || user.vaiTro !== 'NhanVien' || user.chucVu !== 'Kế toán') {
-    throw createServiceError('Chỉ nhân viên kế toán được chốt phiếu đặt cọc', 403);
-  }
-  const maPhieuCoc = String(id || '').trim();
-  if (!maPhieuCoc) throw createServiceError('Thiếu mã phiếu đặt cọc');
-
-  const chot = Boolean(data.chot);
-  const lyDo = String(data.lyDo || '').trim();
-  if (!chot && !lyDo) throw createServiceError('Vui lòng nhập lý do hủy phiếu');
-
-  try {
-    const result = await executeProcedure('dbo.SP_ChotPhieuDatCoc', [
-      { name: 'MaPhieuDatCoc',    type: sql.VarChar(6),        value: maPhieuCoc },
-      { name: 'MaNhanVienKeToan', type: sql.VarChar(6),        value: user.maNguoiDung },
-      { name: 'Chot',             type: sql.Bit,               value: chot ? 1 : 0 },
-      { name: 'LyDo',             type: sql.NVarChar(sql.MAX), value: lyDo || null }
-    ]);
-    return result.recordset[0] || null;
-  } catch (error) {
-    mapDatabaseError(error, {
-      50213: 404,   // không tìm thấy kế toán
-      50270: 404,   // không tìm thấy phiếu
-      50271: 409,   // phiếu đã được chốt
-      50272: 409,   // phiếu không còn hiệu lực
-      50273: 409,   // phiếu quá hạn chốt
-      50274: 400    // thiếu lý do hủy
-    });
-  }
-}
-
 export async function getGiuongTrong(maPhong) {
   const result = await executeProcedure('dbo.SP_DanhSachGiuongTrong', [
     { name: 'MaPhong', type: sql.VarChar(4), value: String(maPhong || '').trim() }
@@ -195,7 +86,9 @@ export async function getPhieuDatCoc(maNhanVienSale) {
   const result = await executeProcedure('dbo.SP_DanhSachDatCocSale', [
     { name: 'MaNhanVienSale', type: sql.VarChar(6), value: String(maNhanVienSale || '').trim() }
   ]);
-  return attachPaymentAccount(result.recordset || []);
+  return attachPaymentAccount((result.recordset || []).map(row => ({
+    ...row, khachThieuEmail: !String(row.email || '').trim()
+  })));
 }
 
 export async function guiYeuCauDatCoc(user, data = {}) {

@@ -11,16 +11,12 @@ router.put('/gui-yeu-cau/:maDangKy/thong-tin-ca-nhan', controller.capNhatThongTi
 // DC01 - Sale chốt phòng khách muốn thuê (trong các phòng khách đã xem).
 router.put('/gui-yeu-cau/:maDangKy/phong-chot', controller.chonPhongKhachChot);
 router.get('/cho-xac-nhan', controller.getDanhSachChoXacNhan);
-// DC02B - hồ sơ Quản lý đã duyệt, chờ Sale lập phiếu cọc.
-// DC03 - phiếu Sale đã lập, chờ Kế toán tính tiền và chốt.
-// D-021: hệ thống có đang tự chốt phiếu cọc không.
 router.get('/giuong-trong', controller.getGiuongTrong);
 // DC01 - các phòng khách đã xem, để Sale chọn phòng chốt.
 router.get('/phong-da-xem', controller.getPhongDaXem);
 router.get('/cho-ghi-nhan-chung-tu', controller.getDanhSachChoGhiNhanChungTu);
 router.get('/cho-xac-nhan-thanh-toan', controller.getDanhSachChoXacNhanThanhToan);
 router.put('/:id/xac-nhan-kha-nang-nhan-coc', controller.xacNhanKhaNangNhanCoc);
-// DC03 - kế toán chốt (hoặc hủy) phiếu cọc do Sale lập.
 router.get('/tien-mat-cho-nop-quy', controller.tienMatChoNopQuy);
 router.put('/:id/nop-quy', controller.ghiNhanNopQuy);
 router.post('/:id/thu-tien-mat', uploadChungTu.single('file'), controller.thuTienMat);

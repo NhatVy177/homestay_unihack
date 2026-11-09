@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import { cuTruApi } from '../nhanPhong/cuTru.api.js';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import '../nhanPhong/cuTru.css';
@@ -129,14 +129,9 @@ function getInitials(name = '') {
 
 /**
  * Kiểm tra giới tính thành viên có phù hợp với quy định phòng không.
- * Điều kiện Bỏ QUA (luôn pass):
- *   - Phòng chưa có ai đang ở (coNguoiDangO = false)
- *   - Hoặc đang thuê nguyên căn (người thuê tự chọn ai ở trong phòng của họ)
- *   - Hoặc phòng không phân biệt giới tính
+ * Phòng không phân biệt giới tính thì mọi thành viên đều phù hợp.
  */
-function genderFits(roomGender = '', memberGender = '', coNguoiDangO = false, hinhThucThue = '') {
-  if (!coNguoiDangO) return true;             // Phòng trống → không áp dụng
-  if (hinhThucThue === 'Nguyên phòng') return true; // Thuê nguyên căn → tự quản
+function genderFits(roomGender = '', memberGender = '') {
   return !roomGender
     || roomGender === 'Không phân biệt'
     || roomGender === memberGender;
@@ -163,10 +158,9 @@ export default function DuyetCuTruTab() {
     ? (selected.hinhThucThue === 'Ghép giường' ? selected.soGiuongDaCoc : selected.sucChuaToiDa)
     : 0;
   const genderMismatchCount = selected
-    ? members.filter((item) => !genderFits(selected.gioiTinhChoPhep, item.gioiTinh, selected.coNguoiDangO, selected.hinhThucThue)).length
+    ? members.filter((item) => item.trangThaiDuyet === 'Đủ điều kiện' && !genderFits(selected.gioiTinhChoPhep, item.gioiTinh)).length
     : 0;
-  // Phải kiểm tra giới tính khi phòng có người đang ở và là ghép giường
-  const isGenderCheckRequired = selected && selected.coNguoiDangO && selected.hinhThucThue !== 'Nguyên phòng';
+  const isGenderCheckRequired = Boolean(selected && selected.gioiTinhChoPhep !== 'Không phân biệt');
   const capacityWarning = Boolean(selected && acceptedMembers.length > capacityLimit);
   const reviewReady = Boolean(selected && acceptedMembers.length > 0 && !capacityWarning && genderMismatchCount === 0);
 
@@ -223,8 +217,7 @@ export default function DuyetCuTruTab() {
       setSelected({ ...base, ...detail });
       
       const listToCheck = detailMembers.length ? detailMembers : base.thanhVien;
-      const hasRejected = listToCheck.some((item) => item.trangThaiDuyet === 'Bị từ chối');
-      setDecision(hasRejected || detail.trangThaiHoSo === 'Từ chối cư trú' ? 'Từ chối cư trú' : 'Đã duyệt cư trú');
+      setDecision(detail.trangThaiHoSo === 'Từ chối cư trú' ? 'Từ chối cư trú' : 'Đã duyệt cư trú');
       
       setManagerNote(detail.ghiChuQuanLy || '');
       setMembers(listToCheck.map((item) => ({
@@ -238,19 +231,13 @@ export default function DuyetCuTruTab() {
   }
 
   function updateMember(index, field, value) {
-    setMembers((prev) => {
-      const nextMembers = prev.map((item, i) => (i === index ? { ...item, [field]: value } : item));
-      if (field === 'trangThaiDuyet') {
-        const hasRejected = nextMembers.some((item) => item.trangThaiDuyet === 'Bị từ chối');
-        if (hasRejected) {
-          setDecision('Từ chối cư trú');
-        }
-      }
-      return nextMembers;
-    });
+    setMembers((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   }
 
   function getDecisionValidation() {
+    if (members.some((item) => item.trangThaiDuyet === 'Bị từ chối' && !item.lyDoTuChoi?.trim())) {
+      return 'Vui lòng nhập lý do cho từng thành viên bị từ chối.';
+    }
     if (decision === 'Từ chối cư trú' && !managerNote.trim()) {
       return 'Vui lòng nhập ghi chú khi từ chối hồ sơ.';
     }
@@ -581,6 +568,13 @@ export default function DuyetCuTruTab() {
                 </section>
               )}
 
+              {selected.trangThaiHoSo === 'Chờ duyệt cư trú' && selected.ghiChuQuanLy?.trim() && (
+                <section className="residence-sale-note" role="alert">
+                  <span className="residence-sale-note-icon"><Icon name="info" /></span>
+                  <div><strong>Lý do cần quản lý kiểm tra</strong><p>{selected.ghiChuQuanLy}</p></div>
+                </section>
+              )}
+
               <div className="residence-approval-strip">
                 <div>
                   <span>Đủ điều kiện</span>
@@ -615,9 +609,7 @@ export default function DuyetCuTruTab() {
                       <strong>Giới tính phù hợp</strong>
                       <span>
                         {!isGenderCheckRequired
-                          ? (selected.hinhThucThue === 'Nguyên phòng'
-                              ? 'Thuê nguyên căn – không giới hạn giới tính.'
-                              : 'Phòng chưa có ai ở – không áp dụng quy định giới tính.')
+                          ? 'Phòng không phân biệt giới tính.'
                           : genderMismatchCount
                             ? `${genderMismatchCount} người chưa khớp quy định phòng.`
                             : `Phòng cho phép: ${selected.gioiTinhChoPhep}.`
@@ -663,7 +655,7 @@ export default function DuyetCuTruTab() {
                           <span>{member.quocTich || 'Việt Nam'}</span>
                           {member.sdt && <span>{member.sdt}</span>}
                         </div>
-                        {isGenderCheckRequired && !genderFits(selected.gioiTinhChoPhep, member.gioiTinh, selected.coNguoiDangO, selected.hinhThucThue) && (
+                        {isGenderCheckRequired && !genderFits(selected.gioiTinhChoPhep, member.gioiTinh) && (
                           <small className="residence-review-warning">Không khớp giới tính phòng</small>
                         )}
                       </div>
@@ -697,7 +689,7 @@ export default function DuyetCuTruTab() {
                 </div>
                 <div className="residence-decision-grid">
                   {['Đã duyệt cư trú', 'Từ chối cư trú'].map((item) => {
-                    const isDisabled = item === 'Đã duyệt cư trú' && rejectedMembers.length > 0;
+                    const isDisabled = item === 'Đã duyệt cư trú' && acceptedMembers.length === 0;
                     return (
                       <button
                         key={item}

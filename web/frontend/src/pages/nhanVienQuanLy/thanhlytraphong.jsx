@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Icon } from '../nhanVienKeToan/LapPhieuDatCocTab.jsx';
+import { Icon } from '../../components/common/Icon.jsx';
 import { thanhLyTraPhongApi } from './thanhlytraphong.api.js';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import '../nhanVienSale/dangKyTraPhongTab.css';
