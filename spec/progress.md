@@ -1,5 +1,39 @@
 # Tiến độ và điểm tiếp tục
 
+## Hướng luồng D-026 (bàn với Claude 2026-11-10, J-047)
+
+Danh sách này giữ **mọi hướng** đã bàn để không bị quên sau Fuji. Cột "Trạng thái": *Đã chốt* = có trong D-026; *Đề xuất* = Claude đề xuất, Vy chưa chốt; *Không làm* = đã bàn và bỏ. Cột "Lịch" là đề xuất, chưa chốt.
+
+| # | Hướng | Trạng thái | Lịch đề xuất |
+|---|---|---|---|
+| 1 | Mỗi hồ sơ một buổi xem nhiều phòng; Sale chỉ ghi trạng thái buổi; nút "Không thuê nữa" | Đã chốt | T-22, song song giao diện đợt 2 (12–13/11), nhánh riêng, không đụng blockchain |
+| 2 | Khách tự gửi giữ chỗ trên web (Sale gửi thay), lời nhắn "chờ quản lý xác nhận" | Đã chốt | T-22 |
+| 3 | Bị từ chối/quá 12 giờ/hết hạn → hồ sơ về "Đã xem" | Đã chốt | T-22 |
+| 4 | Khách tự khai người ở; ô đối chiếu CCCD gốc chuyển sang màn lập hợp đồng | Đã chốt | T-22 |
+| 5 | Thành viên bị loại: nhả giường ngay, hoàn 80% trừ vào kỳ đầu; phần dư/cả nhóm bị loại do kế toán chi | Đã chốt | T-22 |
+| 6 | Đổi đại diện bằng email mời tạo tài khoản; tạm thời Sale lập hồ sơ mới | Đã chốt, làm sau cùng | Sau mục 1–5; nếu trễ thì giữ cách tạm |
+| 7 | Chính sách hoàn cọc (80/50/70/100%) hiện trên phiếu cọc và email; lưu phiên bản chính sách để ghi lên chuỗi lúc bàn giao | Đã chốt (D-031) | T-22 (nhỏ) |
+| 8 | Điều khoản hợp đồng (mã HĐ, giá thuê, kỳ hạn, tiền cọc, phiên bản chính sách) + mã băm bản chụp hợp đồng đã ký vào gói bằng chứng bàn giao; không sửa contract | Đã chốt (D-027) | Trước Fuji (12–13/11) |
+| 8a | Hợp đồng "Chờ ký" + email xem trước; trả kỳ đầu trước (vẫn cho trả tại quầy); ký giấy + đối chiếu CCCD + bàn giao trong một lần đến; CCCD không khớp → khai lại, giữ/hoàn tiền kỳ đầu; Sale tải bản chụp hợp đồng đã ký | Đã chốt (D-027) | T-22 |
+| 9 | Mốc chuỗi 3 "đóng hồ sơ": kế toán ghi số tiền thực hoàn/thu + hash chứng từ, trạng thái Đã đóng. Phải sửa contract + test, xong trước deploy Fuji 14/11. **Lưu ý:** ngược ghi chú plan §3 "contract MVP không cần `PaymentReported`/`Closed`" và quyết định 04/11 giữ tiền ở Web2. **Vy chọn không làm trong bản thi (D-031)**: thay bằng gói bằng chứng cuối trên Web2 có chứng từ chi/thu + email cho khách; chuỗi dừng ở mốc 2 | Để sau bản thi (D-031) | Sau 21/11 |
+| 9a | Gói bằng chứng cuối khi tự thanh lý: thêm mã băm chứng từ chi hoàn/thu thêm, số tiền, thời điểm; email cho khách; không sửa contract | Đã chốt (D-031) | T-22 |
+| 10 | Màn kiểm tra trả phòng hiện cạnh nhau tình trạng lúc bàn giao vào và hiện tại | Đã chốt (D-030) | Giao diện đợt 2 |
+| 11 | Thẻ lịch xem của khách có thanh tiến trình Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ | Đã chốt (D-031) | Giao diện đợt 2 |
+| 12 | Bàn lại toàn bộ luồng giai đoạn 1–9 | Xong (D-026 → D-031) | Bước tiếp: prompt Codex T-22 |
+| 20 | Hệ thống tự soạn bản nháp đối soát (chính sách đã khóa + khoản dự kiến trừ + kết quả kiểm tra), kế toán rà và gửi | Đã chốt (D-030) | T-22 |
+| 21 | Thu thêm qua ví mô phỏng, trả trước khi thanh lý | Đã chốt (D-030) | T-22 |
+| 22 | Khách không phản hồi đối soát: nhắc 24/72 giờ, quá 7 ngày "Quá hạn phản hồi", không tự chấp nhận thay | Đã chốt (D-030) | T-22 |
+| 23 | Tự thanh lý khi tiền đã xong (3 trường hợp tách rõ), quản lý chỉ bấm "Đã thu chìa khóa"; bỏ thanh lý tay và biên bản trả phòng giấy | Đã chốt (D-030) | T-22 |
+| 17 | Hóa đơn tháng trả qua ví mô phỏng (tái dùng F-11), tự "Đã thanh toán" | Đã chốt (D-029) | T-22 |
+| 18 | Trang khách "Khoản dự kiến trừ khi trả phòng" (nợ, hư hỏng kèm ảnh, phạt) | Đã chốt (D-029) | T-22 + giao diện đợt 2 |
+| 19 | Email + phản hồi ngay trên Web2 cho mỗi khoản phát sinh/vi phạm; không lên chuỗi riêng | Đã chốt (D-029) | T-22 |
+| 14 | Ảnh tình trạng tài sản lúc bàn giao (không bắt buộc từng món), mã băm vào gói biên bản | Đã chốt (D-028) | T-22; cần cho mục 10 |
+| 15 | Không ép xác nhận tại chỗ; vẫn giao chìa khóa; email nhắc 24 giờ/72 giờ; không xác nhận thay; danh sách "Chờ khách xác nhận" cho quản lý | Đã chốt (D-028) | T-22 |
+| 16 | Giữ OTP; kích hoạt xác nhận điện tử ngay sau khi trả cọc; nút gửi lại mã + nhắc thư rác; kiểm thời hạn phiên Privy ở đợt Fuji; tiếp tục hỏi BTC Q-08 để bật D-011 | Đã chốt (D-028) | Giao diện + T-22; thử phiên ở Fuji 14–17/11 |
+| 13 | Ghi kết quả xem từng phòng; hạn chờ 7 ngày/tự đóng hồ sơ sau buổi xem; kế toán lập phiếu cọc tay | Không làm | — |
+
+Thứ tự cắt nếu trễ (đề xuất): giữ 1–5 và 7–8; mục 9 đã để sau bản thi (D-031); mục 6 giữ cách tạm; mục 10–11 làm trong phạm vi giao diện đợt 2.
+
 ## Đợt giao diện 1 — T-21 / D-025 (2026-11-10)
 
 - Hoàn thành code và kiểm tra local trên `feat/ui-refresh-1`, gốc `origin/main` ở `43c60b1` (merge PR #1, đã chứa T-20 `66bce65` và hồ sơ `a0a5482`). J-044 là lần dừng trước khi main được merge; Vy đã xác nhận merge và cho tiếp tục ở J-045. Chờ Vy xem nhánh, không tự merge main.
@@ -7,8 +41,8 @@
 - Tokens/lớp chung, 7 component chung, khung nhân viên/Admin/khách/trang chủ/đăng nhập đã đổi tông; thêm chip chi nhánh, tên vai trò và menu mobile mở/đóng bằng nút/nền/Escape. Không đổi nghiệp vụ/API/SP/dữ liệu. Đã chạy frontend build pass (cảnh báo thư viện/size chunk), backend 25 pass/1 skip SQL và smoke Avalanche UI pass; `git diff --check` pass.
 - 14 ảnh trước + 14 ảnh sau cho 7 màn × 2 độ rộng 1440px/390px, thêm ảnh menu và ảnh viewport đăng nhập trong `web/frontend/.ui-screens/{before,after}/`; `report.json` mỗi thư mục. 14/14 màn sau sửa không có JS exception/cuộn ngang toàn trang, Lexend/Inter đã tải; 4/4 menu mở/đóng và Escape pass. Bảng dài trên mobile cuộn trong thẻ. 5 màn cần đăng nhập dùng phiên/API giả lập, dữ liệu rỗng: **chưa đăng nhập tài khoản thật hoặc nghiệm thu dữ liệu/HTTP/SMTP/Privy/Fuji**.
 - Bước kế: Vy xem nhánh UI; đợt 2 ưu tiên trạng thái rỗng lặp ở Quản lý/Kế toán, màu inline còn trong modal/form/badge của tab Sale/Quản lý/Kế toán/khách, bố cục form và bảng dài với dữ liệu demo. Nội dung các tab Admin/khách và màn có dữ liệu thật chưa rà đầy đủ; không coi khung pass là mọi tab đã đạt. Giữ nguyên, không stage `web/backend/package-lock.json`.
-- Bổ sung sau khi Vy xem bản đầu (D-026/J-048): đã đọc dự án tham chiếu `D:\Nam4\Contest\Homestay-Dorm` ở `6e3fa9b`, dùng ý tưởng icon nét viền, nhãn/ô nhập/nhóm form và nút/modal, tự viết bằng CSS thường. Thêm `patterns.css`, tokens cỡ icon/control; làm cụ thể form khách vãng lai và icon trong đăng nhập/đăng ký, chỉnh trình bày form Admin. Chưa coi các form chuyên biệt còn lại là hoàn thành; quy chuẩn triển khai ở scope.
-- Kiểm tra bổ sung J-048 đã chạy: build pass; backend 25 pass/1 skip SQL; smoke Avalanche UI pass. Playwright 12 trạng thái form × 2 bộ trước/sau ở `web/frontend/.ui-screens/forms-{before,after}/` (mỗi bộ gồm 6 trạng thái × 1440px/390px), validation bước 1 và chuyển bước 2 vẫn chạy, readonly Admin giữ nguyên; modal và thanh thao tác không vượt viewport, không gửi API ghi dữ liệu trong fixture. Chạy lại 14 màn khung: không lỗi JS/tràn ngang; 4 menu mobile pass. Đối chiếu AST xác nhận 102 handler và 34 native controls ở 3 file JSX vừa sửa giữ nguyên thuộc tính/xử lý ngoài phần style/class/ARIA; ảnh và fixture không thay nghiệm thu tài khoản thật.
+- Bổ sung sau khi Vy xem bản đầu (D-032/J-054): đã đọc dự án tham chiếu `D:\Nam4\Contest\Homestay-Dorm` ở `6e3fa9b`, dùng ý tưởng icon nét viền, nhãn/ô nhập/nhóm form và nút/modal, tự viết bằng CSS thường. Thêm `patterns.css`, tokens cỡ icon/control; làm cụ thể form khách vãng lai và icon trong đăng nhập/đăng ký, chỉnh trình bày form Admin. Chưa coi các form chuyên biệt còn lại là hoàn thành; quy chuẩn triển khai ở scope.
+- Kiểm tra bổ sung J-054 đã chạy: build pass; backend 25 pass/1 skip SQL; smoke Avalanche UI pass. Playwright 12 trạng thái form × 2 bộ trước/sau ở `web/frontend/.ui-screens/forms-{before,after}/` (mỗi bộ gồm 6 trạng thái × 1440px/390px), validation bước 1 và chuyển bước 2 vẫn chạy, readonly Admin giữ nguyên; modal và thanh thao tác không vượt viewport, không gửi API ghi dữ liệu trong fixture. Chạy lại 14 màn khung: không lỗi JS/tràn ngang; 4 menu mobile pass. Đối chiếu AST xác nhận 102 handler và 34 native controls ở 3 file JSX vừa sửa giữ nguyên thuộc tính/xử lý ngoài phần style/class/ARIA; ảnh và fixture không thay nghiệm thu tài khoản thật.
 
 ## Dữ liệu demo local 2026-11-06 15:32:58 +07:00 (J-030)
 
@@ -81,6 +115,7 @@ Vy đã chốt: nhân viên dẫn sinh viên xem phòng và lập biên bản tr
 | T-06 | Thu gọn contract và thêm xác nhận ký | Đang làm: contract + test local có trong `fadd0ec`; thiếu phiên bản biên bản bàn giao theo D-009 | F-02/F-03/F-04/F-05; bỏ bước tiền/báo trước cũ, test quyền/replay/version/số học. |
 | T-07 | Nối UI ba vai trò, SQL, evidence và Verify | Chưa bắt đầu | F-02/F-03/F-04/F-06/F-07/F-08; cần kiểm tra SQL và receipt/event phục hồi. |
 | T-08 | Deploy, verify source và nghiệm thu Fuji | Chưa bắt đầu | F-09; chưa có deployment/tx/source verification được xác minh trong repo mới. |
+| T-22 | Luồng trước nhận phòng gọn hơn (D-026, F-15) | Chưa bắt đầu. Đã chốt mục 1–6 ở "Hướng luồng D-026"; mục 7–12 đang bàn/đề xuất | Lịch đề xuất 12–13/11 trên nhánh riêng, song song giao diện đợt 2; chưa có prompt Codex. |
 | T-21 | Giao diện đợt 1 (D-025) | Hoàn thành code và kiểm tra local trên `feat/ui-refresh-1` (J-045): tokens, 7 component chung, khung mọi vai trò, menu mobile; build pass, backend 25 pass/1 skip, smoke UI pass; 14 cặp ảnh, không tràn ngang toàn trang/JS exception. | Ảnh màn bảo vệ dùng API/phiên giả lập; chờ Vy duyệt nhánh. Đợt 2 ngày 12–13/11 rà nội dung/form/bảng/badge và dữ liệu demo; Fuji 14–17/11 chưa làm. |
 | T-20 | Nhận phòng: duyệt cư trú theo ngoại lệ + email (D-024) | Code và kiểm thử local hoàn thành trên nhánh `feat/t20-checkin-deposit-fixes` (J-042): SP tự duyệt bằng `NVAUTO` hoặc chuyển quản lý kèm lý do; quản lý duyệt được một phần; 5 email mốc nhận phòng và mail ngoại lệ, chống gửi trùng theo lần gửi duyệt. `residence-flow:db:migrate` áp thành công; `residence-flow:db:verify` qua 3 ca SQL rollback (tự duyệt, ngoại lệ, quản lý duyệt một phần); backend 25 pass/1 skip; frontend build + browser smoke qua; blockchain 12 pass/1 skip. | Cần E2E HTTP/SMTP thật với tài khoản demo; email/unit và UI/API mock chưa thay thế nghiệm thu tích hợp. Chưa thử Fuji. |
 | T-09 | Hồ sơ nộp và demo | Chưa bắt đầu. Kịch bản video 2:50 đề xuất ở J-041 (chờ Vy chốt) | README setup/ghi công, video 2–3 phút, slides, kiểm tra link; Q-06/Q-07. (D-018) Pitch mở bằng nỗi đau trong đề đồ án; video bắt đầu từ hợp đồng chuẩn bị sẵn ở "Chờ bàn giao". |

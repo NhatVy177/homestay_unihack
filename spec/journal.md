@@ -500,21 +500,74 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Tác động sẵn có: scheduler backend lúc startup báo tự hủy 1 phiếu cọc quá hạn và nhả giường/phòng về Trống. Đã báo Vy; không thực hiện sửa dữ liệu thủ công, không ghi thông tin khách vào nhật ký.
 - Lệnh ghép tự mở trình duyệt/ghi nhật ký/commit bị kiểm duyệt tự động chặn, chỉ báo “blocked by policy”, không có lý do chi tiết; lệnh không thực thi. Cung cấp URL để Vy tự mở. File duy nhất sửa là `spec/journal.md` qua công cụ sửa file; `web/backend/package-lock.json` tiếp tục giữ nguyên, không stage.
 
-## 2026-11-10 02:15:29 +07:00 — J-047 — Trao đổi về quy chuẩn icon và form theo giao diện tham khảo
+## 2026-11-10 01:57:06 +07:00 — J-047 — Bàn lại luồng, tham khảo dự án nhóm Hằng; chốt D-026 phần trước nhận phòng
+
+- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Bối cảnh: 07–10/11 Vy chạy thử dự án Homestay-Dorm của nhóm Hằng (bản sao riêng trên Supabase của Vy, không đụng dữ liệu nhóm đó). Claude đọc code để chỉ luồng: khách tự đặt cọc từ thẻ lịch xem, kế toán lập hóa đơn cọc, quản lý duyệt, khách tự khai cư trú, quản lý duyệt cư trú, Sale lập hợp đồng, kế toán lập hóa đơn nhận phòng. Ghi nhận điểm lỏng: không có bước Sale duyệt dù trang khách ghi có; kế toán và quản lý không có thứ tự bắt buộc; màn hóa đơn nhận phòng lưu vào dữ liệu giả khi API lỗi nhưng vẫn báo thành công. Claude đề xuất nhầm "kế toán lập hóa đơn cọc" rồi rút lại vì trái D-021/D-023.
+- Đã chốt (D-026, F-15): một buổi xem nhiều phòng, chỉ ghi trạng thái buổi; khách tự gửi giữ chỗ (Sale gửi thay), quản lý duyệt, tiền cọc tự tính; bị từ chối/hết hạn → về "Đã xem"; khách tự khai người ở, xem CCCD gốc lúc ký hợp đồng; thành viên bị loại → nhả giường, hoàn 80% trừ vào kỳ đầu; đổi đại diện qua email mời (sau cùng, có cách tạm). Không làm: ghi kết quả từng phòng, hạn chờ 7 ngày, kế toán lập phiếu cọc.
+- Vy yêu cầu ghi lại toàn bộ hướng để không quên sau Fuji: thêm bảng "Hướng luồng D-026" vào `spec/progress.md` (đã chốt / đề xuất / không làm, lịch đề xuất) và T-22. Đề xuất mốc chuỗi 3 "đóng hồ sơ" ngược ghi chú plan §3 và quyết định 04/11 giữ tiền ở Web2 — đánh dấu cần Vy quyết.
+- File: `spec/decisions.md` (D-026), `spec/scope.md` (F-14 chú thích, F-15), `hackathon/plan.md` (§3 mục D-026), `spec/progress.md` (bảng hướng, T-22), `spec/journal.md`. Không sửa code. Làm trong worktree riêng `D:\HomeStayDorm-d026`, nhánh `docs/d026-flow-redesign` tách từ `origin/feat/ui-refresh-1` để không chạm thư mục Codex đang dùng.
+- Việc còn lại: bàn tiếp giai đoạn 5–9; Vy chốt các mục đề xuất 7–11; viết prompt Codex cho T-22 (và mục 9 nếu chốt) trước 12/11.
+
+## 2026-11-10 02:14:34 +07:00 — J-048 — Chốt giai đoạn hợp đồng và kỳ đầu (D-027)
+
+- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Claude đề xuất gom ký hợp đồng, đối chiếu CCCD gốc và bàn giao vào một lần đến; kỳ đầu trả trước online, vẫn cho trả tại quầy; Sale tải bản chụp hợp đồng đã ký để băm vào gói bằng chứng bàn giao. Vy chốt cả ba ("chốt").
+- File: `spec/decisions.md` (D-027), `spec/scope.md` (F-15), `spec/progress.md` (mục 8 chuyển "Đã chốt", thêm 8a, mục 12 còn giai đoạn 6–9). Không sửa code. Cùng nhánh `docs/d026-flow-redesign`.
+- Việc còn lại: bàn giai đoạn 6 (bàn giao) → 9; chốt mục 7, 9, 10, 11.
+
+## 2026-11-10 02:19:42 +07:00 — J-049 — Chốt bàn giao vào phòng và cách xác nhận OTP (D-028)
+
+- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Vy hỏi có cách bỏ OTP không. Claude so 5 cách: ví theo phiên đăng nhập (D-011, cần gói Privy trả phí), đổi nhà cung cấp ví (chưa kiểm giá/điều kiện, rủi ro khi còn 11 ngày), ví máy chủ giữ hộ (mất "khách tự ký", trái F-01/F-05), passkey (phải đổi smart wallet/contract, không kịp), giữ OTP nhưng kích hoạt sớm. Vy hỏi OTP có hại UX không: Claude đánh giá ảnh hưởng thấp (quen như ngân hàng, chỉ khoảng 2 lần/thời gian thuê), điểm khó chịu chính là chờ mail tại quầy; giảm bằng kích hoạt sớm, gửi lại mã, không ép xác nhận tại chỗ.
+- Vy đồng ý ("oke") với đề xuất OTP và hai điểm bàn giao Claude nêu ngay trước đó (ảnh tình trạng; vẫn giao chìa khóa, nhắc 24/72 giờ, không xác nhận thay). Claude ghi cả ba vào D-028 và báo rõ trong phản hồi để Vy sửa nếu hiểu sai.
+- File: `spec/decisions.md` (D-028; Q-09 ghi đã trả lời), `spec/scope.md` (F-02), `spec/progress.md` (mục 14–16, mục 12 còn giai đoạn 7–9), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
+- Việc còn lại: bàn giai đoạn 7–9; chốt mục 7, 9, 10, 11; Vy nhắc BTC Q-08.
+
+## 2026-11-10 02:23:30 +07:00 — J-050 — Chốt giai đoạn đang ở (D-029)
+
+- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Claude đề xuất: hóa đơn tháng trả qua ví mô phỏng; trang "Khoản dự kiến trừ khi trả phòng"; khoản phát sinh/vi phạm có email và phản hồi trên Web2, lên chuỗi gián tiếp qua mã băm bảng đối soát. Vy: "chốt luôn".
+- File: `spec/decisions.md` (D-029), `spec/scope.md` (F-11), `spec/progress.md` (mục 17–19, mục 12 còn giai đoạn 8–9), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
+- Việc còn lại: bàn giai đoạn 8–9; chốt mục 7, 9, 10, 11.
+
+## 2026-11-10 02:31:05 +07:00 — J-051 — Chốt trả phòng, đối soát và tự thanh lý (D-030)
+
+- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Vy nhận thấy ở dự án nhóm Hằng "hoàn xong là hợp đồng hết luôn" và không thấy tách thu thêm/hoàn cọc. Claude đọc code (`refund.service.ts`, `payout.repo.ts`, `invoice.service.ts`): đối soát tự tạo phiếu; nút xác nhận chi của kế toán đồng thời đóng đối soát, đóng trả phòng, chuyển hợp đồng "terminated", nhả giường/phòng. Phiếu thu nợ và phiếu hoàn cọc dùng chung loại `refund`, cùng số dương → trang khách có thể hiện khoản nợ thành tiền được hoàn, và kế toán bấm "chi" phiếu nợ là kết thúc hợp đồng dù khách chưa trả. Trường hợp bằng 0 không tạo phiếu nên có thể không đóng được (chưa chạy thử). Chưa thấy bước khách đồng ý đối soát.
+- Claude đề xuất học ý "tự thanh lý khi tiền xong" nhưng tách 3 trường hợp, chữ ký mốc 2 thay biên bản trả phòng giấy. Vy chốt cùng 4 điểm giai đoạn 8 ("có").
+- File: `spec/decisions.md` (D-030), `spec/scope.md` (F-04), `spec/progress.md` (mục 10 đã chốt, thêm 20–23, mục 12 chỉ còn mốc 3), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
+- Việc còn lại: Vy quyết mốc chuỗi 3 (mục 9) và hai đề xuất nhỏ (mục 7, 11); sau đó Claude viết prompt Codex cho T-22.
+
+## 2026-11-10 02:39:33 +07:00 — J-052 — Chốt đóng hồ sơ, không thêm mốc chuỗi 3 (D-031)
+
+- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Claude so sánh A (mốc chuỗi 3, sửa contract trước 14/11) và B (gói bằng chứng cuối trên Web2, không sửa contract), khuyên B vì số tiền đã chi vẫn do kế toán tự khai và rủi ro lịch; khuyên có mục 7 (chính sách hoàn cọc trên phiếu/email cọc) và mục 11 (thanh tiến trình thẻ lịch xem). Vy: "chốt theo những gì bạn đề xuất".
+- File: `spec/decisions.md` (D-031; ghi chú D-030 trỏ sang D-031), `spec/scope.md` (F-15, F-04), `spec/progress.md` (mục 7, 11 đã chốt; mục 9 để sau bản thi; thêm 9a; mục 12 xong), `hackathon/plan.md` (§3 đoạn D-026), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
+- Việc còn lại: Claude viết prompt Codex cho T-22; Vy merge `feat/ui-refresh-1` rồi `docs/d026-flow-redesign`.
+
+## 2026-11-10 02:15:29 +07:00 — J-053 — Trao đổi về quy chuẩn icon và form theo giao diện tham khảo
 
 - Người thực hiện: Codex trao đổi với Vy; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
 - Yêu cầu/câu hỏi: Vy muốn học cả quy định dùng icon và bố trí form, không chỉ màu sắc. Codex xác nhận có thể tham khảo nguyên tắc thiết kế rồi tự viết bằng CSS/React và bộ `Icon.jsx` hiện có, phù hợp D-025; giữ nguyên nghiệp vụ, API, SP, dữ liệu và props/class/id hiện hành.
 - Đề xuất chưa chốt: đồng nhất nét/kích thước/vị trí icon; nhãn và dấu bắt buộc của form, nhóm trường, khoảng cách, helper/error, trạng thái readonly/disabled; thứ bậc nút chính/phụ/nguy hiểm và khung modal. Đợt 1 mới tập trung nền và khung, chưa chuẩn hóa sâu toàn bộ form/tab. Chưa có ảnh/link mẫu cụ thể trong phiên để đối chiếu, chưa chốt bộ quy chuẩn hay triển khai UI mới.
 - File: chỉ `spec/journal.md` ghi trao đổi; chưa đổi scope/plan hoặc thêm quyết định vì chi tiết vẫn là đề xuất. Không sửa code ứng dụng, không chạy lại build/test. Tiếp tục nhánh `feat/ui-refresh-1`, commit/push hồ sơ theo quy ước; backend lockfile có sẵn không stage.
 
-## 2026-11-10 02:31:09 +07:00 — J-048 — Tham chiếu dự án Vy chọn, áp dụng quy chuẩn icon và form
+## 2026-11-10 02:31:09 +07:00 — J-054 — Tham chiếu dự án Vy chọn, áp dụng quy chuẩn icon và form
 
-- Người thực hiện: Codex theo yêu cầu Vy chỉ định `D:\Nam4\Contest\Homestay-Dorm` để học theo icon/form, tiếp nối J-047; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`. D-026 bổ sung nguồn tham chiếu cho D-025; các kích thước cụ thể là lựa chọn triển khai của Codex để Vy xem, chưa coi là nghiệm thu thị giác của Vy.
+- Người thực hiện: Codex theo yêu cầu Vy chỉ định `D:\Nam4\Contest\Homestay-Dorm` để học theo icon/form, tiếp nối J-053; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`. D-032 bổ sung nguồn tham chiếu cho D-025; các kích thước cụ thể là lựa chọn triển khai của Codex để Vy xem, chưa coi là nghiệm thu thị giác của Vy.
 - Tham khảo chỉ đọc: repo mẫu ở commit `6e3fa9b`, React 19/Tailwind, xem `apps/frontend/src/index.css`, `components/ui/{FormLabel,CustomSelect,ModalPortal,ConfirmLogoutModal}.tsx`, form Sale và màn Login; chụp màn đăng nhập tại `http://localhost:3000/#/login` vào `.ui-screens/reference/login-1440.png`. Học cách phân cấp icon/nhãn/control/nhóm form/nút/modal; không chép component, source hoặc ảnh của mẫu, không thêm Lucide/Tailwind/custom select hay đưa API/logic đăng nhập/nghiệp vụ của mẫu vào repo hiện tại. Sau đợt đọc, git status repo mẫu giữ nguyên các thay đổi có sẵn ở package-lock, vite.config và file workspace chưa track; không sửa/push repo mẫu.
 - File code: `web/frontend/src/styles/tokens.css` thêm cỡ icon 16/20/24px và chiều cao control; `styles/patterns.css` mới tự viết quy chuẩn nhãn/ô nhập/focus/lỗi/readonly, nhóm form và footer modal, nút và responsive. `src/main.jsx` import stylesheet này. `components/common/Icon.jsx` giữ SVG nét 2 và props, thêm class dùng chung và tự vẽ icon khóa; CSS vẫn cho phép icon minh họa kế thừa cỡ chữ lớn như trước. `FormInput.jsx` thêm class trường dùng chung, giữ props.
 - File màn hình: `src/pages/TrangChu.jsx` thay emoji trang trí bằng icon sẵn có, thêm icon người dùng/khóa trong ô đăng nhập, giữ nguyên control/onSubmit. `src/pages/nhanVienSale/HoSoDangKyTab.jsx` chỉ trình bày lại modal tạo phiếu khách vãng lai: tiêu đề có biểu tượng, stepper và dấu bắt buộc rõ, hai cột desktop/một cột mobile; thêm ARIA cho dialog/nút đóng, giữ class cũ. Thanh thao tác form Admin sticky qua CSS, không sửa code nghiệp vụ Admin. Không sửa API/backend/SP/dữ liệu/route hoặc phần ký/verify.
-- File hồ sơ: `spec/decisions.md` thêm D-026, `spec/scope.md` ghi bảng quy chuẩn và giới hạn áp dụng, `hackathon/plan.md` bổ sung tham chiếu vào T-21 và việc rà form đặc thù đợt 2, `spec/progress.md` ghi code/bằng chứng, mục journal này.
+- File hồ sơ: `spec/decisions.md` thêm D-032, `spec/scope.md` ghi bảng quy chuẩn và giới hạn áp dụng, `hackathon/plan.md` bổ sung tham chiếu vào T-21 và việc rà form đặc thù đợt 2, `spec/progress.md` ghi code/bằng chứng, mục journal này.
 - Kiểm tra mới: frontend `npm run build` pass, còn cảnh báo dependency/chunk lớn; backend `npm test` 25 pass/1 skip SQL/0 fail; smoke `npm run test:avalanche-ui` pass (Verify, D-017/D-018/D-023/D-024, không browser exception). `git diff --check` pass. So AST với HEAD trước sửa: 45 handler/13 native controls ở TrangChu, 57/20 ở HoSoDangKyTab, 0/1 ở FormInput giữ nguyên event và thuộc tính input/select/textarea ngoài style/class/id/ARIA. Không chạy SQL migration, không thực hiện giao dịch ghi thật hoặc nghiệm thu Fuji.
 - Ảnh/kiểm tra form: thêm `web/frontend/scripts/ui-forms.mjs`, dùng phiên/API giả lập và chặn toàn bộ API trong browser, không gửi thao tác ghi. 12 trạng thái trước + 12 sau ở `.ui-screens/forms-{before,after}/`: Sale bước 1, lỗi validation, bước 2; Admin tạo nhân viên; đăng nhập và đăng ký, mỗi trạng thái ở 1440px/390px. Validation cũ chặn bước 1 thiếu thông tin và đi tiếp bước 2 khi điền hợp lệ; readonly còn nguyên, modal/thanh nút nằm trong viewport; không JS exception/cuộn ngang toàn trang. Lượt đầu script phải bổ sung bước bấm “Tạo tài khoản” sau khi vào tab nhân viên Admin; báo cáo cuối là lượt chạy lại pass. Đã xem ảnh mẫu, ảnh form Sale, đăng nhập và form Admin mobile để sửa phần trình bày.
 - Kiểm tra khung chạy lại: `ui-screens.mjs after` 14/14 màn không lỗi JS hoặc tràn ngang, font tải được, 4/4 menu mobile mở/đóng/Escape pass. Ảnh ở `.ui-screens/after/` được cập nhật theo bản mới; tất cả ảnh/report/log bị ignore. Cổng đang chạy để Vy xem vẫn là `http://127.0.0.1:5173/`; cần tải lại để nhận bản mới.
 - Còn lại: các form nghiệp vụ đặc thù còn inline styles, bảng/empty-state của đợt 2 theo J-045; chưa coi lớp CSS chung là bằng chứng mọi form đã đồng bộ/đăng nhập thật đã đạt. Chỉ push `feat/ui-refresh-1`, commit danh tính `NhatVy177`; không stage backend lockfile hoặc ảnh, không merge/push main.
+
+## 2026-11-10 02:43:47 +07:00 — J-055 — Gỡ xung đột số D-xxx/J-xxx khi gộp main vào `feat/ui-refresh-1`
+
+- Người thực hiện: Claude cùng Vy; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Nguyên nhân: PR `feat/ui-refresh-1` báo xung đột `spec/decisions.md`, `spec/journal.md` vì hai bên cùng dùng D-026, J-047, J-048 (Codex: icon/form; Claude: luồng mới, đã vào main qua PR #2).
+- Xử lý: giữ nguyên D-026…D-031 và J-047…J-052 đã ở main; **đánh số lại phần của Codex** thành D-032 (quy chuẩn icon/form), J-053, J-054 và sửa các chỗ nhắc tới trong `hackathon/plan.md`, `spec/progress.md`, `spec/scope.md`. Nội dung không đổi. Mục J-053/J-054 nằm sau J-052 dù giờ ghi sớm hơn (giữ giờ gốc). Không sửa code.
+- Việc còn lại: Vy merge PR.
