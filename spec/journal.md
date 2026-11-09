@@ -491,3 +491,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Hồ sơ: `spec/decisions.md` thêm D-025 thay lịch cũ D-019/plan §9, `spec/scope.md` thêm tiêu chí UI, `hackathon/plan.md` đổi lịch và việc đợt 2, `spec/progress.md` thêm T-21 và bằng chứng/giới hạn, mục journal này giữ cả J-044. Bảng màu cũ → token nằm trong mô tả commit J-045; các màu phụ thuộc nền (như chữ footer) được điều chỉnh tương phản.
 - Đợt 2: Quản lý/Kế toán còn hai dòng empty state hiển thị lặp (đã có từ trước, giữ chữ/logic trong đợt khung); các tab Sale/Quản lý/Kế toán/khách còn màu inline trong modal/form/badge. Cần rà bảng dài/form nhiều cột với dữ liệu demo, các tab nội dung Admin/khách và hồ sơ có dữ liệu thật chưa chụp chi tiết. Thực hiện 12–13/11 theo D-025, xong trước Fuji.
 - Git cuối đợt: commit với danh tính `NhatVy177`, chỉ push `feat/ui-refresh-1` để Vy xem; hash tra qua `git log --grep=J-045` và báo trong phản hồi sau khi push. Không stage ảnh hoặc `web/backend/package-lock.json`; file lock chỉ có thay đổi xuống dòng từ trước, `git diff --ignore-space-at-eol` không có khác biệt nội dung.
+
+## 2026-11-10 01:48:40 +07:00 — J-046 — Khởi chạy chương trình cho Vy xem giao diện
+
+- Người thực hiện: Codex theo yêu cầu Vy; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Đã chạy frontend repo hiện tại tại `http://127.0.0.1:5173/` (PID 66164), backend cổng 5000 kết nối HOMEDORM4, Hardhat local 31337 ở cổng 8545 (PID 84532). `npm run -s local:ensure` compile/deploy vào chain local thành công, metadata local bị ignore; không sửa env hoặc triển khai Fuji. Giữ nguyên các server dự án khác ở cổng 3000/4000.
+- Kiểm tra: frontend `/` và backend `/api/health` đều HTTP 200; chưa thử đăng nhập hoặc ký thật. Không chạy lại build/test của J-045 trong yêu cầu chỉ khởi chạy.
+- Tác động sẵn có: scheduler backend lúc startup báo tự hủy 1 phiếu cọc quá hạn và nhả giường/phòng về Trống. Đã báo Vy; không thực hiện sửa dữ liệu thủ công, không ghi thông tin khách vào nhật ký.
+- Lệnh ghép tự mở trình duyệt/ghi nhật ký/commit bị kiểm duyệt tự động chặn, chỉ báo “blocked by policy”, không có lý do chi tiết; lệnh không thực thi. Cung cấp URL để Vy tự mở. File duy nhất sửa là `spec/journal.md` qua công cụ sửa file; `web/backend/package-lock.json` tiếp tục giữ nguyên, không stage.
