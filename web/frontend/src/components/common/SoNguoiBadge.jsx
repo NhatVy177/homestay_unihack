@@ -21,7 +21,7 @@ export default function SoNguoiBadge({ soNguoi, soNam = 0, soNu = 0, khacGioi = 
   const tong = Number(soNguoi) || nam + nu;
   return (
     <span className="kp-people">
-      <span className={`kp-people-chip${khacGioi ? ' is-mixed' : ''}`}>
+      <span className={`kp-people-chip ui-badge${khacGioi ? ' is-mixed' : ''}`}>
         <IconGroup />
         <span>{tong}</span>
         {khacGioi && <span className="kp-people-warn" title="Nhóm khác giới" />}

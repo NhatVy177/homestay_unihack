@@ -1,0 +1,102 @@
+/* Shared chrome. Existing feature classes and tab contents keep their contracts. */
+:is(.kp-page, .tc-page, .admin-page, .auth-page-split) :is(button, input, select, textarea, a):focus-visible { outline: 3px solid var(--color-primary); outline-offset: 3px; }
+.ui-employee-shell .kp-sidebar,
+.ui-employee-shell .admin-sidebar { flex-basis: 264px; background: var(--color-surface); border-color: var(--color-border); }
+.ui-employee-shell .kp-sidebar-brand,
+.ui-employee-shell .admin-sidebar-brand { height: auto; min-height: 104px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: var(--space-4) var(--space-6); gap: var(--space-2); }
+.ui-employee-shell .kp-sidebar-brand .kp-brand { padding: 0 !important; }
+.ui-role-label { color: var(--color-accent); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding-left: 34px; }
+.ui-employee-shell .ktp-sidebar-nav,
+.ui-employee-shell .admin-nav { padding: var(--space-6) var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }
+.ui-employee-shell .ktp-side-item,
+.ui-employee-shell .admin-nav-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); min-height: 48px; width: 100%; border: 1px solid transparent; border-radius: var(--radius-md); color: var(--color-text-muted); background: transparent; text-align: left; }
+.ui-employee-shell .ktp-side-item { font-family: var(--font-body); letter-spacing: 0; }
+.ui-employee-shell .ktp-side-item.is-active::after { display: none; }
+.ui-employee-shell .ktp-side-item.is-active,
+.ui-employee-shell .admin-nav-item.active,
+.ui-employee-shell .ktp-side-item:hover,
+.ui-employee-shell .admin-nav-item:hover { background: var(--color-primary-soft); color: var(--color-primary); border-color: transparent; }
+.ui-employee-shell .kp-app,
+.ui-employee-shell .admin-app { min-width: 0; background: var(--color-bg); }
+.ui-employee-shell .kp-topbar,
+.ui-employee-shell .admin-topbar { min-height: 104px; gap: var(--space-4); padding: var(--space-6) var(--space-8); background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+.ui-employee-shell .kp-topbar h1,
+.ui-employee-shell .admin-topbar h1 { font-family: var(--font-heading); font-size: 22px; font-weight: 600; }
+.ui-employee-shell .kp-top-actions { gap: var(--space-4); flex-wrap: wrap; }
+.ui-employee-shell .kp-main,
+.ui-employee-shell .admin-main { width: 100%; max-width: 1440px; margin: 0 auto; padding: var(--space-8) !important; min-width: 0; }
+.ui-employee-shell .ktp-container { padding: 0; height: auto; }
+.ui-employee-shell .ktp-filter-section,
+.ui-employee-shell .ktp-table-section,
+.ui-employee-shell .admin-panel,
+.ui-employee-shell .admin-stat-card,
+.ui-employee-shell .admin-hero { border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border-color: var(--color-border); }
+.ui-employee-shell .kp-user-box-btn { min-width: 0; }
+.ui-employee-shell .kp-user-box-btn strong { color: var(--color-text); }
+.ui-branch-chip { display: inline-flex; align-items: center; gap: var(--space-2); max-width: 100%; padding: var(--space-2) var(--space-3); border-radius: var(--radius-pill); background: var(--color-accent-soft); color: var(--color-accent); font-size: 12px; font-weight: 600; overflow-wrap: anywhere; }
+.ui-branch-chip svg { width: 16px; height: 16px; flex-shrink: 0; }
+.ui-navigation-toggle { display: none; }
+.ui-navigation-backdrop { display: none; }
+.ui-navigation-close { display: none; }
+.ui-dashboard-topbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-8); }
+.ui-account-chip { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--color-text-muted); font-size: 13px; }
+.ui-account-chip svg { width: 32px; height: 32px; padding: 6px; background: var(--color-primary-soft); color: var(--color-primary); border-radius: 50%; }
+.kp-page, .admin-page, .home-page { font-family: var(--font-body); }
+.kp-page h1, .kp-page h2, .kp-page h3, .kp-page h4,
+.admin-page h1, .admin-page h2, .admin-page h3, .admin-page h4,
+.home-page h1, .home-page h2, .home-page h3, .home-page h4 { font-family: var(--font-heading); font-weight: 600; }
+.kp-page .kp-brand, .admin-page .admin-brand { font-family: var(--font-heading); font-weight: 600; }
+.kh-page .kh-room-card, .kh-page .kh-filter-panel, .kh-page .kp-card { border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+.kh-page .kp-side-item.is-active { background: var(--color-primary-soft); color: var(--color-primary); border-radius: var(--radius-md); }
+.kh-page .kp-topbar { background: var(--color-surface); }
+.kh-page .kh-main { max-width: 1440px; margin: 0 auto; }
+.tc-page .tc-header { background: var(--color-surface); border-color: var(--color-border); box-shadow: var(--shadow-sm); }
+.tc-page .tc-footer .tc-logo-icon { color: var(--color-primary-soft); }
+.tc-page .tc-footer :focus-visible { outline-color: var(--color-surface); }
+.tc-page h1, .tc-page h2, .tc-page h3, .tc-page h4 { font-family: var(--font-heading); font-weight: 600; }
+.tc-page .tc-room-card, .tc-page .tc-testimonial-card, .tc-modal { border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
+.tc-page .tc-btn-primary { background: var(--color-primary); color: var(--color-surface); box-shadow: var(--shadow-sm); }
+.tc-page .tc-btn-primary:hover { background: var(--color-primary-hover); }
+.auth-page-split { font-family: var(--font-body); }
+.auth-page-split .auth-card h2 { font-family: var(--font-heading); font-weight: 600; }
+
+@media (max-width: 1180px) {
+  .ui-employee-shell .kp-topbar, .ui-employee-shell .admin-topbar { flex-wrap: wrap; }
+  .ui-employee-shell .kp-top-actions { width: auto; }
+}
+@media (max-width: 1020px) {
+  .ui-employee-shell { padding-bottom: 0; }
+  .ui-employee-shell .kp-sidebar,
+  .ui-employee-shell .admin-sidebar,
+  .app-shell .sidebar { display: none; position: fixed; top: 0; left: 0; bottom: 0; width: min(300px, 85vw); height: 100dvh; overflow-y: auto; z-index: 101; box-shadow: var(--shadow-md); }
+  .ui-menu-open .kp-sidebar,
+  .ui-menu-open .admin-sidebar,
+  .app-shell.ui-menu-open .sidebar { display: flex; }
+  .ui-navigation-toggle { display: inline-flex; flex-shrink: 0; }
+  .ui-navigation-backdrop { display: block; position: fixed; inset: 0; z-index: 100; background: rgba(25,28,26,.36); border: 0; border-radius: 0; }
+  .ui-navigation-close { display: inline-flex; position: fixed; top: var(--space-3); left: min(240px, calc(85vw - 60px)); width: 44px; z-index: 102; font-size: 24px; }
+  .ui-employee-shell .ui-navigation-toggle { background: var(--color-surface); border: 1px solid var(--color-border); }
+  .ui-employee-shell .kp-topbar, .ui-employee-shell .admin-topbar { position: relative; align-items: flex-start !important; flex-direction: column; padding: var(--space-6); }
+  .ui-employee-shell .kp-top-actions { width: 100%; justify-content: space-between; }
+  .ui-employee-shell .kp-main, .ui-employee-shell .admin-main { padding: var(--space-6) !important; }
+  .app-shell { flex-direction: row; }
+}
+@media (max-width: 600px) {
+  .ui-employee-shell .kp-topbar, .ui-employee-shell .admin-topbar { padding: var(--space-4); gap: var(--space-3); }
+  .ui-employee-shell .kp-top-actions { align-items: flex-start; gap: var(--space-3); }
+  .ui-employee-shell .kp-topbar h1, .ui-employee-shell .admin-topbar h1 { font-size: 20px; }
+  .ui-employee-shell .kp-main, .ui-employee-shell .admin-main { padding: var(--space-4) !important; }
+  .ui-employee-shell .admin-account { min-width: 0; max-width: 100%; }
+  .ui-employee-shell .ktp-container, .ui-employee-shell .admin-workspace { min-width: 0; max-width: 100%; }
+  .ui-employee-shell .ktp-table-wrap, .ui-employee-shell .admin-table-wrap { max-width: 100%; overflow-x: auto; }
+  .ui-employee-shell .ktp-table-section { overflow-x: auto; }
+  .ui-employee-shell .ktp-table { min-width: 640px; }
+  .ui-employee-shell .ktp-filter-section { grid-template-columns: minmax(0, 1fr); }
+  .ui-employee-shell .ktp-header, .ui-employee-shell .ktp-section-header { flex-wrap: wrap; gap: var(--space-3); }
+  .ui-employee-shell .ui-branch-chip { font-size: 11px; }
+  .main-content { padding: var(--space-4); }
+  .ui-card, .card, .ui-stat { padding: var(--space-4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

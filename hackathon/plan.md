@@ -250,16 +250,16 @@ Cổng thanh toán mô phỏng chỉ xuất hiện thêm nếu hoàn thiện s�
 
 ## 9. Thứ tự thực hiện và mốc nội bộ
 
-Lịch dự kiến theo giờ Việt Nam, cần điều chỉnh theo kết quả thử nghiệm và hạn BTC xác nhận.
+**Lịch hiện hành theo D-025 (Vy chốt 2026-11-10 00:47 +07:00): làm giao diện trước Fuji.** Lịch này thay bảng mốc cũ tại mục này và phần lịch 15 ngày của D-019; không thay scope nghiệp vụ hoặc coi kiểm thử local là kết quả Fuji. Đây là lịch nội bộ của Vy, không phải xác minh lại hạn BTC.
 
 | Mốc | Đầu ra |
 |---|---|
-| 04–06/11 | Chốt nguồn cọc và policy demo; thử SDK ví nhúng/ký EIP-712/khôi phục, phác relayer; kiểm tra truy cập RPC Fuji và nguồn gas thử. Chọn ví dựa vào kết quả thử, không chỉ README quảng cáo. |
-| 07–10/11 | Thu gọn contract, thêm chữ ký/nonce/hạn dùng, test quyền và replay; deploy + verify Fuji; một luồng xác nhận tối thiểu có bằng chứng xuất tại trình duyệt. |
-| 11–14/11 | Nối ba vai trò và SQL, xuất bộ bằng chứng đầy đủ, Verify, xử lý receipt/event và lỗi đồng bộ. |
-| 15–17/11 | Chạy end-to-end, phục hồi lỗi và hoàn thiện UI. Chỉ thêm simulator nhỏ nếu toàn bộ luồng chính đã đạt nghiệm thu. |
-| 18–19/11 | Đóng scope, kiểm tra setup từ đầu, README/ghi công, slide và video; đo giao dịch Fuji thực tế. |
-| 20/11 | Mục tiêu nội bộ hoàn tất nộp, nếu phù hợp hạn chính thức. Không coi 21/11 mặc nhiên là một ngày dự phòng trọn vẹn. |
+| 10–11/11 | T-21 giao diện đợt 1: tokens sage/nâu gỗ; tiêu đề Lexend, nội dung Inter; component và lớp dùng chung; khung mọi vai trò, trang chủ và đăng nhập. Giữ luồng/API/SP/dữ liệu/route/props/class/id cũ, không đổi ký/verify. CSS thường, không thêm UI library, tự viết. Ảnh trước/sau 1440px và 390px, menu nhân viên thu gọn được; build frontend và test backend. Nhánh `feat/ui-refresh-1` từ main đã chứa T-20; chỉ push nhánh để Vy duyệt. |
+| 12–13/11 | Giao diện đợt 2: rà nội dung từng tab, form/modal/bảng dài và dữ liệu demo; xử lý danh sách còn lại của T-21. **Hạn chót giao diện 13/11.** Chỉ đổi giao diện, không đổi luồng. |
+| 14–17/11 | Fuji: deploy + verify source; thử Privy/HTTP/SQL/SMTP và trọn luồng ba vai trò, bằng chứng/Verify, receipt/event và phục hồi lỗi. Ghi tx/kết quả thật, không suy từ ảnh mock. |
+| 18–20/11 | Hồ sơ và nộp: setup từ đầu, README/ghi công, slide/video, kiểm tra link và bằng chứng Fuji. Mục tiêu hoàn tất nộp trong khoảng này, không coi 21/11 là ngày dự phòng mặc định. |
+
+Kết quả T-21 và danh sách đợt 2 nằm ở `spec/progress.md` / J-045: ưu tiên trạng thái rỗng lặp ở Quản lý/Kế toán, màu inline trong modal/form/badge của các tab Sale/Quản lý/Kế toán/khách, bảng dài và form với dữ liệu demo; rà các tab Admin/khách chưa được chụp chi tiết. Ảnh khung dùng API giả không thay nghiệm thu tài khoản thật.
 
 Nếu thử ví nhúng/relayer chưa đạt, ưu tiên sửa lát cắt nhỏ này và cắt simulator/point trước. Ví giao dịch trực tiếp trên Fuji có thể dùng kiểm thử nội bộ trong lúc phát triển, nhưng chưa đạt mục tiêu UX nộp bài. Không âm thầm coi fallback là chức năng đã hoàn thành.
 

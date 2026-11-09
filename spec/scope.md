@@ -59,6 +59,12 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 
 ## Điều kiện xuyên suốt
 
+### Giao diện trước Fuji — D-025 / T-21
+
+- Đợt 1 (10–11/11): nền tokens sage/nâu gỗ, Lexend cho tiêu đề và Inter cho nội dung; lớp dùng chung cho nút, thẻ, input, bảng, badge, tabs, số liệu, trạng thái rỗng; cập nhật component chung và khung Sale/Quản lý/Kế toán/Admin/khách/trang chủ/đăng nhập. Không thêm thư viện UI, không đổi class/id cũ được script dùng.
+- Menu nhân viên mở/đóng được trên mobile; các màn được chụp ở 1440px và 390px, không cuộn ngang toàn trang. Ảnh local trong `web/frontend/.ui-screens/`, không commit; phân biệt API giả lập với đăng nhập/dữ liệu thật. Frontend build và backend test phải được chạy trong đợt này.
+- Giữ nguyên luồng, API, SP, dữ liệu, route, props, chữ nghiệp vụ và cơ chế Avalanche; đợt 1 chỉ sửa phần khung, chưa làm lại nội dung từng tab. Đợt 2 (12–13/11) xử lý nội dung/form/bảng còn lệch, hạn chót 13/11; Fuji 14–17/11, nộp 18–20/11 theo lịch nội bộ mới của Vy.
+
 Không đưa CCCD, địa chỉ, tài khoản ngân hàng, ảnh hoặc nội dung biên bản lên chain. Chain chỉ giữ ID khó đoán, ví, commitment, version/state và số tiền tối thiểu cần thiết. Không khẳng định hash/salt bảo đảm ẩn danh hoặc chữ ký tự chứng minh hiệu lực pháp lý.
 
 Kiểm thử cần phủ sai quyền/chữ ký, replay/hết hạn/sai domain, sai version/hash, tổng tiền và làm tròn, sửa file/thiếu salt/ảnh, relayer timeout/gas, SQL lệch chain và khôi phục ví. Ghi kết quả thực tế ở nhật ký; chưa có kết quả cho bộ yêu cầu này trong repo hiện hành.

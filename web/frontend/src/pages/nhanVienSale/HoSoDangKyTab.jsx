@@ -678,7 +678,7 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
           onChange={setFilterStatus}
         />
 
-        <button className="ktp-btn-action-fill" style={{ backgroundColor: '#2f6765', borderRadius: '6px', whiteSpace: 'nowrap' }} onClick={() => setShowCreateModal(true)}>
+        <button className="ktp-btn-action-fill" style={{ backgroundColor: 'var(--color-primary)', borderRadius: 'var(--radius-sm)', whiteSpace: 'nowrap' }} onClick={() => setShowCreateModal(true)}>
           <Icon name="add_circle" /> Tạo phiếu mới cho khách vãng lai
         </button>
       </section>
