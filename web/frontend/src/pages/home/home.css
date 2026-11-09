@@ -1,28 +1,26 @@
-@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap");
-
 .home-page {
-  --green: #2fb7a4;
-  --green-dark: #16796f;
-  --green-soft: #e8fbf7;
-  --orange: #e86f51;
-  --orange-dark: #bf4c32;
-  --orange-soft: #fff1ed;
-  --cta-rgb: 232, 111, 81;
-  --bg: #f4fbf8;
-  --surface: #fff;
-  --surface-soft: #fbfffd;
-  --text: #243b3a;
-  --muted: #667b78;
-  --line: #d7eee9;
-  --hero-start: #f8fffc;
-  --hero-end: #f4fbf8;
+  --green: var(--color-primary);
+  --green-dark: var(--color-primary-hover);
+  --green-soft: var(--color-primary-soft);
+  --orange: var(--color-accent);
+  --orange-dark: var(--color-accent);
+  --orange-soft: var(--color-accent-soft);
+  --cta-rgb: 140, 115, 85;
+  --bg: var(--color-bg);
+  --surface: var(--color-surface);
+  --surface-soft: var(--color-bg);
+  --text: var(--color-text);
+  --muted: var(--color-text-muted);
+  --line: var(--color-border);
+  --hero-start: var(--color-bg);
+  --hero-end: var(--color-bg);
   --hero-glow: rgba(47, 183, 164, 0.16);
   --hero-glow-2: rgba(232, 111, 81, 0.13);
   --footer-bg: #203f3b;
   --shadow: 0 14px 35px rgba(22, 121, 111, 0.1);
   background: var(--bg);
   color: var(--text);
-  font-family: "Inter", "Be Vietnam Pro", "Segoe UI", sans-serif;
+  font-family: var(--font-body);
   line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -42,7 +40,7 @@
 
 .home-page h1 {
   color: var(--text);
-  font-family: "Be Vietnam Pro", "Inter", sans-serif;
+  font-family: var(--font-heading);
   font-size: clamp(38px, 5vw, 62px);
   font-weight: 600;
   letter-spacing: -0.045em;
@@ -91,11 +89,11 @@
 .home-btn-primary {
   background: linear-gradient(135deg, var(--orange), var(--orange-dark));
   box-shadow: 0 12px 26px rgba(var(--cta-rgb), 0.3);
-  color: #fff;
+  color: var(--color-surface);
 }
 
 .home-page .home-btn-primary {
-  color: #fff;
+  color: var(--color-surface);
 }
 
 .home-btn-primary:hover {
@@ -116,7 +114,7 @@
 
 .home-header,
 .home-header * {
-  font-family: "Be Vietnam Pro", "Inter", sans-serif;
+  font-family: var(--font-heading);
 }
 
 .home-header {
@@ -241,7 +239,7 @@
 .home-account-pill span {
   background: var(--orange);
   border-radius: 50%;
-  color: #fff;
+  color: var(--color-surface);
   display: grid;
   font-weight: 700;
   height: 34px;
@@ -552,7 +550,7 @@
 
 .home-status {
   border-radius: 999px;
-  color: #fff;
+  color: var(--color-surface);
   font-size: 12px;
   font-weight: 700;
   left: 14px;
@@ -692,7 +690,7 @@
 
 .home-footer {
   background: var(--footer-bg);
-  color: #fff;
+  color: var(--color-surface);
   margin-top: 28px;
   padding: 52px 0 28px;
 }
@@ -711,7 +709,7 @@
 
 .home-footer .home-brand-text,
 .home-footer h3 {
-  color: #fff;
+  color: var(--color-surface);
 }
 
 .home-footer h3 {
@@ -810,7 +808,7 @@
   border-radius: 18px;
   bottom: 24px;
   box-shadow: 0 12px 30px rgba(47, 111, 159, 0.16);
-  color: #fff;
+  color: var(--color-surface);
   font-size: 14px;
   font-weight: 600;
   opacity: 0;
@@ -935,27 +933,27 @@
 
 /* Clean white refinement and balanced desktop width from the homepage reference. */
 .home-page {
-  --green-soft: #eaf7f5;
-  --cta: #e86f51;
-  --cta-dark: #bf4c32;
-  --bg: #f8f9fa;
-  --surface: #ffffff;
-  --surface-soft: #f9fafb;
-  --text: #222222;
+  --green-soft: var(--color-primary-soft);
+  --cta: var(--color-accent);
+  --cta-dark: var(--color-accent);
+  --bg: var(--color-bg);
+  --surface: var(--color-surface);
+  --surface-soft: var(--color-bg);
+  --text: var(--color-text);
   --muted: #555555;
-  --line: #e9ecef;
-  --hero-start: #ffffff;
-  --hero-end: #f8f9fa;
+  --line: var(--color-surface-alt);
+  --hero-start: var(--color-surface);
+  --hero-end: var(--color-bg);
   --hero-glow: rgba(47, 183, 164, 0.055);
   --hero-glow-2: rgba(232, 111, 81, 0.05);
-  --footer-bg: #1e293b;
+  --footer-bg: var(--color-text);
   --shadow: 0 14px 34px rgba(15, 23, 42, 0.075);
 }
 
 .home-page h1,
 .home-page h2,
 .home-page h3 {
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .home-header {
@@ -964,13 +962,13 @@
 }
 
 .home-brand-icon {
-  background: #ffffff;
+  background: var(--color-surface);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.055);
   color: var(--green-dark);
 }
 
 .home-brand-text {
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .home-brand-text strong {
@@ -978,7 +976,7 @@
 }
 
 .home-nav a {
-  color: #333333;
+  color: var(--color-text);
 }
 
 .home-nav a:hover {
@@ -1000,14 +998,14 @@
 
 .home-btn-secondary,
 .home-logout {
-  background: #ffffff;
+  background: var(--color-surface);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.035);
-  color: #333333;
+  color: var(--color-text);
 }
 
 .home-btn-secondary:hover,
 .home-logout:hover {
-  background: #f9fafb;
+  background: var(--color-bg);
   border-color: #dfe5eb;
   color: var(--green-dark);
 }
@@ -1026,14 +1024,14 @@
 .home-hero-features span,
 .home-mini-tags span,
 .home-tags span {
-  background: #f1f3f5;
-  border: 1px solid #e9ecef;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-surface-alt);
 }
 
 .home-field input,
 .home-field select {
-  background: #ffffff;
-  color: #222222;
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .home-field input:focus,
@@ -1051,7 +1049,7 @@
 }
 
 .home-status.soon {
-  background: #4a5568;
+  background: var(--color-text-muted);
 }
 
 .home-room-price {
@@ -1065,7 +1063,7 @@
 
 .home-benefit-icon,
 .home-step-number {
-  background: #ffffff;
+  background: var(--color-surface);
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
   color: var(--green-dark);
 }
@@ -1075,8 +1073,8 @@
 }
 
 .home-modal-close {
-  background: #f1f3f5;
-  color: #333333;
+  background: var(--color-surface-alt);
+  color: var(--color-text);
 }
 
 .home-toast {

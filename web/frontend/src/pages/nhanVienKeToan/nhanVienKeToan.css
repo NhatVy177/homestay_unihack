@@ -16,7 +16,7 @@
 
 .kt-money-card {
   align-items: center;
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--ql-line);
   border-radius: 28px;
   box-shadow: var(--ql-shadow);
@@ -38,14 +38,14 @@
 
 .kt-money-card h2 {
   color: var(--ql-muted);
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-body);
   font-size: 13px;
 }
 
 .kt-money-card strong {
   color: var(--ql-heading);
   display: block;
-  font-family: "Be Vietnam Pro", sans-serif;
+  font-family: var(--font-heading);
   font-size: 24px;
   margin-top: 4px;
 }
@@ -72,8 +72,8 @@
 }
 
 .kt-input {
-  background: #f8f9fa;
-  border: 1px solid #dde4e8;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   color: var(--ql-text);
   font-family: inherit;
@@ -84,7 +84,7 @@
 }
 
 .kt-input:focus {
-  border-color: #2fb7a4;
+  border-color: var(--color-primary);
 }
 
 @media (max-width: 700px) {
@@ -101,7 +101,7 @@
 
 .kt-skel {
   animation: kt-shimmer 1.5s ease-in-out infinite;
-  background: linear-gradient(90deg, #f1f3f5 25%, #e6eaed 50%, #f1f3f5 75%);
+  background: linear-gradient(90deg, var(--color-surface-alt) 25%, #e6eaed 50%, var(--color-surface-alt) 75%);
   background-size: 1000px 100%;
   border-radius: 6px;
   height: 15px;
@@ -156,7 +156,7 @@
 
 .kt-modal-close {
   align-items: center;
-  background: #f1f3f5;
+  background: var(--color-surface-alt);
   border: 0;
   border-radius: 50%;
   color: #666;
@@ -173,7 +173,7 @@
   width: 34px;
 }
 
-.kt-modal-close:hover { background: #e4e7eb; color: #222; }
+.kt-modal-close:hover { background: var(--color-border); color: var(--color-text); }
 
 /* ---- Receipt success header ---- */
 .kt-receipt-header {
@@ -204,7 +204,7 @@
 
 .kt-receipt-header h3 {
   color: var(--ql-heading);
-  font-family: "Be Vietnam Pro", sans-serif;
+  font-family: var(--font-heading);
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0 0 3px;
@@ -227,7 +227,7 @@
 
 .kt-form-header h3 {
   color: var(--ql-heading);
-  font-family: "Be Vietnam Pro", sans-serif;
+  font-family: var(--font-heading);
   font-size: 1.05rem;
   font-weight: 700;
   margin: 0 0 4px;

@@ -641,11 +641,11 @@ function displayValue(value, fallback = 'Chưa cập nhật') {
 function Brand() {
   return (
     <Link className="kp-brand" to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '16px 20px', textDecoration: 'none' }}>
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00666d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 9.5L12 3l9 6.5V21H3V9.5z"/><path d="M9 21V12h6v9"/>
       </svg>
-      <span style={{ fontSize: '19px', fontFamily: '"Montserrat", "Inter", sans-serif', fontWeight: '700', letterSpacing: '0' }}>
-        <span style={{ color: '#00666d' }}>Homestay</span><span style={{ color: '#a43c12' }}>Dorm</span>
+      <span style={{ fontSize: '19px', fontFamily: 'var(--font-heading)', fontWeight: '700', letterSpacing: '0' }}>
+        <span style={{ color: 'var(--color-primary)' }}>Homestay</span><span style={{ color: 'var(--color-accent)' }}>Dorm</span>
       </span>
     </Link>
   );
@@ -2680,7 +2680,7 @@ export default function KhachHangPortalPage() {
                   <div className="hd-card-body">
                     {selectedHd.hoanCoc.map((ds) => (
                       <div className="hd-settlement-info" key={ds.MaDoiSoat}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #bae6fd', paddingBottom: 10 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-info-soft)', paddingBottom: 10 }}>
                           <strong>Quyết toán #{ds.MaDoiSoat} (Phiếu trả: {ds.MaPhieuTra})</strong>
                           <span className={`kh-status-chip kh-status-chip--${ds.TrangThaiDoiSoat === 'Đã quyết toán' ? 'success' : 'warning'}`}>
                             {ds.TrangThaiDoiSoat}
@@ -2700,7 +2700,7 @@ export default function KhachHangPortalPage() {
                             <div className="hd-summary-row"><span>Tiền phạt vi phạm</span><strong>{formatSettlementMoney(ds.TienPhat)}</strong></div>
                           </div>
                         </div>
-                        <div style={{ marginTop: 15, paddingTop: 10, borderTop: '1px solid #bae6fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ marginTop: 15, paddingTop: 10, borderTop: '1px solid var(--color-info-soft)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
                             <span style={{ fontSize: 13, color: '#4b5563' }}>Tổng khấu trừ: <strong>{formatSettlementMoney(ds.TongKhauTru)}</strong></span>
                           </div>
@@ -2708,7 +2708,7 @@ export default function KhachHangPortalPage() {
                             {ds.LoaiQuyetToan === 'Hoàn cọc' ? (
                               <span>Khách nhận lại: <strong style={{ color: '#16a34a', fontSize: 18 }}>{formatSettlementMoney(ds.SoTienHoanThucTe)}</strong></span>
                             ) : ds.LoaiQuyetToan === 'Thu thêm' ? (
-                              <span>Khách phải nộp thêm: <strong style={{ color: '#dc2626', fontSize: 18 }}>{formatSettlementMoney(ds.SoTienKhachPhaiTT)}</strong></span>
+                              <span>Khách phải nộp thêm: <strong style={{ color: 'var(--color-danger)', fontSize: 18 }}>{formatSettlementMoney(ds.SoTienKhachPhaiTT)}</strong></span>
                             ) : (
                               <strong style={{ color: '#4b5563' }}>Không phát sinh hoàn/nộp</strong>
                             )}
@@ -2771,7 +2771,7 @@ export default function KhachHangPortalPage() {
                           <tr key={dk.MaDieuKhoan}>
                             <td>{dk.TenDieuKhoan}</td>
                             <td>{dk.HinhThucXuPhat}</td>
-                            <td style={{ textAlign: 'right', fontWeight: 'bold', color: dk.MucPhat > 0 ? '#dc2626' : 'inherit' }}>
+                            <td style={{ textAlign: 'right', fontWeight: 'bold', color: dk.MucPhat > 0 ? 'var(--color-danger)' : 'inherit' }}>
                               {dk.MucPhat > 0 ? formatSettlementMoney(dk.MucPhat) : 'Nhắc nhở / Cảnh cáo'}
                             </td>
                           </tr>
@@ -3609,7 +3609,7 @@ export default function KhachHangPortalPage() {
                 <div><span>Cơ sở</span><strong>{phieu.tenChiNhanh || 'Chưa cập nhật'}</strong></div>
                 <div><span>Số tiền cọc</span><strong style={{ color: 'var(--dc-primary)' }}>{Number(phieu.soTienCoc).toLocaleString('vi-VN')} VNĐ</strong></div>
                 {doiSoatTraPhongCoc && <div><span>Tỷ lệ hoàn cọc</span><strong>{formatPercent(doiSoatTraPhongCoc.tyLeHoanCocHienTai)}</strong></div>}
-                {doiSoatTraPhongCoc && <div><span>Số tiền được hoàn</span><strong style={{ color: '#137333' }}>{formatSettlementMoney(soTienHoanCoc)}</strong></div>}
+                {doiSoatTraPhongCoc && <div><span>Số tiền được hoàn</span><strong style={{ color: 'var(--color-success)' }}>{formatSettlementMoney(soTienHoanCoc)}</strong></div>}
                 {phieu.thoiHanThanhToan && <div><span>Hạn thanh toán</span><strong style={{ color: isExpired ? 'var(--dc-danger)' : 'inherit' }}>{formatDate(phieu.thoiHanThanhToan, true)}</strong></div>}
                 {phieu.tenNhanVienPhuTrach && <div><span>Nhân viên phụ trách</span><strong>{phieu.tenNhanVienPhuTrach}</strong></div>}
                   </div>
@@ -3635,13 +3635,13 @@ export default function KhachHangPortalPage() {
                 <h3 className="dc-section-title"><Icon name="invoice" />Chọn phương thức thanh toán</h3>
                 <p className="dc-bank-note">Vui lòng chọn cách bạn muốn thanh toán tiền cọc.</p>
                 <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
-                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={() => chonPhuongThucCoc('Chuyển khoản')} style={{ backgroundColor: '#2f6765', borderColor: '#2f6765', color: '#fff' }}>
+                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={() => chonPhuongThucCoc('Chuyển khoản')} style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-primary)', color: 'var(--color-surface)' }}>
                     <Icon name="invoice" /> Chuyển khoản
                   </button>
-                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={() => chonPhuongThucCoc('Tiền mặt')} style={{ backgroundColor: '#2f6765', borderColor: '#2f6765', color: '#fff' }}>
+                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={() => chonPhuongThucCoc('Tiền mặt')} style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-primary)', color: 'var(--color-surface)' }}>
                     <Icon name="profile" /> Tiền mặt tại quầy
                   </button>
-                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={thanhToanViMoPhong} style={{ backgroundColor: '#a43c12', borderColor: '#a43c12', color: '#fff' }}>
+                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={thanhToanViMoPhong} style={{ backgroundColor: 'var(--color-accent)', borderColor: 'var(--color-accent)', color: 'var(--color-surface)' }}>
                     <Icon name="payment" /> Ví điện tử (mô phỏng)
                   </button>
                 </div>
@@ -3660,7 +3660,7 @@ export default function KhachHangPortalPage() {
                         ? <span className="dc-file-name">📎 {uploadForm.fileName}</span>
                         : <><Icon name="profile" /><span>Kéo thả file vào đây hoặc <u>Chọn từ máy tính</u></span><small>Định dạng hỗ trợ: JPG, PNG, PDF (Tối đa 5MB)</small></>}
                     </label>
-                    <button className="kp-btn kp-btn-primary kp-full" type="submit" disabled={uploading} style={{ backgroundColor: '#2f6765', borderColor: '#2f6765', color: '#fff' }}>
+                    <button className="kp-btn kp-btn-primary kp-full" type="submit" disabled={uploading} style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-primary)', color: 'var(--color-surface)' }}>
                       {uploading ? 'Đang gửi...' : 'Gửi chứng từ thanh toán'}
                     </button>
                   </form>
@@ -3668,7 +3668,7 @@ export default function KhachHangPortalPage() {
 
                 <div className="dc-section-card">
                   <p className="dc-bank-note">Không muốn tải chứng từ? Bạn có thể thanh toán nhanh qua ví điện tử (môi trường mô phỏng, không trừ tiền thật).</p>
-                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={thanhToanViMoPhong} style={{ backgroundColor: '#a43c12', borderColor: '#a43c12', color: '#fff', marginTop: 8 }}>
+                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={thanhToanViMoPhong} style={{ backgroundColor: 'var(--color-accent)', borderColor: 'var(--color-accent)', color: 'var(--color-surface)', marginTop: 8 }}>
                     <Icon name="payment" /> Thanh toán bằng ví điện tử (mô phỏng)
                   </button>
                 </div>
@@ -3847,7 +3847,7 @@ export default function KhachHangPortalPage() {
                     </button>
                     <button
                       type="button"
-                      style={{ color: '#e53e3e' }}
+                      style={{ color: 'var(--color-danger)' }}
                       onClick={() => { setAccountMenuOpen(false); logout(); }}
                     >
                       <Icon name="lock" /> Đăng xuất

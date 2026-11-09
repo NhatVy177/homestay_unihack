@@ -1,17 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap");
-
 .ql-page {
-  --ql-green: #2fb7a4;
-  --ql-green-dark: #16796f;
-  --ql-green-soft: #eaf7f5;
-  --ql-orange: #e86f51;
-  --ql-orange-dark: #bf4c32;
-  --ql-bg: #f8f9fa;
-  --ql-text: #222;
-  --ql-heading: #1a1a1a;
+  --ql-green: var(--color-primary);
+  --ql-green-dark: var(--color-primary-hover);
+  --ql-green-soft: var(--color-primary-soft);
+  --ql-orange: var(--color-accent);
+  --ql-orange-dark: var(--color-accent);
+  --ql-bg: var(--color-bg);
+  --ql-text: var(--color-text);
+  --ql-heading: var(--color-text);
   --ql-muted: #555;
-  --ql-subtle: #7b8794;
-  --ql-line: #e9ecef;
+  --ql-subtle: var(--color-text-muted);
+  --ql-line: var(--color-surface-alt);
   --ql-warn: #fff6df;
   --ql-danger: #ef4444;
   --ql-danger-soft: #fff1f1;
@@ -21,7 +19,7 @@
     radial-gradient(circle at 92% 4%, rgba(232, 111, 81, 0.05), transparent 24%),
     var(--ql-bg);
   color: var(--ql-text);
-  font-family: "Inter", "Be Vietnam Pro", "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-body);
   line-height: 1.55;
   min-height: 100vh;
 }
@@ -89,7 +87,7 @@
 }
 
 .ql-brand-icon {
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--ql-line);
   border-radius: 50%;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.055);
@@ -111,7 +109,7 @@
 
 .ql-brand-name {
   color: var(--ql-heading);
-  font-family: "Be Vietnam Pro", sans-serif;
+  font-family: var(--font-heading);
   font-size: 18px;
   font-weight: 700;
 }
@@ -142,7 +140,7 @@
 }
 
 .ql-account {
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--ql-line);
   border-radius: 999px;
   gap: 10px;
@@ -153,7 +151,7 @@
 .ql-avatar {
   background: linear-gradient(135deg, var(--ql-orange), var(--ql-orange-dark));
   border-radius: 50%;
-  color: #fff;
+  color: var(--color-surface);
   display: grid;
   font-size: 13px;
   font-weight: 800;
@@ -238,14 +236,14 @@
 }
 
 .ql-nav-item.active {
-  background: #fff;
+  background: var(--color-surface);
   border-color: var(--ql-line);
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
   color: var(--ql-green-dark);
 }
 
 .ql-nav-item > span {
-  background: #f9fafb;
+  background: var(--color-bg);
   border: 1px solid var(--ql-line);
   border-radius: 14px;
   display: grid;
@@ -271,7 +269,7 @@
 }
 
 .ql-side-note {
-  background: linear-gradient(180deg, #fff, #f9fafb);
+  background: linear-gradient(180deg, var(--color-surface), var(--color-bg));
   border: 1px solid var(--ql-line);
   border-radius: 24px;
   margin-top: auto;
@@ -290,7 +288,7 @@
 }
 
 .ql-side-note div {
-  background: #f1f3f5;
+  background: var(--color-surface-alt);
   border-radius: 999px;
   height: 9px;
   margin-top: 12px;
@@ -318,7 +316,7 @@
 
 .ql-page-head h1 {
   color: var(--ql-heading);
-  font-family: "Be Vietnam Pro", sans-serif;
+  font-family: var(--font-heading);
   font-size: clamp(27px, 3vw, 34px);
   letter-spacing: -0.04em;
   line-height: 1.15;
@@ -338,7 +336,7 @@
 
 .ql-search {
   align-items: center;
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--ql-line);
   border-radius: 999px;
   color: var(--ql-muted);
@@ -374,18 +372,18 @@
   background: linear-gradient(135deg, var(--ql-orange), var(--ql-orange-dark));
   border: 0;
   box-shadow: 0 12px 24px rgba(232, 111, 81, 0.2);
-  color: #fff;
+  color: var(--color-surface);
 }
 
 .ql-btn.secondary {
-  background: #fff;
-  border: 1px solid #dde4e8;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   color: var(--ql-green-dark);
 }
 
 .ql-btn:disabled {
-  background: #e4e7eb;
-  border-color: #e4e7eb;
+  background: var(--color-border);
+  border-color: var(--color-border);
   color: #9aa3ae;
   box-shadow: none;
   cursor: not-allowed;
@@ -412,7 +410,7 @@
 .ql-card,
 .ql-table-card,
 .ql-room-card {
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--ql-line);
   border-radius: 28px;
   box-shadow: var(--ql-shadow);
@@ -477,7 +475,7 @@
 .ql-table-card h2,
 .ql-room-card h2 {
   color: var(--ql-heading);
-  font-family: "Be Vietnam Pro", sans-serif;
+  font-family: var(--font-heading);
   font-size: 19px;
   letter-spacing: -0.025em;
 }
@@ -496,7 +494,7 @@
 }
 
 .ql-pipeline div {
-  background: #f9fafb;
+  background: var(--color-bg);
   border: 1px solid var(--ql-line);
   border-radius: 20px;
   padding: 15px;
@@ -609,8 +607,8 @@
 }
 
 .ql-status.neutral {
-  background: #f1f3f5;
-  color: #4a5568;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
 }
 
 .ql-status.danger {
@@ -626,7 +624,7 @@
 
 .ql-todos > div,
 .ql-checklist > div {
-  background: #f9fafb;
+  background: var(--color-bg);
   border: 1px solid var(--ql-line);
   border-radius: 18px;
   padding: 13px;
@@ -673,7 +671,7 @@
 
 .ql-filters input,
 .ql-filters select {
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--ql-line);
   border-radius: 14px;
   color: var(--ql-text);
@@ -815,13 +813,13 @@
    component, service, and repository layers later.
    ====================================================== */
 .handover-tab {
-  --handover-primary: #00666d;
-  --handover-primary-2: #3b8280;
-  --handover-soft: #eef8f7;
-  --handover-line: #dce7e7;
-  --handover-muted: #657273;
-  --handover-text: #191c1d;
-  --handover-warn: #8a5a00;
+  --handover-primary: var(--color-primary);
+  --handover-primary-2: var(--color-primary);
+  --handover-soft: var(--color-primary-soft);
+  --handover-line: var(--color-primary-soft);
+  --handover-muted: var(--color-text-muted);
+  --handover-text: var(--color-text);
+  --handover-warn: var(--color-warning);
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -833,11 +831,11 @@
 
 .handover-search-card {
   background:
-    linear-gradient(135deg, rgba(0, 102, 109, 0.09), rgba(255, 255, 255, 0) 55%),
-    #ffffff;
+    linear-gradient(135deg, rgba(74, 101, 73, 0.09), rgba(255, 255, 255, 0) 55%),
+    var(--color-surface);
   border: 1px solid var(--handover-line);
   border-radius: 12px;
-  box-shadow: 0 12px 30px rgba(0, 32, 34, 0.06);
+  box-shadow: 0 12px 30px rgba(74, 101, 73, 0.06);
   gap: 18px;
   margin-bottom: 0 !important;
   padding: 22px !important;
@@ -881,7 +879,7 @@
 }
 
 .handover-tab .ktp-label {
-  color: #3f494a;
+  color: var(--color-text-muted);
   display: block;
   font-size: 12px;
   font-weight: 800;
@@ -889,7 +887,7 @@
 }
 
 .handover-tab .ktp-input {
-  background: #ffffff;
+  background: var(--color-surface);
   min-height: 42px;
 }
 
@@ -916,7 +914,7 @@
 
 .handover-queue-card {
   border-color: var(--handover-line) !important;
-  box-shadow: 0 10px 26px rgba(0, 32, 34, 0.05) !important;
+  box-shadow: 0 10px 26px rgba(74, 101, 73, 0.05) !important;
   margin-bottom: 0 !important;
 }
 
@@ -954,17 +952,17 @@
 }
 
 .handover-tab .ktp-table th {
-  background: #f7faf9;
+  background: var(--color-bg);
 }
 
 .handover-tab .ktp-table tbody tr:hover {
-  background: #f7fbfa;
+  background: var(--color-bg);
 }
 
 .handover-current-banner {
   align-items: center;
   background: #f4fbfb;
-  border: 1px solid rgba(0, 102, 109, 0.18);
+  border: 1px solid rgba(74, 101, 73, 0.18);
   border-radius: 12px;
   display: flex;
   flex-wrap: wrap;
@@ -985,11 +983,11 @@
 }
 
 .handover-summary-card {
-  background: #ffffff !important;
+  background: var(--color-surface) !important;
   border: 1px solid var(--handover-line) !important;
   border-radius: 12px !important;
   border-top: 4px solid var(--handover-accent, var(--handover-primary)) !important;
-  box-shadow: 0 8px 22px rgba(0, 32, 34, 0.045);
+  box-shadow: 0 8px 22px rgba(74, 101, 73, 0.045);
   margin-bottom: 0 !important;
   padding: 18px !important;
 }
@@ -1000,10 +998,10 @@
 }
 
 .handover-workspace {
-  background: #ffffff !important;
+  background: var(--color-surface) !important;
   border: 1px solid var(--handover-line) !important;
   border-radius: 12px !important;
-  box-shadow: 0 12px 30px rgba(0, 32, 34, 0.055);
+  box-shadow: 0 12px 30px rgba(74, 101, 73, 0.055);
   gap: 0 !important;
   overflow: hidden !important;
   padding: 0 !important;
@@ -1011,7 +1009,7 @@
 
 .handover-form-head {
   background:
-    linear-gradient(180deg, #f8fbfb, #f2f7f7);
+    linear-gradient(180deg, var(--color-bg), #f2f7f7);
   border-bottom: 1px solid var(--handover-line);
   padding: 22px 24px;
 }
@@ -1044,8 +1042,8 @@
 
 .handover-pill {
   align-items: center;
-  background: #ffffff;
-  border: 1px solid rgba(0, 102, 109, 0.18);
+  background: var(--color-surface);
+  border: 1px solid rgba(74, 101, 73, 0.18);
   border-radius: 999px;
   color: var(--handover-primary);
   display: inline-flex;
@@ -1057,7 +1055,7 @@
 }
 
 .handover-pill.is-warning {
-  background: #fff8e1;
+  background: var(--color-warning-soft);
   border-color: #f0cf73;
   color: var(--handover-warn);
 }
@@ -1067,7 +1065,7 @@
 }
 
 .handover-workspace textarea.ktp-input {
-  background: #ffffff;
+  background: var(--color-surface);
 }
 
 @media (max-width: 980px) {
@@ -1104,12 +1102,12 @@
 }
 
 /* ---- Utilities ---- */
-.ql-page .ql-muted { color: #7b8794; }
+.ql-page .ql-muted { color: var(--color-text-muted); }
 
 .ql-page .ql-empty {
   padding: 2.5rem 1rem;
   text-align: center;
-  color: #7b8794;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 
@@ -1130,7 +1128,7 @@
 }
 
 .ql-page .ql-modal {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 14px;
   padding: 2rem;
   width: min(480px, 90vw);
@@ -1149,8 +1147,8 @@
 }
 
 .ql-page .ql-modal-info {
-  background: #f9fafb;
-  border: 1px solid #e9ecef;
+  background: var(--color-bg);
+  border: 1px solid var(--color-surface-alt);
   border-radius: 8px;
   padding: 0.875rem 1rem;
   margin-bottom: 1.25rem;
@@ -1169,7 +1167,7 @@
 
 .ql-page .ql-textarea {
   width: 100%;
-  border: 1px solid #dde4e8;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 0.625rem 0.75rem;
   font: inherit;
@@ -1179,7 +1177,7 @@
   outline: none;
 }
 
-.ql-page .ql-textarea:focus { border-color: #2fb7a4; }
+.ql-page .ql-textarea:focus { border-color: var(--color-primary); }
 
 .ql-page .ql-modal-warn {
   margin: 0 0 0.75rem;
@@ -1333,7 +1331,7 @@
 
 /* Required note (when discrepancy detected) */
 .ql-page .ql-asset-note-input.required-note {
-  border-color: #e86f51;
+  border-color: var(--color-accent);
 }
 
 .ql-page .ql-asset-note-input.required-note::placeholder {
@@ -1344,7 +1342,7 @@
 /* Signature confirmation strip */
 .ql-page .ql-sign-section {
   align-items: flex-start;
-  background: #f9fafb;
+  background: var(--color-bg);
   border: 1px dashed var(--ql-line);
   border-radius: 16px;
   display: flex;

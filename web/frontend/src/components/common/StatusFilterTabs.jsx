@@ -9,7 +9,7 @@ export default function StatusFilterTabs({
   className = ''
 }) {
   return (
-    <div className={`status-pill-tabs ${className}`.trim()} role="group" aria-label={ariaLabel}>
+    <div className={`status-pill-tabs ui-tabs ${className}`.trim()} role="group" aria-label={ariaLabel}>
       {items.map((item) => {
         const isActive = activeKey === item.key;
         const count = item.count ?? counts?.[item.key];

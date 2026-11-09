@@ -1,29 +1,27 @@
-@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap");
-
 .admin-page {
-  --admin-primary: #00666d;
-  --admin-primary-dark: #004f55;
-  --admin-primary-container: #00818a;
-  --admin-primary-soft: #e0f5f6;
-  --admin-secondary: #a43c12;
-  --admin-secondary-dark: #822800;
-  --admin-secondary-soft: #ffdbcf;
-  --admin-bg: #f8f9fa;
-  --admin-surface: #ffffff;
-  --admin-surface-low: #f3f4f5;
-  --admin-text: #191c1d;
-  --admin-muted: #3f494a;
-  --admin-subtle: #6f797a;
-  --admin-line: #d9e1e2;
-  --admin-line-strong: #bec8c9;
-  --admin-shadow: 0 18px 42px rgba(0, 32, 34, 0.12);
+  --admin-primary: var(--color-primary);
+  --admin-primary-dark: var(--color-primary-hover);
+  --admin-primary-container: var(--color-primary);
+  --admin-primary-soft: var(--color-primary-soft);
+  --admin-secondary: var(--color-accent);
+  --admin-secondary-dark: var(--color-accent);
+  --admin-secondary-soft: var(--color-accent-soft);
+  --admin-bg: var(--color-bg);
+  --admin-surface: var(--color-surface);
+  --admin-surface-low: var(--color-surface-alt);
+  --admin-text: var(--color-text);
+  --admin-muted: var(--color-text-muted);
+  --admin-subtle: var(--color-text-muted);
+  --admin-line: var(--color-border);
+  --admin-line-strong: var(--color-border);
+  --admin-shadow: var(--shadow-md);
   background:
-    radial-gradient(circle at 18% 8%, rgba(0, 102, 109, 0.07), transparent 28%),
-    radial-gradient(circle at 92% 6%, rgba(164, 60, 18, 0.06), transparent 24%),
+    radial-gradient(circle at 18% 8%, rgba(74, 101, 73, 0.07), transparent 28%),
+    radial-gradient(circle at 92% 6%, rgba(140, 115, 85, 0.06), transparent 24%),
     var(--admin-bg);
   color: var(--admin-text);
   display: flex;
-  font-family: "Inter", "Be Vietnam Pro", "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-body);
   min-height: 100vh;
 }
 
@@ -68,7 +66,7 @@
   align-items: center;
   color: var(--admin-secondary);
   display: inline-flex;
-  font-family: "Be Vietnam Pro", "Inter", sans-serif;
+  font-family: var(--font-heading);
   font-size: 19px;
   font-weight: 800;
   gap: 9px;
@@ -114,8 +112,8 @@
 }
 
 .admin-nav-item.active {
-  background: rgba(0, 102, 109, 0.08);
-  border-color: rgba(0, 102, 109, 0.16);
+  background: rgba(74, 101, 73, 0.08);
+  border-color: rgba(74, 101, 73, 0.16);
   color: var(--admin-primary);
   font-weight: 800;
 }
@@ -161,7 +159,7 @@
 .admin-topbar h1,
 .admin-hero h2,
 .admin-panel h3 {
-  font-family: "Be Vietnam Pro", "Inter", sans-serif;
+  font-family: var(--font-heading);
   letter-spacing: -0.015em;
 }
 
@@ -183,7 +181,7 @@
   background: var(--admin-surface);
   border: 1px solid var(--admin-line);
   border-radius: 999px;
-  box-shadow: 0 8px 20px rgba(0, 32, 34, 0.05);
+  box-shadow: 0 8px 20px rgba(74, 101, 73, 0.05);
   display: flex;
   gap: 10px;
   min-width: 260px;
@@ -193,7 +191,7 @@
 .admin-avatar {
   background: linear-gradient(135deg, var(--admin-secondary), var(--admin-secondary-dark));
   border-radius: 50%;
-  color: #fff;
+  color: var(--color-surface);
   display: grid;
   flex: 0 0 auto;
   font-size: 13px;
@@ -236,10 +234,10 @@
 
 .admin-hero {
   align-items: center;
-  background: linear-gradient(135deg, #ffffff 0%, #f0f8f8 100%);
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-primary-soft) 100%);
   border: 1px solid var(--admin-line);
   border-radius: 8px;
-  box-shadow: 0 10px 26px rgba(0, 32, 34, 0.055);
+  box-shadow: 0 10px 26px rgba(74, 101, 73, 0.055);
   display: flex;
   gap: 24px;
   justify-content: space-between;
@@ -282,9 +280,9 @@
   background:
     linear-gradient(45deg, transparent 50%, var(--admin-primary) 50%) right 16px center / 6px 6px no-repeat,
     linear-gradient(135deg, var(--admin-primary) 50%, transparent 50%) right 11px center / 6px 6px no-repeat,
-    #fff;
+    var(--color-surface);
   border-color: var(--admin-primary);
-  box-shadow: 0 0 0 3px rgba(0, 102, 109, 0.08);
+  box-shadow: 0 0 0 3px rgba(74, 101, 73, 0.08);
 }
 
 .admin-action-select:disabled {
@@ -318,8 +316,8 @@
 
 .admin-btn.primary {
   background: var(--admin-primary);
-  box-shadow: 0 10px 22px rgba(0, 102, 109, 0.18);
-  color: #fff;
+  box-shadow: 0 10px 22px rgba(74, 101, 73, 0.18);
+  color: var(--color-surface);
 }
 
 .admin-btn.secondary {
@@ -330,8 +328,8 @@
 
 .admin-btn.danger {
   background: var(--admin-secondary);
-  box-shadow: 0 10px 22px rgba(164, 60, 18, 0.18);
-  color: #fff;
+  box-shadow: 0 10px 22px rgba(140, 115, 85, 0.18);
+  color: var(--color-surface);
 }
 
 .admin-btn:disabled {
@@ -365,7 +363,7 @@
 }
 
 .admin-overview-error {
-  border: 1px solid #fecaca;
+  border: 1px solid var(--color-danger-soft);
   border-radius: 8px;
 }
 
@@ -405,20 +403,20 @@
 }
 
 .admin-quick-action:hover {
-  border-color: rgba(0, 102, 109, 0.2);
+  border-color: rgba(74, 101, 73, 0.2);
   color: var(--admin-primary);
 }
 
 .admin-quick-action.primary {
-  background: rgba(0, 102, 109, 0.09);
-  border-color: rgba(0, 102, 109, 0.16);
+  background: rgba(74, 101, 73, 0.09);
+  border-color: rgba(74, 101, 73, 0.16);
   color: var(--admin-primary);
 }
 
 .admin-quick-action span,
 .admin-health-item > span,
 .admin-recent-row > span {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 8px;
   display: grid;
   flex: 0 0 auto;
@@ -472,7 +470,7 @@
 .admin-health-item strong {
   color: var(--admin-text);
   display: block;
-  font-family: "Be Vietnam Pro", "Inter", sans-serif;
+  font-family: var(--font-heading);
   font-size: 22px;
   line-height: 1.1;
   margin: 2px 0;
@@ -517,7 +515,7 @@
   background: var(--admin-surface);
   border: 1px solid var(--admin-line);
   border-radius: 8px;
-  box-shadow: 0 8px 22px rgba(0, 32, 34, 0.045);
+  box-shadow: 0 8px 22px rgba(74, 101, 73, 0.045);
   display: flex;
   gap: 15px;
   min-width: 0;
@@ -551,7 +549,7 @@
 .admin-stat-card strong {
   color: var(--admin-text);
   display: block;
-  font-family: "Be Vietnam Pro", "Inter", sans-serif;
+  font-family: var(--font-heading);
   font-size: 26px;
   line-height: 1.1;
   margin: 5px 0 2px;
@@ -578,7 +576,7 @@
   background: rgba(255, 255, 255, 0.96);
   border: 1px solid var(--admin-line);
   border-radius: 8px;
-  box-shadow: 0 10px 26px rgba(0, 32, 34, 0.045);
+  box-shadow: 0 10px 26px rgba(74, 101, 73, 0.045);
 }
 
 .admin-panel {
@@ -635,11 +633,11 @@
 }
 
 .admin-task:hover {
-  border-color: rgba(0, 102, 109, 0.18);
+  border-color: rgba(74, 101, 73, 0.18);
 }
 
 .admin-task > span {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 8px;
   color: var(--admin-secondary);
   display: grid;
@@ -678,7 +676,7 @@
 }
 
 .admin-procedure-panel h3 {
-  font-family: "Be Vietnam Pro", "Inter", sans-serif;
+  font-family: var(--font-heading);
   font-size: 16px;
   margin: 4px 0 0;
 }
@@ -692,7 +690,7 @@
   border: 1px solid var(--admin-line);
   border-radius: 8px;
   color: var(--admin-primary-dark);
-  font-family: Consolas, "Courier New", monospace;
+  font-family: var(--font-heading);
   font-size: 11.5px;
   padding: 9px 10px;
   white-space: normal;
@@ -757,7 +755,7 @@
 }
 
 .admin-form-grid input.admin-readonly-field {
-  background: rgba(0, 102, 109, 0.08);
+  background: rgba(74, 101, 73, 0.08);
   color: var(--admin-primary-dark);
   font-weight: 850;
 }
@@ -768,8 +766,8 @@
 .admin-form-grid select:focus,
 .admin-form-grid textarea:focus {
   border-color: var(--admin-primary);
-  box-shadow: 0 0 0 3px rgba(0, 102, 109, 0.08);
-  background: #fff;
+  box-shadow: 0 0 0 3px rgba(74, 101, 73, 0.08);
+  background: var(--color-surface);
 }
 
 .admin-table-wrap {
@@ -777,8 +775,8 @@
 }
 
 .admin-error-banner {
-  background: #fef2f2;
-  border-bottom: 1px solid #fecaca;
+  background: var(--color-danger-soft);
+  border-bottom: 1px solid var(--color-danger-soft);
   color: #b91c1c;
   font-size: 13px;
   font-weight: 700;
@@ -814,11 +812,11 @@
 }
 
 .admin-table tbody tr:hover {
-  background: rgba(0, 102, 109, 0.035);
+  background: rgba(74, 101, 73, 0.035);
 }
 
 .admin-table tbody tr.admin-room-locked-row {
-  background: #f3f4f5;
+  background: var(--color-surface-alt);
 }
 
 .admin-table tbody tr.admin-room-locked-row td:not(:last-child) {
@@ -841,7 +839,7 @@
 }
 
 .admin-status.done {
-  background: rgba(0, 102, 109, 0.1);
+  background: rgba(74, 101, 73, 0.1);
   color: var(--admin-primary);
 }
 
@@ -851,8 +849,8 @@
 }
 
 .admin-status.danger {
-  background: #fef2f2;
-  color: #dc2626;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
 }
 
 .admin-property-grid {
@@ -893,7 +891,7 @@
 
 .admin-property-head > span:not(.admin-status),
 .admin-service-row > span:not(.admin-status) {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 8px;
   color: var(--admin-primary);
   display: grid;
@@ -959,7 +957,7 @@
 }
 
 .admin-note {
-  background: rgba(0, 102, 109, 0.07);
+  background: rgba(74, 101, 73, 0.07);
   border-top: 1px solid var(--admin-line);
   color: var(--admin-primary-dark);
   gap: 10px;
@@ -1025,7 +1023,7 @@
 }
 
 .admin-modal-head h3 {
-  font-family: "Be Vietnam Pro", "Inter", sans-serif;
+  font-family: var(--font-heading);
   font-size: 20px;
   margin: 3px 0 8px;
 }
@@ -1040,7 +1038,7 @@
 .admin-modal-avatar {
   background: linear-gradient(135deg, var(--admin-secondary), var(--admin-secondary-dark));
   border-radius: 50%;
-  color: #fff;
+  color: var(--color-surface);
   display: grid;
   flex: 0 0 auto;
   font-weight: 850;
@@ -1101,8 +1099,8 @@
 }
 
 .admin-form-note {
-  background: rgba(0, 102, 109, 0.07);
-  border: 1px solid rgba(0, 102, 109, 0.12);
+  background: rgba(74, 101, 73, 0.07);
+  border: 1px solid rgba(74, 101, 73, 0.12);
   border-radius: 8px;
   color: var(--admin-primary-dark);
   font-size: 13px;
@@ -1129,8 +1127,8 @@
   background: #111827;
   border: 1px solid rgba(17, 24, 39, 0.18);
   border-radius: 8px;
-  color: #f9fafb;
-  font-family: "Consolas", "SFMono-Regular", monospace;
+  color: var(--color-bg);
+  font-family: var(--font-heading);
   font-size: 12px;
   line-height: 1.55;
   margin: 0;
@@ -1155,8 +1153,8 @@
 }
 
 .admin-form-error {
-  background: #fff1ed;
-  border-bottom: 1px solid rgba(164, 60, 18, 0.16);
+  background: var(--color-accent-soft);
+  border-bottom: 1px solid rgba(140, 115, 85, 0.16);
   color: var(--admin-secondary-dark);
   font-size: 13px;
   font-weight: 700;

@@ -37,3 +37,6 @@ web/backend/uploads/chung-tu/*
 web/backend/uploads/chung-tu-doi-soat/*
 !web/backend/uploads/chung-tu-doi-soat/.gitkeep
 
+
+# Local UI review screenshots and reports
+web/frontend/.ui-screens/

@@ -6,14 +6,14 @@ function PaperPlane() {
   return (
     <svg viewBox="0 0 140 120" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* vệt bay */}
-      <path d="M8 96 C 34 90, 48 80, 60 64" stroke="#9ec9f7" strokeWidth="3"
+      <path d="M8 96 C 34 90, 48 80, 60 64" stroke="var(--color-info-soft)" strokeWidth="3"
         strokeLinecap="round" strokeDasharray="2 9" />
       {/* thân máy bay */}
-      <polygon points="14,58 132,12 78,108 64,72" fill="#ffffff" stroke="#5b6b7b" strokeWidth="2.2" strokeLinejoin="round" />
+      <polygon points="14,58 132,12 78,108 64,72" fill="var(--color-surface)" stroke="var(--color-info)" strokeWidth="2.2" strokeLinejoin="round" />
       {/* cánh dưới (mặt gấp tối hơn) */}
-      <polygon points="132,12 64,72 78,108" fill="#dbe7f6" stroke="#5b6b7b" strokeWidth="2.2" strokeLinejoin="round" />
+      <polygon points="132,12 64,72 78,108" fill="var(--color-info-soft)" stroke="var(--color-info)" strokeWidth="2.2" strokeLinejoin="round" />
       {/* nếp gấp giữa */}
-      <line x1="132" y1="12" x2="64" y2="72" stroke="#5b6b7b" strokeWidth="2.2" strokeLinecap="round" />
+      <line x1="132" y1="12" x2="64" y2="72" stroke="var(--color-info)" strokeWidth="2.2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -23,12 +23,12 @@ function CrashedPlane() {
   return (
     <svg viewBox="0 0 140 120" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* bóng đổ dưới đất */}
-      <ellipse cx="70" cy="104" rx="34" ry="7" fill="#f3a9ab" />
+      <ellipse cx="70" cy="104" rx="34" ry="7" fill="var(--color-danger-soft)" />
       {/* máy bay cắm mũi xuống */}
       <g transform="rotate(168 70 60)">
-        <polygon points="20,52 128,18 80,104 66,70" fill="#ffffff" stroke="#9b4a4d" strokeWidth="2.2" strokeLinejoin="round" />
-        <polygon points="128,18 66,70 80,104" fill="#fbe0e1" stroke="#9b4a4d" strokeWidth="2.2" strokeLinejoin="round" />
-        <line x1="128" y1="18" x2="66" y2="70" stroke="#9b4a4d" strokeWidth="2.2" strokeLinecap="round" />
+        <polygon points="20,52 128,18 80,104 66,70" fill="var(--color-surface)" stroke="var(--color-danger)" strokeWidth="2.2" strokeLinejoin="round" />
+        <polygon points="128,18 66,70 80,104" fill="var(--color-danger-soft)" stroke="var(--color-danger)" strokeWidth="2.2" strokeLinejoin="round" />
+        <line x1="128" y1="18" x2="66" y2="70" stroke="var(--color-danger)" strokeWidth="2.2" strokeLinecap="round" />
       </g>
     </svg>
   );
@@ -59,7 +59,7 @@ export default function ResultModal({ open, type = 'success', title, message, co
 
   return (
     <div className="rm-overlay" onClick={onClose}>
-      <div className="rm-card" onClick={(e) => e.stopPropagation()} role="alertdialog" aria-modal="true">
+      <div className="rm-card ui-card" onClick={(e) => e.stopPropagation()} role="alertdialog" aria-modal="true">
         <div className={`rm-art rm-art--${isSuccess ? 'success' : 'error'}`}>
           <div className="rm-hill" />
           {isSuccess ? <PaperPlane /> : <CrashedPlane />}
@@ -71,7 +71,7 @@ export default function ResultModal({ open, type = 'success', title, message, co
           <h3 className="rm-title">{heading}</h3>
           {/* Không có message thì bỏ luôn thẻ <p>, tránh để lại khoảng trống thừa */}
           {message ? <p className="rm-msg">{message}</p> : null}
-          <button className={`rm-btn rm-btn--${isSuccess ? 'success' : 'error'}`} onClick={onClose}>
+          <button className={`rm-btn ui-btn rm-btn--${isSuccess ? 'success' : 'error'}`} onClick={onClose}>
             {btnText}
           </button>
         </div>

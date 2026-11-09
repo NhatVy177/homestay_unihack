@@ -1,29 +1,29 @@
 .kp-page {
-  --kp-primary: #00666d;
-  --kp-primary-dark: #004f55;
-  --kp-primary-soft: #e0f5f6;
-  --kp-accent: #a43c12;
-  --kp-accent-dark: #822800;
-  --kp-accent-soft: #ffdbcf;
-  --kp-bg: #f8f9fa;
-  --kp-surface: #ffffff;
-  --kp-surface-low: #f3f4f5;
-  --kp-surface-mid: #e7e8e9;
-  --kp-text: #191c1d;
-  --kp-muted: #3e494a;
-  --kp-soft-text: #6e797a;
-  --kp-border: #d9e1e2;
-  --kp-border-strong: #bdc9ca;
-  --kp-shadow: 0 8px 24px rgba(0, 105, 112, 0.08);
-  --kp-shadow-strong: 0 18px 42px rgba(0, 32, 34, 0.14);
-  --kp-radius: 8px;
-  --kp-radius-lg: 12px;
+  --kp-primary: var(--color-primary);
+  --kp-primary-dark: var(--color-primary-hover);
+  --kp-primary-soft: var(--color-primary-soft);
+  --kp-accent: var(--color-accent);
+  --kp-accent-dark: var(--color-accent);
+  --kp-accent-soft: var(--color-accent-soft);
+  --kp-bg: var(--color-bg);
+  --kp-surface: var(--color-surface);
+  --kp-surface-low: var(--color-surface-alt);
+  --kp-surface-mid: var(--color-surface-alt);
+  --kp-text: var(--color-text);
+  --kp-muted: var(--color-text-muted);
+  --kp-soft-text: var(--color-text-muted);
+  --kp-border: var(--color-border);
+  --kp-border-strong: var(--color-border);
+  --kp-shadow: var(--shadow-md);
+  --kp-shadow-strong: var(--shadow-md);
+  --kp-radius: var(--radius-sm);
+  --kp-radius-lg: var(--radius-lg);
   --kp-sidebar-width: 256px;
 
   background: var(--kp-bg);
   color: var(--kp-text);
   display: flex;
-  font-family: Inter, Arial, sans-serif;
+  font-family: var(--font-body);
   min-height: 100vh;
 }
 
@@ -63,7 +63,7 @@
   align-items: center;
   color: var(--kp-primary);
   display: inline-flex;
-  font-family: Montserrat, Inter, Arial, sans-serif;
+  font-family: var(--font-heading);
   font-size: 20px;
   font-weight: 800;
   gap: 10px;
@@ -146,7 +146,7 @@
 }
 
 .kp-side-item.is-active {
-  background: rgba(0, 102, 109, 0.08);
+  background: rgba(74, 101, 73, 0.08);
   color: var(--kp-primary);
   font-weight: 600;
   border-left: 4px solid var(--kp-primary);
@@ -224,7 +224,7 @@
 
 .kp-topbar h1,
 .kp-result-head h2 {
-  font-family: Montserrat, Inter, Arial, sans-serif;
+  font-family: var(--font-heading);
   letter-spacing: 0;
 }
 
@@ -335,7 +335,7 @@
   background: var(--kp-surface);
   border: 1px solid var(--kp-border);
   border-radius: var(--kp-radius-lg);
-  box-shadow: 0 4px 18px rgba(0, 32, 34, 0.05);
+  box-shadow: 0 4px 18px rgba(74, 101, 73, 0.05);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -344,7 +344,7 @@
 
 .kp-keyword {
   align-items: center;
-  background: var(--kp-surface-container, #f3f4f5);
+  background: var(--kp-surface-container, var(--color-surface-alt));
   border: 1px solid var(--kp-border);
   border-radius: 4px;
   color: var(--kp-soft-text);
@@ -393,7 +393,7 @@
 
 .kp-select-trigger {
   align-items: center;
-  background: var(--kp-surface-container, #f3f4f5);
+  background: var(--kp-surface-container, var(--color-surface-alt));
   border: 1px solid var(--kp-border);
   border-radius: 4px;
   color: var(--kp-text);
@@ -477,23 +477,23 @@
 
 .kp-btn-primary {
   background: var(--kp-accent);
-  color: #ffffff;
+  color: var(--color-surface);
 }
 
 .kp-btn-primary:hover {
   background: var(--kp-accent-dark);
-  box-shadow: 0 10px 22px rgba(164, 60, 18, 0.22);
+  box-shadow: 0 10px 22px rgba(140, 115, 85, 0.22);
   transform: translateY(-1px);
 }
 
 .kp-btn-soft {
-  background: rgba(0, 102, 109, 0.1);
+  background: rgba(74, 101, 73, 0.1);
   color: var(--kp-primary);
 }
 
 .kp-btn-soft:hover {
   background: var(--kp-primary);
-  color: #ffffff;
+  color: var(--color-surface);
 }
 
 .kp-btn-ghost {
@@ -503,7 +503,7 @@
 }
 
 .kp-btn-light {
-  background: #ffffff !important;
+  background: var(--color-surface) !important;
   color: var(--kp-primary) !important;
 }
 
@@ -545,7 +545,7 @@
   background: var(--kp-surface);
   border: 1px solid var(--kp-border);
   border-radius: var(--kp-radius-lg);
-  box-shadow: 0 4px 18px rgba(0, 32, 34, 0.04);
+  box-shadow: 0 4px 18px rgba(74, 101, 73, 0.04);
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -579,7 +579,7 @@
 
 .kp-room-placeholder {
   align-items: center;
-  background: linear-gradient(135deg, #f3f4f5, #e0f5f6);
+  background: linear-gradient(135deg, var(--color-surface-alt), var(--color-primary-soft));
   color: var(--kp-primary);
   display: flex;
   flex-direction: column;
@@ -604,7 +604,7 @@
 .kp-status-badge {
   background: var(--kp-primary);
   border-radius: 6px;
-  color: #ffffff;
+  color: var(--color-surface);
   font-size: 10px;
   font-weight: 800;
   left: 12px;
@@ -763,7 +763,7 @@
 }
 
 .kp-message.error {
-  color: #9f1d1d;
+  color: var(--color-danger);
 }
 
 .kp-rightbar {
@@ -781,7 +781,7 @@
 .kp-info-panel {
   background: var(--kp-surface);
   border: 1px solid var(--kp-border);
-  box-shadow: 0 4px 18px rgba(0, 32, 34, 0.04);
+  box-shadow: 0 4px 18px rgba(74, 101, 73, 0.04);
   padding: 18px;
 }
 
@@ -830,7 +830,7 @@
 
 .kp-support-panel {
   background: var(--kp-primary);
-  color: #ffffff;
+  color: var(--color-surface);
   overflow: hidden;
   padding: 20px;
   position: relative;
@@ -896,7 +896,7 @@
 
 .kp-modal-backdrop {
   align-items: center;
-  background: rgba(0, 20, 22, 0.58);
+  background: rgba(74, 101, 73, 0.58);
   display: flex;
   inset: 0;
   justify-content: center;
@@ -925,7 +925,7 @@
 }
 
 .kp-modal-head h2 {
-  font-family: Montserrat, Inter, Arial, sans-serif;
+  font-family: var(--font-heading);
   font-size: 24px;
   letter-spacing: 0;
   margin: 4px 0 0;
@@ -1056,7 +1056,7 @@
     background: var(--kp-surface);
     border-top: 1px solid var(--kp-border);
     bottom: 0;
-    box-shadow: 0 -8px 24px rgba(0, 32, 34, 0.08);
+    box-shadow: 0 -8px 24px rgba(74, 101, 73, 0.08);
     display: flex;
     height: 64px;
     justify-content: space-around;

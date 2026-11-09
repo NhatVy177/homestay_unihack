@@ -1,3 +1,5 @@
+import NavigationToggle from '../../components/common/NavigationToggle.jsx';
+import BranchChip from '../../components/common/BranchChip.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
@@ -1305,7 +1307,7 @@ function BranchDetailModal({ branch, isBusy, onClose, onToggleStatus, onEdit, on
           <section className="admin-modal" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}>
             <header className="admin-modal-head">
               <div className="admin-modal-title">
-                <span className="admin-modal-avatar" style={{ background: isInactive ? 'rgba(0, 102, 109, 0.1)' : '#fef2f2', color: isInactive ? 'var(--admin-primary)' : '#dc2626' }}><Icon name={isInactive ? 'check_circle' : 'warning'} /></span>
+                <span className="admin-modal-avatar" style={{ background: isInactive ? 'rgba(0, 102, 109, 0.1)' : 'var(--color-danger-soft)', color: isInactive ? 'var(--admin-primary)' : 'var(--color-danger)' }}><Icon name={isInactive ? 'check_circle' : 'warning'} /></span>
                 <div>
                   <span className="admin-eyebrow">Xác nhận thao tác</span>
                   <h3>{isInactive ? 'Mở hoạt động lại chi nhánh' : 'Ngừng hoạt động chi nhánh'}</h3>
@@ -1315,7 +1317,7 @@ function BranchDetailModal({ branch, isBusy, onClose, onToggleStatus, onEdit, on
                 <Icon name="close" />
               </button>
             </header>
-            <div style={{ padding: '0 24px 24px 24px', color: '#6f797a' }}>
+            <div style={{ padding: '0 24px 24px 24px', color: 'var(--color-text-muted)' }}>
               <p>Bạn có chắc chắn muốn {isInactive ? 'mở hoạt động lại' : 'ngừng hoạt động'} chi nhánh <strong>{branch.tenChiNhanh}</strong> không?</p>
               {!isInactive && <p style={{ marginTop: '8px', fontSize: '13px' }}>Sau khi ngừng hoạt động, chi nhánh có thể sẽ không xuất hiện trong các danh sách chọn phòng mới. Bạn có thể mở lại bất kỳ lúc nào.</p>}
             </div>
@@ -2277,7 +2279,7 @@ function PropertyView() {
                   <tr
                     key={room.maPhong}
                     className={isRoomLocked ? 'admin-room-locked-row' : ''}
-                    style={{ opacity: isBranchInactive ? 0.6 : 1, background: isBranchInactive ? '#f9fafb' : 'transparent' }}
+                    style={{ opacity: isBranchInactive ? 0.6 : 1, background: isBranchInactive ? 'var(--color-bg)' : 'transparent' }}
                   >
                     <td><strong>{room.maPhong}</strong></td>
                     <td>{room.tenPhong}</td>
@@ -2417,7 +2419,7 @@ function PropertyView() {
             <section className="admin-modal" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}>
               <header className="admin-modal-head">
                 <div className="admin-modal-title">
-                  <span className="admin-modal-avatar" style={{ background: isMaintenance ? 'rgba(0, 102, 109, 0.1)' : '#fef2f2', color: isMaintenance ? 'var(--admin-primary)' : '#dc2626' }}>
+                  <span className="admin-modal-avatar" style={{ background: isMaintenance ? 'rgba(0, 102, 109, 0.1)' : 'var(--color-danger-soft)', color: isMaintenance ? 'var(--admin-primary)' : 'var(--color-danger)' }}>
                     <Icon name={isMaintenance ? 'lock_open' : 'lock'} />
                   </span>
                   <div>
@@ -2429,7 +2431,7 @@ function PropertyView() {
                   <Icon name="close" />
                 </button>
               </header>
-              <div style={{ padding: '0 24px 24px 24px', color: '#6f797a' }}>
+              <div style={{ padding: '0 24px 24px 24px', color: 'var(--color-text-muted)' }}>
                 <p>Bạn có chắc chắn muốn {isMaintenance ? 'mở khóa' : 'khóa (bảo trì)'} phòng <strong>{roomToConfirm.tenPhong}</strong> không?</p>
                 {!isMaintenance && <p style={{ marginTop: '8px', fontSize: '13px' }}>Khi khóa, phòng sẽ chuyển sang trạng thái Bảo trì và không thể phân bổ thêm khách.</p>}
               </div>
@@ -3262,10 +3264,11 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="admin-page">
+    <div className="admin-page ui-employee-shell">
       <aside className="admin-sidebar">
         <div className="admin-sidebar-brand">
           <AdminBrand />
+          <span className="ui-role-label">Admin</span>
         </div>
         <nav className="admin-nav" aria-label="Admin">
           {navItems.map((item) => (
@@ -3284,12 +3287,14 @@ export default function AdminPage() {
 
       <div className="admin-app">
         <header className="admin-topbar">
+          <NavigationToggle />
           <div>
             <span className="admin-eyebrow">{activeMeta.eyebrow}</span>
             <h1>Chào {user?.hoTen?.split(' ').slice(-1)[0] || 'Admin'},</h1>
             <p>Quản trị dữ liệu lõi và cấu hình vận hành HomeStayDorm.</p>
           </div>
 
+          <BranchChip user={user} />
           <div className="admin-account">
             <span className="admin-avatar">{getUserInitials(user)}</span>
             <div>
