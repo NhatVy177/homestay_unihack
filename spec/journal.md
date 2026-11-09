@@ -530,3 +530,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Claude đề xuất: hóa đơn tháng trả qua ví mô phỏng; trang "Khoản dự kiến trừ khi trả phòng"; khoản phát sinh/vi phạm có email và phản hồi trên Web2, lên chuỗi gián tiếp qua mã băm bảng đối soát. Vy: "chốt luôn".
 - File: `spec/decisions.md` (D-029), `spec/scope.md` (F-11), `spec/progress.md` (mục 17–19, mục 12 còn giai đoạn 8–9), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
 - Việc còn lại: bàn giai đoạn 8–9; chốt mục 7, 9, 10, 11.
+
+## 2026-11-10 02:31:05 +07:00 — J-051 — Chốt trả phòng, đối soát và tự thanh lý (D-030)
+
+- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Vy nhận thấy ở dự án nhóm Hằng "hoàn xong là hợp đồng hết luôn" và không thấy tách thu thêm/hoàn cọc. Claude đọc code (`refund.service.ts`, `payout.repo.ts`, `invoice.service.ts`): đối soát tự tạo phiếu; nút xác nhận chi của kế toán đồng thời đóng đối soát, đóng trả phòng, chuyển hợp đồng "terminated", nhả giường/phòng. Phiếu thu nợ và phiếu hoàn cọc dùng chung loại `refund`, cùng số dương → trang khách có thể hiện khoản nợ thành tiền được hoàn, và kế toán bấm "chi" phiếu nợ là kết thúc hợp đồng dù khách chưa trả. Trường hợp bằng 0 không tạo phiếu nên có thể không đóng được (chưa chạy thử). Chưa thấy bước khách đồng ý đối soát.
+- Claude đề xuất học ý "tự thanh lý khi tiền xong" nhưng tách 3 trường hợp, chữ ký mốc 2 thay biên bản trả phòng giấy. Vy chốt cùng 4 điểm giai đoạn 8 ("có").
+- File: `spec/decisions.md` (D-030), `spec/scope.md` (F-04), `spec/progress.md` (mục 10 đã chốt, thêm 20–23, mục 12 chỉ còn mốc 3), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
+- Việc còn lại: Vy quyết mốc chuỗi 3 (mục 9) và hai đề xuất nhỏ (mục 7, 11); sau đó Claude viết prompt Codex cho T-22.

@@ -16,9 +16,13 @@ Danh sách này giữ **mọi hướng** đã bàn để không bị quên sau F
 | 8 | Điều khoản hợp đồng (mã HĐ, giá thuê, kỳ hạn, tiền cọc, phiên bản chính sách) + mã băm bản chụp hợp đồng đã ký vào gói bằng chứng bàn giao; không sửa contract | Đã chốt (D-027) | Trước Fuji (12–13/11) |
 | 8a | Hợp đồng "Chờ ký" + email xem trước; trả kỳ đầu trước (vẫn cho trả tại quầy); ký giấy + đối chiếu CCCD + bàn giao trong một lần đến; CCCD không khớp → khai lại, giữ/hoàn tiền kỳ đầu; Sale tải bản chụp hợp đồng đã ký | Đã chốt (D-027) | T-22 |
 | 9 | Mốc chuỗi 3 "đóng hồ sơ": kế toán ghi số tiền thực hoàn/thu + hash chứng từ, trạng thái Đã đóng. Phải sửa contract + test, xong trước deploy Fuji 14/11. **Lưu ý:** ngược ghi chú plan §3 "contract MVP không cần `PaymentReported`/`Closed`" và quyết định 04/11 giữ tiền ở Web2 — cần Vy quyết rõ | Đề xuất | 12–13/11, nhánh riêng |
-| 10 | Màn kiểm tra trả phòng hiện cạnh nhau tình trạng lúc bàn giao vào và hiện tại | Đề xuất | Giao diện đợt 2 |
+| 10 | Màn kiểm tra trả phòng hiện cạnh nhau tình trạng lúc bàn giao vào và hiện tại | Đã chốt (D-030) | Giao diện đợt 2 |
 | 11 | Thẻ lịch xem của khách có thanh tiến trình Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ | Đề xuất | Giao diện đợt 2 / T-22 |
-| 12 | Bàn tiếp giai đoạn 8–9: trả phòng/đối soát, thanh toán cuối (giai đoạn 5 đã chốt ở D-027, 6 ở D-028, 7 ở D-029) | Đang bàn | Bàn xong trước 12/11 để kịp giao việc |
+| 12 | Bàn tiếp giai đoạn 9: chỉ còn quyết mốc chuỗi 3 (mục 9); giai đoạn 5–8 đã chốt ở D-027 → D-030 | Đang bàn | Bàn xong trước 12/11 để kịp giao việc |
+| 20 | Hệ thống tự soạn bản nháp đối soát (chính sách đã khóa + khoản dự kiến trừ + kết quả kiểm tra), kế toán rà và gửi | Đã chốt (D-030) | T-22 |
+| 21 | Thu thêm qua ví mô phỏng, trả trước khi thanh lý | Đã chốt (D-030) | T-22 |
+| 22 | Khách không phản hồi đối soát: nhắc 24/72 giờ, quá 7 ngày "Quá hạn phản hồi", không tự chấp nhận thay | Đã chốt (D-030) | T-22 |
+| 23 | Tự thanh lý khi tiền đã xong (3 trường hợp tách rõ), quản lý chỉ bấm "Đã thu chìa khóa"; bỏ thanh lý tay và biên bản trả phòng giấy | Đã chốt (D-030) | T-22 |
 | 17 | Hóa đơn tháng trả qua ví mô phỏng (tái dùng F-11), tự "Đã thanh toán" | Đã chốt (D-029) | T-22 |
 | 18 | Trang khách "Khoản dự kiến trừ khi trả phòng" (nợ, hư hỏng kèm ảnh, phạt) | Đã chốt (D-029) | T-22 + giao diện đợt 2 |
 | 19 | Email + phản hồi ngay trên Web2 cho mỗi khoản phát sinh/vi phạm; không lên chuỗi riêng | Đã chốt (D-029) | T-22 |
