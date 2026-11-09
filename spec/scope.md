@@ -65,6 +65,18 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 - Menu nhân viên mở/đóng được trên mobile; các màn được chụp ở 1440px và 390px, không cuộn ngang toàn trang. Ảnh local trong `web/frontend/.ui-screens/`, không commit; phân biệt API giả lập với đăng nhập/dữ liệu thật. Frontend build và backend test phải được chạy trong đợt này.
 - Giữ nguyên luồng, API, SP, dữ liệu, route, props, chữ nghiệp vụ và cơ chế Avalanche; đợt 1 chỉ sửa phần khung, chưa làm lại nội dung từng tab. Đợt 2 (12–13/11) xử lý nội dung/form/bảng còn lệch, hạn chót 13/11; Fuji 14–17/11, nộp 18–20/11 theo lịch nội bộ mới của Vy.
 
+### Quy chuẩn icon và form tham chiếu — D-026
+
+Vy chọn `D:\Nam4\Contest\Homestay-Dorm` làm mẫu cho cách trình bày, không chỉ bảng màu. Đã đọc source frontend của mẫu tại commit `6e3fa9b` và xem màn đăng nhập đang chạy; không sửa repo mẫu. Các quy tắc dưới đây là lựa chọn triển khai của Codex để Vy xem, không phải yêu cầu pixel đã được Vy nghiệm thu.
+
+| Phần | Quy chuẩn triển khai trong repo hiện tại |
+|---|---|
+| Icon | SVG nét viền 2, màu kế thừa; cỡ 16/20/24px qua tokens, menu/nút/ô nhập thường 20px, biểu tượng tiêu đề 24px. Giữ khả năng phóng icon minh họa theo cỡ chữ hiện có. Icon trang trí không nhận focus; nút chỉ có icon đóng cần nhãn truy cập và vùng bấm 40px. |
+| Trường nhập | Nhãn nằm trên, 14px/500, cách ô 8px; ô cao tối thiểu 48px, góc 12px, padding 12–16px. Dấu bắt buộc và lỗi dùng màu danger, lỗi nằm dưới trường; readonly/disabled nền surface-alt và không làm mờ nội dung quá mức. Giữ nguyên loại trường, value/onChange, giới hạn, validation và native select/date. |
+| Nhóm form | Desktop hai cột ở form khách vãng lai, khoảng cách 24px; mobile dưới 600px về một cột, khoảng cách 16px. Từng khối có tiêu đề rõ; không thêm/bớt trường hoặc thay thứ tự xử lý. |
+| Hộp thoại/nút | Thẻ trắng góc 20px, tiêu đề có biểu tượng trong ô nền dịu; nút đóng độc lập. Nội dung dài cuộn trong modal, giữ thanh thao tác thấy được; nút chính sage, nút hủy viền, thao tác nguy hiểm giữ màu danger; nút thường cao tối thiểu 44px. |
+| Mức áp dụng đã làm | Lớp dùng chung nối các class form/modal hiện có; làm cụ thể form Sale “Tạo phiếu mới cho khách vãng lai”, đăng nhập/đăng ký và phần trình bày form Admin. Các form chuyên biệt và inline style còn lại tiếp tục rà đợt 2, không mặc định đã đồng bộ mọi tab. |
+
 Không đưa CCCD, địa chỉ, tài khoản ngân hàng, ảnh hoặc nội dung biên bản lên chain. Chain chỉ giữ ID khó đoán, ví, commitment, version/state và số tiền tối thiểu cần thiết. Không khẳng định hash/salt bảo đảm ẩn danh hoặc chữ ký tự chứng minh hiệu lực pháp lý.
 
 Kiểm thử cần phủ sai quyền/chữ ký, replay/hết hạn/sai domain, sai version/hash, tổng tiền và làm tròn, sửa file/thiếu salt/ảnh, relayer timeout/gas, SQL lệch chain và khôi phục ví. Ghi kết quả thực tế ở nhật ký; chưa có kết quả cho bộ yêu cầu này trong repo hiện hành.

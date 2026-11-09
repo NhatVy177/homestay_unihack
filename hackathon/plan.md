@@ -261,6 +261,8 @@ Cổng thanh toán mô phỏng chỉ xuất hiện thêm nếu hoàn thiện s�
 
 Kết quả T-21 và danh sách đợt 2 nằm ở `spec/progress.md` / J-045: ưu tiên trạng thái rỗng lặp ở Quản lý/Kế toán, màu inline trong modal/form/badge của các tab Sale/Quản lý/Kế toán/khách, bảng dài và form với dữ liệu demo; rà các tab Admin/khách chưa được chụp chi tiết. Ảnh khung dùng API giả không thay nghiệm thu tài khoản thật.
 
+**Bổ sung D-026 / J-048:** Vy chọn `D:\Nam4\Contest\Homestay-Dorm` làm mẫu cho quy tắc icon/form/modal. T-21 bổ sung lớp quy chuẩn CSS tự viết, icon SVG sẵn có, form khách vãng lai và đăng nhập/đăng ký, trình bày form Admin; kiểm ảnh và thao tác form ở 1440px/390px. Quy chuẩn cụ thể và mức áp dụng ở `spec/scope.md`; giữ native controls và handler/validation, không chép code/asset, không chuyển sang stack hoặc nghiệp vụ của dự án mẫu. Đợt 2 tiếp tục áp dụng vào các form chuyên biệt chưa rà; lịch D-025 giữ nguyên.
+
 Nếu thử ví nhúng/relayer chưa đạt, ưu tiên sửa lát cắt nhỏ này và cắt simulator/point trước. Ví giao dịch trực tiếp trên Fuji có thể dùng kiểm thử nội bộ trong lúc phát triển, nhưng chưa đạt mục tiêu UX nộp bài. Không âm thầm coi fallback là chức năng đã hoàn thành.
 
 Các phụ thuộc còn lại: chốt nghiệp vụ cọc với Vy; quyền truy cập SQL/dữ liệu mẫu; chọn và cấu hình SDK ví; kết nối RPC/nguồn AVAX thử cho relayer/deploy. Không yêu cầu Vy gửi khóa bí mật qua chat.

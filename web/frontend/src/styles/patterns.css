@@ -1,0 +1,227 @@
+/* HomeStayDorm form and icon conventions, implemented with the existing CSS and SVGs. */
+.kp-line-icon.ui-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  font-size: var(--ui-icon-size, inherit);
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+.ui-icon--sm { --ui-icon-size: var(--icon-sm); }
+.ui-icon--lg { --ui-icon-size: var(--icon-lg); }
+:is(.ui-btn, .ktp-btn-submit, .ktp-btn-cancel, .admin-btn, .kp-btn, .ui-employee-shell nav, .ktp-modal-close, .admin-icon-btn, .ui-heading-symbol, .ui-field-control) {
+  --ui-icon-size: var(--icon-md);
+}
+
+.ui-form-field,
+.kp-page :is(.kh-form-grid, .residence-form-grid) > label,
+.admin-page .admin-form-grid > label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.ui-form-field > span,
+.kp-page :is(.ktp-filter-label, .kh-form-grid label > span, .residence-form-grid label),
+.admin-page .admin-form-grid > label > span,
+.tc-page .tc-form-field > span {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-muted);
+}
+.kp-page .ktp-filter-label {
+  display: block;
+  margin-bottom: var(--space-2);
+}
+.ui-required,
+.admin-page .admin-required,
+.tc-page .tc-required,
+.ui-form-field .required-mark {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+/* Keep native input/select semantics and the application's validation and handlers. */
+.kp-page :is(.ktp-input, .ktp-textarea, .kh-form-grid input, .kh-form-grid select, .kh-form-grid textarea, .residence-form-grid input, .residence-form-grid select),
+.admin-page .admin-form-grid :is(input, select, textarea),
+.tc-page .tc-form-field :is(input, select),
+.ui-form-field .ui-input {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--control-height-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  transition: border-color .16s, box-shadow .16s;
+}
+.kp-page .ktp-input-with-icon { padding-left: 40px; }
+.tc-page .tc-form-field :is(input, select) { background-color: var(--color-surface-alt); }
+.kp-page :is(.ktp-input, .ktp-textarea):hover:not(:disabled):not([readonly]),
+.admin-page .admin-form-grid :is(input, select, textarea):hover:not(:disabled):not([readonly]) {
+  border-color: var(--color-accent);
+}
+.kp-page :is(.ktp-input, .ktp-textarea):focus,
+.admin-page .admin-form-grid :is(input, select, textarea):focus,
+.tc-page .tc-form-field :is(input, select):focus {
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+.kp-page :is(.ktp-input, .ktp-textarea).is-invalid,
+.kp-page :is(.ktp-input, .ktp-textarea)[aria-invalid="true"] {
+  border-color: var(--color-danger);
+  background-color: var(--color-danger-soft);
+}
+.kp-page :is(.ktp-input, .ktp-textarea).is-invalid:focus {
+  box-shadow: 0 0 0 3px var(--color-danger-soft);
+}
+.kp-page :is(.ktp-input, .ktp-textarea):is(:disabled, [readonly]),
+.admin-page .admin-form-grid :is(input, select, textarea):is(:disabled, [readonly]) {
+  background-color: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  opacity: 1;
+  cursor: default;
+}
+.kp-page .ktp-text-error,
+.admin-page .admin-form-error,
+.tc-page .tc-modal-error {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-danger);
+}
+.kp-page .ktp-text-error { display: block; margin-top: var(--space-1); }
+
+.kp-page :is(.ktp-modal, .residence-modal),
+.admin-page .admin-modal {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  min-width: 0;
+}
+.admin-page .admin-modal-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--color-surface);
+}
+.admin-page .admin-modal-form .admin-modal-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+}
+.kp-page :is(.ktp-modal-header, .ktp-modal-header-primary, .ktp-modal-header-primary-container),
+.admin-page .admin-modal-head {
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+.kp-page .ktp-modal-body { min-height: 0; }
+.kp-page .ktp-modal-footer,
+.admin-page .admin-modal-actions {
+  flex-shrink: 0;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.kp-page :is(.ktp-btn-submit, .ktp-btn-cancel, .ktp-btn-primary-container),
+.admin-page .admin-btn {
+  min-height: var(--control-height);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  justify-content: center;
+}
+.kp-page .ktp-btn-cancel { border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-muted); }
+.kp-page .ktp-btn-cancel:hover { background: var(--color-surface-alt); }
+.kp-page .ktp-modal-close,
+.admin-page .admin-modal-head .admin-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+}
+.ui-dialog-heading { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.ui-heading-symbol,
+.ui-auth-symbol {
+  --ui-icon-size: var(--icon-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+.tc-page .ui-auth-symbol {
+  display: flex;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  --ui-icon-size: var(--icon-lg);
+}
+.tc-page .tc-modal-header { margin-bottom: var(--space-6); }
+.tc-page .tc-form-field { gap: var(--space-2); margin-bottom: var(--space-4); }
+.ui-field-control { position: relative; display: block; }
+.tc-page .ui-field-control > .ui-icon {
+  position: absolute;
+  top: 50%;
+  left: var(--space-4);
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+.tc-page .ui-field-control > input { padding-left: 48px; }
+.tc-page .tc-modal-submit {
+  min-height: var(--control-height-lg);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+.tc-page .tc-modal-submit:hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); transform: none; }
+
+.kp-page .ui-registration-form { width: 800px; max-width: 100%; max-height: 90dvh; }
+.ui-registration-form .ui-dialog-heading h3 { margin: 0; font-size: 20px; font-weight: 600; }
+.ui-form-stepper { display: flex; gap: var(--space-2); margin-bottom: var(--space-6); padding: var(--space-1); border-radius: var(--radius-md); background: var(--color-surface-alt); }
+.ui-form-stepper > div { flex: 1; padding: var(--space-3); border-radius: var(--radius-sm); color: var(--color-text-muted); font-size: 13px; text-align: center; }
+.ui-form-stepper > .is-active { background: var(--color-surface); color: var(--color-primary); box-shadow: var(--shadow-sm); font-weight: 600; }
+.ui-registration-form .ui-form-grid { gap: var(--space-6); }
+.kp-page .ui-registration-form .ktp-modal-header { background: var(--color-surface); color: var(--color-text); border-bottom: 1px solid var(--color-border); align-items: center; }
+.kp-page .ui-registration-form .ktp-modal-body { display: block; padding: var(--space-6); }
+.kp-page .ui-registration-form .ktp-modal-footer { justify-content: flex-end; }
+
+@media (max-width: 600px) {
+  .kp-page .ui-registration-form { max-height: calc(100dvh - 32px); }
+  .kp-page .ui-registration-form :is(.ktp-modal-header, .ktp-modal-body, .ktp-modal-footer) { padding: var(--space-4); }
+  .ui-registration-form .ui-dialog-heading h3 { font-size: 18px; }
+  .ui-registration-form .ui-form-grid,
+  .kp-page .residence-form-grid,
+  .admin-page .admin-form-grid,
+  .tc-page .tc-form-row { grid-template-columns: minmax(0, 1fr); }
+  .ui-registration-form .ui-form-grid { gap: var(--space-4); }
+  .ui-form-stepper > div { padding: var(--space-3) var(--space-2); font-size: 12px; }
+  .kp-page .ktp-modal-footer,
+  .admin-page .admin-modal-actions { flex-wrap: wrap; }
+  .kp-page .ui-registration-form .ktp-modal-footer > button { flex: 1; min-width: 0; }
+}

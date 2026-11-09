@@ -33,4 +33,9 @@
   --space-6: 24px;
   --space-8: 32px;
   --space-10: 40px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --control-height: 44px;
+  --control-height-lg: 48px;
 }
