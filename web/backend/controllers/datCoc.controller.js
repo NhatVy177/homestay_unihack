@@ -8,6 +8,12 @@ export async function getPhieuDatCoc(req, res, next) {
 export async function khachGiuCho(req, res, next) {
   try { res.status(201).json(await service.khachGiuCho(req.user, req.body)); } catch (err) { next(err); }
 }
+export async function khachKhongThueNua(req, res, next) {
+  try { res.json(await service.khachKhongThueNua(req.user, req.params.maDangKy)); } catch (err) { next(err); }
+}
+export async function ghiNhanKhachKhongDen(req, res, next) {
+  try { res.json(await service.ghiNhanKhachKhongDen(req.user, req.params.maDangKy, req.params.sttLich)); } catch (err) { next(err); }
+}
 export async function xacNhanKhaNangNhanCoc(req, res, next) {
   try { res.json(await service.xacNhanKhaNangNhanCoc(req.user, req.params.id, req.body)); } catch (err) { next(err); }
 }

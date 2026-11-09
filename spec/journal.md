@@ -578,3 +578,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Code: `database/SP_DatCoc/khach-giu-cho-20261110.sql` (`SP_KhachGiuCho`: kiểm tra hồ sơ của khách, tái dùng `SP_ChonPhongKhachChot` + `SP_GuiYeuCauCocKemLuaChon`, Sale phụ trách là Sale đã tiếp nhận, lỗi thì trả lại lựa chọn phòng cũ); `services/datCoc.service.js` (`khachGiuCho`, kèm lời nhắn chờ quản lý tối đa 12 giờ); `controllers/datCoc.controller.js`, `routes/datCoc.routes.js` (`POST /api/dat-coc/khach-giu-cho`); `scripts/khach-giu-cho-db.mjs` và script npm; `test/customer-hold.test.mjs`.
 - Kiểm tra: backend `node --test` 27 pass/1 skip/0 fail (test mới chỉ kiểm tra vai trò và dữ liệu vào). **Chưa chạy SP lên DB nên chưa thử đường đi thật.**
 - Việc còn lại: Vy đồng ý chạy migration SP lên HOMEDORM4 rồi thử thật; các mục T-22 tiếp theo.
+
+## 2026-11-10 03:02:00 +07:00 — J-057 — T-22: từ chối về "Đã xem", Không thuê nữa, Khách không đến (backend)
+
+- Người thực hiện: Claude, tiếp J-056, theo yêu cầu Vy làm tiếp phần sau. Nhánh `feat/t22-backend`.
+- Code: `database/SP_DatCoc/dat-coc-xac-nhan-kha-nang.sql` (nhánh từ chối của `SP_XacNhanKhaNangNhanCoc`: luôn về "Đã tiếp nhận", gỡ lựa chọn phòng, không còn đánh dấu phòng bị từ chối hay tự đóng hồ sơ; bộ hẹn giờ 12 giờ dùng chung SP nên cũng theo); `database/SP_DatCoc/trang-thai-buoi-xem-20261110.sql` (thêm "Khách không đến" vào ràng buộc `CHK_LXP_TrangThai`, `SP_GhiNhanKhachKhongDen`, `SP_KhachKhongThueNua`); `services/datCoc.service.js`, controller, routes (`PUT /api/dat-coc/khach-khong-thue-nua/:maDangKy`, `PUT /api/dat-coc/khach-khong-den/:maDangKy/:sttLich`); `scripts/khach-giu-cho-db.mjs` gom cả 3 phần.
+- Kiểm tra: backend `node --test` 28 pass/1 skip/0 fail (test mới kiểm tra vai trò và dữ liệu vào). Chưa chạy SQL lên DB. Chưa kiểm tra chỗ khác trong code còn cho rằng hồ sơ bị "Từ chối" khi hết phòng.
+- Việc còn lại: Vy đồng ý chạy migration; các mục T-22 sau (khai người ở, thành viên bị loại, hợp đồng "Chờ ký", ...).

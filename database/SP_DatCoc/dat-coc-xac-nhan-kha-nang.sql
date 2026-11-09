@@ -214,37 +214,19 @@ BEGIN
     END
     ELSE
     BEGIN
-        -- ===== TỪ CHỐI =====
-        -- Quản lý từ chối vì PHÒNG không còn phù hợp tại thời điểm duyệt (Sale ở DC01
-        -- không nhìn thấy tình trạng phòng thật). Hồ sơ KHÔNG chết: nó quay lại DC01
-        -- để Sale chọn phòng khác trong các phòng khách ĐÃ XEM còn lại.
-        DECLARE @ConPhongKhac BIT;
-
+        -- ===== TỪ CHỐI (D-026) =====
+        -- Từ chối, quá 12 giờ hay hết hạn đều đưa hồ sơ về "Đã tiếp nhận" (hiển thị "Đã xem"):
+        -- khách giữ chỗ lại phòng này hoặc phòng khác trong buổi xem. Không còn đánh dấu
+        -- từng phòng bị từ chối và không tự đóng hồ sơ; chỉ khách bấm "Không thuê nữa" mới đóng.
         BEGIN TRY
             BEGIN TRAN;
 
-            -- Đánh dấu phòng vừa bị từ chối: 1 -> 2. Từ giờ nó biến mất khỏi danh sách
-            -- Sale chọn (SP_DanhSachPhongDaXem lọc <> 2) và không chọn lại được (50259).
             UPDATE dbo.ChiTietXemPhong
-            SET KhachChon = 2
-            WHERE MaDangKy = @MaDangKy AND MaPhong = @MaPhong;
-
-            -- Còn phòng nào khách đã xem mà chưa bị từ chối không?
-            SET @ConPhongKhac = CASE WHEN EXISTS (
-                SELECT 1
-                FROM dbo.ChiTietXemPhong AS ctxp
-                INNER JOIN dbo.LichXemPhong AS lxp
-                        ON lxp.MaDangKy = ctxp.MaDangKy AND lxp.STTLich = ctxp.STTLich
-                WHERE ctxp.MaDangKy = @MaDangKy
-                  AND ctxp.KhachChon <> 2
-                  AND lxp.TrangThai = N'Đã xem'
-            ) THEN 1 ELSE 0 END;
+            SET KhachChon = 0
+            WHERE MaDangKy = @MaDangKy AND KhachChon = 1;
 
             UPDATE dbo.PhieuDangKy
-            SET TrangThai  = CASE WHEN @ConPhongKhac = 1
-                                  THEN N'Đã tiếp nhận'   -- quay lại DC01
-                                  ELSE N'Từ chối'         -- hết phòng -> đóng hồ sơ
-                             END,
+            SET TrangThai  = N'Đã tiếp nhận',
                 GhiChuSale = @LyDo
             WHERE MaDangKy = @MaDangKy;
 

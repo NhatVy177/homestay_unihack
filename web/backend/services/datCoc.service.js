@@ -166,6 +166,41 @@ export async function khachGiuCho(user, data = {}) {
   }
 }
 
+// D-026: khách bấm "Không thuê nữa" -> đóng hồ sơ (cách duy nhất đóng hồ sơ sau buổi xem).
+export async function khachKhongThueNua(user, maDangKy) {
+  if (user?.vaiTro !== 'KhachHang') throw createServiceError('Chỉ khách hàng được đóng hồ sơ của mình', 403);
+  const ma = String(maDangKy || '').trim();
+  if (!ma) throw createServiceError('Thiếu mã hồ sơ');
+  try {
+    const result = await executeProcedure('dbo.SP_KhachKhongThueNua', [
+      { name: 'MaKhachHang', type: sql.VarChar(6), value: user.maNguoiDung },
+      { name: 'MaDangKy', type: sql.VarChar(6), value: ma }
+    ]);
+    return result.recordset[0] || null;
+  } catch (error) {
+    mapDatabaseError(error, { 50320: 404, 50325: 409 });
+  }
+}
+
+// D-026: Sale ghi nhận kết quả buổi xem: chỉ "Khách không đến" (Đã xem do hệ thống tự đặt theo giờ).
+export async function ghiNhanKhachKhongDen(user, maDangKy, sttLich) {
+  if (user?.vaiTro !== 'NhanVien' || user?.chucVu !== 'Sale')
+    throw createServiceError('Chỉ Sale được ghi nhận khách không đến', 403);
+  const ma = String(maDangKy || '').trim();
+  const stt = Number.parseInt(sttLich, 10);
+  if (!ma || !Number.isInteger(stt) || stt < 1) throw createServiceError('Thiếu mã hồ sơ hoặc số thứ tự buổi xem');
+  try {
+    const result = await executeProcedure('dbo.SP_GhiNhanKhachKhongDen', [
+      { name: 'MaNhanVien', type: sql.VarChar(6), value: user.maNguoiDung },
+      { name: 'MaDangKy', type: sql.VarChar(6), value: ma },
+      { name: 'STTLich', type: sql.Int, value: stt }
+    ]);
+    return result.recordset[0] || null;
+  } catch (error) {
+    mapDatabaseError(error, { 50322: 403, 50323: 404, 50324: 409 });
+  }
+}
+
 export async function capNhatThongTinCaNhan(maDangKy, data = {}) {
   const ma = String(maDangKy || '').trim();
   if (!ma) {
