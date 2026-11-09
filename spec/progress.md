@@ -18,7 +18,10 @@ Danh sách này giữ **mọi hướng** đã bàn để không bị quên sau F
 | 9 | Mốc chuỗi 3 "đóng hồ sơ": kế toán ghi số tiền thực hoàn/thu + hash chứng từ, trạng thái Đã đóng. Phải sửa contract + test, xong trước deploy Fuji 14/11. **Lưu ý:** ngược ghi chú plan §3 "contract MVP không cần `PaymentReported`/`Closed`" và quyết định 04/11 giữ tiền ở Web2 — cần Vy quyết rõ | Đề xuất | 12–13/11, nhánh riêng |
 | 10 | Màn kiểm tra trả phòng hiện cạnh nhau tình trạng lúc bàn giao vào và hiện tại | Đề xuất | Giao diện đợt 2 |
 | 11 | Thẻ lịch xem của khách có thanh tiến trình Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ | Đề xuất | Giao diện đợt 2 / T-22 |
-| 12 | Bàn tiếp giai đoạn 6–9: bàn giao, đang ở, trả phòng/đối soát, thanh toán cuối (giai đoạn 5 đã chốt ở D-027) | Đang bàn | Bàn xong trước 12/11 để kịp giao việc |
+| 12 | Bàn tiếp giai đoạn 7–9: đang ở, trả phòng/đối soát, thanh toán cuối (giai đoạn 5 đã chốt ở D-027, giai đoạn 6 ở D-028) | Đang bàn | Bàn xong trước 12/11 để kịp giao việc |
+| 14 | Ảnh tình trạng tài sản lúc bàn giao (không bắt buộc từng món), mã băm vào gói biên bản | Đã chốt (D-028) | T-22; cần cho mục 10 |
+| 15 | Không ép xác nhận tại chỗ; vẫn giao chìa khóa; email nhắc 24 giờ/72 giờ; không xác nhận thay; danh sách "Chờ khách xác nhận" cho quản lý | Đã chốt (D-028) | T-22 |
+| 16 | Giữ OTP; kích hoạt xác nhận điện tử ngay sau khi trả cọc; nút gửi lại mã + nhắc thư rác; kiểm thời hạn phiên Privy ở đợt Fuji; tiếp tục hỏi BTC Q-08 để bật D-011 | Đã chốt (D-028) | Giao diện + T-22; thử phiên ở Fuji 14–17/11 |
 | 13 | Ghi kết quả xem từng phòng; hạn chờ 7 ngày/tự đóng hồ sơ sau buổi xem; kế toán lập phiếu cọc tay | Không làm | — |
 
 Thứ tự cắt nếu trễ (đề xuất): giữ 1–5 và 7–8; mục 9 chỉ làm nếu kịp trước 14/11; mục 6 giữ cách tạm; mục 10–11 làm trong phạm vi giao diện đợt 2.
