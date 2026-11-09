@@ -499,3 +499,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: frontend `/` và backend `/api/health` đều HTTP 200; chưa thử đăng nhập hoặc ký thật. Không chạy lại build/test của J-045 trong yêu cầu chỉ khởi chạy.
 - Tác động sẵn có: scheduler backend lúc startup báo tự hủy 1 phiếu cọc quá hạn và nhả giường/phòng về Trống. Đã báo Vy; không thực hiện sửa dữ liệu thủ công, không ghi thông tin khách vào nhật ký.
 - Lệnh ghép tự mở trình duyệt/ghi nhật ký/commit bị kiểm duyệt tự động chặn, chỉ báo “blocked by policy”, không có lý do chi tiết; lệnh không thực thi. Cung cấp URL để Vy tự mở. File duy nhất sửa là `spec/journal.md` qua công cụ sửa file; `web/backend/package-lock.json` tiếp tục giữ nguyên, không stage.
+
+## 2026-11-10 02:15:29 +07:00 — J-047 — Trao đổi về quy chuẩn icon và form theo giao diện tham khảo
+
+- Người thực hiện: Codex trao đổi với Vy; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Yêu cầu/câu hỏi: Vy muốn học cả quy định dùng icon và bố trí form, không chỉ màu sắc. Codex xác nhận có thể tham khảo nguyên tắc thiết kế rồi tự viết bằng CSS/React và bộ `Icon.jsx` hiện có, phù hợp D-025; giữ nguyên nghiệp vụ, API, SP, dữ liệu và props/class/id hiện hành.
+- Đề xuất chưa chốt: đồng nhất nét/kích thước/vị trí icon; nhãn và dấu bắt buộc của form, nhóm trường, khoảng cách, helper/error, trạng thái readonly/disabled; thứ bậc nút chính/phụ/nguy hiểm và khung modal. Đợt 1 mới tập trung nền và khung, chưa chuẩn hóa sâu toàn bộ form/tab. Chưa có ảnh/link mẫu cụ thể trong phiên để đối chiếu, chưa chốt bộ quy chuẩn hay triển khai UI mới.
+- File: chỉ `spec/journal.md` ghi trao đổi; chưa đổi scope/plan hoặc thêm quyết định vì chi tiết vẫn là đề xuất. Không sửa code ứng dụng, không chạy lại build/test. Tiếp tục nhánh `feat/ui-refresh-1`, commit/push hồ sơ theo quy ước; backend lockfile có sẵn không stage.
