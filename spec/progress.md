@@ -18,7 +18,10 @@ Danh sách này giữ **mọi hướng** đã bàn để không bị quên sau F
 | 9 | Mốc chuỗi 3 "đóng hồ sơ": kế toán ghi số tiền thực hoàn/thu + hash chứng từ, trạng thái Đã đóng. Phải sửa contract + test, xong trước deploy Fuji 14/11. **Lưu ý:** ngược ghi chú plan §3 "contract MVP không cần `PaymentReported`/`Closed`" và quyết định 04/11 giữ tiền ở Web2 — cần Vy quyết rõ | Đề xuất | 12–13/11, nhánh riêng |
 | 10 | Màn kiểm tra trả phòng hiện cạnh nhau tình trạng lúc bàn giao vào và hiện tại | Đề xuất | Giao diện đợt 2 |
 | 11 | Thẻ lịch xem của khách có thanh tiến trình Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ | Đề xuất | Giao diện đợt 2 / T-22 |
-| 12 | Bàn tiếp giai đoạn 7–9: đang ở, trả phòng/đối soát, thanh toán cuối (giai đoạn 5 đã chốt ở D-027, giai đoạn 6 ở D-028) | Đang bàn | Bàn xong trước 12/11 để kịp giao việc |
+| 12 | Bàn tiếp giai đoạn 8–9: trả phòng/đối soát, thanh toán cuối (giai đoạn 5 đã chốt ở D-027, 6 ở D-028, 7 ở D-029) | Đang bàn | Bàn xong trước 12/11 để kịp giao việc |
+| 17 | Hóa đơn tháng trả qua ví mô phỏng (tái dùng F-11), tự "Đã thanh toán" | Đã chốt (D-029) | T-22 |
+| 18 | Trang khách "Khoản dự kiến trừ khi trả phòng" (nợ, hư hỏng kèm ảnh, phạt) | Đã chốt (D-029) | T-22 + giao diện đợt 2 |
+| 19 | Email + phản hồi ngay trên Web2 cho mỗi khoản phát sinh/vi phạm; không lên chuỗi riêng | Đã chốt (D-029) | T-22 |
 | 14 | Ảnh tình trạng tài sản lúc bàn giao (không bắt buộc từng món), mã băm vào gói biên bản | Đã chốt (D-028) | T-22; cần cho mục 10 |
 | 15 | Không ép xác nhận tại chỗ; vẫn giao chìa khóa; email nhắc 24 giờ/72 giờ; không xác nhận thay; danh sách "Chờ khách xác nhận" cho quản lý | Đã chốt (D-028) | T-22 |
 | 16 | Giữ OTP; kích hoạt xác nhận điện tử ngay sau khi trả cọc; nút gửi lại mã + nhắc thư rác; kiểm thời hạn phiên Privy ở đợt Fuji; tiếp tục hỏi BTC Q-08 để bật D-011 | Đã chốt (D-028) | Giao diện + T-22; thử phiên ở Fuji 14–17/11 |

@@ -523,3 +523,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Vy đồng ý ("oke") với đề xuất OTP và hai điểm bàn giao Claude nêu ngay trước đó (ảnh tình trạng; vẫn giao chìa khóa, nhắc 24/72 giờ, không xác nhận thay). Claude ghi cả ba vào D-028 và báo rõ trong phản hồi để Vy sửa nếu hiểu sai.
 - File: `spec/decisions.md` (D-028; Q-09 ghi đã trả lời), `spec/scope.md` (F-02), `spec/progress.md` (mục 14–16, mục 12 còn giai đoạn 7–9), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
 - Việc còn lại: bàn giai đoạn 7–9; chốt mục 7, 9, 10, 11; Vy nhắc BTC Q-08.
+
+## 2026-11-10 02:23:30 +07:00 — J-050 — Chốt giai đoạn đang ở (D-029)
+
+- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Claude đề xuất: hóa đơn tháng trả qua ví mô phỏng; trang "Khoản dự kiến trừ khi trả phòng"; khoản phát sinh/vi phạm có email và phản hồi trên Web2, lên chuỗi gián tiếp qua mã băm bảng đối soát. Vy: "chốt luôn".
+- File: `spec/decisions.md` (D-029), `spec/scope.md` (F-11), `spec/progress.md` (mục 17–19, mục 12 còn giai đoạn 8–9), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
+- Việc còn lại: bàn giai đoạn 8–9; chốt mục 7, 9, 10, 11.
