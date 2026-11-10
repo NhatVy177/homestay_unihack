@@ -46,11 +46,13 @@ Ghi chú 2026-11-05 14:58:04 +07:00: thay đổi chưa commit xóa mục “Tổ
 
 Khi thay đổi một quyết định, thêm mã mới cùng thời gian, lý do, nguồn và mã bị thay thế; cập nhật nhãn quyết định cũ thành “được thay bởi D-xxx”. Không xóa lịch sử hoặc mặc định gợi ý AI/BTC là yêu cầu của Vy.
 
+| D-034 | 2026-11-11 00:39:53 +07:00; Vy trả lời hai câu hỏi C1 (J-X060) | **Chốt phạm vi C1.** Tiền cọc trong gói bàn giao/điều khoản hợp đồng tiếp tục lấy `PhieuDatCoc.SoTienCoc` như code hiện tại; chưa trừ hoàn một phần trong C1. Hồ sơ cũ **phải bổ sung ảnh hợp đồng đã ký và khách xác nhận chính sách trước khi phát hành bàn giao v2**; không tự coi chính sách mới là bản khách đã thấy lúc cọc, không mặc định giữ hồ sơ cũ ở v1 để né điều kiện. Bổ sung D-027/D-031, giải quyết Q-01 trong phạm vi C1; phần hoàn/cấn trừ D-026 ngoài C1 vẫn cần thiết kế riêng. Bằng chứng v1 đã phát hành tiếp tục đọc/kiểm chứng được, không sửa bản đã khóa hoặc contract Solidity. |
+
 ## Câu hỏi và phụ thuộc chưa giải quyết
 
 | Mã | Nội dung cần rõ | Ai/nguồn giải quyết | Ảnh hưởng |
 |---|---|---|---|
-| Q-01 | `tienCocBanDau` có phải cọc thực tế còn giữ sau cấn trừ? Nguồn trường nào là đúng? | Vy + kiểm tra luồng SQL/repository | F-02/F-03; chưa dùng hồ sơ thật để cam kết tiền khi chưa rõ. |
+| Q-01 | Nguồn cọc: **đã chốt cho C1 ở D-034** là `PhieuDatCoc.SoTienCoc`, chưa trừ hoàn một phần. Nguồn cọc sau hoàn/cấn trừ khi triển khai đầy đủ D-026 vẫn cần thiết kế riêng. | Vy chốt C1 ngày 11/11, J-X060 | Không mở rộng C1 thành xử lý hoàn một phần. |
 | Q-02 | Dùng logic 80/100/50/70% theo calculator hiện tại hay quy định thời gian báo trước trong mô tả cũ? | Vy xác nhận nghiệp vụ + code/SQL | Không tự kết hợp hai chính sách; demo đủ hạn theo D-005. |
 | Q-03 (đã trả lời một phần bởi D-011) | SDK ví nào, cơ chế giữ/khôi phục khóa, loại EOA/smart account, chi phí/cấu hình? | Thử nghiệm kỹ thuật với tài khoản cấu hình phù hợp | F-01/F-05; chưa có lựa chọn nhà cung cấp. |
 | Q-04 | Nền Avalanche cũ `09f8270` còn truy cập được và tái sử dụng được đến đâu? | Kiểm tra nhánh cũ ở repo homedorm trong đợt triển khai tiếp | Chưa nhập code; phải rà scope và đường dẫn `Web/` → `web/` trước khi tích hợp. |

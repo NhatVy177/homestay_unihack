@@ -615,3 +615,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File đã đổi: chỉ `spec/progress.md` sửa trạng thái hiện tại, A1 trên nhánh riêng và câu hỏi C1; `spec/journal.md` mục này. Chưa đổi tính năng/scope/plan/decisions, chưa sửa code, contract hoặc SQL C1. Không chạy SQL lên HOMEDORM4 và không dùng thông tin cá nhân khách/khóa bí mật trong hồ sơ.
 - Kiểm tra: kiểm tra Git/worktree, đọc source/schema local và `git diff --check`; không chạy lại build/test vì C1 chỉ có hồ sơ. Kết quả test A1 đã báo riêng, không phải bằng chứng C1 đã triển khai.
 - Còn lại: đợi Vy trả lời hai câu hỏi rồi tiếp tục C1 theo quy trình; nếu cần SQL thì viết migration chạy lại được và xin phép trước khi áp dụng DB thật. Commit hồ sơ bằng `NhatVy177`, không Co-Authored-By, chỉ push nhánh C1 để giữ điểm tiếp tục; C1 chưa hoàn thành, không merge/push main.
+
+## 2026-11-11 00:39:53 +07:00 — J-X060 — Vy chốt nguồn cọc và điều kiện hồ sơ cũ cho C1
+
+- Người thực hiện: Codex ghi câu trả lời của Vy; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Đã chốt D-034: C1 giữ `PhieuDatCoc.SoTienCoc` như code hiện tại, chưa trừ hoàn một phần. Hồ sơ cũ phải bổ sung ảnh hợp đồng đã ký và khách xác nhận chính sách trước khi phát hành v2. Không tự coi snapshot mới là bản chính sách đã có ở thời điểm cọc; bản v1 đã khóa không bị sửa. Bổ sung D-027/D-031; Q-01 giải quyết trong phạm vi C1, không chốt thay phần hoàn/cấn trừ D-026.
+- Hồ sơ: `spec/decisions.md` thêm D-034 sau khi fetch/kiểm số trên mọi nhánh; `spec/luong-tong-hop.md` đồng bộ; `spec/progress.md` bỏ trạng thái chờ trả lời, ghi triển khai tiếp; journal mục này. Chưa đổi code/SQL, chưa có kiểm thử C1 và chưa chạy HOMEDORM4.
+- Git: commit/push ngay quyết định trên `feat/t22-handover-bundle` để giữ số D-034; không merge/push main, danh tính `NhatVy177`, không Co-Authored-By. Bước tiếp: triển khai C1, chuẩn bị migration và hỏi trước khi áp dụng SQL thật.

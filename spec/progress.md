@@ -86,11 +86,11 @@ Việc đã xong trước 11/11 (T-01, T-02, T-10, T-12, T-15 → T-20): xem fil
 
 ## Câu hỏi còn mở
 
-C1 đang dừng theo yêu cầu không tự quyết khi quyết định chưa rõ:
+C1 đã được Vy chốt hai điểm tại D-034/J-X060, tiếp tục triển khai trên worktree/nhánh riêng:
 
-1. **Q-01:** `sources.js` hiện dùng `PhieuDatCoc.SoTienCoc` cho cọc bàn giao, nhưng Q-01 vẫn chưa chốt đây có phải tiền thực còn giữ sau hoàn/cấn trừ. Cần Vy chọn giữ nguồn hiện tại trong C1 hay dùng cọc thực còn giữ và chốt nguồn dữ liệu.
-2. **D-027/D-031, hồ sơ cũ:** schema/code hiện không lưu snapshot chính sách theo phiếu cọc và không có file hợp đồng đã ký. Không thể chứng minh chính sách hiện tại là bản khách đã thấy lúc cọc. Cần Vy chọn giữ hồ sơ cũ ở v1, chỉ hồ sơ mới đủ dữ liệu dùng v2; hoặc yêu cầu hồ sơ cũ bổ sung ảnh và khách xác nhận chính sách trước v2. Đây là lựa chọn được hỏi, chưa phải quyết định.
+1. **Q-01/C1:** giữ `PhieuDatCoc.SoTienCoc`, chưa trừ hoàn một phần.
+2. **Hồ sơ cũ:** bắt buộc bổ sung ảnh ký và khách xác nhận chính sách trước v2. Không tự hồi tố thời điểm đã xem chính sách hoặc sửa bản v1 đã khóa.
 
-Chưa sửa source/SQL/contract của C1; chưa chạy SQL vào HOMEDORM4. Khi Vy trả lời, ghi quyết định theo quy trình, thực hiện migration dạng file nếu cần và xin phép riêng trước khi áp dụng DB thật. Chưa có test C1; không dùng kết quả test A1 làm bằng chứng C1.
+Đang triển khai C1; chưa chạy SQL vào HOMEDORM4. Migration nếu cần sẽ viết thành file và xin phép riêng trước khi áp dụng DB thật. Chưa có test C1; không dùng kết quả test A1 làm bằng chứng C1.
 
 Q-01 (nguồn tiền cọc), Q-06 (hạn và cổng nộp), Q-07 (ghi công nhóm cũ), Q-08 (email demo), Q-10 (Privy JWT) trong [decisions.md](decisions.md). Các đề xuất mới chờ Vy chốt: mục 4 của [audit-2026-11-11.md](audit-2026-11-11.md).

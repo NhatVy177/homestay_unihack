@@ -129,6 +129,8 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
 4. **Sale chụp/scan hợp đồng đã ký và tải lên.** Mã băm file + **điều khoản chính** (mã hợp đồng, giá thuê, kỳ hạn, tiền cọc, phiên bản chính sách) đi vào **gói bằng chứng bàn giao**. **Không sửa contract.**
 5. Hợp đồng **vẫn ký giấy, không ký trên chuỗi.**
 
+**C1 / D-034:** điều khoản/gói bàn giao lấy tiền cọc từ `PhieuDatCoc.SoTienCoc`, chưa trừ hoàn một phần. Hồ sơ cũ phải bổ sung ảnh hợp đồng đã ký và khách xác nhận chính sách trước khi phát hành v2; không bịa lại lịch sử chính sách lúc cọc. Bằng chứng v1 đã phát hành vẫn đọc/kiểm chứng được, không sửa bản đã khóa.
+
 ### 3.6 Giai đoạn 6: Bàn giao phòng và xác nhận điện tử (D-009, D-010, D-028)
 
 1. Bàn giao diễn ra **trong buổi ký hợp đồng**. Quản lý lập **biên bản tài sản trên web** (không có ô ký giấy). **Có thể chụp ảnh tình trạng** (vài tấm cho cả phòng hoặc món có vết sẵn, không bắt buộc từng món). Ảnh không lên chuỗi; **mã băm ảnh đi vào gói biên bản** để trả phòng so trước/sau.
