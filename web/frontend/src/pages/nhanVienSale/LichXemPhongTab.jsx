@@ -163,10 +163,10 @@ export default function LichXemPhongTab() {
         </button>
       </section>
 
-      <section className="sale-schedule-filters" aria-label="Bộ lọc lịch xem phòng">
+      <section className="sale-schedule-filters ui-list-toolbar" aria-label="Bộ lọc lịch xem phòng">
         <div className="sale-schedule-filter sale-schedule-filter-search">
           <label className="ktp-filter-label" htmlFor="schedule-search">Tìm kiếm</label>
-          <div className="ktp-input-icon-wrap">
+          <div className="ktp-input-icon-wrap ui-list-search">
             <Icon name="search" className="ktp-input-icon" />
             <input
               id="schedule-search"

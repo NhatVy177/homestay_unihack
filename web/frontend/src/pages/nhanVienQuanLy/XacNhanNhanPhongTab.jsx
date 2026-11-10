@@ -1,3 +1,4 @@
+import OverviewCards from '../../components/common/OverviewCards.jsx';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { datCocApi } from '../datCoc/datCoc.api.js';
@@ -188,26 +189,32 @@ export default function XacNhanNhanPhongTab() {
   return (
     <div className="ktp-container">
       {/* Table Section */}
-      <section className="ktp-table-section">
-        {/* Thanh tìm kiếm (đã bỏ lọc ngày & sắp xếp — xử lý theo hàng đợi) */}
-        <div style={{ backgroundColor: '#f4f7f7', padding: '16px', borderRadius: '8px', display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '20px' }}>
-          <div style={{ flex: '2 1 240px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#191c1d', marginBottom: '8px' }}>Tìm kiếm</label>
-            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tên khách hàng, SĐT hoặc mã phiếu..." className="ktp-input" style={{ width: '100%', backgroundColor: '#fff' }} />
-          </div>
+      <>
+<OverviewCards items={[{ key: 'all', label: 'Tất cả' }, ...STATUS_ORDER.map((s) => ({ key: s, label: STATUS_CONFIG[s].chip }))]} counts={counts} />
+<div className="ui-list-toolbar">
+          <label className="ui-list-search">
+            <span className="ui-search-label">Tìm kiếm</span>
+            <Icon name="search" />
+<input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tên khách hàng, SĐT hoặc mã phiếu..." className="ktp-input"  />
+          </label>
           {search && (
-            <button type="button" onClick={() => setSearch('')} className="ktp-btn-cancel" style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#3f494a', padding: '9px 16px', fontSize: '13px' }}>Xóa lọc</button>
+            <button type="button" onClick={() => setSearch('')} className="ktp-btn-cancel" >Xóa lọc</button>
           )}
-        </div>
 
-        {/* Segmented control: lọc theo trạng thái + số đếm (căn thẳng lề trái với ô tìm kiếm) */}
-        <StatusFilterTabs
+<StatusFilterTabs
           className="status-pill-tabs-offset"
           items={[{ key: 'all', label: 'Tất cả' }, ...STATUS_ORDER.map((s) => ({ key: s, label: STATUS_CONFIG[s].chip }))]}
           activeKey={statusFilter}
           counts={counts}
           onChange={chonChip}
         />
+</div>
+<section className="ktp-table-section ui-list-table-card">
+        {/* Thanh tìm kiếm (đã bỏ lọc ngày & sắp xếp — xử lý theo hàng đợi) */}
+
+
+        {/* Segmented control: lọc theo trạng thái + số đếm (căn thẳng lề trái với ô tìm kiếm) */}
+
 
         <table className="ktp-table">
           <thead>
@@ -277,6 +284,7 @@ export default function XacNhanNhanPhongTab() {
           )}
         </div>
       </section>
+</>
 
       {/* Modal xử lý */}
       {selected && (

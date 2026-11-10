@@ -1,3 +1,4 @@
+import OverviewCards from '../../components/common/OverviewCards.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { cuTruApi } from '../nhanPhong/cuTru.api.js';
@@ -389,11 +390,11 @@ export default function NhanPhongTab() {
 
 
 
-      <section className="residence-filter" style={{ display: 'grid', gridTemplateColumns: '1fr' }}>
-        <div className="ktp-filter-group" style={{ margin: 0 }}>
-          <label className="ktp-filter-label">Tìm kiếm phiếu cọc</label>
-          <div className="ktp-input-icon-wrap">
-            <span className="ktp-input-icon"><Icon name="search" /></span>
+      <OverviewCards items={[{ key: 'all', label: 'Tất cả' }, ...RESIDENCE_STATUS_ORDER.map((s) => ({ key: s, label: RESIDENCE_STATUS_CONFIG[s].chip }))]} counts={statusCounts} />
+      <section className="residence-filter ui-list-toolbar">
+        <label className="ktp-filter-group ui-list-search">
+          <span className="ui-search-label">Tìm kiếm phiếu cọc</span>
+          <Icon name="search" />
             <input
               className="ktp-input ktp-input-with-icon"
               value={searchText}
@@ -404,40 +405,27 @@ export default function NhanPhongTab() {
               }}
               placeholder="Nhập mã phiếu, tên khách hàng, SĐT"
             />
-          </div>
-        </div>
-      </section>
-
-      {/* Bộ lọc trạng thái dạng chip (giống DatCocTab) */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' }}>
+        </label>
+        <div className="status-pill-tabs ui-tabs">
         {[{ key: 'all', label: 'Tất cả' }, ...RESIDENCE_STATUS_ORDER.map((s) => ({ key: s, label: RESIDENCE_STATUS_CONFIG[s].chip }))].map((tab) => {
           const active = statusFilter === tab.key;
           return (
             <button
+              className={`status-pill-tab${active ? ' is-active' : ''}`}
               key={tab.key}
               type="button"
               onClick={() => setStatusFilter(tab.key)}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                padding: '8px 16px', borderRadius: '999px', cursor: 'pointer',
-                fontSize: '13px', fontWeight: 600, transition: 'all .15s',
-                border: active ? '1px solid #2f6765' : '1px solid #d7dcdc',
-                background: active ? '#2f6765' : '#fff',
-                color: active ? '#fff' : '#3f494a'
-              }}
             >
               {tab.label}
-              <span style={{
-                background: active ? 'rgba(255,255,255,0.25)' : '#eef2f3',
-                color: active ? '#fff' : '#6f797a',
-                borderRadius: '999px', padding: '1px 8px', fontSize: '12px', fontWeight: 700, minWidth: '20px', textAlign: 'center'
-              }}>
+              <span className="status-pill-count">
                 {statusCounts[tab.key] ?? 0}
               </span>
             </button>
           );
         })}
-      </div>
+
+        </div>
+      </section>
 
       <section className="ktp-table-section">
         <div className="residence-table-head">

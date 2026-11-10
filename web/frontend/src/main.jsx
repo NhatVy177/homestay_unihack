@@ -7,6 +7,7 @@ import { AuthProvider } from './auth/AuthContext.jsx';
 import './styles/global.css';
 import './styles/shell.css';
 import './styles/patterns.css';
+import './styles/lists.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -21,7 +21,7 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy đ�
 | Nhánh | Nội dung | Trạng thái |
 |---|---|---|
 | `main` (`dcc1a59`) | Đã có T-19, T-20, T-21 đợt đầu, hồ sơ D-026 → D-032 | Gốc để tạo nhánh mới |
-| `feat/ui-refresh-1` (Codex) | Thẻ tổng quan + thanh tìm kiếm danh sách (D-033, J-056), J-057 | 2 commit chưa merge; chờ Vy xem |
+| `feat/ui-refresh-1` (Codex) | Thẻ tổng quan + thanh tìm kiếm danh sách (D-033, J-056), J-057 | 2 commit chưa vào `main`; **đã gộp sẵn vào `chore/audit-cleanup`** nên merge nhánh nào trước cũng không xung đột |
 | `feat/t22-backend` (Claude) | Khách tự giữ chỗ, từ chối → "Đã xem", "Không thuê nữa", "Khách không đến" | Có code + test đầu vào; **SQL chưa chạy lên HOMEDORM4**, chưa nối giao diện |
 | `chore/audit-cleanup` (Claude) | Rà soát 11/11: dọn file thừa, AGENTS.md, skill giao diện, file này | Chờ Vy xem |
 | `docs/review-branch-workflow` | Quy tắc "không push main" | Nội dung đã đưa vào AGENTS.md mới; có thể xóa nhánh |

@@ -1,3 +1,4 @@
+import OverviewCards from '../../components/common/OverviewCards.jsx';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { xacNhanPhanHoiApi } from './xacnhanphanhoi.api.js';
@@ -379,26 +380,31 @@ export default function XacNhanPhanHoi() {
           }
         }
       `}</style>
-      <section className="ktp-table-section">
-        <div style={{ backgroundColor: '#f4f7f7', padding: '16px', borderRadius: '8px', display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '20px' }}>
-          <div style={{ flex: '2 1 240px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#191c1d', marginBottom: '8px' }}>Tìm kiếm</label>
-            <input
+      <>
+<OverviewCards items={[
+            { key: 'Tất cả', label: 'Tất cả' },
+            { key: 'Chờ phản hồi', label: 'Chờ phản hồi' },
+            { key: 'Đã phản hồi', label: 'Đã phản hồi' }
+          ]} counts={{ 'Tất cả': countTatCa, 'Chờ phản hồi': countChoPhanHoi, 'Đã phản hồi': countDaPhanHoi }} />
+<div className="ui-list-toolbar">
+          <label className="ui-list-search">
+            <span className="ui-search-label">Tìm kiếm</span>
+            <Icon name="search" />
+<input
               type="text"
               value={searchQ}
               onChange={(e) => setSearchQ(e.target.value)}
               placeholder="Tên khách, mã đối soát hoặc mã phiếu trả..."
               className="ktp-input"
-              style={{ width: '100%', backgroundColor: '#fff' }}
+
               spellCheck={false}
             />
-          </div>
+          </label>
           {searchQ && (
-            <button type="button" onClick={() => setSearchQ('')} className="ktp-btn-cancel" style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#3f494a', padding: '9px 16px', fontSize: '13px' }}>Xóa lọc</button>
+            <button type="button" onClick={() => setSearchQ('')} className="ktp-btn-cancel" >Xóa lọc</button>
           )}
-        </div>
 
-        <StatusFilterTabs
+<StatusFilterTabs
           className="status-pill-tabs-offset"
           items={[
             { key: 'Tất cả', label: 'Tất cả' },
@@ -409,6 +415,11 @@ export default function XacNhanPhanHoi() {
           counts={{ 'Tất cả': countTatCa, 'Chờ phản hồi': countChoPhanHoi, 'Đã phản hồi': countDaPhanHoi }}
           onChange={setFilterStatus}
         />
+</div>
+<section className="ktp-table-section ui-list-table-card">
+
+
+
 
         {loading ? (
           <div style={{ padding: 32, textAlign: 'center', color: '#6f797a' }}>Đang tải...</div>
@@ -448,6 +459,7 @@ export default function XacNhanPhanHoi() {
         )}
         {!loading && <div style={{ padding: '8px 16px', fontSize: 13, color: '#6f797a' }}>{filtered.length} phiếu chờ xử lý</div>}
       </section>
+</>
 
       {modalOpen && (
         <div className="ktp-modal-overlay" onClick={() => !submitting && setModalOpen(false)}>

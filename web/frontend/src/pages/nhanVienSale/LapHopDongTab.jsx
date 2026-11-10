@@ -703,10 +703,11 @@ export default function LapHopDongTab() {
         </div>
       )}
 
-      <div className="lhd-card" style={{ display: 'grid', gridTemplateColumns: '1fr 160px', gap: '12px', alignItems: 'flex-end', marginBottom: '20px', padding: '16px 20px' }}>
-        <div className="lhd-form-group">
-          <label className="lhd-label">Tìm kiếm</label>
-          <input 
+      <div className="lhd-card ui-list-toolbar">
+        <label className="lhd-form-group ui-list-search">
+          <span className="lhd-label ui-search-label">Tìm kiếm</span>
+          <Icon name="search" />
+<input
             className="lhd-input" 
             placeholder="Tra cứu theo mã phiếu, tên khách hàng, số điện thoại..." 
             value={searchText} 
@@ -716,7 +717,7 @@ export default function LapHopDongTab() {
               loadPhieuCocs(val, ngayTaoFilter);
             }} 
           />
-        </div>
+        </label>
         <div className="lhd-form-group">
           <label className="lhd-label">Ngày tạo</label>
           <input 

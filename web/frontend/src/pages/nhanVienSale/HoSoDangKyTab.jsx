@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import OverviewCards from '../../components/common/OverviewCards.jsx';
 import { Icon } from '../../components/common/Icon.jsx';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { dangKyThueApi } from '../dangKyThue/dangKyThue.api.js';
@@ -665,7 +666,14 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
   return (
     <div className="ktp-container">
       {/* HEADER TABS & STATS */}
-      <section style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '16px', flexWrap: 'wrap' }}>
+      <OverviewCards items={[
+        { key: 'Tất cả', label: 'Tất cả', count: branchFilteredList.length },
+        { key: 'Chờ tiếp nhận', label: 'Chờ tiếp nhận', count: stats.choTiepNhan },
+        { key: 'Đã tiếp nhận', label: 'Đã tiếp nhận', count: stats.daTiepNhan },
+        { key: 'Từ chối', label: 'Từ chối', count: stats.tuChoi },
+        { key: 'Hủy', label: 'Hủy', count: stats.huy }
+      ]} />
+      <section className="ui-list-toolbar">
         <StatusFilterTabs
           items={[
             { key: 'Tất cả', label: 'Tất cả', count: branchFilteredList.length },

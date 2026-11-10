@@ -1,0 +1,134 @@
+.ui-overview-grid,
+.admin-page .admin-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
+  gap: var(--space-4);
+  margin: 0 0 var(--space-6);
+}
+.ui-overview-card,
+.admin-page .admin-stat-card {
+  min-width: 0;
+  min-height: 140px;
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+.ui-overview-caption { display: flex; align-items: center; gap: var(--space-3); min-width: 0; margin-bottom: var(--space-3); }
+.ui-overview-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 40px; width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--color-accent-soft); color: var(--color-accent); --ui-icon-size: var(--icon-md); }
+.ui-overview-label { color: var(--color-text-muted); font-size: 12px; font-weight: 600; line-height: 1.5; letter-spacing: .05em; text-transform: uppercase; overflow-wrap: anywhere; }
+.ui-overview-value { display: block; font-family: var(--font-heading); font-size: 32px; font-weight: 600; line-height: 1.3; color: var(--color-accent); }
+.ui-overview-card--success .ui-overview-icon { color: var(--color-success); background: var(--color-success-soft); }
+.ui-overview-card--success .ui-overview-value { color: var(--color-success); }
+.ui-overview-card--warning .ui-overview-icon { color: var(--color-warning); background: var(--color-warning-soft); }
+.ui-overview-card--warning .ui-overview-value { color: var(--color-warning); }
+.ui-overview-card--danger .ui-overview-icon { color: var(--color-danger); background: var(--color-danger-soft); }
+.ui-overview-card--danger .ui-overview-value { color: var(--color-danger); }
+
+.ui-list-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.ui-list-toolbar .ui-list-search {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  position: relative;
+  flex: 1 1 280px;
+  gap: var(--space-3);
+  min-width: 0;
+  min-height: 50px;
+  margin: 0;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg);
+}
+.ui-list-search > .ui-icon { color: var(--color-accent); --ui-icon-size: var(--icon-md); }
+.ui-list-toolbar .ui-list-search input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: var(--space-3) 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  box-shadow: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--color-text);
+}
+.ui-list-search:focus-within { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-soft); }
+.ui-search-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.ui-list-toolbar .status-pill-tabs { flex: 0 1 auto; gap: var(--space-2); padding: 0; min-width: 0; }
+.ui-list-toolbar .status-pill-tab { min-height: 44px; padding: 10px var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-pill); color: var(--color-text-muted); background: var(--color-surface); font-size: 13px; font-weight: 600; }
+.ui-list-toolbar .status-pill-tab.is-active { background: var(--color-accent-soft); border-color: var(--color-accent); color: var(--color-accent); }
+.ui-list-toolbar .status-pill-count { min-width: 0; height: auto; padding: 0; background: transparent; color: inherit; font-size: inherit; }
+.ui-list-toolbar .status-pill-count::before { content: '('; }
+.ui-list-toolbar .status-pill-count::after { content: ')'; }
+.ui-list-toolbar > button { min-height: 44px; border-radius: var(--radius-pill); }
+.ui-list-table-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow-x: auto; }
+.ui-list-toolbar.residence-filter { display: flex; }
+.sale-schedule-filters.ui-list-toolbar { display: flex; align-items: flex-end; }
+.sale-schedule-filters .sale-schedule-filter { flex: 1 1 140px; min-width: 0; }
+.sale-schedule-filters .sale-schedule-filter-search { flex: 2 1 280px; }
+.sale-schedule-filter-search > label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.ui-list-search > .ktp-input-icon { position: static; transform: none; }
+.lhd-card.ui-list-toolbar { display: flex; }
+.lhd-card.ui-list-toolbar > .lhd-form-group:not(.ui-list-search) { flex: 0 1 180px; min-width: 0; margin: 0; }
+.lhd-card.ui-list-toolbar .ui-list-search { flex-direction: row; }
+.lhd-card.ui-list-toolbar input[type="date"] { min-height: 48px; border-radius: var(--radius-pill); }
+.kp-page .kh-keyword { min-height: 50px; border-radius: var(--radius-pill); background: var(--color-bg); border-color: var(--color-border); }
+.lhd-container {
+  --lhd-primary: var(--color-primary);
+  --lhd-primary-hover: var(--color-primary-hover);
+  --lhd-primary-soft: var(--color-primary-soft);
+  --lhd-secondary: var(--color-accent);
+  --lhd-text: var(--color-text);
+  --lhd-text-muted: var(--color-text-muted);
+  --lhd-border: var(--color-border);
+  --lhd-bg: var(--color-bg);
+  --lhd-white: var(--color-surface);
+  min-width: 0;
+  max-width: 100%;
+}
+.lhd-container .lhd-stepper, .lhd-container .lhd-table-wrapper { max-width: 100%; overflow-x: auto; }
+
+.admin-page .admin-stat-card { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-content: start; gap: var(--space-3); }
+.admin-stat-card > div { display: contents; }
+.admin-page .admin-stat-icon { grid-column: 1; grid-row: 1; width: 40px; height: 40px; border-radius: var(--radius-md); --ui-icon-size: var(--icon-md); }
+.admin-page .admin-stat-card p { grid-column: 2; grid-row: 1; align-self: center; margin: 0; color: var(--color-text-muted); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.admin-page .admin-stat-card strong { grid-column: 1 / -1; font-size: 32px; font-family: var(--font-heading); font-weight: 600; line-height: 1.3; }
+.admin-page .admin-stat-card small { grid-column: 1 / -1; font-size: 12px; line-height: 1.5; }
+.admin-page .admin-stat-card.primary strong, .admin-page .admin-stat-card.secondary strong { color: var(--color-accent); }
+.admin-page .admin-stat-card.success strong { color: var(--color-success); }
+.admin-page .admin-stat-card.warning strong { color: var(--color-warning); }
+.admin-page .admin-filter-row { padding: var(--space-4) var(--space-6); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+.admin-page .admin-filter-row input { min-height: 48px; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-bg); color: var(--color-text); }
+
+@media (max-width: 600px) {
+  .lhd-container { padding: 0; }
+  .ui-overview-grid, .admin-page .admin-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+  .ui-overview-card, .admin-page .admin-stat-card { min-height: 132px; padding: var(--space-4); }
+  .ui-overview-caption { align-items: flex-start; gap: var(--space-2); }
+  .ui-overview-icon { width: 32px; height: 32px; flex-basis: 32px; --ui-icon-size: var(--icon-sm); }
+  .ui-overview-label { font-size: 10px; letter-spacing: .02em; }
+  .ui-overview-value, .admin-page .admin-stat-card strong { font-size: 28px; overflow-wrap: anywhere; }
+  .ui-list-toolbar { padding: var(--space-4); gap: var(--space-3); }
+  .ui-list-toolbar .ui-list-search { flex-basis: 100%; }
+  .ui-list-toolbar .status-pill-tabs { width: 100%; }
+  .ui-list-toolbar .status-pill-tab { flex: 1 1 auto; padding: var(--space-2) var(--space-3); font-size: 12px; }
+  .admin-page .admin-stat-card { grid-template-columns: 32px minmax(0, 1fr); gap: var(--space-2); }
+  .admin-page .admin-stat-icon { width: 32px; height: 32px; }
+  .admin-page .admin-stat-card p { font-size: 10px; }
+}
