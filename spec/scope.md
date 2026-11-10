@@ -31,6 +31,10 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 | F-09 | Triển khai và demo Fuji | Contract deploy và verify source; ABI/address/UI thống nhất; chạy luồng đầy đủ ba vai trò, có tx thật, test phù hợp, README setup và bằng chứng demo. Local pass không thay thế nghiệm thu này. |
 
 
+### Chuẩn bị ví vận hành Fuji — A1
+
+Theo yêu cầu Vy ngày 11/11: tạo ba ví mới (deployer kiêm manager, accountant, relayer), chỉ in địa chỉ; khóa lưu trong `.env` và `.fuji-backend-env.local` bị ignore, từ chối ghi đè khóa cũ. Script chia 0,3 AVAX thử cho accountant và relayer, kiểm tra đúng Fuji và đủ tiền/gas trước giao dịch, in số dư ba ví; chưa deploy. Khóa vận hành không phải khóa ví khách. Không chạy SQL hoặc đổi cấu hình ứng dụng trong A1; deploy/verify/nghiệm thu thật vẫn thuộc F-09/A2–A3.
+
 ## Nghiệp vụ bàn giao mới nhất — D-009
 
 - **Không tự check-in.** Nhân viên vẫn dẫn sinh viên xem phòng, ghi tình trạng và ảnh, rồi phát hành biên bản Web2 từ hồ sơ hợp đồng. Tận dụng nghiệp vụ hiện tại; không coi dữ liệu SQL sẵn có là đã có UI khách.

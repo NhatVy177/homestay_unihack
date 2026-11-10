@@ -19,6 +19,8 @@
     "chain": "hardhat node --network local --hostname 127.0.0.1",
     "deploy:local": "npm run compile && node scripts/deploy.mjs local",
     "deploy:fuji": "npm run compile && node scripts/deploy.mjs fuji",
+    "fuji:keygen": "node scripts/fuji-keygen.mjs",
+    "fuji:fund": "node scripts/fuji-fund.mjs",
     "local:ensure": "node scripts/ensure-local.mjs"
   },
   "dependencies": {

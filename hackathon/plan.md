@@ -254,6 +254,8 @@ Cổng thanh toán mô phỏng chỉ xuất hiện thêm nếu hoàn thiện s�
 
 ## 9. Thứ tự thực hiện và mốc nội bộ
 
+**Việc Vy giao ngày 11/11 (J-X058):** tạm dừng UI, làm lần lượt A1 (`chore/fuji-setup`) rồi C1 (`feat/t22-handover-bundle`), hai worktree/nhánh riêng từ `origin/chore/audit-cleanup`. A1 chuẩn bị ba ví vận hành và script chia AVAX thử; chưa deploy. Sau A1 báo địa chỉ deployer để Vy xin faucet; C1 không sửa contract và không tự chạy SQL trên HOMEDORM4. Yêu cầu này chỉ chốt hai việc đang làm, không mặc định phê duyệt toàn bộ lịch đề xuất dưới đây.
+
 > **Đề xuất 2026-11-11 (J-C059, chờ Vy chốt):** đưa Fuji lên trước (11–12/11), sau đó chỉ làm phần T-22 và giao diện nằm trên đường demo; lý do và bảng ngày ở `spec/progress.md`, phân tích ở `spec/audit-2026-11-11.md`. Cho tới khi Vy chốt, lịch D-025 bên dưới vẫn là lịch chính thức.
 
 **Lịch hiện hành theo D-025 (Vy chốt 2026-11-10 00:47 +07:00): làm giao diện trước Fuji.** Lịch này thay bảng mốc cũ tại mục này và phần lịch 15 ngày của D-019; không thay scope nghiệp vụ hoặc coi kiểm thử local là kết quả Fuji. Đây là lịch nội bộ của Vy, không phải xác minh lại hạn BTC.

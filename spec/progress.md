@@ -1,6 +1,6 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-11 00:11 +07:00** (J-C059). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát và đề xuất: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-11 00:27:35 +07:00** (J-X058). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát và đề xuất: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
 
@@ -24,6 +24,7 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy đ�
 | `feat/ui-refresh-1` (Codex) | Thẻ tổng quan + thanh tìm kiếm danh sách (D-033, J-056), J-057 | 2 commit chưa vào `main`; **đã gộp sẵn vào `chore/audit-cleanup`** nên merge nhánh nào trước cũng không xung đột |
 | `feat/t22-backend` (Claude) | Khách tự giữ chỗ, từ chối → "Đã xem", "Không thuê nữa", "Khách không đến" | Có code + test đầu vào; **SQL chưa chạy lên HOMEDORM4**, chưa nối giao diện |
 | `chore/audit-cleanup` (Claude) | Rà soát 11/11: dọn file thừa, AGENTS.md, skill giao diện, file này | Chờ Vy xem |
+| `chore/fuji-setup` (Codex) | A1: keygen và chia AVAX thử; worktree `D:\HomeStayDorm-fuji`, gốc `923a665` của audit-cleanup theo yêu cầu Vy | Code/test A1 xong (J-X058), ví chờ faucet; chưa chuyển AVAX hoặc deploy |
 | `docs/review-branch-workflow` | Quy tắc "không push main" | Nội dung đã đưa vào AGENTS.md mới; có thể xóa nhánh |
 
 Nhánh đã merge, có thể xóa trên GitHub: `feat/t20-checkin-deposit-fixes`, `docs/d026-flow-redesign`.
@@ -42,10 +43,10 @@ Nhánh đã merge, có thể xóa trên GitHub: `feat/t20-checkin-deposit-fixes`
 
 | Mã | Việc | Trạng thái | Bước kế |
 |---|---|---|---|
-| T-08 | Deploy, verify source, nghiệm thu Fuji | **Chưa bắt đầu.** Chưa có `blockchain/.env`, `deployments/fuji.json` | Việc A1–A3 trong `viec-cho-agent.md` |
+| T-08 | Deploy, verify source, nghiệm thu Fuji | A1 đã có script keygen/fund và ba ví local trong worktree Fuji; số dư 0, chưa có `deployments/fuji.json` | Vy xin faucet cho deployer; sau A1 làm C1 theo yêu cầu, chưa thực hiện A2/deploy |
 | T-11 / T-14 | Bàn giao Web2 → email → OTP → ký | Có code, test tự động qua, **chưa chạy thật** | Chạy thật trong việc A3 |
 | T-22 | Luồng D-026 → D-031 | Đang làm: 4 mục đầu có code backend (nhánh `feat/t22-backend`); còn lại chưa làm | Chia mức ưu tiên bên dưới |
-| T-21 | Giao diện | Đợt đầu xong (khung, token, form, danh sách) | Làm lại 6 màn demo: việc B1–B6 |
+| T-21 | Giao diện | Đợt đầu xong (khung, token, form, danh sách); Vy tạm dừng để làm A1 rồi C1 | Sau hai việc này mới tiếp tục UI |
 | T-09 | Hồ sơ nộp | Chưa bắt đầu | Việc D1–D3 |
 | T-04 | Nguồn tiền cọc (Q-01) và dữ liệu demo | Chưa chốt | Cần trước khi tạo hồ sơ demo trên Fuji |
 | T-13 | Privy JWT (bỏ OTP) | Tạm dừng, chờ BTC (Q-10) | Giữ OTP |
@@ -71,6 +72,8 @@ Việc đã xong trước 11/11 (T-01, T-02, T-10, T-12, T-15 → T-20): xem fil
 
 ## Kiểm tra gần nhất (2026-11-11, chạy lại trong J-C059)
 
+Kiểm tra mới A1/J-X058 tại worktree Fuji: blockchain 15 pass/1 skip SQL/0 fail (thêm 3 ca keygen/funding); backend 25 pass/1 skip SQL/0 fail; frontend build và `test:avalanche-ui` pass. Không dùng SQL thật hoặc gửi giao dịch Fuji. Các kết quả J-C059 dưới đây là mốc trước A1, không phải kiểm tra mới.
+
 - `blockchain npm test`: 12 qua, 1 bỏ qua (test SQL), 0 lỗi.
 - `web/backend npm test`: 25 qua, 1 bỏ qua trên `feat/ui-refresh-1`; 28 qua, 1 bỏ qua trên `feat/t22-backend`.
 - `web/frontend vite build`: qua; gói chính 1,1 MB, có cảnh báo kích thước.
@@ -79,7 +82,7 @@ Việc đã xong trước 11/11 (T-01, T-02, T-10, T-12, T-15 → T-20): xem fil
 ## Môi trường local (không chứa giá trị bí mật)
 
 - `web/backend/.env`: chain local `31337`, `PRIVY_AUTH_MODE=email`, SMTP đã cấu hình, ví mô phỏng bật. `MAIL_REDIRECT_TO` đang tắt; email nhân viên trong DB trỏ về hộp thư thử của Vy.
-- Chưa có `blockchain/.env` (chưa có ví Fuji).
+- Worktree `D:\HomeStayDorm-fuji`: đã có `blockchain/.env` và `.fuji-backend-env.local`, cả hai bị ignore. Deployer/manager `0x7bb2e96898Db7e387e118eB92a9C390E29f54B2f`; accountant `0x9F86a6119723f46d2e8236C2935f660918cCbf0D`; relayer `0x8C8D363E9430bD7e8ED72752Fb1356Bec0fe62f9`. Đọc RPC xác nhận chain 43113 và cả ba số dư 0; `fuji:fund` dừng vì chưa có AVAX, chưa gửi giao dịch. Khóa không đi theo Git/worktree; giữ hai file local tại đây.
 - HOMEDORM4 đã dọn dữ liệu giao dịch ngày 06/11 (J-030); có vài hồ sơ thử tạo sau đó. Bản sao lưu trước khi dọn: xem file lưu trữ.
 
 ## Câu hỏi còn mở
