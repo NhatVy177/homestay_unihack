@@ -277,7 +277,7 @@ In đậm = quyết định của đợt bàn lại luồng ngày 10/11/2026.
 | Mã | Việc | Ai | Ghi chú |
 |---|---|---|---|
 | Q-10 | BTC có cấp gói Privy Scale (JWT) để bỏ OTP không | Vy nhắn BTC | Có → bật D-011; không → giữ OTP (D-015) |
-| Q-01 | Số cọc thực tế còn giữ là trường nào. Code đang lấy `SoTienCoc` của phiếu cọc để ghi lên chuỗi, và báo lỗi nếu khác `TienCocBanDau` trên đối soát | Vy | Phải chốt trước khi tạo hồ sơ demo Fuji; liên quan việc hoàn 80% cho thành viên bị loại (mục 3.4) |
+| Q-01 | D-034 chốt C1 dùng `PhieuDatCoc.SoTienCoc`, chưa trừ hoàn một phần; đối soát vẫn chặn nếu khác cọc đã xác nhận | Vy đã chốt C1 | Nguồn tiền sau hoàn/cấn trừ ở D-026 ngoài C1 còn cần thiết kế |
 | Q-02 | Đã rõ từ code: dùng bảng 80/50/70/100% theo thời gian ở; không có quy định báo trước | — | Đóng nếu Vy đồng ý |
 | Q-05 | SQL demo, RPC, AVAX thử cho Fuji đã sẵn sàng chưa | Kiểm tra môi trường | Không gửi khóa bí mật qua chat |
 | Q-06 | Giờ đóng cổng, deadline chính thức | Theo thông báo BTC | 20/11 là mục tiêu nội bộ, hạn thi 21/11 |

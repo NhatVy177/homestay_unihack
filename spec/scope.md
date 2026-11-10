@@ -31,6 +31,14 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 | F-09 | Triển khai và demo Fuji | Contract deploy và verify source; ABI/address/UI thống nhất; chạy luồng đầy đủ ba vai trò, có tx thật, test phù hợp, README setup và bằng chứng demo. Local pass không thay thế nghiệm thu này. |
 
 
+### C1 — Điều khoản và bản chụp hợp đồng trong bàn giao v2 (D-027/D-031/D-034)
+
+- Payload `homestaydorm.handover.v2`: `contractTerms` chứa mã hợp đồng, giá thuê, ngày bắt đầu/kết thúc, kỳ thanh toán, cọc theo `PhieuDatCoc.SoTienCoc`; chưa trừ hoàn một phần. Không thêm thông tin định danh cá nhân vào điều khoản.
+- `policyVersion` = 8 ký tự đầu SHA-256 UTF-8 của chính sách đã lưu theo phiếu; phiếu khách/email cọc dùng cùng nội dung và phiên bản. Policy document text/version vẫn đi qua hàm băm có salt hiện có; không đổi contract/thuật toán commitment.
+- Sale tải ảnh/PDF hợp đồng đã ký ở bản xem hợp đồng; file lưu riêng có quyền, bộ JSON chỉ chứa tên file hệ thống và SHA-256. Hồ sơ cũ phải có ảnh và khách đứng tên xác nhận chính sách bổ sung trước v2, không ghi hồi tố đã đọc lúc cọc.
+- Bản v1 đã khóa tiếp tục đọc/verify được, không sửa bản đã khóa; review v1 chưa lên chuỗi phải được quản lý phát hành bản sửa v2. V2 thiếu dữ liệu hoặc file sai hash bị chặn. Thay số tiền/điều khoản/hash ảnh/phiên bản trong bundle bị phát hiện khi kiểm chứng.
+- Migration hai bảng mới chỉ áp dụng sau khi Vy cho phép; test giả lập/local không thay nghiệm thu HOMEDORM4/Privy/Fuji.
+
 ## Nghiệp vụ bàn giao mới nhất — D-009
 
 - **Không tự check-in.** Nhân viên vẫn dẫn sinh viên xem phòng, ghi tình trạng và ảnh, rồi phát hành biên bản Web2 từ hồ sơ hợp đồng. Tận dụng nghiệp vụ hiện tại; không coi dữ liệu SQL sẵn có là đã có UI khách.

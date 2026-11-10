@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { createPublicClient, http, isAddress } from 'viem';
 import { verifyEvidence } from '@homestaydorm/settlement/evidence';
+import { HandoverView } from '../../components/xacNhan/DocumentView.jsx';
+import '../../components/xacNhan/xacNhan.css';
 import './avalancheVerify.css';
 
 const chainId = Number(import.meta.env.VITE_AVALANCHE_CHAIN_ID || 43113);
@@ -11,10 +13,12 @@ const deployment = { chainId, address };
 export default function AvalancheVerifyPage() {
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [evidence, setEvidence] = useState(null);
 
   async function onFile(event) {
     const file = event.target.files?.[0];
     setResult(null);
+    setEvidence(null);
     if (!file) return;
     if (!Number.isSafeInteger(chainId) || chainId < 1 || !isAddress(address)) {
       setResult({ valid: false, reason: 'Ứng dụng chưa cấu hình contract Avalanche để kiểm chứng.' });
@@ -28,7 +32,9 @@ export default function AvalancheVerifyPage() {
     try {
       const bundle = JSON.parse(await file.text());
       const client = createPublicClient({ transport: http(rpcUrl) });
-      setResult(await verifyEvidence(client, deployment, bundle));
+      const checked = await verifyEvidence(client, deployment, bundle);
+      setResult(checked);
+      if (checked.valid) setEvidence(bundle);
     } catch (error) {
       setResult({ valid: false, reason: `Không kiểm chứng được: ${error.message}` });
     } finally { setBusy(false); }
@@ -48,6 +54,7 @@ export default function AvalancheVerifyPage() {
             <>
               <h2>Nội dung khớp bản ghi trên chain</h2>
               <p>Trạng thái: {result.status}. {result.accepted ? 'Đã được bên cần xác nhận chấp nhận.' : 'Chưa được chấp nhận.'}</p>
+              {result.kind === 'handover' && evidence && <HandoverView policy={evidence.documents.policy} handover={evidence.documents.handover} />}
               {result.kind === 'settlement' && (
                 <p>Phiên bản {result.version}{result.superseded ? ' — đã có bản mới hơn' : ' — bản mới nhất'};
                   {result.disputed ? ' đã từng bị phản đối;' : ''}

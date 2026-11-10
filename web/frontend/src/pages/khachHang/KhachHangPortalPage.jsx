@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { khachMoiApi } from '../khachMoi/khachMoi.api.js';
 import { datCocApi } from '../datCoc/datCoc.api.js';
+import DepositPolicyPanel from '../../components/common/DepositPolicyPanel.jsx';
 import ResultModal from '../../components/common/ResultModal.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import '../khamPhaPhong/khamPhaPhong.css';
@@ -3548,6 +3549,7 @@ export default function KhachHangPortalPage() {
 
     return (
       <section className="dc-detail">
+        <DepositPolicyPanel key={phieu.maPhieuCoc} depositId={phieu.maPhieuCoc} />
         {(isWaiting || isRejected) && !!deadlineMs && <div className="dc-banner dc-banner-info">
           <Icon name="schedule" /> <strong>Còn {Math.floor(remainingMinutes / 60)} giờ {remainingMinutes % 60} phút để thanh toán</strong>
         </div>}
