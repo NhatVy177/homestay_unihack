@@ -572,23 +572,25 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Xử lý: giữ nguyên D-026…D-031 và J-047…J-052 đã ở main; **đánh số lại phần của Codex** thành D-032 (quy chuẩn icon/form), J-053, J-054 và sửa các chỗ nhắc tới trong `hackathon/plan.md`, `spec/progress.md`, `spec/scope.md`. Nội dung không đổi. Mục J-053/J-054 nằm sau J-052 dù giờ ghi sớm hơn (giữ giờ gốc). Không sửa code.
 - Việc còn lại: Vy merge PR.
 
-## 2026-11-10 02:48:53 +07:00 — J-056 — T-22: khách tự giữ chỗ (backend)
+## 2026-11-10 02:48:53 +07:00 — J-C056 — T-22: khách tự giữ chỗ (backend)
 
 - Người thực hiện: Claude, theo yêu cầu Vy ("bạn triển khai code trước, chia việc với Codex"): Claude làm backend/DB, Codex làm giao diện. Nhánh `feat/t22-backend` (worktree `D:\HomeStayDorm-t22`, gốc `origin/main` `dcc1a59`).
 - Code: `database/SP_DatCoc/khach-giu-cho-20261110.sql` (`SP_KhachGiuCho`: kiểm tra hồ sơ của khách, tái dùng `SP_ChonPhongKhachChot` + `SP_GuiYeuCauCocKemLuaChon`, Sale phụ trách là Sale đã tiếp nhận, lỗi thì trả lại lựa chọn phòng cũ); `services/datCoc.service.js` (`khachGiuCho`, kèm lời nhắn chờ quản lý tối đa 12 giờ); `controllers/datCoc.controller.js`, `routes/datCoc.routes.js` (`POST /api/dat-coc/khach-giu-cho`); `scripts/khach-giu-cho-db.mjs` và script npm; `test/customer-hold.test.mjs`.
 - Kiểm tra: backend `node --test` 27 pass/1 skip/0 fail (test mới chỉ kiểm tra vai trò và dữ liệu vào). **Chưa chạy SP lên DB nên chưa thử đường đi thật.**
 - Việc còn lại: Vy đồng ý chạy migration SP lên HOMEDORM4 rồi thử thật; các mục T-22 tiếp theo.
 
-## 2026-11-10 03:02:00 +07:00 — J-057 — T-22: từ chối về "Đã xem", Không thuê nữa, Khách không đến (backend)
+## 2026-11-10 03:02:00 +07:00 — J-C057 — T-22: từ chối về "Đã xem", Không thuê nữa, Khách không đến (backend)
 
-- Người thực hiện: Claude, tiếp J-056, theo yêu cầu Vy làm tiếp phần sau. Nhánh `feat/t22-backend`.
+- Người thực hiện: Claude, tiếp J-C056, theo yêu cầu Vy làm tiếp phần sau. Nhánh `feat/t22-backend`.
 - Code: `database/SP_DatCoc/dat-coc-xac-nhan-kha-nang.sql` (nhánh từ chối của `SP_XacNhanKhaNangNhanCoc`: luôn về "Đã tiếp nhận", gỡ lựa chọn phòng, không còn đánh dấu phòng bị từ chối hay tự đóng hồ sơ; bộ hẹn giờ 12 giờ dùng chung SP nên cũng theo); `database/SP_DatCoc/trang-thai-buoi-xem-20261110.sql` (thêm "Khách không đến" vào ràng buộc `CHK_LXP_TrangThai`, `SP_GhiNhanKhachKhongDen`, `SP_KhachKhongThueNua`); `services/datCoc.service.js`, controller, routes (`PUT /api/dat-coc/khach-khong-thue-nua/:maDangKy`, `PUT /api/dat-coc/khach-khong-den/:maDangKy/:sttLich`); `scripts/khach-giu-cho-db.mjs` gom cả 3 phần.
 - Kiểm tra: backend `node --test` 28 pass/1 skip/0 fail (test mới kiểm tra vai trò và dữ liệu vào). Chưa chạy SQL lên DB. Chưa kiểm tra chỗ khác trong code còn cho rằng hồ sơ bị "Từ chối" khi hết phòng.
 - Việc còn lại: Vy đồng ý chạy migration; các mục T-22 sau (khai người ở, thành viên bị loại, hợp đồng "Chờ ký", ...).
 
-## 2026-11-10 23:21:08 +07:00 — J-058 — Viết file luồng tổng hợp cho Vy kiểm tra
+## 2026-11-10 23:21:08 +07:00 — J-C058 — Viết file luồng tổng hợp cho Vy kiểm tra
 
 - Người thực hiện: Claude, theo yêu cầu Vy ("viết 1 file plan.md rõ ràng tất cả kế hoạch, luồng, quyết định để t check lại"); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
 - File: `spec/luong-tong-hop.md` (mới). Là **bản đọc gộp** từ D-001 → D-032, scope, progress, plan; không thêm quyết định mới và không thay `hackathon/plan.md` (tránh plan song song, theo AGENTS.md). Chứa: nguyên tắc, vai trò, 9 giai đoạn, hai mốc chuỗi, thanh toán, email, việc đã bỏ, bảng quyết định theo giai đoạn, việc còn mở, trạng thái T-22.
 - Kiểm tra: đối chiếu thủ công với decisions.md, scope.md, progress.md; chi tiết giai đoạn 3 (thanh toán cọc) lấy từ D-023 và F-13 nhưng phần nội dung bị cắt khi đọc, nên có thể thiếu chi tiết nhỏ.
 - Việc còn lại: Vy đọc, ghi lại mục sai/chưa ưng để Claude sửa và ghi quyết định mới (nếu có).
+
+Ghi chú 2026-11-11 (J-C059, mục đầy đủ ở nhánh `chore/audit-cleanup`): ba mục J-056 → J-058 của nhánh này đổi mã thành J-C056 → J-C058 để không trùng J-056, J-057 của Codex trên `feat/ui-refresh-1`; thông điệp commit cũ vẫn ghi mã cũ. `spec/luong-tong-hop.md` chuyển sang nhánh `chore/audit-cleanup` (đã sửa), nên xóa ở nhánh này để tránh xung đột khi merge.
