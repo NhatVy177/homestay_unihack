@@ -1,5 +1,10 @@
 # Tiến độ và điểm tiếp tục
 
+## Runtime đăng nhập local — 2026-11-10 09:52:21 +07:00 (J-057)
+
+- Vy báo không đăng nhập được; kiểm tra frontend 5173 còn chạy nhưng backend 5000 đã dừng. Đã khởi động lại backend bằng tiến trình nền ẩn PID 92484, kết nối SQL HOMEDORM4 thành công. Trang xem: `http://127.0.0.1:5173/`.
+- Kiểm tra mới: frontend/health HTTP 200, browser fetch từ frontend tới health thành công; preflight đăng nhập 204, cho phép origin/POST/content-type. Chưa đăng nhập tài khoản thật; chờ Vy thử lại. Không đổi source hoặc tài khoản, chưa xác định vì sao tiến trình cũ dừng.
+
 ## Hướng luồng D-026 (bàn với Claude 2026-11-10, J-047)
 
 Danh sách này giữ **mọi hướng** đã bàn để không bị quên sau Fuji. Cột "Trạng thái": *Đã chốt* = có trong D-026; *Đề xuất* = Claude đề xuất, Vy chưa chốt; *Không làm* = đã bàn và bỏ. Cột "Lịch" là đề xuất, chưa chốt.
