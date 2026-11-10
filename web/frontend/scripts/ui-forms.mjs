@@ -53,6 +53,9 @@ try {
       await page.goto(base + (role === 'Sale' ? '/nhan-vien-sale' : role === 'Admin' ? '/nhan-vien-admin' : '/'), { waitUntil: 'domcontentloaded' });
       await page.locator('h1').first().waitFor();
       if (role === 'Sale') {
+        if (width === 390) await page.getByRole('button', { name: 'Mở menu', exact: true }).click();
+        await page.locator('aside nav').getByRole('button', { name: 'Tra cứu khách hàng', exact: true }).click();
+        await page.getByRole('button', { name: 'Hồ sơ đăng ký', exact: true }).click();
         await page.getByRole('button', { name: 'Tạo phiếu mới cho khách vãng lai' }).click();
         await capture('sale-form');
         await page.getByRole('button', { name: 'Tiếp tục', exact: true }).click();

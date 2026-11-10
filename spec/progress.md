@@ -1,10 +1,14 @@
 # Tiến độ và điểm tiếp tục
 
-## Không gian Sale — D-035 / J-X063 (đang làm)
+## Không gian Sale — D-035 / J-X064 (code và kiểm tra local xong, chờ Vy review)
 
 - Worktree `D:\HomeStayDorm-sale`, nhánh riêng `feat/ui-sale-workspace` từ `origin/main` mới nhất `dcc1a59`; không chạm checkout cũ/backend lockfile. Đã đọc cả hồ sơ mới trên các nhánh audit/C1 và phân biệt code chưa merge.
 - Vy chốt sửa Sale trước: menu 5 mục theo ảnh, bỏ kiểm tra phòng/giường và tab cư trú độc lập; giữ nhập hộ cư trú cùng hồ sơ/cọc/trả phòng trong Tra cứu khách hàng. Khách tự khai người ở đúng D-026 nhưng code chưa có, không triển khai trong đợt này.
-- Đang khảo sát và triển khai tổng quan/lịch hẹn/lập lịch/tra cứu/hồ sơ cá nhân, dùng API hiện có và CSS/token/icon tự viết. Chưa có kết quả build/test/ảnh mới của đợt này; không dùng kết quả các nhánh khác để đánh dấu hoàn thành.
+- Đã có menu 5 mục, tổng quan với số liệu API, lịch tháng + bộ lọc/danh sách/chi tiết/đổi-hủy, chọn hồ sơ đã tiếp nhận để lập lịch; form chọn nhiều phòng/thời gian đã thiết kế lại. Tra cứu khách hàng xem hồ sơ Sale được phép truy cập, có các lối hồ sơ/đặt cọc/nhập hộ cư trú/trả phòng; hồ sơ cá nhân chỉ đọc thông tin phiên hiện tại. Không xóa chức năng nghiệp vụ cũ hoặc thêm API/SQL.
+- Kiểm tra mới J-X064: frontend build và `test:avalanche-ui` pass; backend 25 pass/1 skip SQL; blockchain 12 pass/1 skip SQL; `git diff --check` pass. Đối chiếu nguyên khối controller lập lịch trước/sau bằng code: xử lý phòng/giới tính/sức chứa, validation ngày/giờ và payload API không đổi. Style inline: SalePage 20→0, LichXemPhongTab 41→0, LapLichChoHoSo 44→0; component mới không có style inline.
+- Ảnh API giả: 10 ảnh trước tại `web/frontend/.ui-screens/sale-before/`, 26 ảnh sau tại `sale-after/` (1440/390px), kèm report JSON. Có kiểm số tổng quan, màu menu, chuyển tháng/lọc, khóa menu khi lập lịch, không đổi/hủy lịch đã hủy, payload đổi/hủy và tạo nhiều phòng, chặn phòng sai giới tính và giờ ngoài 07:00–17:00; toàn bộ API chặn trong fixture, không ghi DB thật. Chạy lại `ui-forms.mjs after` có 12 trạng thái form Sale/Admin/login/register pass; lỗi/trạng thái rỗng có ảnh riêng. 26/26 sau sửa không JS exception/cuộn ngang; thanh bước Hợp đồng mobile cũ tràn 565px đã chuyển cuộn trong thẻ.
+- Bản xem `http://127.0.0.1:5196/` chạy đúng worktree Sale; backend đang chạy cổng 5000. Chưa đăng nhập tài khoản thật để nghiệm thu Sale/SQL/SMTP; không chạy migration, không sửa backend/contract/ABI hoặc dữ liệu. Test compile chỉ đổi xuống dòng ABI, đã đối chiếu nội dung bằng nhau và hoàn nguyên thay đổi do test tạo.
+- Còn lại: Vy xem nhánh và thử tài khoản Sale; form nghiệp vụ lớn giữ nguyên (hồ sơ/cọc/nhập hộ/trả phòng và nội dung hợp đồng), chưa được làm lại toàn bộ trong đợt này. Khách tự khai cư trú, giữ chỗ/khách không đến T-22 và C1 ở nhánh riêng không tự gộp vào đây. Không tự merge/push main.
 - Các mốc A1/C1 nằm ở nhánh riêng: A1 `d338e15`; C1 code `fda4f82`, migration HOMEDORM4 được Vy cho phép và kiểm tra ở `c1b3acd`. Chưa nhập code các nhánh đó vào Sale; đợt này không chạy SQL hoặc thay ký/verify.
 
 ## Hướng luồng D-026 (bàn với Claude 2026-11-10, J-047)
