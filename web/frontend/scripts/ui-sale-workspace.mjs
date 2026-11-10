@@ -65,9 +65,12 @@ try {
       report.push({ name, ...metrics, errors: [...errors] });
     };
     await open(); await shot('overview');
+    if (phase === 'refine-before') { await nav('Tra cứu khách hàng'); await shot('customers'); }
     if (phase === 'after') {
       const color = await page.locator('aside nav .is-active').evaluate(e => getComputedStyle(e).backgroundColor);
-      assert.equal(color, 'rgb(140, 115, 85)', 'active navigation uses wood token');
+      assert.equal(color, 'rgb(74, 101, 73)', 'active navigation uses primary green token');
+      const backgrounds = await page.evaluate(() => [getComputedStyle(document.querySelector('.kp-sidebar')).backgroundColor, getComputedStyle(document.querySelector('.kp-app')).backgroundColor]);
+      assert.equal(backgrounds[0], backgrounds[1], 'sidebar and content share the green background');
       assert.deepEqual(await page.locator('.sale-stat strong').allTextContents(), ['1', '1', String(schedules.filter(s => new Date(s.thoiGianHen) > new Date() && !['Đã hủy', 'Đã xem'].includes(s.trangThai)).length), '2']);
     }
     await nav(phase === 'before' ? 'Lịch xem phòng' : 'Lịch hẹn xem phòng');
@@ -105,11 +108,21 @@ try {
       assert.equal(await page.locator('aside nav button:disabled').count(), 4, 'other tabs stay locked while scheduling');
       await page.getByRole('button', { name: 'Quay lại', exact: true }).click();
       await nav('Tra cứu khách hàng'); await page.getByText('Khách thử An', { exact: true }).first().waitFor(); await shot('customers');
-      await page.getByRole('button', { name: 'Nhập hộ cư trú', exact: true }).click(); await shot('residence-fallback');
+      assert.equal(await page.locator('.sale-work-tabs').count(), 0);
+      for (const label of ['Trả phòng', 'Đặt cọc', 'Nhập hộ cư trú', 'Hồ sơ đăng ký']) assert.equal(await page.getByRole('button', { name: label, exact: true }).count(), 0, 'lookup has no operation tabs');
+      await page.getByRole('textbox', { name: 'Họ và tên' }).fill('An');
+      assert.equal(await page.locator('.sale-customer-item').count(), 1);
+      await page.locator('.sale-customer-item').first().click();
+      await page.getByRole('heading', { name: 'Khách thử An', exact: true }).waitFor(); await shot('customer-detail');
       await nav('Hồ sơ cá nhân'); await shot('profile');
     }
     await nav(phase === 'before' ? 'Hợp đồng thuê' : 'Lập hợp đồng thuê'); await shot('contracts');
     if (phase === 'after') {
+      assert.equal(await page.locator('.lhd-stepper').count(), 0, 'contract entry is a list without the editor stepper');
+      await page.getByRole('button', { name: 'Hợp đồng đã lập', exact: true }).click();
+      await page.getByRole('heading', { name: 'Chưa có hợp đồng đã lập', exact: true }).waitFor(); await shot('contracts-issued-empty');
+      await page.getByRole('button', { name: /Hỗ trợ khai thông tin người ở/ }).click(); await shot('residence-context');
+      await nav('Tổng quan'); await page.getByRole('button', { name: /Xử lý đặt cọc \/ thu tiền tại quầy/ }).click(); await shot('deposit-context');
       await nav('Tổng quan'); failOverview = true;
       await page.getByRole('button', { name: 'Làm mới', exact: true }).click();
       await page.getByRole('alert').waitFor(); await shot('overview-error');

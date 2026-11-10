@@ -67,6 +67,7 @@ export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
   if (creating) return <SaleScheduleCreate schedules={schedules} onBack={() => setCreating(false)} onCreated={fetchSchedules} onSchedulingChange={onSchedulingChange} />;
 
   return <div className="sale-view">
+    <button className="sale-context-link" onClick={() => onNavigate?.('ho-so')}><Icon name="description" /> Tiếp nhận hồ sơ đăng ký <Icon name="chevron_right" /></button>
     <div className="sale-section-heading"><div><p className="sale-eyebrow">LỊCH TRÌNH CỦA BẠN</p><h2>Lịch hẹn xem phòng</h2><p>Theo dõi buổi xem, thông tin khách và các phòng trong lịch hẹn.</p></div><div className="sale-actions"><button className="ui-btn ui-btn--secondary" onClick={fetchSchedules} disabled={loading}><Icon name="refresh" /> Làm mới</button><button className="ui-btn ui-btn--primary" onClick={() => setCreating(true)}><Icon name="add_circle" /> Lập lịch hẹn</button></div></div>
     <section className="ui-card sale-schedule-toolbar" aria-label="Bộ lọc lịch xem phòng">
       <label className="sale-search" htmlFor="schedule-search"><Icon name="search" /><span className="sale-sr-only">Tìm kiếm lịch</span><input id="schedule-search" className="ui-input" value={filters.keyword} onChange={e => setFilters(current => ({ ...current, keyword: e.target.value }))} placeholder="Tên khách, số điện thoại, mã lịch..." /></label>

@@ -40,6 +40,7 @@ export default function SaleOverview({ user, onNavigate }) {
         ['Lập hợp đồng thuê', 'article', 'hop-dong-thue'], ['Tra cứu khách hàng', 'search', 'khach-hang'],
       ].map(([label, icon, tab]) => <button className="sale-shortcut" key={tab} onClick={() => onNavigate(tab)}><span><Icon name={icon} /></span><strong>{label}</strong><Icon name="arrow_forward" /></button>)}
     </section>
+    <button type="button" className="sale-context-link" onClick={() => onNavigate('dat-coc')}><Icon name="account_balance_wallet" /> Xử lý đặt cọc / thu tiền tại quầy <Icon name="chevron_right" /></button>
     <div className="sale-overview-columns">
       <section className="ui-card sale-panel"><div className="sale-section-heading"><div><p className="sale-eyebrow">LỊCH TRÌNH</p><h2>Lịch hẹn hôm nay</h2></div><button className="ui-btn ui-btn--ghost ui-btn--sm" onClick={() => onNavigate('lich-xem')}>Xem tất cả <Icon name="arrow_forward" /></button></div>
         {loading ? <p role="status">Đang tải lịch hẹn...</p> : daySchedules.length ? <div className="sale-agenda">{daySchedules.map(s => <button className="sale-agenda-row" key={s.id} onClick={() => onNavigate('lich-xem')}><strong className="sale-agenda-time">{timeLabel(s.thoiGianHen)}</strong><span><strong>{s.hoTenKhach}</strong><small>{s.danhSachPhong || s.maPhong || 'Chưa có phòng'}</small></span><StatusBadge status={s.trangThai} /></button>)}</div> : <EmptyState message="Hôm nay chưa có lịch hẹn xem phòng." />}

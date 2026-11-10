@@ -12,6 +12,9 @@ import SaleCustomerWorkspace from './SaleCustomerWorkspace.jsx';
 import SaleProfile from './SaleProfile.jsx';
 import LichXemPhongTab from './LichXemPhongTab.jsx';
 import LapHopDongTab from './LapHopDongTab.jsx';
+import HoSoDangKyTab from './HoSoDangKyTab.jsx';
+import DatCocTab from './DatCocTab.jsx';
+import NhanPhongTab from './NhanPhongTab.jsx';
 
 const navigation = [
   ['tong-quan', 'Tổng quan', 'home'], ['lich-xem', 'Lịch hẹn xem phòng', 'event_note'],
@@ -20,13 +23,13 @@ const navigation = [
 ];
 export default function NhanVienSalePage() {
   const { user, dangXuat } = useAuth();
-  const [activeTab, setActiveTab] = useState('tong-quan'), [customerTab, setCustomerTab] = useState('khach-hang');
+  const [activeTab, setActiveTab] = useState('tong-quan'), [task, setTask] = useState(null);
   const [scheduling, setScheduling] = useState(false);
   function navigate(tab) {
     if (scheduling && tab !== activeTab) return;
-    if (['ho-so', 'dat-coc', 'nhan-phong', 'tra-phong', 'khach-hang'].includes(tab)) {
-      setCustomerTab(tab); setActiveTab('khach-hang');
-    } else setActiveTab(tab);
+    const taskParents = { 'ho-so': 'lich-xem', 'dat-coc': 'tong-quan', 'nhan-phong': 'hop-dong-thue' };
+    if (taskParents[tab]) { setTask(tab); setActiveTab(taskParents[tab]); }
+    else if (navigation.some(([id]) => id === tab)) { setTask(null); setActiveTab(tab); }
   }
   return <div className="kp-page kh-page ui-employee-shell sale-workspace">
     <aside className="kp-sidebar"><div className="kp-sidebar-brand"><Link className="kp-brand sale-brand" to="/"><Icon name="home" /><span>Homestay<span>Dorm</span></span></Link><span className="ui-role-label">Nhân viên Sale</span></div>
@@ -37,10 +40,11 @@ export default function NhanVienSalePage() {
       <div className="kp-top-actions"><BranchChip user={user} /><button className="sale-account" onClick={() => navigate('ho-so-ca-nhan')} disabled={scheduling}><span className="kp-avatar">{(user?.hoTen || 'S').trim().charAt(0).toUpperCase()}</span><span><strong>{user?.hoTen || 'Nhân viên'}</strong><small>Nhân viên Sale</small></span></button><button className="ui-btn ui-btn--ghost" type="button" onClick={dangXuat} aria-label="Đăng xuất"><Icon name="logout" /></button></div>
     </header>
       <main className="kp-main" id="sale-main">
-        {activeTab === 'tong-quan' && <SaleOverview user={user} onNavigate={navigate} />}
-        {activeTab === 'lich-xem' && <LichXemPhongTab onNavigate={navigate} onSchedulingChange={setScheduling} />}
-        {activeTab === 'hop-dong-thue' && <LapHopDongTab />}
-        {activeTab === 'khach-hang' && <SaleCustomerWorkspace initialTab={customerTab} onSchedulingChange={setScheduling} scheduling={scheduling} />}
+        {task && <div className="sale-view"><div className="sale-section-heading"><p className="sale-eyebrow">{task === 'ho-so' ? 'TIẾP NHẬN HỒ SƠ' : task === 'dat-coc' ? 'XỬ LÝ ĐẶT CỌC' : 'HỖ TRỢ KHAI NGƯỜI Ở'}</p><button className="ui-btn ui-btn--secondary" disabled={scheduling} onClick={() => setTask(null)}><Icon name="arrow_back" /> Quay lại</button></div>{task === 'ho-so' && <HoSoDangKyTab onSchedulingChange={setScheduling} />}{task === 'dat-coc' && <DatCocTab />}{task === 'nhan-phong' && <NhanPhongTab />}</div>}
+        {!task && activeTab === 'tong-quan' && <SaleOverview user={user} onNavigate={navigate} />}
+        {!task && activeTab === 'lich-xem' && <LichXemPhongTab onNavigate={navigate} onSchedulingChange={setScheduling} />}
+        {!task && activeTab === 'hop-dong-thue' && <LapHopDongTab onResidence={() => navigate('nhan-phong')} />}
+        {activeTab === 'khach-hang' && <SaleCustomerWorkspace />}
         {activeTab === 'ho-so-ca-nhan' && <SaleProfile user={user} />}
       </main>
     </div>
