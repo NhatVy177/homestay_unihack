@@ -254,6 +254,8 @@ Cổng thanh toán mô phỏng chỉ xuất hiện thêm nếu hoàn thiện s�
 
 ## 9. Thứ tự thực hiện và mốc nội bộ
 
+**Đợt Sale D-035 (11/11, J-X063):** Vy cho sửa Sale trước theo bố cục mẫu Hằng: menu 5 mục, tổng quan, lịch tháng và form lập lịch; bỏ mục kiểm tra phòng/giường và tab cư trú riêng, giữ nhập hộ trong Tra cứu khách hàng. Nghiệp vụ hồ sơ/cọc/trả phòng vẫn có lối truy cập. Nhánh `feat/ui-sale-workspace` từ `origin/main` (`dcc1a59`), worktree riêng; không tự merge/push main. Phạm vi này không làm khách tự khai cư trú hoặc thay backend/SQL/quyền/luồng D-026; phần đó tiếp tục ở đợt nghiệp vụ tương ứng.
+
 **Lịch hiện hành theo D-025 (Vy chốt 2026-11-10 00:47 +07:00): làm giao diện trước Fuji.** Lịch này thay bảng mốc cũ tại mục này và phần lịch 15 ngày của D-019; không thay scope nghiệp vụ hoặc coi kiểm thử local là kết quả Fuji. Đây là lịch nội bộ của Vy, không phải xác minh lại hạn BTC.
 
 | Mốc | Đầu ra |

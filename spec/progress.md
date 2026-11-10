@@ -1,5 +1,12 @@
 # Tiến độ và điểm tiếp tục
 
+## Không gian Sale — D-035 / J-X063 (đang làm)
+
+- Worktree `D:\HomeStayDorm-sale`, nhánh riêng `feat/ui-sale-workspace` từ `origin/main` mới nhất `dcc1a59`; không chạm checkout cũ/backend lockfile. Đã đọc cả hồ sơ mới trên các nhánh audit/C1 và phân biệt code chưa merge.
+- Vy chốt sửa Sale trước: menu 5 mục theo ảnh, bỏ kiểm tra phòng/giường và tab cư trú độc lập; giữ nhập hộ cư trú cùng hồ sơ/cọc/trả phòng trong Tra cứu khách hàng. Khách tự khai người ở đúng D-026 nhưng code chưa có, không triển khai trong đợt này.
+- Đang khảo sát và triển khai tổng quan/lịch hẹn/lập lịch/tra cứu/hồ sơ cá nhân, dùng API hiện có và CSS/token/icon tự viết. Chưa có kết quả build/test/ảnh mới của đợt này; không dùng kết quả các nhánh khác để đánh dấu hoàn thành.
+- Các mốc A1/C1 nằm ở nhánh riêng: A1 `d338e15`; C1 code `fda4f82`, migration HOMEDORM4 được Vy cho phép và kiểm tra ở `c1b3acd`. Chưa nhập code các nhánh đó vào Sale; đợt này không chạy SQL hoặc thay ký/verify.
+
 ## Hướng luồng D-026 (bàn với Claude 2026-11-10, J-047)
 
 Danh sách này giữ **mọi hướng** đã bàn để không bị quên sau Fuji. Cột "Trạng thái": *Đã chốt* = có trong D-026; *Đề xuất* = Claude đề xuất, Vy chưa chốt; *Không làm* = đã bàn và bỏ. Cột "Lịch" là đề xuất, chưa chốt.

@@ -60,6 +60,13 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 
 ## Điều kiện xuyên suốt
 
+### Không gian Sale — D-035
+
+- Menu chính 5 mục theo bố cục Vy gửi: Tổng quan, Lịch hẹn xem phòng, Lập hợp đồng thuê, Tra cứu khách hàng, Hồ sơ cá nhân. Không có tab Kiểm tra phòng/giường hoặc Ghi nhận cư trú độc lập.
+- Tổng quan dùng dữ liệu API được phân quyền chi nhánh: hồ sơ mới, lịch hôm nay/sắp tới, việc cần xử lý, liên kết nhanh; không đưa số liệu mẫu vào ứng dụng. Lịch hẹn có lịch tháng, bộ lọc, danh sách/chi tiết và lối tạo lịch từ hồ sơ đã tiếp nhận; phần chọn phòng/ngày/giờ dùng quy tắc và API sẵn có.
+- Tra cứu khách hàng lấy từ hồ sơ Sale được phép xem; tiếp tục mở được hồ sơ đăng ký, đặt cọc, nhập hộ cư trú và trả phòng. Đây là tổ chức lại giao diện, không bỏ nghiệp vụ. Hồ sơ cá nhân hiển thị thông tin tài khoản hiện có, không tạo API chỉnh sửa mới.
+- Đợt này chưa làm khách tự khai cư trú: D-026 vẫn áp dụng cho đợt nghiệp vụ tiếp theo; hiện giữ nhập hộ để không đứt luồng. Không đổi quản lý duyệt ngoại lệ, SQL/SP, luồng ký/verify, quyền hoặc trạng thái; không tự mang code chưa merge của A1/C1/T-22 vào nhánh Sale.
+
 ### Giao diện trước Fuji — D-025 / T-21
 
 - Đợt 1 (10–11/11): nền tokens sage/nâu gỗ, Lexend cho tiêu đề và Inter cho nội dung; lớp dùng chung cho nút, thẻ, input, bảng, badge, tabs, số liệu, trạng thái rỗng; cập nhật component chung và khung Sale/Quản lý/Kế toán/Admin/khách/trang chủ/đăng nhập. Không thêm thư viện UI, không đổi class/id cũ được script dùng.
