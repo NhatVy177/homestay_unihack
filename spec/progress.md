@@ -1,6 +1,6 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-11 00:59:24 +07:00** (J-X061). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát và đề xuất: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-11 01:06:49 +07:00** (J-X062). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát và đề xuất: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
 
@@ -10,7 +10,7 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy đ�
 
 | Tiêu chí (điểm) | Đã có | Còn thiếu |
 |---|---|---|
-| Technical (25) | C1: blockchain 15 pass, backend 31 pass, mỗi bộ 1 skip SQL; build và hai bộ smoke UI qua | Chạy trọn luồng thật một lần; áp dụng/kiểm tra migration C1 sau khi Vy cho phép; README cài DB từ đầu |
+| Technical (25) | C1: code/test qua; migration và cấu trúc hai bảng đã kiểm tra trên HOMEDORM4 theo phép Vy (J-X062) | Chạy trọn luồng thật một lần; C1 chưa thử tài khoản thật/SQL qua UI; README cài DB từ đầu |
 | Avalanche (25) | Contract EIP-712, relayer trả gas, ví nhúng, trang kiểm chứng (chạy local) | **Deploy + verify source Fuji, giao dịch thật, link explorer** |
 | Creativity (15), Impact (15) | Bài toán thật, luồng D-026 → D-031 đã chốt | Slide nêu người dùng, giới hạn pháp lý, vì sao on-chain |
 | Pitch (10) | Kịch bản video 2:50 đề xuất ở J-041 (chưa chốt) | Slide, video, README nộp |
@@ -25,7 +25,7 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy đ�
 | `feat/t22-backend` (Claude) | Khách tự giữ chỗ, từ chối → "Đã xem", "Không thuê nữa", "Khách không đến" | Có code + test đầu vào; **SQL chưa chạy lên HOMEDORM4**, chưa nối giao diện |
 | `chore/audit-cleanup` (Claude) | Rà soát 11/11: dọn file thừa, AGENTS.md, skill giao diện, file này | Chờ Vy xem |
 | `chore/fuji-setup` (Codex) | A1 tại `D:\HomeStayDorm-fuji`, riêng từ `923a665` | Đã push `d338e15` (J-X058); có script và ví local, chờ faucet, chưa deploy |
-| `feat/t22-handover-bundle` (Codex) | C1 tại `D:\HomeStayDorm-handover`, riêng từ `923a665` theo yêu cầu Vy | Có code/test (J-X061); D-034 đã chốt tại `ba33162`. **Chưa chạy migration HOMEDORM4**, chờ Vy cho phép, chưa nghiệm thu DB/Fuji |
+| `feat/t22-handover-bundle` (Codex) | C1 tại `D:\HomeStayDorm-handover`, riêng từ `923a665` theo yêu cầu Vy | Code/test đã push `fda4f82`; migration HOMEDORM4 và cấu trúc pass theo phép Vy (J-X062). Chưa nghiệm thu luồng thật qua UI/Fuji |
 | `docs/review-branch-workflow` | Quy tắc "không push main" | Nội dung đã đưa vào AGENTS.md mới; có thể xóa nhánh |
 
 Nhánh đã merge, có thể xóa trên GitHub: `feat/t20-checkin-deposit-fixes`, `docs/d026-flow-redesign`.
@@ -46,7 +46,7 @@ Nhánh đã merge, có thể xóa trên GitHub: `feat/t20-checkin-deposit-fixes`
 |---|---|---|---|
 | T-08 | Deploy, verify source, nghiệm thu Fuji | A1 code/test xong trên nhánh riêng `chore/fuji-setup` (`d338e15`); ba ví local có số dư 0, chưa deploy | Vy xin faucet cho deployer, funding sau; A2/A3 chưa làm |
 | T-11 / T-14 | Bàn giao Web2 → email → OTP → ký | Có code, test tự động qua, **chưa chạy thật** | Chạy thật trong việc A3 |
-| T-22 | Luồng D-026 → D-031 | C1 có code/test trên nhánh riêng; 4 mục đầu có code backend ở `feat/t22-backend`; SQL hai nhánh chưa áp dụng | Xin phép migration C1 và kiểm tra thật; phần còn lại theo bảng dưới |
+| T-22 | Luồng D-026 → D-031 | C1 có code/test và migration HOMEDORM4 đã áp dụng; 4 mục đầu có code backend ở `feat/t22-backend`, SQL nhánh đó chưa áp dụng | C1 cần thử tài khoản thật sau khi chuẩn bị hợp đồng; phần còn lại theo bảng dưới |
 | T-21 | Giao diện | Đợt đầu xong (khung, token, form, danh sách); Vy tạm dừng để làm A1 rồi C1 | Chờ xong hai việc trước khi tiếp tục UI |
 | T-09 | Hồ sơ nộp | Chưa bắt đầu | Việc D1–D3 |
 | T-04 | Nguồn tiền cọc (Q-01) và dữ liệu demo | C1 đã chốt dùng `SoTienCoc`, chưa trừ hoàn một phần (D-034) | Chốt nguồn sau hoàn/cấn trừ khi làm phần D-026 ngoài C1; chuẩn bị demo trước Fuji |
@@ -58,7 +58,7 @@ Việc đã xong trước 11/11 (T-01, T-02, T-10, T-12, T-15 → T-20): xem fil
 
 | Mức | Mục | Quyết định | Trạng thái |
 |---|---|---|---|
-| **Phải có** (trên đường demo) | Điều khoản hợp đồng + phiên bản chính sách + mã băm ảnh hợp đồng vào gói bàn giao | D-027, D-031, D-034 | C1 có code/test: v2, ảnh ký private, hồ sơ cũ cần xác nhận chính sách; migration chưa chạy |
+| **Phải có** (trên đường demo) | Điều khoản hợp đồng + phiên bản chính sách + mã băm ảnh hợp đồng vào gói bàn giao | D-027, D-031, D-034 | C1 code/test + migration/kiểm cấu trúc HOMEDORM4 pass; chưa chạy trọn luồng UI thật |
 | | Màn kiểm tra trả phòng so trước/sau | D-030 | Chưa làm |
 | | Bản nháp đối soát tự soạn; phiếu thu nợ và phiếu hoàn cọc khác loại | D-030 | Chưa làm |
 | | Tự thanh lý 3 trường hợp + gói bằng chứng cuối | D-030, D-031 | Chưa làm |
@@ -77,13 +77,15 @@ Việc đã xong trước 11/11 (T-01, T-02, T-10, T-12, T-15 → T-20): xem fil
 - `web/backend npm test`: 31 qua, 1 bỏ qua SQL, 0 lỗi; policy bất biến, quyền chủ phiếu/chi nhánh/Sale, chặn thiếu ảnh/xác nhận và file sai hash, không đưa PII/bytes ảnh ký vào payload, email đúng snapshot, multipart từ chối file quá giới hạn.
 - `web/frontend npm run build` và `npm run test:avalanche-ui`: qua; còn cảnh báo thư viện/chunk lớn.
 - `npm run test:handover-ui`: qua, 12 ảnh tại `web/frontend/.ui-screens/c1/` (6 trạng thái × 1440px/390px), report JSON không JS exception/cuộn ngang. Component xác nhận/upload dùng API giả; trang verify dùng RPC Hardhat trong bộ nhớ và kiểm thật commitment v1/v2. Không phải tài khoản/SQL/SMTP/Privy/Fuji thật.
-- Không thay contract Solidity hoặc backend lockfile; `git diff --check` pass. Chưa chạy SQL/migration. Các ca SQL vẫn bỏ qua, cần Vy cho phép trước HOMEDORM4.
+- Không thay contract Solidity hoặc backend lockfile; `git diff --check` pass. Các ca test tự động cần SQL vẫn bỏ qua ở J-X061, không chạy lại trong J-X062.
+- SQL thật J-X062 sau khi Vy cho phép: migration C1 pass, đúng DB HOMEDORM4; hai bảng có đủ 13 cột, 2 khóa chính và 4 khóa ngoại. Hai phiếu cũ được đánh dấu cần xác nhận; nội dung/phiên bản/thời điểm ghi nhận/xác nhận đều chưa điền. Không có file ký. Fingerprint số tiền/trạng thái phiếu cọc và điều khoản/trạng thái hợp đồng trước/sau không đổi. Đây là kiểm tra migration/cấu trúc, chưa phải kiểm thử luồng nghiệp vụ thật.
 
 ## Môi trường local (không chứa giá trị bí mật)
 
 - `web/backend/.env`: chain local `31337`, `PRIVY_AUTH_MODE=email`, SMTP đã cấu hình, ví mô phỏng bật. `MAIL_REDIRECT_TO` đang tắt; email nhân viên trong DB trỏ về hộp thư thử của Vy.
 - Nhánh A1 riêng `chore/fuji-setup`: đã có hai file khóa bị ignore ở `D:\HomeStayDorm-fuji\blockchain`; không có file này tại worktree C1 và không chép qua. Deployer/manager `0x7bb2e96898Db7e387e118eB92a9C390E29f54B2f`, số dư Fuji 0 tại kiểm tra A1; chưa gửi giao dịch. Chi tiết và test A1 ở commit `d338e15`/J-X058, chưa được tích hợp vào nhánh C1.
 - HOMEDORM4 đã dọn dữ liệu giao dịch ngày 06/11 (J-030); có vài hồ sơ thử tạo sau đó. Bản sao lưu trước khi dọn: xem file lưu trữ.
+- Tại J-X062: HOMEDORM4 có 2 phiếu cọc và 0 hợp đồng. Đã tạo hai bảng C1; chưa tạo snapshot nội dung hoặc xác nhận chính sách thay khách. Cấu hình DB được nạp trực tiếp từ file local cũ khi chạy script, không chép `.env`/khóa giữa worktree.
 
 ## Câu hỏi còn mở
 
@@ -92,6 +94,6 @@ C1 đã được Vy chốt hai điểm tại D-034/J-X060 và đã triển khai 
 1. **Q-01/C1:** giữ `PhieuDatCoc.SoTienCoc`, chưa trừ hoàn một phần.
 2. **Hồ sơ cũ:** bắt buộc bổ sung ảnh ký và khách xác nhận chính sách trước v2. Không tự hồi tố thời điểm đã xem chính sách hoặc sửa bản v1 đã khóa.
 
-**Bước tiếp C1:** chờ Vy cho phép chạy `handover-bundle:db:migrate` với cấu hình HOMEDORM4; file `database/avalanche/20261111_handover_evidence.sql` tạo hai bảng mới, đánh dấu phiếu cũ cần xác nhận bổ sung, không đổi tiền/trạng thái hợp đồng. Sau đó kiểm tra SQL và để Vy dùng tài khoản thật xác nhận chính sách/tải ảnh/phát hành v2. Chưa thực hiện thao tác đó; code/test pass không đồng nghĩa nghiệm thu SQL/Fuji.
+**Bước tiếp C1:** Vy review nhánh `feat/t22-handover-bundle`; migration đã được cho phép và chạy thành công. Cần chuẩn bị hợp đồng bằng luồng Web2 rồi dùng tài khoản thật xác nhận chính sách/tải ảnh/phát hành v2; DB đang có 0 hợp đồng nên chưa thử luồng đó. Không tự tạo hợp đồng, xác nhận thay khách, bật scheduler hoặc phát hành/gửi email trong đợt chỉ áp dụng migration này. Chưa nghiệm thu SQL qua UI/Privy/Fuji.
 
 Q-01 còn mở ngoài phạm vi C1 (hoàn/cấn trừ D-026); Q-06 (hạn và cổng nộp), Q-07 (ghi công nhóm cũ), Q-08 (email demo), Q-10 (Privy JWT) trong [decisions.md](decisions.md). Các đề xuất mới chờ Vy chốt: mục 4 của [audit-2026-11-11.md](audit-2026-11-11.md).
