@@ -585,3 +585,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Code: `database/SP_DatCoc/dat-coc-xac-nhan-kha-nang.sql` (nhánh từ chối của `SP_XacNhanKhaNangNhanCoc`: luôn về "Đã tiếp nhận", gỡ lựa chọn phòng, không còn đánh dấu phòng bị từ chối hay tự đóng hồ sơ; bộ hẹn giờ 12 giờ dùng chung SP nên cũng theo); `database/SP_DatCoc/trang-thai-buoi-xem-20261110.sql` (thêm "Khách không đến" vào ràng buộc `CHK_LXP_TrangThai`, `SP_GhiNhanKhachKhongDen`, `SP_KhachKhongThueNua`); `services/datCoc.service.js`, controller, routes (`PUT /api/dat-coc/khach-khong-thue-nua/:maDangKy`, `PUT /api/dat-coc/khach-khong-den/:maDangKy/:sttLich`); `scripts/khach-giu-cho-db.mjs` gom cả 3 phần.
 - Kiểm tra: backend `node --test` 28 pass/1 skip/0 fail (test mới kiểm tra vai trò và dữ liệu vào). Chưa chạy SQL lên DB. Chưa kiểm tra chỗ khác trong code còn cho rằng hồ sơ bị "Từ chối" khi hết phòng.
 - Việc còn lại: Vy đồng ý chạy migration; các mục T-22 sau (khai người ở, thành viên bị loại, hợp đồng "Chờ ký", ...).
+
+## 2026-11-10 23:21:08 +07:00 — J-058 — Viết file luồng tổng hợp cho Vy kiểm tra
+
+- Người thực hiện: Claude, theo yêu cầu Vy ("viết 1 file plan.md rõ ràng tất cả kế hoạch, luồng, quyết định để t check lại"); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- File: `spec/luong-tong-hop.md` (mới). Là **bản đọc gộp** từ D-001 → D-032, scope, progress, plan; không thêm quyết định mới và không thay `hackathon/plan.md` (tránh plan song song, theo AGENTS.md). Chứa: nguyên tắc, vai trò, 9 giai đoạn, hai mốc chuỗi, thanh toán, email, việc đã bỏ, bảng quyết định theo giai đoạn, việc còn mở, trạng thái T-22.
+- Kiểm tra: đối chiếu thủ công với decisions.md, scope.md, progress.md; chi tiết giai đoạn 3 (thanh toán cọc) lấy từ D-023 và F-13 nhưng phần nội dung bị cắt khi đọc, nên có thể thiếu chi tiết nhỏ.
+- Việc còn lại: Vy đọc, ghi lại mục sai/chưa ưng để Claude sửa và ghi quyết định mới (nếu có).
