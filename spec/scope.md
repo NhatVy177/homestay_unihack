@@ -62,6 +62,8 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 
 ### Không gian Sale — D-035
 
+**D-036 thay phần trình bày/vị trí:** nền sidebar và nội dung cùng token xanh; Tra cứu chỉ tìm/xem khách, không chứa thanh hồ sơ/cọc/cư trú/trả phòng. Sale không còn lối Trả phòng; luồng các vai trò khác giữ nguyên. Tiếp nhận hồ sơ mở từ lịch hẹn/tổng quan, xử lý cọc tiền mặt từ tổng quan, nhập hộ cư trú từ lập hợp đồng. Màn hợp đồng mở bằng danh sách đủ điều kiện và lối xem hợp đồng đã lập; không thêm chức năng bản nháp không có API. Các mô tả vị trí ở D-035 bên dưới là mốc trước D-036.
+
 - Menu chính 5 mục theo bố cục Vy gửi: Tổng quan, Lịch hẹn xem phòng, Lập hợp đồng thuê, Tra cứu khách hàng, Hồ sơ cá nhân. Không có tab Kiểm tra phòng/giường hoặc Ghi nhận cư trú độc lập.
 - Tổng quan dùng dữ liệu API được phân quyền chi nhánh: hồ sơ mới, lịch hôm nay/sắp tới, việc cần xử lý, liên kết nhanh; không đưa số liệu mẫu vào ứng dụng. Lịch hẹn có lịch tháng, bộ lọc, danh sách/chi tiết và lối tạo lịch từ hồ sơ đã tiếp nhận; phần chọn phòng/ngày/giờ dùng quy tắc và API sẵn có.
 - Tra cứu khách hàng lấy từ hồ sơ Sale được phép xem; tiếp tục mở được hồ sơ đăng ký, đặt cọc, nhập hộ cư trú và trả phòng. Đây là tổ chức lại giao diện, không bỏ nghiệp vụ. Hồ sơ cá nhân hiển thị thông tin tài khoản hiện có, không tạo API chỉnh sửa mới.
