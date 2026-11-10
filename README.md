@@ -14,14 +14,15 @@ HomeStayDorm/
 │  └─ scripts/     # Công cụ hỗ trợ phân tích code
 ├─ hackathon/      # Bối cảnh, proposal và kế hoạch UniHack/Avalanche
 ├─ spec/           # Phạm vi, quyết định, tiến độ và nhật ký làm việc
+├─ .agents/skills/ # Quy chuẩn giao diện cho AI (homestaydorm-ui)
 ├─ AGENTS.md       # Hướng dẫn AI đọc và cập nhật hồ sơ mỗi phiên
 ├─ run.bat         # Chạy nhanh trên Command Prompt
 └─ run.ps1         # Chạy nhanh trên PowerShell
 ```
 
-Phần Avalanche nằm trong [module riêng](blockchain/README.md) (contract `DormSettlement`, Hardhat 3 + solc 0.8.38 + viem). Ví nhúng/ký ở `web/frontend/src/components/xacNhan/` và `web/frontend/src/lib/avalanche/`; relayer, đồng bộ và email ở `web/backend/integrations/avalanche/`. Trạng thái thực tế (đã test gì, chưa deploy Fuji) theo [spec/progress.md](spec/progress.md).
+Phần Avalanche nằm trong [module riêng](blockchain/README.md) (contract `DormSettlement`, Hardhat 3 + solc 0.8.38 + viem). Ví nhúng/ký ở `web/frontend/src/components/xacNhan/` và `web/frontend/src/lib/avalanche/`; relayer, đồng bộ và email ở `web/backend/integrations/avalanche/`. Trạng thái thực tế (đã test gì, đã lên Fuji chưa) theo [spec/progress.md](spec/progress.md).
 
-**Công nghệ:** React 18 + Vite, Node.js 24 + Express, SQL Server; Avalanche Fuji C-Chain, Solidity 0.8.38, OpenZeppelin EIP-712, viem; Privy embedded wallet (JWT-based auth); nodemailer.
+**Công nghệ:** React 18 + Vite, Node.js 24 + Express, SQL Server; Avalanche Fuji C-Chain, Solidity 0.8.38, OpenZeppelin EIP-712, viem; Privy embedded wallet (khách nhập mã OTP email một lần; JWT-based auth chỉ bật được khi có gói Privy Scale); nodemailer.
 
 ## Chạy local
 
@@ -71,7 +72,7 @@ Kiểm thử: `cd blockchain && npm test` (contract + luồng tích hợp trên 
 
 ## Tài liệu UniHack
 
-- [Bắt đầu cho Vy và AI tiếp nối](spec/README.md) — xem [tiến độ hiện tại](spec/progress.md) và [nhật ký có thời gian](spec/journal.md).
+- [Tiến độ hiện tại](spec/progress.md), [luồng và quyết định đã gộp](spec/luong-tong-hop.md), [nhật ký có thời gian](spec/journal.md); cách ghi hồ sơ ở [spec/README.md](spec/README.md).
 - [Tổng quan cuộc thi](hackathon/README.md)
 - [Kế hoạch thực hiện](hackathon/plan.md)
 - [Proposal](hackathon/Proposal.md)

@@ -1,150 +1,87 @@
-# Tiến độ và điểm tiếp tục
+# Tiến độ hiện tại
 
-## Hướng luồng D-026 (bàn với Claude 2026-11-10, J-047)
+Cập nhật: **2026-11-11 00:11 +07:00** (J-C059). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát và đề xuất: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
-Danh sách này giữ **mọi hướng** đã bàn để không bị quên sau Fuji. Cột "Trạng thái": *Đã chốt* = có trong D-026; *Đề xuất* = Claude đề xuất, Vy chưa chốt; *Không làm* = đã bàn và bỏ. Cột "Lịch" là đề xuất, chưa chốt.
+## Tóm tắt
 
-| # | Hướng | Trạng thái | Lịch đề xuất |
-|---|---|---|---|
-| 1 | Mỗi hồ sơ một buổi xem nhiều phòng; Sale chỉ ghi trạng thái buổi; nút "Không thuê nữa" | Đã chốt | T-22, song song giao diện đợt 2 (12–13/11), nhánh riêng, không đụng blockchain |
-| 2 | Khách tự gửi giữ chỗ trên web (Sale gửi thay), lời nhắn "chờ quản lý xác nhận" | Đã chốt | T-22 |
-| 3 | Bị từ chối/quá 12 giờ/hết hạn → hồ sơ về "Đã xem" | Đã chốt | T-22 |
-| 4 | Khách tự khai người ở; ô đối chiếu CCCD gốc chuyển sang màn lập hợp đồng | Đã chốt | T-22 |
-| 5 | Thành viên bị loại: nhả giường ngay, hoàn 80% trừ vào kỳ đầu; phần dư/cả nhóm bị loại do kế toán chi | Đã chốt | T-22 |
-| 6 | Đổi đại diện bằng email mời tạo tài khoản; tạm thời Sale lập hồ sơ mới | Đã chốt, làm sau cùng | Sau mục 1–5; nếu trễ thì giữ cách tạm |
-| 7 | Chính sách hoàn cọc (80/50/70/100%) hiện trên phiếu cọc và email; lưu phiên bản chính sách để ghi lên chuỗi lúc bàn giao | Đã chốt (D-031) | T-22 (nhỏ) |
-| 8 | Điều khoản hợp đồng (mã HĐ, giá thuê, kỳ hạn, tiền cọc, phiên bản chính sách) + mã băm bản chụp hợp đồng đã ký vào gói bằng chứng bàn giao; không sửa contract | Đã chốt (D-027) | Trước Fuji (12–13/11) |
-| 8a | Hợp đồng "Chờ ký" + email xem trước; trả kỳ đầu trước (vẫn cho trả tại quầy); ký giấy + đối chiếu CCCD + bàn giao trong một lần đến; CCCD không khớp → khai lại, giữ/hoàn tiền kỳ đầu; Sale tải bản chụp hợp đồng đã ký | Đã chốt (D-027) | T-22 |
-| 9 | Mốc chuỗi 3 "đóng hồ sơ": kế toán ghi số tiền thực hoàn/thu + hash chứng từ, trạng thái Đã đóng. Phải sửa contract + test, xong trước deploy Fuji 14/11. **Lưu ý:** ngược ghi chú plan §3 "contract MVP không cần `PaymentReported`/`Closed`" và quyết định 04/11 giữ tiền ở Web2. **Vy chọn không làm trong bản thi (D-031)**: thay bằng gói bằng chứng cuối trên Web2 có chứng từ chi/thu + email cho khách; chuỗi dừng ở mốc 2 | Để sau bản thi (D-031) | Sau 21/11 |
-| 9a | Gói bằng chứng cuối khi tự thanh lý: thêm mã băm chứng từ chi hoàn/thu thêm, số tiền, thời điểm; email cho khách; không sửa contract | Đã chốt (D-031) | T-22 |
-| 10 | Màn kiểm tra trả phòng hiện cạnh nhau tình trạng lúc bàn giao vào và hiện tại | Đã chốt (D-030) | Giao diện đợt 2 |
-| 11 | Thẻ lịch xem của khách có thanh tiến trình Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ | Đã chốt (D-031) | Giao diện đợt 2 |
-| 12 | Bàn lại toàn bộ luồng giai đoạn 1–9 | Xong (D-026 → D-031) | Bước tiếp: prompt Codex T-22 |
-| 20 | Hệ thống tự soạn bản nháp đối soát (chính sách đã khóa + khoản dự kiến trừ + kết quả kiểm tra), kế toán rà và gửi | Đã chốt (D-030) | T-22 |
-| 21 | Thu thêm qua ví mô phỏng, trả trước khi thanh lý | Đã chốt (D-030) | T-22 |
-| 22 | Khách không phản hồi đối soát: nhắc 24/72 giờ, quá 7 ngày "Quá hạn phản hồi", không tự chấp nhận thay | Đã chốt (D-030) | T-22 |
-| 23 | Tự thanh lý khi tiền đã xong (3 trường hợp tách rõ), quản lý chỉ bấm "Đã thu chìa khóa"; bỏ thanh lý tay và biên bản trả phòng giấy | Đã chốt (D-030) | T-22 |
-| 17 | Hóa đơn tháng trả qua ví mô phỏng (tái dùng F-11), tự "Đã thanh toán" | Đã chốt (D-029) | T-22 |
-| 18 | Trang khách "Khoản dự kiến trừ khi trả phòng" (nợ, hư hỏng kèm ảnh, phạt) | Đã chốt (D-029) | T-22 + giao diện đợt 2 |
-| 19 | Email + phản hồi ngay trên Web2 cho mỗi khoản phát sinh/vi phạm; không lên chuỗi riêng | Đã chốt (D-029) | T-22 |
-| 14 | Ảnh tình trạng tài sản lúc bàn giao (không bắt buộc từng món), mã băm vào gói biên bản | Đã chốt (D-028) | T-22; cần cho mục 10 |
-| 15 | Không ép xác nhận tại chỗ; vẫn giao chìa khóa; email nhắc 24 giờ/72 giờ; không xác nhận thay; danh sách "Chờ khách xác nhận" cho quản lý | Đã chốt (D-028) | T-22 |
-| 16 | Giữ OTP; kích hoạt xác nhận điện tử ngay sau khi trả cọc; nút gửi lại mã + nhắc thư rác; kiểm thời hạn phiên Privy ở đợt Fuji; tiếp tục hỏi BTC Q-08 để bật D-011 | Đã chốt (D-028) | Giao diện + T-22; thử phiên ở Fuji 14–17/11 |
-| 13 | Ghi kết quả xem từng phòng; hạn chờ 7 ngày/tự đóng hồ sơ sau buổi xem; kế toán lập phiếu cọc tay | Không làm | — |
+Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy được trên máy local. Phần Avalanche **mới chạy trên chain local (Hardhat 31337)**: chưa deploy Fuji, chưa có giao dịch Fuji nào, chưa ai thử mã OTP Privy thật, chưa chạy trọn luồng bàn giao → đối soát → kiểm chứng qua giao diện với SQL Server thật. Đây là rủi ro lớn nhất vì hai tiêu chí Technical + Avalanche chiếm 50/100 điểm.
 
-Thứ tự cắt nếu trễ (đề xuất): giữ 1–5 và 7–8; mục 9 đã để sau bản thi (D-031); mục 6 giữ cách tạm; mục 10–11 làm trong phạm vi giao diện đợt 2.
+## Mức sẵn sàng theo tiêu chí chấm
 
-## Đợt giao diện 1 — T-21 / D-025 (2026-11-10)
-
-- Hoàn thành code và kiểm tra local trên `feat/ui-refresh-1`, gốc `origin/main` ở `43c60b1` (merge PR #1, đã chứa T-20 `66bce65` và hồ sơ `a0a5482`). J-044 là lần dừng trước khi main được merge; Vy đã xác nhận merge và cho tiếp tục ở J-045. Chờ Vy xem nhánh, không tự merge main.
-- Lịch mới: giao diện đợt 1 ngày 10–11/11; đợt 2 ngày 12–13/11, hạn chót 13/11; Fuji 14–17/11; hồ sơ/nộp 18–20/11. Lịch này thay thứ tự ưu tiên cũ bên dưới theo D-025.
-- Tokens/lớp chung, 7 component chung, khung nhân viên/Admin/khách/trang chủ/đăng nhập đã đổi tông; thêm chip chi nhánh, tên vai trò và menu mobile mở/đóng bằng nút/nền/Escape. Không đổi nghiệp vụ/API/SP/dữ liệu. Đã chạy frontend build pass (cảnh báo thư viện/size chunk), backend 25 pass/1 skip SQL và smoke Avalanche UI pass; `git diff --check` pass.
-- 14 ảnh trước + 14 ảnh sau cho 7 màn × 2 độ rộng 1440px/390px, thêm ảnh menu và ảnh viewport đăng nhập trong `web/frontend/.ui-screens/{before,after}/`; `report.json` mỗi thư mục. 14/14 màn sau sửa không có JS exception/cuộn ngang toàn trang, Lexend/Inter đã tải; 4/4 menu mở/đóng và Escape pass. Bảng dài trên mobile cuộn trong thẻ. 5 màn cần đăng nhập dùng phiên/API giả lập, dữ liệu rỗng: **chưa đăng nhập tài khoản thật hoặc nghiệm thu dữ liệu/HTTP/SMTP/Privy/Fuji**.
-- Bước kế: Vy xem nhánh UI; đợt 2 ưu tiên trạng thái rỗng lặp ở Quản lý/Kế toán, màu inline còn trong modal/form/badge của tab Sale/Quản lý/Kế toán/khách, bố cục form và bảng dài với dữ liệu demo. Nội dung các tab Admin/khách và màn có dữ liệu thật chưa rà đầy đủ; không coi khung pass là mọi tab đã đạt. Giữ nguyên, không stage `web/backend/package-lock.json`.
-- Bổ sung sau khi Vy xem bản đầu (D-032/J-054): đã đọc dự án tham chiếu `D:\Nam4\Contest\Homestay-Dorm` ở `6e3fa9b`, dùng ý tưởng icon nét viền, nhãn/ô nhập/nhóm form và nút/modal, tự viết bằng CSS thường. Thêm `patterns.css`, tokens cỡ icon/control; làm cụ thể form khách vãng lai và icon trong đăng nhập/đăng ký, chỉnh trình bày form Admin. Chưa coi các form chuyên biệt còn lại là hoàn thành; quy chuẩn triển khai ở scope.
-- Kiểm tra bổ sung J-054 đã chạy: build pass; backend 25 pass/1 skip SQL; smoke Avalanche UI pass. Playwright 12 trạng thái form × 2 bộ trước/sau ở `web/frontend/.ui-screens/forms-{before,after}/` (mỗi bộ gồm 6 trạng thái × 1440px/390px), validation bước 1 và chuyển bước 2 vẫn chạy, readonly Admin giữ nguyên; modal và thanh thao tác không vượt viewport, không gửi API ghi dữ liệu trong fixture. Chạy lại 14 màn khung: không lỗi JS/tràn ngang; 4 menu mobile pass. Đối chiếu AST xác nhận 102 handler và 34 native controls ở 3 file JSX vừa sửa giữ nguyên thuộc tính/xử lý ngoài phần style/class/ARIA; ảnh và fixture không thay nghiệm thu tài khoản thật.
-
-## Dữ liệu demo local 2026-11-06 15:32:58 +07:00 (J-030)
-
-- Theo yêu cầu Vy, HOMEDORM4 đã được dọn hồ sơ giao dịch để làm trống toàn bộ 44 phòng và 138 giường. Các bảng đăng ký, cọc, hợp đồng, hóa đơn, trả phòng, đối soát và hồ sơ xác nhận Avalanche trong SQL đều 0 bản ghi; 3 chi nhánh, 61 khách hàng, 69 tài khoản và dữ liệu danh mục vẫn giữ. Muốn thử lại luồng đầy đủ cần tạo đăng ký/cọc/hợp đồng mới.
-- Bản sao lưu SQL đã `RESTORE VERIFYONLY` thành công trước khi dọn: `D:\sql\MSSQL16.SQLEXPRESS04\MSSQL\Backup\HOMEDORM4_before_demo_room_reset_20261106T083034.bak`. File upload local còn tồn tại được sao lưu riêng trong `%LOCALAPPDATA%\HomeStayDormBackups\20261106T083034_uploads`. Lịch sử chain local không bị xóa.
-- Đính chính 2026-11-06 15:47:06 +07:00 (J-031): sau mốc J-030, email test của Vy được đăng ký lại nên phát sinh một tài khoản khách mới. Theo phản hồi của Vy, đã xóa tài khoản này cùng người dùng/khách hàng tương ứng. Kiểm tra email, tên đăng nhập và số điện thoại trên form đều không còn bị chiếm; 44 phòng vẫn `Trống`. Số lượng khách hàng/tài khoản hiện tại giảm 1 so với ảnh chụp trạng thái J-030.
-- Cập nhật 2026-11-06 16:08:33 +07:00 (J-032): đã có hồ sơ đăng ký test mới với lịch xem phòng. Theo yêu cầu Vy, lịch được chuyển `Đã xem` bằng cách đưa giờ hẹn về trước thời điểm hiện tại và áp dụng cùng điều kiện với scheduler; phòng đã xem vẫn `Trống`, hồ sơ xuất hiện trong danh sách đặt cọc của Sale. Các con số bảng giao dịch bằng 0 ở mốc J-030 là ảnh chụp trước khi Vy tạo hồ sơ mới, không còn là trạng thái hiện tại.
-- Cập nhật 2026-11-06 23:14:52 +07:00 (J-033): theo yêu cầu Vy, đã gỡ yêu cầu đặt cọc test của tài khoản khách được chỉ định bằng cách đưa hồ sơ từ `Xác nhận cọc` về `Đã tiếp nhận`. Chưa có phiếu cọc hoặc giao dịch thanh toán để xóa; lịch `Đã xem` và phòng đã chọn vẫn còn để Sale có thể gửi lại yêu cầu. Kiểm tra SQL sau commit: đúng một hồ sơ ở `Đã tiếp nhận`, một lịch đã xem, một phòng đã chọn, không có phiếu cọc.
-- Cập nhật 2026-11-07 17:10:41 +07:00 (J-043): lịch demo `DK0002-1` của phòng P103 được chuyển từ `Chờ xem` sang `Đã xem` theo yêu cầu Vy. Đã kiểm tra lại qua `SP_KhachMoi_DanhSachLichXem`; giờ hẹn và phòng giữ nguyên.
-
-## Xác nhận hộp thư 2026-11-06 01:52:14 +07:00 (J-018)
-
-- Vy xác nhận đã nhận email test tại hộp thư redirect. Kết hợp kết quả `status: sent` ở J-017, cấu hình Gmail SMTP local đã hoạt động đầu cuối cho thư test. Luồng phát hành biên bản thật và trạng thái thông báo UI vẫn chưa được kiểm thử/sửa trong đợt này.
-
-## Cập nhật SMTP local 2026-11-06 01:51:12 +07:00 (J-017)
-
-- Vy đã nhập App Password vào `web/backend/.env` (file local ngoài Git). Backend gửi email test qua Gmail SMTP trả `status: sent` và có message ID; mail được chuyển hướng tới hộp thư test, **chưa có xác nhận của Vy là đã thấy thư trong Inbox/Spam**.
-- Đã nạp lại tiến trình backend đang chạy bằng `nodemon`; tiến trình `node index.js` có PID mới, `GET /api/avalanche/config` trả HTTP 200. Chưa chạy luồng lập biên bản thật qua giao diện hoặc kiểm tra mail đến khách thực tế. Cập nhật J-015 bên dưới là lịch sử trước khi có App Password.
-
-## Cập nhật SMTP local 2026-11-06 01:39:27 +07:00 (J-015)
-
-- Đã điền cấu hình Gmail SMTP và chuyển mọi email demo về hộp thư test trong `web/backend/.env` (file local bị Git bỏ qua). Kết nối TCP tới `smtp.gmail.com:587` thành công; đọc cấu hình qua `dotenv` xác nhận mailer dùng chế độ `smtp`.
-- Chưa có `SMTP_PASS` (App Password); **chưa gửi/nhận email thật**. Vy sẽ tự nhập App Password vào file local và báo để kiểm tra kết nối/xác thực, gửi một thư test, rồi khởi động lại backend. Không đưa giá trị bí mật vào Git hoặc journal.
-
-Cập nhật quyết định nghiệp vụ: **2026-11-05 02:13:15 +07:00**. Đối chiếu code thực tế: **2026-11-05 14:43:07 +07:00** (J-006) — xem mục “Đính chính 14:43” ngay dưới; các dòng cũ bên dưới giữ làm lịch sử.
-
-## Cập nhật 15:29 (J-007) — triển khai D-010 → D-013
-
-Đã code trong repo này (chưa commit tại thời điểm viết dòng này; xem Git cho commit J-007):
-- Vòng xem/yêu cầu sửa/bản mới ở Web2; lưu biên bản Web2 tự phát hành bản xem cho khách; khách xác nhận → backend ghi bản đó lên chain rồi khách ký ngầm; không còn bắt tick “đã lưu”; email thông báo (dev-log khi chưa có SMTP).
-- Privy JWT-based auth (backend ký RS256 + JWKS, script `privy:keygen`), frontend ví nhúng không đăng nhập thứ hai, ký ngầm.
-- UI: khu xác nhận trong tab Hợp đồng của khách; tab “Khách xác nhận biên bản” (quản lý), “Khách xác nhận đối soát” (kế toán); bỏ ô “khách đã ký biên bản” ở tab bàn giao; `/ho-so-xac-nhan` dùng lại các component mới; xóa `PrivyPortal.jsx`.
-- SP05 `SP_LapBienBanBanGiaoVao` không còn chặn khi chưa ký giấy; migration `20261105b_payment_simulator.sql`; **đã chạy `avalanche:db:migrate` trên DB local HOMEDORM4** (thêm `PaymentSimOrder`, cập nhật SP05).
-- Cổng ví điện tử mô phỏng cho tiền cọc (backend + trang `/thanh-toan-mo-phong/:id` + nút trong phiếu cọc).
-
-Kiểm tra lúc 15:0x–15:2x: `blockchain npm test` 12 pass/1 skip; `TEST_SQL=true npm run test:sql` 1 pass (SQL Server thật); `web/backend npm test` 6 pass; `web/frontend npm run build` qua (cảnh báo chunk lớn có sẵn); `npm run test:avalanche-ui` PASS (Chrome headless, API giả lập trong test); truy vấn đọc `sources.js` trên DB thật đúng (cọc, chính sách, danh sách biên bản chưa gửi, đối soát).
-
-**Chưa kiểm tra:** Privy thật (cần app ID + dán public key vào dashboard), email SMTP thật, luồng lập biên bản Web2 → tự phát hành chạy qua HTTP với DB thật (sẽ tạo dữ liệu thật nên chưa chạy), cổng mô phỏng qua HTTP với phiếu cọc thật, deploy/verify Fuji.
-
-## Đính chính 14:43 (J-006) — code đã có trong repo
-
-- Commit `fadd0ec` (01:39, trên main/origin) **đã có** `blockchain/contracts/DormSettlement.sol` (EIP-712, nonce, deadline, ERC-1271 qua SignatureChecker, không giữ tiền, ghi chú “Adapted from 09f8270”), toolchain Hardhat 3 + solc 0.8.38 + viem, scripts compile/deploy local/Fuji, evidence/confirmation dùng chung; backend `integrations/avalanche/` (relayer ký sẵn raw tx lưu trước khi broadcast, đồng bộ receipt/event, CAS), route `/api/avalanche`, migration `database/migrations/20261105_avalanche.sql`; frontend Privy (`/ho-so-xac-nhan`) và trang Verify (`/kiem-chung-avalanche`).
-- Kiểm tra lúc 14:4x: `cd blockchain && npm test` → **11 pass, 0 fail, 1 skip** (test SQL Server bị skip vì không chạy với `.env`). Chưa chạy build frontend, chưa chạy với SQL Server/Privy thật, **chưa deploy/verify Fuji**.
-- Khoảng trống so với D-009 thấy khi đọc code: contract chỉ cho `proposeHandover` một lần/hồ sơ (không có phiên bản biên bản bàn giao hay hành động “yêu cầu chỉnh sửa”); chưa có email link; portal là trang riêng có đăng nhập Privy bằng email lần hai, nhân viên nhập tay mã biên bản/chính sách/ảnh; chưa nối vào màn hợp đồng hiện có. Các đề xuất xử lý ghi ở J-006, **chưa chốt**.
-- `hackathon/plan.md` đang có thay đổi chưa commit (xóa mục “Tổ chức code đã chọn sau khi đọc Senpai”), không do phiên J-006 tạo; chờ Vy xác nhận.
-
-## Điểm đứng hiện tại
-
-- Repo: `https://github.com/NhatVy177/homestay_unihack.git`; local `D:\HomeStayDorm`; branch kiểm tra: `main`; commit trước đợt dựng khung blockchain: `a83b18e` (sổ làm việc, J-003); nền tổ chức Web2: `40acf39`.
-- Đã tổ chức `database/`, `web/`, `hackathon/` và push repo mới trong phiên trước. Không thay SQL Server hoặc logic nghiệp vụ khi đổi cấu trúc.
-- Đợt hiện tại đọc Senpai local và tạo khung `blockchain/` riêng cùng các vị trí integration frontend/backend theo D-008/J-004.
-- **Đã có thư mục/package blockchain nhưng chưa có file Solidity, ABI, trang Avalanche Verify hoặc toolchain chạy được.** Integration mới chỉ có README. Các chức năng F-01–F-09 chưa được triển khai trong repo này; không nhầm khung với nền được handoff mô tả.
-- Handoff báo nền contract/adapter/evidence/Verify ở `homedorm/feature/avalanche-settlement`, commit `09f8270`; **chưa kiểm tra lại nhánh đó hoặc nhập về repo này**. Không khởi động lại từ đầu mà bỏ qua nền cũ, cũng không đánh dấu nó đã có ở đây.
-
-## Yêu cầu mới cần đối chiếu code (D-009)
-
-Vy đã chốt: nhân viên dẫn sinh viên xem phòng và lập biên bản trong Web2; sinh viên xem/phản hồi/ký ví nhúng trên trang hợp đồng; nếu chưa ký tại chỗ thì email link để đăng nhập ký sau. Không tự check-in hoặc ký giấy song song; tách đã giao phòng với đã ký Avalanche; không báo đã ký khi chưa có receipt/event. Mốc nhắc 24h chưa chốt. Xem F-02 trong scope.md và mục D-009 trong hackathon/plan.md.
-
-**Đây là thay đổi yêu cầu, không phải báo cáo code đã xong.** Vy thông báo Codex đã code trong phiên riêng; code local/commit chưa push có thể mới hơn snapshot dưới đây. AI phải kiểm tra git status, diff, source và test trước khi sửa, rồi cập nhật tiến độ thực tế.
-
-## Công việc và bằng chứng
-
-| Mã | Công việc | Trạng thái trong repo hiện tại | Bằng chứng / bước kế |
-|---|---|---|---|
-| T-01 | Chuẩn hóa cấu trúc và gom tài liệu | Hoàn thành | `40acf39`; database/web chữ thường, 5 file hackathon gồm handoff; origin repo mới. |
-| T-02 | Thiết lập sổ làm việc và chỉ dẫn AI | Hoàn thành | 5 file spec + AGENTS và chú thích nguồn; 31 link local hợp lệ, diff tài liệu qua. Commit chứa mã J-003; kiểm tra trạng thái đồng bộ qua Git. |
-| T-03 | Kiểm tra nền Avalanche cũ để tiếp nối | Đã được nhập/viết lại trong `fadd0ec` (theo ghi chú contract); chưa so diff với nhánh cũ — J-006 | Q-04; so diff/đường dẫn và scope trước khi nhập. Kết quả test cũ không thay test hiện tại. |
-| T-04 | Chốt nguồn cọc/policy và dữ liệu demo | Chưa bắt đầu | Q-01/Q-02/Q-05; đã đọc calculator local, chưa chốt ý nghĩa số cọc. |
-| T-05 | Thử ví → chữ ký → relayer → receipt | Đang làm: test local qua (J-006); chưa thử Privy thật/Fuji | F-01/F-05; Q-03 nghiêng về Privy theo code, chưa thử khôi phục ví thật. |
-| T-06 | Thu gọn contract và thêm xác nhận ký | Đang làm: contract + test local có trong `fadd0ec`; thiếu phiên bản biên bản bàn giao theo D-009 | F-02/F-03/F-04/F-05; bỏ bước tiền/báo trước cũ, test quyền/replay/version/số học. |
-| T-07 | Nối UI ba vai trò, SQL, evidence và Verify | Chưa bắt đầu | F-02/F-03/F-04/F-06/F-07/F-08; cần kiểm tra SQL và receipt/event phục hồi. |
-| T-08 | Deploy, verify source và nghiệm thu Fuji | Chưa bắt đầu | F-09; chưa có deployment/tx/source verification được xác minh trong repo mới. |
-| T-22 | Luồng trước nhận phòng gọn hơn (D-026, F-15) | Chưa bắt đầu. Đã chốt mục 1–6 ở "Hướng luồng D-026"; mục 7–12 đang bàn/đề xuất | Lịch đề xuất 12–13/11 trên nhánh riêng, song song giao diện đợt 2; chưa có prompt Codex. |
-| T-21 | Giao diện đợt 1 (D-025) | Hoàn thành code và kiểm tra local trên `feat/ui-refresh-1` (J-045): tokens, 7 component chung, khung mọi vai trò, menu mobile; build pass, backend 25 pass/1 skip, smoke UI pass; 14 cặp ảnh, không tràn ngang toàn trang/JS exception. | Ảnh màn bảo vệ dùng API/phiên giả lập; chờ Vy duyệt nhánh. Đợt 2 ngày 12–13/11 rà nội dung/form/bảng/badge và dữ liệu demo; Fuji 14–17/11 chưa làm. |
-| T-20 | Nhận phòng: duyệt cư trú theo ngoại lệ + email (D-024) | Code và kiểm thử local hoàn thành trên nhánh `feat/t20-checkin-deposit-fixes` (J-042): SP tự duyệt bằng `NVAUTO` hoặc chuyển quản lý kèm lý do; quản lý duyệt được một phần; 5 email mốc nhận phòng và mail ngoại lệ, chống gửi trùng theo lần gửi duyệt. `residence-flow:db:migrate` áp thành công; `residence-flow:db:verify` qua 3 ca SQL rollback (tự duyệt, ngoại lệ, quản lý duyệt một phần); backend 25 pass/1 skip; frontend build + browser smoke qua; blockchain 12 pass/1 skip. | Cần E2E HTTP/SMTP thật với tài khoản demo; email/unit và UI/API mock chưa thay thế nghiệm thu tích hợp. Chưa thử Fuji. |
-| T-09 | Hồ sơ nộp và demo | Chưa bắt đầu. Kịch bản video 2:50 đề xuất ở J-041 (chờ Vy chốt) | README setup/ghi công, video 2–3 phút, slides, kiểm tra link; Q-06/Q-07. (D-018) Pitch mở bằng nỗi đau trong đề đồ án; video bắt đầu từ hợp đồng chuẩn bị sẵn ở "Chờ bàn giao". |
-| T-17 | Ví mô phỏng cho khoản thu kỳ đầu (D-018) | Hoàn thành code và kiểm thử local (J-026): đơn `thu-nhan-phong`, báo giá từ SP, IPN ký HMAC, hóa đơn `Đã TT` với người thu NULL/method `Ví điện tử`, `PaymentSimOrder.MaHoaDon`; thẻ Hợp đồng và cổng mô phỏng. Migration HOMEDORM4 chạy lại được; SQL thử SP bằng transaction rồi rollback, `-3` chặn ghi lần hai; backend 9 pass/1 skip mặc định, SQL test riêng 1 pass; blockchain 12 pass/1 skip; frontend build + browser smoke pass. | Chưa chạy trọn IPN qua HTTP với hợp đồng thật; browser smoke dùng hồ sơ mô phỏng. Cần thử sau với dữ liệu test có thể hoàn tác và kiểm tra bàn giao thực tế. |
-| T-19 | Luồng đặt cọc mới có email (D-023) | J-039 hoàn thành code/test local; J-042 sửa bổ sung: thiếu email khách hiện ở Sale và quản lý, email hết hạn chỉ xét 48 giờ, migration kiểm `NVAUTO`, xử lý từng yêu cầu quá hạn lỗi độc lập, bỏ code cọc cũ; sửa khóa FIFO dùng `datetime2` và loại yêu cầu hiện tại. `deposit-flow:db:migrate` và 5 ca SQL rollback qua; backend 25 pass/1 skip, frontend build/smoke qua. | Chưa chạy trọn luồng HTTP/SMTP thật với tài khoản demo; browser smoke dùng API giả. Cần nghiệm thu E2E local trước Fuji. |
-| T-18 | Tự động chốt phiếu cọc (D-019; D-020 bỏ phần tự duyệt nhận cọc; D-021) | Được T-19/D-023 thay thế trong luồng hiện hành (J-039). Lịch sử J-027/J-033/J-034: Sale lập phiếu rồi hệ thống tự chốt tùy công tắc Admin; tài khoản `NVAUTO` và tham số DB đã có trong HOMEDORM4. | Luồng mới giữ `NVAUTO` để chốt ngay trong transaction quản lý duyệt; công tắc và tab chốt tay không còn dùng. |
-| T-10 | Tổ chức module blockchain sau khi đọc Senpai | Hoàn thành | Khung root + integration client/server, private package chưa có dependencies; 34 link local, JSON, ignore rules và diff đã kiểm tra. Commit mang mã J-004. Không đồng nghĩa hoàn thành tính năng blockchain. |
-| T-12 | Cổng ví điện tử mô phỏng cho tiền cọc (D-013) | Đang làm: code + unit test + UI smoke qua (J-007). Sửa J-035: chỉ ghi phương thức "Chuyển khoản" khi trả ví thành công, mở ví rồi bỏ không còn khóa phiếu; SQL thử trong transaction (rollback) qua | Còn chạy thử với phiếu cọc thật qua HTTP; đặt `PAYMENT_SIM_SECRET`. |
-| T-14 | Ví nhúng bằng OTP email (D-015) + môi trường test local | Đang làm (J-009, 23:50): code xong; `.env` local trỏ chain Hardhat 31337; `run.ps1` tự mở chain + deploy; backend chạy thật báo `enabled:true, walletAuth:email`; test 12+6 pass, build + smoke qua | **Vy chạy `run.ps1` và thử trên trình duyệt**: lập biên bản → khách nhập OTP → xác nhận. Chưa ai thử OTP Privy thật. |
-| T-15 | Email bắt buộc khi đăng ký (D-016) | Xong (J-010, 17:31): form + backend + `SP_DangKy` đã áp vào DB local; thử SP: thiếu/sai định dạng/trùng bị chặn, ca hợp lệ chạy được (rollback, không để lại dữ liệu); backend test pass, build qua | DB local còn 1 email trùng giữa 2 tài khoản cũ và 8 tài khoản không có email: không tự sửa, chờ Vy quyết. DB máy khác cần chạy lại `database/SP_Chung/auth.sql`. |
-| T-16 | Đơn giản hóa màn khách sau xác nhận (D-017) | Hoàn thành code và kiểm thử local (J-023): receipt có `at`; khách thấy trạng thái/tải/kiểm tra, không thấy tx/mạng; quản lý/kế toán có chi tiết rút gọn và tên mạng local. `blockchain npm test`: 12 pass, 1 skip SQL; backend: 6 pass; frontend build và browser smoke pass, gồm hồ sơ mẫu đã xác nhận và hồ sơ cũ thiếu `at`. | Chưa thử lại với hồ sơ SQL thật trong ba vai trò hoặc Fuji; phần đó thuộc nghiệm thu tích hợp/T-08, không suy từ smoke mô phỏng. |
-| T-13 (tạm dừng, chờ Q-10) | Cấu hình Privy JWT + thử khôi phục ví (D-011) | JWT-based auth cần gói Scale trả phí. Đã làm (J-008, 15:44): App ID đã xác minh với Privy (app “HomeStayDorm”), đã điền `.env` local, đã tạo khóa RS256 (`web/backend/secrets/`, ngoài Git), backend ký JWT verify được | Chờ Vy bật JWT-based auth + dán public key trên dashboard (`custom_jwt_auth` đang `false`); sau đó deploy local, bật `AVALANCHE_ENABLED` và thử đăng nhập lại/đổi trình duyệt vẫn cùng ví. |
-| T-11 | Nối bàn giao Web2 → email → chữ ký Avalanche theo D-009/D-010 | Đang làm: code + test local xong (J-007); chưa E2E HTTP/Privy/Fuji | Kiểm tra luồng nhân viên lập, khách xem/yêu cầu sửa/ký hoặc mở email sau; quyền, version, trạng thái thực tế vs điện tử, receipt và chống gửi trùng. |
-
-## Kiểm thử: phân biệt nguồn kết quả
-
-| Nguồn | Điều đã biết | Giới hạn |
+| Tiêu chí (điểm) | Đã có | Còn thiếu |
 |---|---|---|
-| Phiên cấu trúc lại repo, trước `40acf39` | Frontend `npm run build` qua; backend `node --check` qua; đường dẫn SQL kiểm tra tồn tại; hash 4 file UniHack khi chép trùng nguồn. | Không E2E SQL; build có cảnh báo bundle lớn và `use client`; không phải kiểm thử Avalanche. Hai dòng trắng cuối run.bat/run.ps1 là thay đổi có sẵn, đã giữ lại. |
-| Handoff phiên AI cũ, mục 9 | Báo 4 test contract + 3 adapter, build frontend, deploy EVM local qua. | Chỉ là báo cáo lịch sử ở nhánh cũ; chưa chạy lại, chưa bao gồm ví/relayer/scope mới và không chứng minh Fuji. |
-| Phiên sổ làm việc | Đọc đủ 5 file hackathon, đối chiếu Git và calculator local. | Kiểm tra tài liệu mới ghi ở J-003; không chạy app/test nghiệp vụ trong đợt chỉ sửa tài liệu. |
-| Phiên tổ chức blockchain | Đọc Senpai local tại `cde33571a348c26bae614f11aa31b32487cbc285`: contract, Foundry config, export artifact, ví/ký, relayer/API và README. | Chưa chạy Senpai, chưa kiểm deployment; giữ nguyên thay đổi có sẵn `senpai/web/package-lock.json`. Kết quả kiểm tra khung ghi ở J-004. |
+| Technical (25) | Contract + 12 test, backend 25 test, build frontend qua | Chạy trọn luồng thật một lần; README cài DB từ đầu |
+| Avalanche (25) | Contract EIP-712, relayer trả gas, ví nhúng, trang kiểm chứng (chạy local) | **Deploy + verify source Fuji, giao dịch thật, link explorer** |
+| Creativity (15), Impact (15) | Bài toán thật, luồng D-026 → D-031 đã chốt | Slide nêu người dùng, giới hạn pháp lý, vì sao on-chain |
+| Pitch (10) | Kịch bản video 2:50 đề xuất ở J-041 (chưa chốt) | Slide, video, README nộp |
+| UI/UX (10) | Khung trang mọi vai trò đã đổi (T-21) | Các màn trên đường demo còn nhiều `style` viết tay |
 
-## Bước tiếp theo cho AI
+## Nhánh đang mở
 
-**Sau J-007 (15:29):** (1) T-13 cấu hình Privy và thử thật trên localhost; (2) deploy local rồi chạy E2E HTTP với DB demo (có kế hoạch dọn dữ liệu) cho: lập biên bản → khách sửa/xác nhận → kế toán đối soát v1/v2 → Verify; (3) T-08 deploy + verify Fuji; (4) chạy thử cổng mô phỏng với phiếu cọc demo; (5) T-09 README nộp bài/video. Q-01, Q-08, Q-09 vẫn mở.
+| Nhánh | Nội dung | Trạng thái |
+|---|---|---|
+| `main` (`dcc1a59`) | Đã có T-19, T-20, T-21 đợt đầu, hồ sơ D-026 → D-032 | Gốc để tạo nhánh mới |
+| `feat/ui-refresh-1` (Codex) | Thẻ tổng quan + thanh tìm kiếm danh sách (D-033, J-056), J-057 | 2 commit chưa merge; chờ Vy xem |
+| `feat/t22-backend` (Claude) | Khách tự giữ chỗ, từ chối → "Đã xem", "Không thuê nữa", "Khách không đến" | Có code + test đầu vào; **SQL chưa chạy lên HOMEDORM4**, chưa nối giao diện |
+| `chore/audit-cleanup` (Claude) | Rà soát 11/11: dọn file thừa, AGENTS.md, skill giao diện, file này | Chờ Vy xem |
+| `docs/review-branch-workflow` | Quy tắc "không push main" | Nội dung đã đưa vào AGENTS.md mới; có thể xóa nhánh |
 
-**Ưu tiên theo yêu cầu mới (mốc cũ):** đối chiếu code Codex vừa làm với D-009/F-02. Tái dùng UI, API, Privy, relayer và contract thực tế; chỉ bổ sung phần thiếu, test rồi ghi kết quả thật. Đừng coi có bản ghi BG trong SQL là có trang khách xem. Sau đó tiếp tục các nhiệm vụ dưới đây nếu chưa xong.
+Nhánh đã merge, có thể xóa trên GitHub: `feat/t20-checkin-deposit-fixes`, `docs/d026-flow-redesign`.
 
-Mốc cũ (00:50): Bắt đầu T-03: đọc nhánh Avalanche cũ và đối chiếu với scope hiện hành, xác định phần tái sử dụng vào khung đã có; sau đó T-04/T-05. Di chuyển adapter phụ thuộc nghiệp vụ sang integration backend; giữ mã thuần dùng chung ở blockchain/src. Chọn toolchain sau khi rà nền cũ, rồi bổ sung dependency/lockfile, compile/test và cách nối shared vào hai app. Khi bắt tay triển khai, thử một luồng nhỏ trước khi làm nhiều màn hình; không lấy mô tả handoff làm bằng chứng đã tích hợp.
+## Thứ tự ưu tiên (đề xuất của Claude ở J-C059, **chờ Vy chốt**; thay lịch D-025 nếu được chốt)
 
-Vướng mắc đang biết nằm ở Q-01 đến Q-07 trong [decisions.md](decisions.md). Chưa có tác vụ triển khai blockchain đang chạy hoặc thay đổi code ứng dụng dở dang do đợt ghi sổ này.
+| Ngày | Việc | Vì sao |
+|---|---|---|
+| 11–12/11 | **Fuji trước**: ví thử + AVAX faucet, deploy, verify source, đổi `.env`, chạy trọn luồng thật một lần (OTP Privy thật), lưu link giao dịch | 50 điểm phụ thuộc; chưa từng chạy thật nên chưa biết sẽ hỏng ở đâu |
+| 13–15/11 | Phần T-22 **nằm trên đường demo** + làm lại giao diện 6 màn demo | Giám khảo nhìn thấy trong video |
+| 16–17/11 | Phần T-22 còn lại nếu kịp; dự phòng sửa lỗi | Web2 phía trước chỉ lên slide (D-018) |
+| 18–19/11 | README (cài từ đầu, phần có sẵn/phần mới, giới hạn), slide, video | Hồ sơ nộp |
+| 20/11 | Nộp; 21/11 dự phòng | |
+
+## Công việc
+
+| Mã | Việc | Trạng thái | Bước kế |
+|---|---|---|---|
+| T-08 | Deploy, verify source, nghiệm thu Fuji | **Chưa bắt đầu.** Chưa có `blockchain/.env`, `deployments/fuji.json` | Việc A1–A3 trong `viec-cho-agent.md` |
+| T-11 / T-14 | Bàn giao Web2 → email → OTP → ký | Có code, test tự động qua, **chưa chạy thật** | Chạy thật trong việc A3 |
+| T-22 | Luồng D-026 → D-031 | Đang làm: 4 mục đầu có code backend (nhánh `feat/t22-backend`); còn lại chưa làm | Chia mức ưu tiên bên dưới |
+| T-21 | Giao diện | Đợt đầu xong (khung, token, form, danh sách) | Làm lại 6 màn demo: việc B1–B6 |
+| T-09 | Hồ sơ nộp | Chưa bắt đầu | Việc D1–D3 |
+| T-04 | Nguồn tiền cọc (Q-01) và dữ liệu demo | Chưa chốt | Cần trước khi tạo hồ sơ demo trên Fuji |
+| T-13 | Privy JWT (bỏ OTP) | Tạm dừng, chờ BTC (Q-10) | Giữ OTP |
+
+Việc đã xong trước 11/11 (T-01, T-02, T-10, T-12, T-15 → T-20): xem file lưu trữ.
+
+## T-22 chia theo mức ưu tiên (đề xuất, chờ Vy chốt)
+
+| Mức | Mục | Quyết định | Trạng thái |
+|---|---|---|---|
+| **Phải có** (trên đường demo) | Điều khoản hợp đồng + phiên bản chính sách + mã băm ảnh hợp đồng vào gói bàn giao | D-027, D-031 | Chưa làm |
+| | Màn kiểm tra trả phòng so trước/sau | D-030 | Chưa làm |
+| | Bản nháp đối soát tự soạn; phiếu thu nợ và phiếu hoàn cọc khác loại | D-030 | Chưa làm |
+| | Tự thanh lý 3 trường hợp + gói bằng chứng cuối | D-030, D-031 | Chưa làm |
+| | Danh sách "Chờ khách xác nhận", nhắc 24/72 giờ | D-028 | Có nút nhắc tay; chưa tự nhắc |
+| **Nên có** | Khách tự giữ chỗ; từ chối → "Đã xem"; "Không thuê nữa"; "Khách không đến" | D-026 | Có code backend, chưa chạy SQL, chưa có giao diện |
+| | Chính sách hoàn cọc trên phiếu và email cọc | D-031 | Chưa làm |
+| | Thẻ "Kích hoạt xác nhận điện tử" sau khi trả cọc | D-028 | Chưa làm |
+| **Để sau nếu trễ** | Khách tự khai người ở; thành viên bị loại hoàn 80%; hợp đồng "Chờ ký" | D-026, D-027 | Chưa làm |
+| | Hóa đơn tháng qua ví; trang "Khoản dự kiến trừ" | D-029 | Chưa làm |
+| | Đổi người đại diện bằng email mời | D-026 | Giữ cách tạm |
+| **Sau bản thi** | Mốc chuỗi 3 | D-031 | Không làm |
+
+## Kiểm tra gần nhất (2026-11-11, chạy lại trong J-C059)
+
+- `blockchain npm test`: 12 qua, 1 bỏ qua (test SQL), 0 lỗi.
+- `web/backend npm test`: 25 qua, 1 bỏ qua trên `feat/ui-refresh-1`; 28 qua, 1 bỏ qua trên `feat/t22-backend`.
+- `web/frontend vite build`: qua; gói chính 1,1 MB, có cảnh báo kích thước.
+- **Không chạy lại**: `test:avalanche-ui`, các test cần SQL Server, luồng qua giao diện.
+
+## Môi trường local (không chứa giá trị bí mật)
+
+- `web/backend/.env`: chain local `31337`, `PRIVY_AUTH_MODE=email`, SMTP đã cấu hình, ví mô phỏng bật. `MAIL_REDIRECT_TO` đang tắt; email nhân viên trong DB trỏ về hộp thư thử của Vy.
+- Chưa có `blockchain/.env` (chưa có ví Fuji).
+- HOMEDORM4 đã dọn dữ liệu giao dịch ngày 06/11 (J-030); có vài hồ sơ thử tạo sau đó. Bản sao lưu trước khi dọn: xem file lưu trữ.
+
+## Câu hỏi còn mở
+
+Q-01 (nguồn tiền cọc), Q-06 (hạn và cổng nộp), Q-07 (ghi công nhóm cũ), Q-08 (email demo), Q-10 (Privy JWT) trong [decisions.md](decisions.md). Các đề xuất mới chờ Vy chốt: mục 4 của [audit-2026-11-11.md](audit-2026-11-11.md).
