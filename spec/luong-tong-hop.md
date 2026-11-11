@@ -129,6 +129,8 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
 4. **Sale chụp/scan hợp đồng đã ký và tải lên.** Mã băm file + **điều khoản chính** (mã hợp đồng, giá thuê, kỳ hạn, tiền cọc, phiên bản chính sách) đi vào **gói bằng chứng bàn giao**. **Không sửa contract.**
 5. Hợp đồng **vẫn ký giấy, không ký trên chuỗi.**
 
+**C1 / D-034:** điều khoản/gói bàn giao lấy tiền cọc từ `PhieuDatCoc.SoTienCoc`, chưa trừ hoàn một phần. Hồ sơ cũ phải bổ sung ảnh hợp đồng đã ký và khách xác nhận chính sách trước khi phát hành v2; không bịa lại lịch sử chính sách lúc cọc. Bằng chứng v1 đã phát hành vẫn đọc/kiểm chứng được, không sửa bản đã khóa.
+
 ### 3.6 Giai đoạn 6: Bàn giao phòng và xác nhận điện tử (D-009, D-010, D-028)
 
 1. Bàn giao diễn ra **trong buổi ký hợp đồng**. Quản lý lập **biên bản tài sản trên web** (không có ô ký giấy). **Có thể chụp ảnh tình trạng** (vài tấm cho cả phòng hoặc món có vết sẵn, không bắt buộc từng món). Ảnh không lên chuỗi; **mã băm ảnh đi vào gói biên bản** để trả phòng so trước/sau.
@@ -275,7 +277,7 @@ In đậm = quyết định của đợt bàn lại luồng ngày 10/11/2026.
 | Mã | Việc | Ai | Ghi chú |
 |---|---|---|---|
 | Q-10 | BTC có cấp gói Privy Scale (JWT) để bỏ OTP không | Vy nhắn BTC | Có → bật D-011; không → giữ OTP (D-015) |
-| Q-01 | Số cọc thực tế còn giữ là trường nào. Code đang lấy `SoTienCoc` của phiếu cọc để ghi lên chuỗi, và báo lỗi nếu khác `TienCocBanDau` trên đối soát | Vy | Phải chốt trước khi tạo hồ sơ demo Fuji; liên quan việc hoàn 80% cho thành viên bị loại (mục 3.4) |
+| Q-01 | D-034 chốt C1 dùng `PhieuDatCoc.SoTienCoc`, chưa trừ hoàn một phần; đối soát vẫn chặn nếu khác cọc đã xác nhận | Vy đã chốt C1 | Nguồn tiền sau hoàn/cấn trừ ở D-026 ngoài C1 còn cần thiết kế |
 | Q-02 | Đã rõ từ code: dùng bảng 80/50/70/100% theo thời gian ở; không có quy định báo trước | — | Đóng nếu Vy đồng ý |
 | Q-05 | SQL demo, RPC, AVAX thử cho Fuji đã sẵn sàng chưa | Kiểm tra môi trường | Không gửi khóa bí mật qua chat |
 | Q-06 | Giờ đóng cổng, deadline chính thức | Theo thông báo BTC | 20/11 là mục tiêu nội bộ, hạn thi 21/11 |

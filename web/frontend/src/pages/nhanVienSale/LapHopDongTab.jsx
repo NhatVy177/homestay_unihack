@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { hopDongApi } from './hopDong.api.js';
+import SignedContractUpload from '../../components/common/SignedContractUpload.jsx';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import './lapHopDongTab.css';
 
@@ -469,6 +470,7 @@ export default function LapHopDongTab() {
           </div>
 
           <div style={{ flex: 1, overflowY: 'auto' }} className="lhd-print-overlay">
+            <SignedContractUpload key={savedHD.maHopDong} contractId={savedHD.maHopDong} />
             <article id="print-area-wrapper" className="contract-paper-a4">
               <header style={{ textAlign: 'center', marginBottom: '24px' }}>
                 <div style={{ fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.01em' }}>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>

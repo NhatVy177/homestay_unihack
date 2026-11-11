@@ -1,6 +1,7 @@
 import { executeQuery, sql } from '../../database/connection.js';
 import { getPaymentAccount } from '../../config/payment.js';
 import { createMailer } from './mailer.js';
+import { contractEvidence } from '../avalanche/contractEvidence.js';
 
 const v = (name, type, value) => ({ name, type, value });
 const origin = () => (process.env.AVALANCHE_APP_ORIGIN || process.env.CLIENT_URL || 'http://localhost:5173').split(',')[0].trim();
@@ -25,7 +26,9 @@ async function details(id) {
     OUTER APPLY (SELECT TOP (1) c.MaPhong FROM dbo.ChiTietXemPhong c
       WHERE c.MaDangKy=p.MaDangKy AND c.KhachChon IN (1,2) ORDER BY c.KhachChon) ph
     WHERE p.MaDangKy=@id OR d.MaPhieuDatCoc=@id`, [v('id', sql.VarChar(6), id)]);
-  return result.recordset[0] || null;
+  const row = result.recordset[0] || null;
+  if (row?.maPhieuDatCoc) row.policyInfo = await contractEvidence.capture(row.maPhieuDatCoc);
+  return row;
 }
 
 export async function managers(id, query = executeQuery) {
@@ -97,11 +100,15 @@ export function createDepositNotifier({ load = details, loadManagers = managers,
       const subject = subjects[kind];
       if (!subject) throw new Error('Unknown deposit notification');
       const account = `Ngân hàng: ${bank.nganHang}\nSố tài khoản: ${bank.soTaiKhoan}\nChủ tài khoản: ${bank.chuTaiKhoan}\nNội dung chuyển khoản: ${transfer}`;
-      const body = kind === 'issued' ? `Yêu cầu cọc đã được duyệt và phiếu đã phát hành.\n${summary}`
+      let body = kind === 'issued' ? `Yêu cầu cọc đã được duyệt và phiếu đã phát hành.\n${summary}`
         : kind === 'rejected' ? `Yêu cầu cọc chưa được chấp nhận. Lý do: ${reason || 'Phòng/giường không còn phù hợp'}. Sale sẽ liên hệ đề xuất phòng khác.\nMã hồ sơ: ${row.maDangKy}`
           : kind === 'paid' ? `HomeStayDorm đã ghi nhận thanh toán cọc thành công.\n${summary}\nLịch nhận phòng: ${dateTime(row.thoiGianNhanPhong)}.\nKhi đến nhận phòng, vui lòng mang CCCD gốc của tất cả thành viên cư trú để Sale đối chiếu.`
             : kind === 'reminder' ? `Còn không quá 3 giờ để thanh toán phiếu cọc.\n${summary}`
               : `Phiếu cọc đã quá hạn 24 giờ và bị hủy.\n${summary}`;
+      if (['issued', 'paid'].includes(kind) && row.policyInfo) {
+        body += `\n\nPhiên bản chính sách: ${row.policyInfo.version}\n${row.policyInfo.text}`;
+        if (row.policyInfo.requiresConfirmation) body += '\nĐây là chính sách bổ sung cho hồ sơ cũ; vui lòng mở phiếu cọc để đọc và xác nhận trước bàn giao.';
+      }
       const results = {};
       for (const [role, email] of [['sale', row.emailSale], ['customer', row.emailKhach]]) {
         const key = `${kind}:${eventId}:${role}`;

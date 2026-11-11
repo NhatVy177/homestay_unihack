@@ -1,7 +1,14 @@
 import { Router } from 'express';
 import * as controller from '../controllers/hopDong.controller.js';
+import * as evidence from '../controllers/contractEvidence.controller.js';
 
 const router = Router();
+
+router.get('/phieu-coc/:id/chinh-sach', evidence.policy);
+router.post('/phieu-coc/:id/chinh-sach/xac-nhan', evidence.confirmPolicy);
+router.get('/:id/ban-ky', evidence.metadata);
+router.get('/:id/ban-ky/file', evidence.download);
+router.post('/:id/ban-ky', evidence.signedUpload, evidence.upload);
 
 router.get('/phieu-coc', controller.traCuuPhieuCoc);
 router.get('/phieu-coc/:id', controller.layChiTietPhieuCoc);

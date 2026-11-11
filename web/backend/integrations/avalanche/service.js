@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { getAddress, verifyMessage, zeroHash } from 'viem';
-import { documentHash, createEvidence, validateStatement } from '@homestaydorm/settlement/evidence';
+import { documentHash, createEvidence, validateStatement, validateHandover, policyVersion } from '@homestaydorm/settlement/evidence';
 import { confirmationData } from '@homestaydorm/settlement/confirmation';
 const hash = () => '0x' + randomBytes(32).toString('hex');
 const fail = (message, statusCode = 400) => { throw Object.assign(new Error(message), { statusCode }); };
@@ -80,7 +80,7 @@ export class AvalancheService {
   async publish(user, sourceId, input = {}) {
     return this.exclusive(async () => {
       this.staff(user, 'Quản lý');
-      const source = await this.sources.handover(sourceId);
+      const source = await this.sources.handover(sourceId, user);
       if (!source || source.branchId !== user.maChiNhanh) fail('Không tìm thấy biên bản trong chi nhánh.', 404);
       if (!/^(0|[1-9][0-9]*)$/.test(source.depositVnd || '') || BigInt(source.depositVnd) > BigInt(Number.MAX_SAFE_INTEGER)) fail('Chưa xác định được tiền cọc của hợp đồng trong hệ thống.', 409);
       if (!String(source.policy || '').trim()) fail('Chưa có chính sách hoàn cọc trong hệ thống.', 409);
@@ -92,6 +92,7 @@ export class AvalancheService {
           sourceId, depositHeldVnd: source.depositVnd, deployment: this.chain.deployment,
           drafts: [this.draft(id, 1, source.depositVnd, source.policy, {
             inventory: source.inventory, notes: source.notes || '', attachments: validateAttachments(input.attachments || []),
+            contractTerms: source.contractTerms, signedContract: source.signedContract, policyVersion: source.policyVersion,
           }, user)],
           handover: null, tenant: null, state: 'review', versions: [], receipts: [], notifications: [],
         });
@@ -104,10 +105,14 @@ export class AvalancheService {
     });
   }
   draft(id, revision, depositHeldVnd, policyText, content, user) {
+    const policy = { schema: 'homestaydorm.policy.v1', text: policyText, version: policyVersion(policyText) };
+    const payload = { schema: 'homestaydorm.handover.v2', agreementId: id, revision, depositHeldVnd, ...content };
+    try { validateHandover(payload, policy); }
+    catch { fail('Chưa đủ điều khoản, chính sách hoặc ảnh hợp đồng hợp lệ để phát hành bàn giao v2.', 409); }
     return {
       revision, publishedAt: this.now(), publishedBy: user.maNguoiDung, changeRequest: null, resolution: null,
-      policy: document({ schema: 'homestaydorm.policy.v1', text: policyText }),
-      handover: document({ schema: 'homestaydorm.handover.v1', agreementId: id, revision, depositHeldVnd, ...content }),
+      policy: document(policy),
+      handover: document(payload),
     };
   }
   async requestChange(user, id, reason) {
@@ -127,12 +132,19 @@ export class AvalancheService {
       let c = await this.accessible(user, id);
       if (!['review', 'change-requested'].includes(c.state) || c.pending || c.handover) fail('Biên bản đã được khách xác nhận hoặc đang ghi nhận; không sửa được.', 409);
       const previous = currentDraft(c), payload = previous.handover.payload;
+      // Upgrade an unbound v1 review only after D-034 prerequisites are met; never rewrite locked v1 evidence.
+      const source = await this.sources.handover(c.sourceId, user);
+      if (!source || source.contractId !== c.contractId || source.branchId !== c.branchId || source.customerId !== c.customerId
+        || source.depositVnd !== c.depositHeldVnd) fail('Nguồn hợp đồng đã thay đổi, cần kiểm tra trước khi phát hành.', 409);
       const resolution = text(input.resolution, 1000, 'Nội dung đã điều chỉnh');
       if (!resolution) fail('Hãy ghi lại nội dung đã điều chỉnh để khách xem.');
       const inventory = input.inventory === undefined ? payload.inventory : validateInventory(input.inventory);
       const notes = input.notes === undefined ? payload.notes : text(input.notes, 2000, 'Ghi chú chung');
       const attachments = input.attachments === undefined ? payload.attachments : validateAttachments(input.attachments);
-      const next = this.draft(c.id, previous.revision + 1, c.depositHeldVnd, previous.policy.payload.text, { inventory, notes, attachments }, user);
+      const next = this.draft(c.id, previous.revision + 1, c.depositHeldVnd, source.policy, {
+        inventory, notes, attachments, contractTerms: source.contractTerms,
+        signedContract: source.signedContract, policyVersion: source.policyVersion,
+      }, user);
       next.resolution = resolution;
       c = await this.store.saveCase({ ...c, drafts: [...c.drafts, next], state: 'review' }, c.revision);
       return publicCase(await this.notified(c, 'handover-revised'));
@@ -178,6 +190,7 @@ export class AvalancheService {
   /** Proposes the reviewed revision on-chain (operator pays gas), then returns typed data for the tenant. */
   async proposeReviewed(c, revision) {
     const draft = currentDraft(c);
+    if (draft.handover.payload.schema !== 'homestaydorm.handover.v2') fail('Hồ sơ cũ cần được quản lý bổ sung và phát hành bàn giao v2 trước khi xác nhận.', 409);
     if (revision !== undefined && Number(revision) !== draft.revision) fail('Biên bản vừa được cập nhật. Hãy xem lại bản mới nhất.', 409);
     const tenant = await this.store.getWallet(c.customerId);
     if (!tenant) fail('Tài khoản đang được thiết lập xác nhận. Vui lòng thử lại sau giây lát.', 409);

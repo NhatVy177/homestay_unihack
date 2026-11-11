@@ -4,7 +4,7 @@ import { createWalletClient, custom, zeroHash } from 'viem';
 import { generatePrivateKey, privateKeyToAccount, mnemonicToAccount } from 'viem/accounts';
 import { hardhat } from 'viem/chains';
 import { localChain } from '../scripts/local-chain.mjs';
-import { verifyEvidence, canonicalize, documentHash } from '../src/evidence.js';
+import { verifyEvidence, canonicalize, documentHash, policyVersion } from '../src/evidence.js';
 import { confirmationData } from '../src/confirmation.js';
 import { AvalancheService } from '../../web/backend/integrations/avalanche/service.js';
 import { makeChain } from '../../web/backend/integrations/avalanche/chain.js';
@@ -48,7 +48,14 @@ async function fixture() {
   const store = new MemoryStore(), customerWallet = privateKeyToAccount(generatePrivateKey());
   let deductions = '900000';
   const sources = {
-    async handover() { return { contractId: 'HD0001', customerId: tenant.maNguoiDung, branchId: manager.maChiNhanh, depositVnd: '3000000', policy: 'Hợp đồng đủ hạn; trừ nợ và chi phí hai bên đồng ý.', notes: '', inventory: [{ item: 'Nệm', quantity: 1, condition: 'Đã rách lúc nhận phòng' }] }; },
+    async handover() {
+      const policy = 'Hợp đồng đủ hạn; trừ nợ và chi phí hai bên đồng ý.';
+      return { contractId: 'HD0001', customerId: tenant.maNguoiDung, branchId: manager.maChiNhanh, depositVnd: '3000000', policy,
+        policyVersion: policyVersion(policy),
+        contractTerms: { contractId: 'HD0001', rentVnd: '1500000', startDate: '2026-01-01', endDate: '2027-01-01', paymentCycle: 'Hàng tháng', depositVnd: '3000000' },
+        signedContract: { name: 'hop-dong-HD0001-test.pdf', sha256: 'a'.repeat(64) },
+        notes: '', inventory: [{ item: 'Nệm', quantity: 1, condition: 'Đã rách lúc nhận phòng' }] };
+    },
     async statements() { return [{ sourceId: 'DS0001' }]; },
     async statement(sourceId, c, version) {
       return { schema: 'homestaydorm.settlement.v1', agreementId: c.id, version, depositHeldVnd: c.depositHeldVnd,
@@ -70,6 +77,25 @@ async function fixture() {
   return { ...ctx, service, store, chain, customerWallet, challenge, create, confirm, sent, revise: value => { deductions = value; } };
 }
 describe('Integrated account → tenant signature → relayer → contract → evidence (local)', () => {
+  it('C1 refuses incomplete v2; unbound v1 requires a new v2 revision and keeps its original history', async () => {
+    const c = await fixture();
+    try {
+      let r = await c.create();
+      const stored = await c.store.getCase(r.id);
+      stored.drafts[0].handover.payload.schema = 'homestaydorm.handover.v1';
+      delete stored.drafts[0].handover.payload.contractTerms;
+      delete stored.drafts[0].handover.payload.signedContract;
+      delete stored.drafts[0].handover.payload.policyVersion;
+      await c.store.saveCase(stored, stored.revision);
+      await assert.rejects(c.service.prepare(tenant, r.id, 1), /hồ sơ cũ/i);
+      r = await c.service.revise(manager, r.id, { resolution: 'Bổ sung ảnh ký và chính sách đã xác nhận.' });
+      assert.equal(r.drafts[0].handover.payload.schema, 'homestaydorm.handover.v1');
+      assert.equal(r.drafts[1].handover.payload.schema, 'homestaydorm.handover.v2');
+      const prepared = await c.service.prepare(tenant, r.id, 1);
+      assert.equal((await verifyEvidence(c.client, c.deployment, prepared.bundle)).valid, true);
+      assert.throws(() => c.service.draft(r.id, 1, '3000000', 'Policy', { inventory: [] }, manager), e => e.statusCode === 409);
+    } finally { await c.close(); }
+  });
   it('runs handover, dispute v1, revision v2, acceptance and independent verification without tenant gas', async () => {
     const c = await fixture();
     try {
@@ -237,7 +263,12 @@ describe('Integrated account → tenant signature → relayer → contract → e
       await assert.rejects(c.service.prepare(tenant, r.id, 1), /thiết lập xác nhận/);
       assert.equal((await c.store.getCase(r.id)).state, 'review');
       await assert.rejects(c.chain.read('getAgreement', [r.id]));
-      const failing = new AvalancheService({ store: c.store, sources: { async handover() { return { contractId: 'HD0003', customerId: 'KH0003', branchId: manager.maChiNhanh, depositVnd: '1000000', policy: 'P', inventory: [] }; } },
+      const template = (await c.store.getCase(r.id)).drafts[0].handover.payload;
+      const failing = new AvalancheService({ store: c.store, sources: { async handover() { return {
+        contractId: 'HD0003', customerId: 'KH0003', branchId: manager.maChiNhanh, depositVnd: '1000000', policy: 'P', inventory: [],
+        policyVersion: policyVersion('P'), contractTerms: { ...template.contractTerms, contractId: 'HD0003', depositVnd: '1000000' },
+        signedContract: template.signedContract,
+      }; } },
         chain: c.chain, origin: 'https://local.example', notify: async () => { throw new Error('SMTP down'); } });
       const published = await failing.publish(manager, 'BG0003');
       assert.equal(published.state, 'review');

@@ -1,4 +1,4 @@
-import { encodeAbiParameters, getAddress, keccak256, stringToHex } from "viem";
+import { encodeAbiParameters, getAddress, keccak256, sha256, stringToHex } from "viem";
 import { abi } from "./abi.js";
 
 export const STATUS = Object.freeze({
@@ -53,6 +53,34 @@ export function documentHash(payload, salt) {
     [{ type: "bytes32" }, { type: "bytes32" }, { type: "bytes32" }],
     [DOCUMENT_TYPEHASH, keccak256(stringToHex(canonicalize(payload))), bytes32(salt, "salt")],
   ));
+}
+
+// A short public label, not a replacement for the salted full policy commitment.
+export function policyVersion(text) {
+  if (typeof text !== 'string' || !text.trim()) throw new Error('Policy text is required.');
+  return sha256(stringToHex(text)).slice(2, 10);
+}
+
+export function validateHandover(payload, policy) {
+  if (!['homestaydorm.handover.v1', 'homestaydorm.handover.v2'].includes(payload?.schema)) throw new Error('Unsupported handover document schema.');
+  if (payload.schema === 'homestaydorm.handover.v1') return;
+  const terms = payload.contractTerms, file = payload.signedContract;
+  const allowed = ['contractId', 'rentVnd', 'startDate', 'endDate', 'paymentCycle', 'depositVnd'];
+  if (!terms || Object.keys(terms).length !== allowed.length || Object.keys(terms).some(key => !allowed.includes(key))
+    || !/^[A-Za-z0-9]{1,6}$/.test(terms.contractId || '')) throw new Error('Invalid contract terms; personal fields are not allowed.');
+  amount(terms.rentVnd);
+  if (amount(terms.depositVnd) !== amount(payload.depositHeldVnd)) throw new Error('Contract deposit differs from the handover deposit.');
+  const date = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
+    && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
+  if (!date(terms.startDate) || !date(terms.endDate) || terms.endDate <= terms.startDate
+    || !['Hàng tháng', 'Hàng quý'].includes(terms.paymentCycle)) throw new Error('Invalid contract term dates or payment cycle.');
+  if (!file || Object.keys(file).length !== 2 || typeof file.name !== 'string'
+    || !/^[A-Za-z0-9-]+\.(pdf|png|jpg|webp)$/.test(file.name) || !/^[0-9a-f]{64}$/.test(file.sha256 || '')) {
+    throw new Error('Signed contract evidence must contain only a safe filename and SHA-256 hash.');
+  }
+  if (payload.policyVersion !== policyVersion(policy?.text) || policy.version !== payload.policyVersion) {
+    throw new Error('Policy version does not match the saved policy text.');
+  }
 }
 
 export function handoverCommitment(deployment, id, manager, accountant, agreement) {
@@ -117,6 +145,7 @@ function validateBundle(bundle) {
   bytes32(bundle.agreementId, "agreementId");
   const required = bundle.kind === "handover" ? ["policy", "handover"] : ["statement"];
   for (const key of required) documentHash(bundle.documents?.[key]?.payload, bundle.documents?.[key]?.salt);
+  if (bundle.kind === 'handover') validateHandover(bundle.documents.handover.payload, bundle.documents.policy.payload);
   if (bundle.kind === "settlement") {
     if (bundle.version !== bundle.documents.statement.payload.version) throw new Error("Evidence version differs from document version.");
     validateStatement(bundle.documents.statement.payload);
@@ -145,7 +174,7 @@ export async function verifyEvidence(client, deployment, bundle) {
     const payload = handover.payload;
     let fieldsMatch = false;
     try {
-      fieldsMatch = payload.schema === "homestaydorm.handover.v1"
+      fieldsMatch = ['homestaydorm.handover.v1', 'homestaydorm.handover.v2'].includes(payload.schema)
         && bytes32(payload.agreementId) === bundle.agreementId.toLowerCase()
         && getAddress(payload.tenant) === getAddress(agreement.tenant)
         && amount(payload.depositHeldVnd) === agreement.depositHeld;
