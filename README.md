@@ -26,7 +26,14 @@ Phần Avalanche nằm trong [module riêng](blockchain/README.md) (contract `Do
 
 ## Triển khai Fuji (A2)
 
-Đã có công cụ kiểm tra/chia AVAX, deploy và verify source bằng Sourcify API v2. **Chưa có contract Fuji được deploy hoặc source được verify trong đợt này**: deployer mới có 0,05 AVAX, còn chờ nạp hai ví phụ theo kế hoạch. Địa chỉ contract và link explorer chỉ công bố sau receipt thành công trong `blockchain/deployments/fuji.json`; không dùng địa chỉ giả thay kết quả thật. Theo [tiến độ](spec/progress.md) và [hướng dẫn A2](blockchain/README.md#deploy-và-verify-fuji-a2).
+Đã deploy thật ngày 11/11/2026 trên **Avalanche Fuji C-Chain (43113)**:
+
+- Contract: [`0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C`](https://testnet.snowtrace.io/address/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C).
+- [Giao dịch deploy thành công](https://testnet.snowtrace.io/tx/0x40dd64ee77434c21b0e47242d2edda9f8d4a0d9a448a77cd8905b101b4dd945e), block `60882820`.
+- [Mã nguồn trên Sourcify](https://repo.sourcify.dev/43113/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C): creation/runtime **exact match**; không suy ra explorer khác đã index source.
+- [Manifest công khai](blockchain/deployments/fuji.json) lưu compiler, constructor, source commit, receipt và hai giao dịch nạp ví vận hành. Khóa/env không nằm trong Git.
+
+Cấu hình Fuji và bản sao cấu hình local cũ đã chuẩn bị riêng tại worktree A2; kiểm route config thật với env mới và đọc manager/accountant trên chain đã khớp. **Chưa restart ứng dụng đầy đủ hoặc nghiệm thu A3** (SQL/SMTP/OTP Privy, bàn giao → đối soát → kiểm chứng tài liệu qua giao diện). Theo [tiến độ](spec/progress.md) và [hướng dẫn A2](blockchain/README.md#deploy-và-verify-fuji-a2).
 
 ## Chạy local
 

@@ -1,6 +1,6 @@
 # Blockchain — HomeStayDorm
 
-Contract `DormSettlement.sol`, canonical evidence/hash và EIP-712 dùng chung với frontend/backend. Đã có compile, ABI, test và deploy local; **chưa có deployment hoặc giao dịch Fuji được nghiệm thu**. Không giữ/chuyển tiền cọc trên chuỗi.
+Contract `DormSettlement.sol`, canonical evidence/hash và EIP-712 dùng chung với frontend/backend. Đã deploy trên **Fuji 43113** ở `0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C` (J-X068); [Sourcify](https://repo.sourcify.dev/43113/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C) xác nhận creation/runtime exact match. Manifest và hai giao dịch nạp ví ở [deployments/fuji.json](deployments/fuji.json). **Chưa nghiệm thu A3 với người thuê/SQL/OTP thật.** Không giữ/chuyển tiền cọc trên chuỗi.
 
 ## Chuẩn bị ví Fuji (A1)
 

@@ -1,0 +1,39 @@
+{
+  "chainId": 43113,
+  "manager": "0x7bb2e96898Db7e387e118eB92a9C390E29f54B2f",
+  "accountant": "0x9F86a6119723f46d2e8236C2935f660918cCbf0D",
+  "transactionHash": "0x40dd64ee77434c21b0e47242d2edda9f8d4a0d9a448a77cd8905b101b4dd945e",
+  "compilerVersion": "0.8.38+commit.1835d247.Emscripten.clang",
+  "standardInputSha256": "330d3e050aee41354a73453acc53909b8d60c869cf153769d9047b37558a6d7c",
+  "constructorArguments": "0x0000000000000000000000007bb2e96898db7e387e118eb92a9c390e29f54b2f0000000000000000000000009f86a6119723f46d2e8236c2935f660918ccbf0d",
+  "sourceCommit": "515c31473b97f29d5d1e734ac210c76db4a2f654",
+  "address": "0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C",
+  "blockNumber": "60882820",
+  "protocolVersion": "2",
+  "sourceVerification": "verified",
+  "sourceVerificationJob": "bbf1ffce-169d-4f33-9e05-54276fd7ea96",
+  "sourceVerificationProvider": "Sourcify API v2",
+  "sourceVerificationUrl": "https://repo.sourcify.dev/43113/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C",
+  "explorerUrl": "https://testnet.snowtrace.io/address/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C",
+  "sourceVerifiedAt": "2026-11-11T08:44:13Z",
+  "sourceVerificationMatch": {
+    "creation": "exact_match",
+    "runtime": "exact_match"
+  },
+  "fundingTransactions": [
+    {
+      "role": "accountant",
+      "address": "0x9F86a6119723f46d2e8236C2935f660918cCbf0D",
+      "amountAvax": "0.1",
+      "transactionHash": "0xb82f37d9d9ca5b5e4af4ef434d49a1dee4e0b0af2891473fbfa98b046a3338e4"
+    },
+    {
+      "role": "relayer",
+      "address": "0x8C8D363E9430bD7e8ED72752Fb1356Bec0fe62f9",
+      "amountAvax": "0.1",
+      "transactionHash": "0xe1fbd607e1808e9eb258ac3e60dce0ae2bf9f4a896a43e9a4cb9084fe2ab5868"
+    }
+  ],
+  "deploymentGasUsed": "1585340",
+  "deploymentFeeAvax": "0.0000000002536544"
+}
