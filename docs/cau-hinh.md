@@ -33,6 +33,14 @@ npm run dev
 - Frontend: `http://localhost:5173`
 - Backend: `http://localhost:5000`
 
+## Lịch xem phòng — C5-a / D-026
+
+Trong `web/backend`, `npm run viewing-status:db:check` chỉ đọc định nghĩa 8 SP và liệt kê khối tự chuyển Đã xem còn tồn tại. Sau khi Vy cho phép chạy lên HOMEDORM4, `npm run viewing-status:db:migrate` gỡ đúng các khối cũ, giữ phần SP còn lại (kể cả thay đổi của migration mới hơn), mở rộng trạng thái Khách không đến và thêm `SP_GhiNhanKetQuaBuoiXem` trong cùng transaction. Định nghĩa không đúng mẫu sẽ báo lỗi để xem lại; không tự thay cả SP bằng bản nguồn cũ. Migration không ghi trạng thái lịch/phiếu cũ và chạy lại được.
+
+Triển khai đồng thời backend/frontend mới và restart mọi backend cũ đang nối cùng DB; tiến trình cũ còn giữ hàm JS/scheduler tự đánh dấu trong bộ nhớ. Sale phụ trách ghi kết quả sau buổi xem ở Lịch hẹn xem phòng; backend kiểm lại quyền, chi nhánh, giờ hẹn và trạng thái dù gọi API trực tiếp. Không đổi quy tắc đặt lịch từ ngày mai, 07:00–17:00; không sửa ngày SQL để đi tắt A3.
+
+Kiểm thử riêng SQL: `C5A_SQL_TEST=true` rồi `node --test test/viewing-status-sql.test.mjs` với cấu hình kết nối local. Test tạo/xóa CSDL riêng `HOMEDORM_C5A_TEST_*`, cần quyền tạo CSDL; không đưa fixture vào HOMEDORM4. Test thường bỏ qua ca này, kết quả chạy riêng phải báo tách biệt. Ảnh UI dùng API giả không thay nghiệm thu A3 thật.
+
 ## Xác nhận bàn giao/đối soát trên Avalanche và thanh toán mô phỏng
 
 Luồng theo D-009 → D-013 trong [spec/decisions.md](../spec/decisions.md). Quản lý lập biên bản bàn giao Web2, hệ thống tự gửi bản xem vào tab **Hợp đồng** của khách kèm email. Khách **xác nhận** hoặc **yêu cầu chỉnh sửa**; khi khách yêu cầu sửa, quản lý phát hành bản mới. Chỉ bản khách xác nhận mới được ghi lên Avalanche: khách ký bằng ví nhúng trong tài khoản, ứng dụng trả phí gas. Kế toán gửi bảng đối soát cọc; khách đồng ý hoặc phản hồi. Mọi phiên bản đều được giữ và tự kiểm chứng được tại `/kiem-chung-avalanche`. Khi chưa cấu hình, Web2 vẫn chạy bình thường và phần xác nhận tự ẩn.

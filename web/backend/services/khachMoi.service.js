@@ -2,7 +2,6 @@ import { executeProcedure, executeQuery, getPool, sql } from '../database/connec
 import { getDanhSachPhongKhamPha } from './phongKhamPha.service.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as phieuTraPhongRepository from '../repositories/phieuTraPhong.repository.js';
-import { capNhatLichXemDenGioThanhDaXem } from '../repositories/lichXemPhong.repository.js';
 import { getPaymentAccount } from '../config/payment.js';
 
 function requireCustomer(user) {
@@ -256,7 +255,6 @@ async function getProfiles(khachHangId) {
 }
 
 async function getSchedules(khachHangId) {
-  await capNhatLichXemDenGioThanhDaXem();
 
   const result = await executeProcedure('dbo.SP_KhachMoi_DanhSachLichXem', [
     { name: 'KhachHangId', type: sql.VarChar(6), value: khachHangId }
@@ -278,7 +276,6 @@ async function getAvailableRooms(filter = {}) {
 export async function getTongQuan(user) {
   const khachHangId = requireCustomer(user);
   const trangThai = await assertNewCustomer(khachHangId);
-  await capNhatLichXemDenGioThanhDaXem();
   const [hoSo, lichXem, phongGoiY] = await Promise.all([
     getProfiles(khachHangId),
     getSchedules(khachHangId),
@@ -577,7 +574,6 @@ export async function getLichXemDetail(user, id) {
 
     if (!ownerCheck.recordset?.length) throw createServiceError('Không tìm thấy lịch xem phòng', 404);
 
-    await capNhatLichXemDenGioThanhDaXem({ maDangKy });
     const result = await executeProcedure('dbo.SP_KhachMoi_ChiTietLichXem', [
       { name: 'KhachHangId', type: sql.VarChar(6), value: khachHangId },
       { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },

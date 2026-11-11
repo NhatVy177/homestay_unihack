@@ -1,6 +1,5 @@
 import { executeProcedure, getPool, sql } from '../database/connection.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
-import { capNhatLichXemDenGioThanhDaXem } from '../repositories/lichXemPhong.repository.js';
 import { attachPaymentAccount } from '../config/payment.js';
 import { notifyDeposit } from '../integrations/mail/datCocNotifications.js';
 
@@ -38,7 +37,6 @@ export async function getPhongDaXem(maDangKy) {
   const ma = String(maDangKy || '').trim();
   if (!ma) throw createServiceError('Thiếu mã phiếu đăng ký');
   try {
-    await capNhatLichXemDenGioThanhDaXem({ maDangKy: ma });
     const result = await executeProcedure('dbo.SP_DanhSachPhongDaXem', [
       { name: 'MaDangKy', type: sql.VarChar(6), value: ma }
     ]);
@@ -59,7 +57,6 @@ export async function chonPhongKhachChot(user, maDangKy, maPhong) {
   if (!ma || !phong) throw createServiceError('Thiếu mã phiếu đăng ký hoặc mã phòng');
 
   try {
-    await capNhatLichXemDenGioThanhDaXem({ maDangKy: ma });
     const result = await executeProcedure('dbo.SP_ChonPhongKhachChot', [
       { name: 'MaDangKy', type: sql.VarChar(6), value: ma },
       { name: 'MaPhong',  type: sql.VarChar(4), value: phong }
@@ -107,7 +104,6 @@ export async function guiYeuCauDatCoc(user, data = {}) {
     throw createServiceError('Chọn giường cho khách');
 
   try {
-    await capNhatLichXemDenGioThanhDaXem({ maDangKy });
     const result = await executeProcedure('dbo.SP_GuiYeuCauCocKemLuaChon', [
       { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
       { name: 'MaNhanVienSale', type: sql.VarChar(6), value: maNhanVienSale },
