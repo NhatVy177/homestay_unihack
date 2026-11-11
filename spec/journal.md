@@ -805,3 +805,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - B4, nhánh `feat/b4-settlement-ui` từ `feat/t22-settlement`: `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx` bỏ hết 46 style viết tay. Nhãn trạng thái dùng `StatusBadge` (có biểu tượng); màu tiền dùng class `qt-money--*`; ô bảng dùng `ui-cell-code/main/sub`, cột tiền `ui-num`; thông báo dùng `ui-list-alert`; ba hộp thoại bỏ đầu màu xanh cũ, dùng đầu sáng chung. CSS mới `pages/nhanVienKeToan/quyetToanTraPhong.css` (chỉ dùng token). `components/xacNhan/KeToanXacNhanTab.jsx` bỏ style viết tay cuối cùng (class `xn-radio-option` trong `xacNhan.css`). Không đổi logic.
 - Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả); đã xem ảnh hộp thoại lập đối soát 1440px.
 - Chưa làm: ô tìm kiếm và phân trang của bộ danh sách chung cho 3 bảng của màn Quyết toán; C4.
+
+## 2026-11-11 23:30:00 +07:00 — J-C068 — B4 (tiếp): tìm kiếm và phân trang màn Quyết toán
+
+- Người thực hiện: Claude, nhánh `feat/b4-settlement-ui`. `QuyetToanTraPhongTab.jsx`: 3 ô tìm kiếm viết tay đổi sang `ListSearch` (nút xóa từ khóa trong ô thay nút "Xóa lọc"); dòng "Đang tải danh sách..." đổi sang dòng khung xương `TableState`; 3 bảng (thu thêm/hoàn cọc, kết quả đối soát, lập đối soát) có `ListPagination` 10 dòng/trang, đổi bộ lọc hay từ khóa thì về trang 1. Không đổi logic nghiệp vụ.
+- `scripts/ui-settlement-c3.mjs` thêm 12 phiếu giả, kiểm tra "Hiển thị 1–10 / 12 phiếu".
+- Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả). Giờ ghi là ước lượng sau khi chạy xong kiểm tra.
+- Còn: C4.
