@@ -12,6 +12,7 @@ import './khachHangPortal.css';
 import LichXemPhongPage from '../lichXemPhong/LichXemPhongPage.jsx';
 import { httpClient } from '../../api/httpClient.js';
 import ThuNhanPhongWalletCard from './ThuNhanPhongWalletCard.jsx';
+import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Claude), one line agreed with Vy
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
 const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
 const PORTAL_TABS = ['kham-pha', 'ho-so', 'lich-xem', 'dat-coc', 'hop-dong', 'tra-phong'];
@@ -2503,6 +2504,7 @@ export default function KhachHangPortalPage() {
               </div>
 
               <ThuNhanPhongWalletCard contractId={selectedHd.MaHopDong} />
+              <ThuThemDoiSoatWalletCard contractId={selectedHd.MaHopDong} />
 
               <Suspense fallback={null}>
                 <HopDongXacNhanSection contractId={selectedHd.MaHopDong} />

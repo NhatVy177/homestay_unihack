@@ -46,7 +46,10 @@ async function fixture(t) {
 
 test('C2: only a manager of the same branch reads the move-in record', async t => {
   const { service } = await fixture(t);
-  await assert.rejects(service.moveIn({ ...manager, chucVu: 'Kế toán' }, 'PT0001'), e => e.statusCode === 403);
+  await assert.rejects(service.moveIn({ ...manager, chucVu: 'Sale' }, 'PT0001'), e => e.statusCode === 403);
+  const accountant = { ...manager, chucVu: 'Kế toán' };
+  assert.equal((await service.moveIn(accountant, 'PT0001')).nguon, 'web2', 'C3: accountant of the branch can read');
+  await assert.rejects(service.upload(accountant, 'PT0001', { mimetype: 'image/png', buffer: Buffer.from('x') }), e => e.statusCode === 403);
   await assert.rejects(service.moveIn({ vaiTro: 'KhachHang', maNguoiDung: 'KH0001' }, 'PT0001'), e => e.statusCode === 403);
   await assert.rejects(service.moveIn({ ...manager, maChiNhanh: 'CN0009' }, 'PT0001'), e => e.statusCode === 404);
   await assert.rejects(service.moveIn(manager, "PT0001'; DROP"), e => e.statusCode === 400);

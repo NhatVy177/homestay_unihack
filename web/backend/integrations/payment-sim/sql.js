@@ -104,3 +104,39 @@ export const sqlFirstCharges = {
     }
   },
 };
+
+// C3 / D-030 (3): settlement top-up. Quote reads the newest DoiSoat of the tenant's contract;
+// markPaid runs the procedure and marks the order Paid in one transaction.
+export const sqlTopUps = {
+  async get(maHopDong) {
+    if (!/^[A-Za-z0-9]{1,6}$/.test(maHopDong)) return null;
+    const r = (await executeQuery(`SELECT TOP (1) hd.MaKhachHang, ds.MaDoiSoat, ds.TrangThai, ds.SoTienKhachPhaiTT, pt.TrangThai AS TrangThaiPhieuTra
+      FROM dbo.HopDongThue hd
+      LEFT JOIN dbo.PhieuTraPhong pt ON pt.MaHopDong = hd.MaHopDong
+      LEFT JOIN dbo.DoiSoat ds ON ds.MaPhieuTra = pt.MaPhieuTra
+      WHERE hd.MaHopDong=@id ORDER BY ds.MaDoiSoat DESC`, [v('id', sql.VarChar(6), maHopDong)])).recordset[0];
+    return r && { customerId: r.MaKhachHang, settlementId: r.MaDoiSoat, status: r.TrangThai,
+      returnStatus: r.TrangThaiPhieuTra, amountVnd: r.SoTienKhachPhaiTT == null ? 0 : Number(r.SoTienKhachPhaiTT) };
+  },
+  async markPaid(order, receipt, transId) {
+    const transaction = new sql.Transaction(await getPool());
+    await transaction.begin();
+    try {
+      await new sql.Request(transaction)
+        .input('MaDoiSoat', sql.VarChar(6), order.refId)
+        .input('MaKhachHang', sql.VarChar(6), order.customerId)
+        .input('SoTien', sql.Decimal(15, 2), order.amountVnd)
+        .input('ChungTuThanhToan', sql.VarChar(500), receipt)
+        .execute('dbo.SP_TraPhong_ThuThemQuaViMoPhong');
+      const updated = await new sql.Request(transaction)
+        .input('id', sql.VarChar(32), order.id).input('transId', sql.VarChar(40), transId)
+        .query(`UPDATE dbo.PaymentSimOrder SET Status='Paid', GatewayTransId=@transId, PaidAt=SYSUTCDATETIME(), LastError=NULL
+          WHERE Id=@id AND Status='Processing'`);
+      if (updated.rowsAffected[0] !== 1) throw Object.assign(new Error('Đơn thanh toán không còn ở trạng thái xử lý.'), { statusCode: 409 });
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback().catch(() => {});
+      throw error;
+    }
+  },
+};
