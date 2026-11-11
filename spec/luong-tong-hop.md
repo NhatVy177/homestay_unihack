@@ -199,7 +199,7 @@ Contract `DormSettlement.sol` (EIP-712). Trạng thái: None → HandoverPropose
 - **Ví:** Privy embedded wallet, OTP email trong khung HomeStayDorm (D-015). JWT-based auth cần gói Scale trả phí (Q-10 đang chờ BTC).
 - **Khóa vận hành:** khóa của "quản lý", "kế toán" và relayer nằm trên máy chủ, đại diện cho bên cho thuê; không phải ví riêng của từng nhân viên. Contract chỉ nhận một địa chỉ quản lý và một địa chỉ kế toán cho toàn hệ thống.
 - **Cách gọi:** dùng "xác nhận điện tử", không gọi là "chữ ký số". Đây là bằng chứng bổ sung theo thỏa thuận hai bên, không thay hợp đồng thuê (vẫn ký giấy).
-- **Trạng thái thật (11/11):** mới chạy trên chain local; chưa deploy Fuji.
+- **Trạng thái thật (11/11, J-X068/J-X069):** đã deploy Fuji và Sourcify exact match; phiên ứng dụng Fuji, preflight SQL chỉ đọc và đăng nhập Sale thật đã chạy. Chưa có sáu giao dịch nghiệp vụ/OTP thật; A3 chờ Claude sửa lịch xem C5 theo D-026 (A3-01 trong [bảng kiểm](kiem-thu-fuji.md)).
 - **Token point** (D-014): chỉ dự phòng, không làm trước khi luồng chính đạt nghiệm thu.
 
 ---
@@ -292,7 +292,7 @@ In đậm = quyết định của đợt bàn lại luồng ngày 10/11/2026.
 | Mục 9 | Mốc chuỗi 3 "đóng hồ sơ" | **Để sau bản thi** | Cần sửa contract |
 | — | Thời hạn phiên Privy | Thử ở Fuji | Ảnh hưởng số lần phải nhập OTP |
 
-**Rủi ro lớn nhất:** chưa có gì chạy trên Fuji trong khi T-22 và giao diện còn nhiều. Đề xuất làm Fuji trước và chia T-22 theo mức ưu tiên: xem [progress.md](progress.md).
+**Rủi ro lớn nhất:** A3 chưa nghiệm thu sáu giao dịch nghiệp vụ Fuji, trong khi T-22 và giao diện còn nhiều; deploy thành công không thay kết quả toàn luồng. Ưu tiên và điểm đang chờ chốt: [progress.md](progress.md).
 
 ---
 
