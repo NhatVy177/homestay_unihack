@@ -89,7 +89,9 @@ export class CheckoutComparison {
     this.repository = repository; this.directory = resolve(directory);
   }
   async access(user, maPhieuTra, { writable = false } = {}) {
-    if (user?.vaiTro !== 'NhanVien' || user.chucVu !== 'Quản lý' || !user.maChiNhanh) fail('Chỉ quản lý chi nhánh được dùng chức năng này.', 403);
+    // C3: the accountant of the branch reads the same comparison and photos when settling; only the manager changes photos.
+    const roles = writable ? ['Quản lý'] : ['Quản lý', 'Kế toán'];
+    if (user?.vaiTro !== 'NhanVien' || !roles.includes(user.chucVu) || !user.maChiNhanh) fail(writable ? 'Chỉ quản lý chi nhánh được đổi ảnh trả phòng.' : 'Chỉ quản lý hoặc kế toán của chi nhánh được xem.', 403);
     const phieu = await this.repository.phieu(code(maPhieuTra));
     if (!phieu || phieu.maChiNhanh !== user.maChiNhanh) fail('Không tìm thấy phiếu trả phòng trong chi nhánh.', 404);
     if (!phieu.maHopDong) fail('Phiếu trả phòng này không thuộc hợp đồng thuê.', 400);

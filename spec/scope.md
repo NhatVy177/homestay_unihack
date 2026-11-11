@@ -35,6 +35,13 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 
 Theo yêu cầu Vy ngày 11/11: tạo ba ví mới (deployer kiêm manager, accountant, relayer), chỉ in địa chỉ; khóa lưu trong `.env` và `.fuji-backend-env.local` bị ignore, từ chối ghi đè khóa cũ. Script chia 0,3 AVAX thử cho accountant và relayer, kiểm tra đúng Fuji và đủ tiền/gas trước giao dịch, in số dư ba ví; chưa deploy. Khóa vận hành không phải khóa ví khách. Không chạy SQL hoặc đổi cấu hình ứng dụng trong A1; deploy/verify/nghiệm thu thật vẫn thuộc F-09/A2–A3.
 
+### C3 — Bản nháp đối soát, tỷ lệ hoàn, thu thêm qua ví (D-030 mục 2, 3; D-040)
+
+- Bản nháp đã có sẵn trước C3: màn kế toán tự điền nợ thuê, nợ dịch vụ, chi phí sửa chữa (từ biên bản kiểm tra), tiền phạt; kế toán rà, chỉnh, gửi; khách phản hồi thì lập bản điều chỉnh. Thu thêm và hoàn cọc là hai luồng riêng theo loại quyết toán.
+- D-040: tỷ lệ hoàn đọc từ chính sách đã khóa trên phiếu cọc (`DepositPolicySnapshot`), nhận dạng 4 trường hợp theo tên quy định; màn kế toán ghi "theo chính sách phiên bản …". Phiếu cọc chưa có chính sách đã khóa, hoặc chính sách không có dòng rõ ràng cho trường hợp đó: dùng tỷ lệ mặc định và ghi rõ lý do. Màn kế toán hiển thị đúng tỷ lệ backend tính, không tự tính lại.
+- Thu thêm qua ví mô phỏng: khách thấy thẻ "Thanh toán khi trả phòng" trong tab Hợp đồng khi đối soát mới nhất ở "Chờ thanh toán thêm"; đơn loại `thu-them-doi-soat` gắn với mã đối soát; IPN thành công gọi `SP_TraPhong_ThuThemQuaViMoPhong` (đúng chủ hợp đồng, đúng số tiền) và đổi đơn sang Paid trong cùng transaction; IPN lặp chỉ ghi nhận một lần. Phương thức `Ví điện tử`, không ghi kế toán là người thu. Tiền mặt/chuyển khoản do kế toán ghi nhận vẫn giữ.
+- Kế toán đúng chi nhánh xem biên bản lúc nhận phòng, tình trạng từng món lúc vào và ảnh lúc trả phòng ngay trong hộp thoại lập đối soát (chỉ đọc). Khách xem ảnh trả phòng: chưa làm.
+
 ### C2 — Kiểm tra trả phòng so trước/sau (D-030 mục 1)
 
 - Màn kiểm tra trả phòng của quản lý hiện cột "Lúc nhận phòng" cạnh hiện trạng từng tài sản, ảnh lúc nhận phòng và trạng thái biên bản: bản khách đã xác nhận điện tử (kèm phiên bản, giờ), bản mới nhất chưa xác nhận, hoặc chỉ có biên bản Web2. Ghép theo mã tài sản khi tra được, nếu không theo tên; không đổi cấu trúc bản đã ký.

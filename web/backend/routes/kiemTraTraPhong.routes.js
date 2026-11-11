@@ -19,5 +19,9 @@ router.get('/quan-ly/anh/:maPhieuTra', controller.quanLyDanhSachAnh);
 router.post('/quan-ly/anh/:maPhieuTra', controller.anhUpload, controller.quanLyTaiAnh);
 router.delete('/quan-ly/anh/:maPhieuTra/:maAnh', controller.quanLyXoaAnh);
 router.get('/quan-ly/anh/:maPhieuTra/:maAnh/file', controller.quanLyFileAnh);
+// C3: kế toán xem cùng dữ liệu khi quyết toán (chỉ đọc)
+router.get('/doi-chieu/ban-giao-vao/:maPhieuTra', controller.quanLyBanGiaoVao);
+router.get('/doi-chieu/anh/:maPhieuTra', controller.quanLyDanhSachAnh);
+router.get('/doi-chieu/anh/:maPhieuTra/:maAnh/file', controller.quanLyFileAnh);
 
 export default router;
