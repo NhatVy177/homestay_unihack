@@ -4,9 +4,9 @@ Lập 2026-11-11 (J-C059), cập nhật 09:40 cùng ngày (J-C060), kèm [audit-
 
 **Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036), B0 khung chung (J-C061).
 
-**Ai làm việc nào (Vy đồng ý 11/11):** mỗi file chỉ một người sửa.
-- **Claude:** B1, B5, B2, phần giao diện C5, D1–D3. Codex **không** sửa các file này: `components/common/WorkspaceShell.jsx`, `styles/shell.css`, các trang khung `NhanVien*Page.jsx`, `AdminPage.jsx` (phần khung), `KhachHangPortalPage.jsx`, `components/xacNhan/*`, `pages/avalanche/*`, `pages/thanhToanMoPhong/*`, `BanGiaoPhongTab.jsx`.
-- **Codex:** A2, A3, C6, B7, C2 (gộp B3), C3 (gộp B4), C4, phần backend C5, E1–E3.
+**Ai làm việc nào:** mỗi file chỉ một người sửa. **Chia lại 2026-11-11 15:3x (Vy chọn, J-C064)** vì Codex đang chờ AVAX cho A2 nên chuỗi trả phòng đứng yên; thay bảng chia lúc 10:11 (J-C061).
+- **Claude:** chuỗi trả phòng C2 (gộp B3, **xong**), C3 (gộp B4), C4; D1–D3 (bản nháp xong). C5: chưa đổi người, đề xuất Claude làm sau C4 vì backend đã viết ở `feat/t22-backend`. Codex **không** sửa: `pages/nhanVienQuanLy/{KiemTraTraPhong,XuLyTraPhongTab,thanhlytraphong,GhiNhanBanGiaoRa,XacNhanPhanHoi}.jsx`, `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx`, `web/backend/services/{doiSoat*,khauTruDoiSoat,thuThemDoiSoat,hoanCocDoiSoat,kiemTraTraPhong,traPhongSoSanh,thanhlytraphong}*.js`, `styles/lists.css` (chỉ thêm ở cuối nếu cần).
+- **Codex:** A2, A3 (Fuji, làm trước); sau đó B1, B2, B5, B7, C6; E1–E3. Được sửa `components/common/WorkspaceShell.jsx`, `styles/shell.css`, `KhachHangPortalPage.jsx`, các file còn lại trong `components/xacNhan/`, `pages/avalanche/*`, `pages/thanhToanMoPhong/*`, `BanGiaoPhongTab.jsx` khi làm B1/B2/B5.
 
 **Bộ danh sách chung (J-C062, Claude):** `ListSearch`, `TableState`, `ListPagination`, `OverviewCards` lọc được, `StatusBadge` có icon; CSS ở `styles/lists.css` (Claude giữ file này, Codex chỉ thêm quy tắc ở cuối file nếu cần). Codex dùng chúng khi làm B3, B4, B7, C4.
 
@@ -98,11 +98,11 @@ File chính: <FILE>. Tham khảo bố cục (chỉ xem, không chép code): màn
 
 | Mã | Màn | File chính | `style` hiện có | Vai trò mẫu |
 |---|---|---|---|---|
-| B1 (Claude) | Khách: tab Hợp đồng + khu xác nhận biên bản/đối soát | `pages/khachHang/KhachHangPortalPage.jsx` (chỉ phần tab Hợp đồng), `components/xacNhan/HopDongXacNhanSection.jsx`, `DocumentView.jsx` | 78 (cả file) | customer |
-| B2 (Claude) | Quản lý: Bàn giao phòng + "Khách xác nhận biên bản" | `pages/nhanVienQuanLy/BanGiaoPhongTab.jsx`, `components/xacNhan/QuanLyXacNhanTab.jsx` | 140 | manager |
-| B3 (Codex, làm cùng C2) | Quản lý: Kiểm tra trả phòng | `pages/nhanVienQuanLy/KiemTraTraPhong.jsx` | 144 | manager |
-| B4 (Codex, làm cùng C3) | Kế toán: Quyết toán trả phòng + "Khách xác nhận đối soát" | `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx` | 46 | accountant |
-| B5 (Claude) | Trang kiểm chứng + cổng ví mô phỏng | `pages/avalanche/AvalancheVerifyPage.jsx`, `pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx` | — | landing |
+| B1 (Codex, sau Fuji) | Khách: tab Hợp đồng + khu xác nhận biên bản/đối soát | `pages/khachHang/KhachHangPortalPage.jsx` (chỉ phần tab Hợp đồng), `components/xacNhan/HopDongXacNhanSection.jsx`, `DocumentView.jsx` | 78 (cả file) | customer |
+| B2 (Codex, sau Fuji) | Quản lý: Bàn giao phòng + "Khách xác nhận biên bản" | `pages/nhanVienQuanLy/BanGiaoPhongTab.jsx`, `components/xacNhan/QuanLyXacNhanTab.jsx` | 140 | manager |
+| B3 (Claude, cùng C2, **xong J-C064**) | Quản lý: Kiểm tra trả phòng | `pages/nhanVienQuanLy/KiemTraTraPhong.jsx` | 144 → 0 | manager |
+| B4 (Claude, cùng C3) | Kế toán: Quyết toán trả phòng + "Khách xác nhận đối soát" | `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx` | 46 | accountant |
+| B5 (Codex, sau Fuji) | Trang kiểm chứng + cổng ví mô phỏng | `pages/avalanche/AvalancheVerifyPage.jsx`, `pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx` | — | landing |
 | B6 (Claude, nếu kịp) | Trang chủ + đăng nhập/đăng ký (rà lần cuối) | `pages/TrangChu.jsx` | 0 | landing, auth |
 
 | B7 (Codex) | Sale: việc nhỏ còn lại sau D-036 (prompt riêng bên dưới) | `pages/nhanVienSale/*` | — | sale |
@@ -144,7 +144,7 @@ Hiện trạng: web/backend/integrations/avalanche/sources.js (handover) trả i
 Chưa rõ tên cột nào thì đọc database/CreateDB/app.sql trước, không đoán.
 ```
 
-### C2 — Màn kiểm tra trả phòng so trước/sau (D-030 mục 1)
+### C2 — Màn kiểm tra trả phòng so trước/sau (D-030 mục 1) (ĐÃ XONG, Claude, J-C064; nhánh `feat/t22-checkout`)
 
 ```
 Việc: trên màn Kiểm tra trả phòng của quản lý, hiện cạnh nhau tình trạng lúc bàn giao vào (biên bản khách đã xác nhận, kèm ảnh nếu có) và ô nhập tình trạng hiện tại cho từng tài sản. Nhánh: feat/t22-checkout-compare.
@@ -153,7 +153,7 @@ Việc: trên màn Kiểm tra trả phòng của quản lý, hiện cạnh nhau 
 3. Làm sau hoặc cùng B3 để tránh hai nhánh cùng sửa KiemTraTraPhong.jsx.
 ```
 
-### C3 — Bản nháp đối soát tự soạn (D-030 mục 2, 3)
+### C3 — Bản nháp đối soát tự soạn (D-030 mục 2, 3) (Claude)
 
 ```
 Việc: khảo sát rồi bổ sung. Nhánh: feat/t22-settlement-draft.
@@ -163,7 +163,7 @@ Việc: khảo sát rồi bổ sung. Nhánh: feat/t22-settlement-draft.
 4. Test SQL chạy trong transaction rồi rollback, theo mẫu scripts/deposit-flow-verify.mjs.
 ```
 
-### C4 — Tự thanh lý và gói bằng chứng cuối (D-030 mục 5, D-031 mục 1)
+### C4 — Tự thanh lý và gói bằng chứng cuối (D-030 mục 5, D-031 mục 1) (Claude)
 
 ```
 Việc: tự thanh lý hợp đồng khi tiền đã xong. Nhánh: feat/t22-auto-liquidation. KHÔNG sửa contract.
@@ -185,7 +185,7 @@ Việc: tiếp nhánh feat/t22-backend (đã có SP_KhachGiuCho, SP_KhachKhongTh
 4. Giao diện khách: nút "Giữ chỗ" trên thẻ buổi đã xem (chọn phòng, hình thức, giường), lời nhắn chờ quản lý tối đa 12 giờ, nút "Không thuê nữa"; thanh tiến trình Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ. Giao diện Sale: nút "Khách không đến".
 ```
 
-### C6 — Điều khoản xác nhận điện tử và ô đồng ý dữ liệu cá nhân (D-038)
+### C6 — Điều khoản xác nhận điện tử và ô đồng ý dữ liệu cá nhân (D-038) (Codex, sau Fuji)
 
 ```
 Việc nhỏ, chỉ sửa chữ và một ô tích. Nhánh: feat/t22-consent-wording.

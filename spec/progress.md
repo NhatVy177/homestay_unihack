@@ -24,7 +24,8 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy đ�
 |---|---|---|
 | `main` (`3725840`) | Đã có nhánh tích hợp `integration/2026-11-11` (PR #4): ui-refresh-1, audit, A1, C1, không gian Sale | Gốc cho mọi nhánh mới |
 | `feat/ui-shared-shell` (Claude) | B0: khung chung cho 5 vai trò; bỏ tab của ứng dụng cũ (D-039); sửa lỗi tab kế toán | Chờ Vy merge |
-| `feat/ui-list-b1` (Claude) | Tạo từ `feat/ui-shared-shell` (nên chứa luôn B0). Bộ danh sách chung theo mẫu bên Hằng (J-C062); sau đó B1 và hồ sơ nộp D1–D3 | Đang làm; merge PR này là có cả B0 |
+| `feat/ui-list-b1` (Claude) | Tạo từ `feat/ui-shared-shell` (nên chứa luôn B0). Bộ danh sách chung theo mẫu bên Hằng (J-C062); bản nháp hồ sơ nộp D1–D3 (J-C063) | Chờ Vy merge; merge PR này là có cả B0 |
+| `feat/t22-checkout` (Claude) | Tạo từ `feat/ui-list-b1`. C2 + B3: màn kiểm tra trả phòng so trước/sau, ảnh lúc trả phòng (J-C064); tiếp theo C3, C4 trên cùng nhánh | Đang làm; bảng `KiemTraTraPhongAnh` đã tạo trên HOMEDORM4 |
 | `feat/t22-backend` (Claude) | Khách tự giữ chỗ, từ chối → "Đã xem", "Không thuê nữa", "Khách không đến" | Có code + test đầu vào; SQL chưa chạy lên HOMEDORM4; chưa nối giao diện; chưa gộp vào nhánh tích hợp (việc C5) |
 | `docs/review-branch-workflow` | Quy tắc "không push main" | Nội dung đã có trong AGENTS.md; xóa được |
 
@@ -57,7 +58,7 @@ Sau khi merge nhánh tích hợp, xóa được trên GitHub: 5 nhánh đã gộ
 | Mức | Mục | Quyết định | Trạng thái |
 |---|---|---|---|
 | **Phải có** (trên đường demo) | Điều khoản hợp đồng + phiên bản chính sách + mã băm ảnh hợp đồng vào gói bàn giao | D-027, D-031, D-034 | **Xong code + test (C1)**; migration đã chạy; chưa chạy thật qua giao diện |
-| | Màn kiểm tra trả phòng so trước/sau | D-030 | Chưa làm (C2) |
+| | Màn kiểm tra trả phòng so trước/sau | D-030 | **Xong code + test (C2, J-C064)**; bảng ảnh đã tạo; HOMEDORM4 chưa có phiếu trả phòng của hợp đồng nên chưa thử dữ liệu thật |
 | | Bản nháp đối soát tự soạn; thu thêm qua ví | D-030 | Chưa làm (C3) |
 | | Tự thanh lý 3 trường hợp + gói bằng chứng cuối + "Thanh lý không có xác nhận của khách" | D-030, D-031, D-038 | Chưa làm (C4) |
 | | Điều khoản xác nhận điện tử trong mẫu hợp đồng; ô đồng ý dữ liệu cá nhân | D-038 | Chưa làm (C6) |
@@ -70,14 +71,14 @@ Sau khi merge nhánh tích hợp, xóa được trên GitHub: 5 nhánh đã gộ
 | | Đổi người đại diện bằng email mời | D-026 | Giữ cách tạm |
 | **Sau bản thi** | Mốc chuỗi 3; cấp lại ví khi mất email (P-04) | D-031 | Không làm |
 
-## Chia việc giữa Claude và Codex (Vy đồng ý 2026-11-11, J-C061)
+## Chia việc giữa Claude và Codex (Vy chia lại 2026-11-11 15:3x, J-C064; thay bảng J-C061)
 
 Nguyên tắc: mỗi file chỉ một người sửa. Chi tiết và prompt: [viec-cho-agent.md](viec-cho-agent.md).
 
 | Người | Việc |
 |---|---|
-| **Claude** | Giao diện chung và màn khách/giám khảo nhìn: B0 (xong), B1, B5, B2; phần giao diện C5; hồ sơ nộp D1–D3 |
-| **Codex** | Fuji A2, A3; C6; B7; chuỗi trả phòng C2 (+B3), C3 (+B4), C4; phần backend C5; dọn dẹp E1–E3 |
+| **Claude** | Chuỗi trả phòng: C2 + B3 (xong), C3 + B4, C4; hồ sơ nộp D1–D3 (bản nháp xong, điền số liệu Fuji sau); C5 đề xuất làm sau C4 |
+| **Codex** | Fuji A2, A3 trước; sau đó giao diện B1, B2, B5, B7 và C6; dọn dẹp E1–E3 |
 | **Vy** | Faucet; merge PR; chạy luồng thật cùng A3 (OTP, các vai trò); trả lời Q-07; dựng slide, quay video |
 
 ## Lưu ý khi chạy thật (từ đợt xem code J-C060)
@@ -94,6 +95,7 @@ Nguyên tắc: mỗi file chỉ một người sửa. Chi tiết và prompt: [vi
 - `blockchain npm test`: 18 qua, 1 bỏ qua (test SQL), 0 lỗi.
 - `web/backend npm test`: 31 qua, 1 bỏ qua, 0 lỗi.
 - `web/frontend`: `vite build` qua (cảnh báo kích thước gói); `test:avalanche-ui` qua; `test:handover-ui` qua.
+- Nhánh `feat/t22-checkout` (J-C064, 2026-11-11 15:4x): backend `npm test` 36 qua/1 bỏ qua (thêm 5 test C2); build qua; `test:avalanche-ui`, `test:shell-ui`, `test:list-kit`, `test:handover-ui` qua; `ui-checkout-compare.mjs` mới qua ở 1440/390px (dữ liệu giả). Migration `checkout-photos:db:migrate` chạy 2 lần trên HOMEDORM4: bảng 9 cột, 0 dòng.
 - Nhánh `feat/ui-list-b1` (J-C062, 2026-11-11 15:1x): build qua; `test:avalanche-ui` qua; `test:shell-ui` qua; `test:list-kit` mới qua (Kế toán xác nhận tiền về, tiền mặt chờ nộp quỹ, Quản lý duyệt nhận cọc, trạng thái đang tải; 1440 và 390px; dữ liệu giả).
 - Nhánh `feat/ui-shared-shell` (J-C061): build qua; `test:avalanche-ui`, `test:handover-ui` qua; `test:shell-ui` mới qua (5 vai trò dùng chung khung, menu điện thoại mở/chuyển/đóng bằng Escape, mở được mọi tab không khóa của khách, Sale, quản lý, kế toán; Admin chỉ kiểm khung và menu); 14 ảnh `ui-screens` không lỗi, không tràn ngang; backend 31 qua.
 - **Không chạy**: test cần SQL Server, luồng qua giao diện với tài khoản thật, Privy thật, Fuji. Các script chụp ảnh giao diện của Codex (`ui-sale-*.mjs`) không chạy lại.
