@@ -116,6 +116,7 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
    - Email cho khách và Sale, nêu lựa chọn ký với người còn lại hoặc dừng.
 5. **Người đại diện bị loại:** gửi **email mời** người khác tạo tài khoản để làm đại diện. Làm **sau cùng**; tạm thời Sale lập hồ sơ mới.
 6. **CCCD gốc** được đối chiếu **một lần duy nhất, lúc ký hợp đồng giấy** (giai đoạn 5), bằng ô tích bắt buộc.
+7. *(D-038)* Khi khai người ở, người đại diện **bắt buộc tích ô xác nhận** các thành viên đồng ý cung cấp thông tin để làm thủ tục thuê và đăng ký tạm trú. CCCD không vào gói bằng chứng, không lên chuỗi.
 
 ### 3.5 Giai đoạn 5: Hợp đồng và kỳ đầu, "một lần đến" (D-027, D-024, D-018)
 
@@ -128,6 +129,8 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
    - **CCCD không khớp** → chưa ký, hồ sơ quay về khai lại; tiền kỳ đầu đã trả giữ cho lần sau, hoặc hoàn nếu khách dừng thuê.
 4. **Sale chụp/scan hợp đồng đã ký và tải lên.** Mã băm file + **điều khoản chính** (mã hợp đồng, giá thuê, kỳ hạn, tiền cọc, phiên bản chính sách) đi vào **gói bằng chứng bàn giao**. **Không sửa contract.**
 5. Hợp đồng **vẫn ký giấy, không ký trên chuỗi.**
+6. *(D-038)* Mẫu hợp đồng giấy có điều khoản: hai bên đồng ý dùng **xác nhận điện tử** trên hệ thống cho biên bản bàn giao và đối soát; quá 7 ngày không phản hồi thì bên cho thuê được xử lý theo hợp đồng.
+7. *(D-034, đã có code)* Để phát hành biên bản bàn giao, hệ thống đòi đủ hai thứ: khách đã thấy bản chính sách hoàn cọc lưu theo phiếu cọc (phiếu cũ phải bấm xác nhận bổ sung) và Sale đã tải ảnh hợp đồng đã ký. Thiếu thì biên bản Web2 vẫn lập được nhưng chưa gửi được cho khách xác nhận; màn quản lý hiện lý do.
 
 **C1 / D-034:** điều khoản/gói bàn giao lấy tiền cọc từ `PhieuDatCoc.SoTienCoc`, chưa trừ hoàn một phần. Hồ sơ cũ phải bổ sung ảnh hợp đồng đã ký và khách xác nhận chính sách trước khi phát hành v2; không bịa lại lịch sử chính sách lúc cọc. Bằng chứng v1 đã phát hành vẫn đọc/kiểm chứng được, không sửa bản đã khóa.
 
@@ -155,6 +158,7 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
 5. **Thu thêm** (khách nợ): trả **qua ví mô phỏng** (hoặc tiền mặt/chuyển khoản kế toán ghi nhận), **trả trước khi thanh lý**.
 6. **Phiếu thu nợ và phiếu hoàn cọc PHẢI khác loại** (bài học từ code nhóm Hằng: dùng chung một loại làm trang khách hiện nợ thành tiền được hoàn).
 7. **Khách không phản hồi:** email nhắc 24 giờ và 72 giờ; **quá 7 ngày → "Quá hạn phản hồi"**, quản lý liên hệ trực tiếp. **Không bao giờ tự chấp nhận thay trên chuỗi.**
+8. *(D-038)* **Đường thoát:** nếu khách vẫn im lặng, phản đối kéo dài, hoặc chưa từng xác nhận bàn giao (khi đó chuỗi không cho lập đối soát), quản lý dùng thao tác Web2 **"Thanh lý không có xác nhận của khách"**: bắt buộc ghi lý do và đính kèm bằng chứng đã liên hệ. Chuỗi vẫn ghi đúng là khách chưa đồng ý; gói bằng chứng cuối ghi rõ "đóng không có xác nhận của khách".
 
 ### 3.9 Giai đoạn 9: Thanh toán cuối và đóng hồ sơ (D-030, D-031)
 
@@ -165,6 +169,7 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
 | Khách **trả thêm** | Khách đồng ý đối soát **và** đã trả xong |
 | Khách **được hoàn** | Khách đồng ý đối soát **và** kế toán đã chi, **có chứng từ** |
 | **Bằng 0** | Khách đồng ý đối soát (vẫn phải đóng được hồ sơ) |
+| **Không có xác nhận** *(D-038)* | Quản lý bấm "Thanh lý không có xác nhận của khách", có lý do và bằng chứng |
 
 Đủ điều kiện → **hệ thống tự thanh lý hợp đồng và đóng hồ sơ**. **Bỏ** bước thanh lý tay và biên bản trả phòng giấy (chữ ký điện tử ở mốc 2 thay thế).
 
@@ -266,7 +271,8 @@ Email có chống trùng theo từng lần gửi; lỗi gửi không làm hỏng
 | 8 Trả phòng | **D-030**, D-004 (không khai báo thanh toán on-chain) |
 | 9 Đóng hồ sơ | **D-030** (5), **D-031** (1) |
 | Web3 chung | D-002 (ví + gas), D-003, D-012, D-014 (token dự phòng) |
-| Giao diện, lịch | D-025 (UI trước Fuji; đợt 2 hạn 13/11), D-032 (quy chuẩn icon/form) |
+| Giao diện, lịch | **D-037 (Fuji trước, T-22 theo mức ưu tiên; thay lịch D-025)**, D-025 (ràng buộc thiết kế), D-032 (icon/form), D-033 (danh sách), D-035, D-036 (không gian Sale) |
+| Bổ sung thực tế | **D-038** (đường thoát khi khách im lặng, điều khoản xác nhận điện tử, ô đồng ý dữ liệu cá nhân), D-034 (nguồn tiền cọc và điều kiện phát hành bàn giao) |
 
 In đậm = quyết định của đợt bàn lại luồng ngày 10/11/2026.
 
@@ -277,8 +283,7 @@ In đậm = quyết định của đợt bàn lại luồng ngày 10/11/2026.
 | Mã | Việc | Ai | Ghi chú |
 |---|---|---|---|
 | Q-10 | BTC có cấp gói Privy Scale (JWT) để bỏ OTP không | Vy nhắn BTC | Có → bật D-011; không → giữ OTP (D-015) |
-| Q-01 | D-034 chốt C1 dùng `PhieuDatCoc.SoTienCoc`, chưa trừ hoàn một phần; đối soát vẫn chặn nếu khác cọc đã xác nhận | Vy đã chốt C1 | Nguồn tiền sau hoàn/cấn trừ ở D-026 ngoài C1 còn cần thiết kế |
-| Q-02 | Đã rõ từ code: dùng bảng 80/50/70/100% theo thời gian ở; không có quy định báo trước | — | Đóng nếu Vy đồng ý |
+| Q-01 | Tiền cọc ghi lên chuỗi: giữ số trên phiếu cọc (D-034). Khi làm mục "thành viên bị loại được hoàn 80%" (mục 3.4) thì "cọc còn giữ" = cọc trên phiếu trừ phần đã hoàn (D-038) | AI làm mục đó | Mục này đang xếp "để sau nếu trễ" |
 | Q-05 | SQL demo, RPC, AVAX thử cho Fuji đã sẵn sàng chưa | Kiểm tra môi trường | Không gửi khóa bí mật qua chat |
 | Q-06 | Giờ đóng cổng, deadline chính thức | Theo thông báo BTC | 20/11 là mục tiêu nội bộ, hạn thi 21/11 |
 | Q-07 | Ghi công và đồng ý của thành viên nhóm cũ | Vy | Cho README/nộp bài |

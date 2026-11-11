@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { hopDongApi } from './hopDong.api.js';
-import SignedContractUpload from '../../components/common/SignedContractUpload.jsx';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import './lapHopDongTab.css';
+import SaleContractList from './SaleContractList.jsx';
+import '../../styles/contractPresentation.css';
+import SignedContractUpload from '../../components/common/SignedContractUpload.jsx';
 
 const STEPS = [
   { id: 1, label: 'Tra cứu phiếu cọc' },
@@ -37,12 +39,12 @@ function StepIndicator({ current }) {
   );
 }
 
-export default function LapHopDongTab() {
+export default function LapHopDongTab({ onResidence }) {
   const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [searchText, setSearchText] = useState('');
   const [ngayTaoFilter, setNgayTaoFilter] = useState('');
-  
+
   // Data lists from API
   const [phieuCocs, setPhieuCocs] = useState([]);
   const [services, setServices] = useState([]);
@@ -175,7 +177,7 @@ export default function LapHopDongTab() {
       } catch {
         // Hồ sơ cư trú chưa duyệt: giữ luồng nhập thành viên thủ công hiện có.
       }
-      
+
       // Auto-set estimated dates based on ThoiGianNhanPhong
       if (details?.thoiGianNhanPhong) {
         const start = new Date(details.thoiGianNhanPhong);
@@ -243,7 +245,7 @@ export default function LapHopDongTab() {
     try {
       setLoading(true);
       setErrorMsg('');
-      
+
       // Check members list using database SP validation logic
       const res = await hopDongApi.kiemTraThanhVienHopDongTam(selectedPhieu.maPhieuDatCoc, thanhVien);
       const result = res.data;
@@ -442,7 +444,7 @@ export default function LapHopDongTab() {
       </div>
     );
     const articleTitle = (index, title) => (
-      <h4 style={{ textTransform: 'uppercase' }}>
+      <h4 className={["lhd-display-001"].filter(Boolean).join(" ")}>
         ĐIỀU {index}. {title}
       </h4>
     );
@@ -452,35 +454,35 @@ export default function LapHopDongTab() {
 
     return (
       <div className="ktp-modal-overlay" onClick={closeModal}>
-        <div className="ktp-modal" onClick={e => e.stopPropagation()} style={{ width: '980px', maxWidth: '96vw', maxHeight: '94vh', display: 'flex', flexDirection: 'column' }}>
+        <div className={["ktp-modal", "lhd-display-002"].filter(Boolean).join(" ")} onClick={e => e.stopPropagation()} >
           <div className="lhd-modal-topbar">
             <div className="lhd-modal-topbar-icon"><Icon name="description" /></div>
-            <div style={{ flex: 1 }}>
-              <h3 style={{ margin: 0, fontSize: '17px', fontWeight: '800', color: '#191c1d' }}>Bản xem hợp đồng thuê</h3>
-              <p style={{ margin: '2px 0 0', fontSize: '13px', color: '#6f797a' }}>Mã hợp đồng: {savedHD.maHopDong}</p>
+            <div className={["lhd-display-003"].filter(Boolean).join(" ")}>
+              <h3 className={["lhd-display-004"].filter(Boolean).join(" ")}>Bản xem hợp đồng thuê</h3>
+              <p className={["lhd-display-005"].filter(Boolean).join(" ")}>Mã hợp đồng: {savedHD.maHopDong}</p>
             </div>
-            <button 
+            <button
               onClick={() => window.print()}
-              className="lhd-btn lhd-btn-outline" 
-              style={{ padding: '6px 14px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', marginRight: '8px' }}
+              className={["lhd-btn lhd-btn-outline", "lhd-display-006"].filter(Boolean).join(" ")}
+
             >
-              <Icon name="print" style={{ fontSize: '18px' }} /> In hợp đồng
+              <Icon name="print" className={["lhd-display-007"].filter(Boolean).join(" ")} /> In hợp đồng
             </button>
-            <button onClick={closeModal} className="lhd-modal-close-btn"><Icon name="close" style={{ fontSize: '22px' }} /></button>
+            <button onClick={closeModal} className="lhd-modal-close-btn"><Icon name="close" className={["lhd-display-008"].filter(Boolean).join(" ")} /></button>
           </div>
 
-          <div style={{ flex: 1, overflowY: 'auto' }} className="lhd-print-overlay">
+          <div  className={["lhd-print-overlay", "lhd-display-009"].filter(Boolean).join(" ")}>
             <SignedContractUpload key={savedHD.maHopDong} contractId={savedHD.maHopDong} />
             <article id="print-area-wrapper" className="contract-paper-a4">
-              <header style={{ textAlign: 'center', marginBottom: '24px' }}>
-                <div style={{ fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.01em' }}>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
-                <div style={{ fontWeight: '800', display: 'inline-block', borderBottom: '1px solid #111819', padding: '0 14px 3px' }}>Độc lập - Tự do - Hạnh phúc</div>
-                <h2 style={{ margin: '42px 0 0', fontSize: '25px', fontWeight: '900', textTransform: 'uppercase', lineHeight: 1.12 }}>HỢP ĐỒNG THUÊ CHỖ Ở NỘI TRÚ</h2>
-                <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '2px' }}>HOMESTAYDORM</div>
-                <div style={{ fontSize: '18px', fontStyle: 'italic' }}>Số: {savedHD.maHopDong || '.....'}/HĐ-HSD</div>
+              <header className={["lhd-display-010"].filter(Boolean).join(" ")}>
+                <div className={["lhd-display-011"].filter(Boolean).join(" ")}>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+                <div className={["lhd-display-012"].filter(Boolean).join(" ")}>Độc lập - Tự do - Hạnh phúc</div>
+                <h2 className={["lhd-display-013"].filter(Boolean).join(" ")}>HỢP ĐỒNG THUÊ CHỖ Ở NỘI TRÚ</h2>
+                <div className={["lhd-display-014"].filter(Boolean).join(" ")}>HOMESTAYDORM</div>
+                <div className={["lhd-display-015"].filter(Boolean).join(" ")}>Số: {savedHD.maHopDong || '.....'}/HĐ-HSD</div>
               </header>
 
-              <section style={{ marginBottom: '10px' }}>
+              <section className={["lhd-display-016"].filter(Boolean).join(" ")}>
                 {legalBase('Căn cứ Bộ Luật Dân sự số 91/2015/QH13 ngày 24/11/2015 của Quốc hội Nước Cộng hòa Xã hội Chủ nghĩa Việt Nam;')}
                 {legalBase('Căn cứ nhu cầu thuê chỗ ở của Bên B và khả năng cung cấp chỗ ở của HomeStayDorm;')}
                 {legalBase('Căn cứ thông tin đặt cọc, hồ sơ cư trú đã được đối chiếu và kết quả thỏa thuận giữa hai bên.')}
@@ -490,15 +492,15 @@ export default function LapHopDongTab() {
                 Hôm nay, ngày <strong>{signedDay}</strong> tháng <strong>{signedMonth}</strong> năm <strong>{signedYear}</strong>, tại <strong>{savedHD.diaChiChiNhanh || 'HomeStayDorm'}</strong>, hai bên gồm:
               </p>
 
-              <section style={{ marginTop: '8px', marginBottom: '8px' }}>
-                <div style={{ fontWeight: '900', textTransform: 'uppercase' }}>BÊN CHO THUÊ (Bên A): {savedHD.benChoThue || 'HomeStayDorm'}</div>
+              <section className={["lhd-display-017"].filter(Boolean).join(" ")}>
+                <div className={["lhd-display-018"].filter(Boolean).join(" ")}>BÊN CHO THUÊ (Bên A): {savedHD.benChoThue || 'HomeStayDorm'}</div>
                 {contractRow('Tên đơn vị', savedHD.benChoThue)}
                 {contractRow('Đại diện', daiDienBenA)}
                 {contractRow('Chức vụ', 'Nhân viên sale')}
                 {contractRow('Địa chỉ chi nhánh', savedHD.diaChiChiNhanh)}
               </section>
-              <section style={{ marginBottom: '10px' }}>
-                <div style={{ fontWeight: '900', textTransform: 'uppercase' }}>BÊN THUÊ CHỖ Ở (Bên B):</div>
+              <section className={["lhd-display-016"].filter(Boolean).join(" ")}>
+                <div className={["lhd-display-018"].filter(Boolean).join(" ")}>BÊN THUÊ CHỖ Ở (Bên B):</div>
                 {contractRow('Họ tên', savedHD.benThue)}
                 {contractRow('CCCD/Hộ chiếu', savedHD.cccdBenThue)}
                 {contractRow('Mã khách hàng', savedHD.maKhachHang)}
@@ -516,16 +518,16 @@ export default function LapHopDongTab() {
               <table>
                 <tbody>
                   <tr>
-                    <td style={{ width: '44%', fontWeight: '700' }}>{giaTheoHinhThuc}</td>
-                    <td style={{ fontWeight: '800', color: '#a43c12' }}>{formatMoney(savedHD.giaThueThang)}</td>
+                    <td className={["lhd-display-019"].filter(Boolean).join(" ")}>{giaTheoHinhThuc}</td>
+                    <td className={["lhd-display-020"].filter(Boolean).join(" ")}>{formatMoney(savedHD.giaThueThang)}</td>
                   </tr>
                   <tr>
-                    <td style={{ fontWeight: '700' }}>Kỳ thanh toán</td>
-                    <td style={{ fontWeight: '800' }}>{kyThanhToan}</td>
+                    <td className={["lhd-display-021"].filter(Boolean).join(" ")}>Kỳ thanh toán</td>
+                    <td className={["lhd-display-022"].filter(Boolean).join(" ")}>{kyThanhToan}</td>
                   </tr>
                   <tr>
-                    <td style={{ fontWeight: '700' }}>Tiền đặt cọc đã nhận</td>
-                    <td style={{ fontWeight: '800', color: '#a43c12' }}>{formatMoney(savedHD.soTienCoc)}</td>
+                    <td className={["lhd-display-021"].filter(Boolean).join(" ")}>Tiền đặt cọc đã nhận</td>
+                    <td className={["lhd-display-020"].filter(Boolean).join(" ")}>{formatMoney(savedHD.soTienCoc)}</td>
                   </tr>
                 </tbody>
               </table>
@@ -549,9 +551,9 @@ export default function LapHopDongTab() {
                   {quyDinhHoanCoc.length > 0 ? (
                     quyDinhHoanCoc.map((qd) => (
                       <tr key={qd.maQuyDinhHoanCoc}>
-                        <td style={{ width: '100px', fontWeight: '700' }}>{qd.maQuyDinhHoanCoc}</td>
+                        <td className={["lhd-display-023"].filter(Boolean).join(" ")}>{qd.maQuyDinhHoanCoc}</td>
                         <td>{qd.tenQuyDinh}</td>
-                        <td style={{ width: '130px', fontWeight: '800', color: '#1b6f6d' }}>{Number(qd.tyLeHoanCoc || 0).toLocaleString('vi-VN')}%</td>
+                        <td className={["lhd-display-024"].filter(Boolean).join(" ")}>{Number(qd.tyLeHoanCoc || 0).toLocaleString('vi-VN')}%</td>
                       </tr>
                     ))
                   ) : (
@@ -578,8 +580,8 @@ export default function LapHopDongTab() {
                 <tbody>
                   {(savedHD.dichVu || []).map((dv, i) => (
                     <tr key={i}>
-                      <td style={{ width: '54px' }}>{i + 1}</td>
-                      <td style={{ fontWeight: '700' }}>{dv.tenDichVu}</td>
+                      <td className={["lhd-display-025"].filter(Boolean).join(" ")}>{i + 1}</td>
+                      <td className={["lhd-display-021"].filter(Boolean).join(" ")}>{dv.tenDichVu}</td>
                       <td>{formatMoney(dv.donGia)}</td>
                       <td>{dv.donViTinh}</td>
                       <td>Tính theo mức sử dụng hoặc chính sách dịch vụ tại thời điểm thanh toán.</td>
@@ -601,8 +603,8 @@ export default function LapHopDongTab() {
                 <tbody>
                   {(savedHD.thanhVien || []).map((tv, i) => (
                     <tr key={i}>
-                      <td style={{ width: '54px' }}>{i + 1}</td>
-                      <td style={{ fontWeight: '700' }}>{tv.hoTen}</td>
+                      <td className={["lhd-display-025"].filter(Boolean).join(" ")}>{i + 1}</td>
+                      <td className={["lhd-display-021"].filter(Boolean).join(" ")}>{tv.hoTen}</td>
                       <td>{tv.quanHe || 'Thành viên'}</td>
                       <td>{tv.sdt || '-'}</td>
                     </tr>
@@ -615,23 +617,23 @@ export default function LapHopDongTab() {
                 <table>
                   <thead>
                     <tr>
-                      <th style={{ width: '40px' }}>STT</th>
-                      <th style={{ width: '220px' }}>Nội dung</th>
+                      <th className={["lhd-display-026"].filter(Boolean).join(" ")}>STT</th>
+                      <th className={["lhd-display-027"].filter(Boolean).join(" ")}>Nội dung</th>
                       <th>Quy định cụ thể</th>
                     </tr>
                   </thead>
                   <tbody>
                     {noiQuyList.map((nq, i) => (
                       <tr key={nq.maQuyDinh || i}>
-                        <td style={{ width: '40px' }}>{i + 1}</td>
-                        <td style={{ fontWeight: '700' }}>{nq.tieuDeNoiQuy}</td>
+                        <td className={["lhd-display-026"].filter(Boolean).join(" ")}>{i + 1}</td>
+                        <td className={["lhd-display-021"].filter(Boolean).join(" ")}>{nq.tieuDeNoiQuy}</td>
                         <td>{nq.noiDung}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               ) : (
-                <p style={{ color: '#888', fontStyle: 'italic' }}>Chưa có dữ liệu nội quy.</p>
+                <p className={["lhd-display-028"].filter(Boolean).join(" ")}>Chưa có dữ liệu nội quy.</p>
               )}
 
               {articleTitle(7, 'Điều khoản xử lý vi phạm')}
@@ -639,19 +641,19 @@ export default function LapHopDongTab() {
                 <table>
                   <thead>
                     <tr>
-                      <th style={{ width: '40px' }}>STT</th>
+                      <th className={["lhd-display-026"].filter(Boolean).join(" ")}>STT</th>
                       <th>Điều khoản vi phạm</th>
-                      <th style={{ width: '120px' }}>Hình thức</th>
-                      <th style={{ width: '130px' }}>Mức phạt</th>
+                      <th className={["lhd-display-029"].filter(Boolean).join(" ")}>Hình thức</th>
+                      <th className={["lhd-display-030"].filter(Boolean).join(" ")}>Mức phạt</th>
                     </tr>
                   </thead>
                   <tbody>
                     {dieuKhoanViPham.map((dk, i) => (
                       <tr key={dk.maDieuKhoan || i}>
-                        <td style={{ width: '40px' }}>{i + 1}</td>
-                        <td style={{ fontWeight: '700' }}>{dk.tenDieuKhoan}</td>
+                        <td className={["lhd-display-026"].filter(Boolean).join(" ")}>{i + 1}</td>
+                        <td className={["lhd-display-021"].filter(Boolean).join(" ")}>{dk.tenDieuKhoan}</td>
                         <td>{dk.hinhThucXuPhat}</td>
-                        <td style={{ fontWeight: '800', color: dk.mucPhat > 0 ? '#a43c12' : '#1b6f6d' }}>
+                        <td className={["lhd-display-022", dk.mucPhat > 0 ? "lhd-display-031" : "lhd-display-032"].filter(Boolean).join(" ")}>
                           {dk.mucPhat > 0 ? `${Number(dk.mucPhat).toLocaleString('vi-VN')}đ` : 'Nhắc nhở'}
                         </td>
                       </tr>
@@ -659,7 +661,7 @@ export default function LapHopDongTab() {
                   </tbody>
                 </table>
               ) : (
-                <p style={{ color: '#888', fontStyle: 'italic' }}>Chưa có dữ liệu điều khoản vi phạm.</p>
+                <p className={["lhd-display-028"].filter(Boolean).join(" ")}>Chưa có dữ liệu điều khoản vi phạm.</p>
               )}
 
               {articleTitle(8, 'Cam kết chung')}
@@ -667,25 +669,25 @@ export default function LapHopDongTab() {
                 Hai bên cam kết thực hiện đúng các nội dung đã thỏa thuận trong hợp đồng. Hợp đồng có hiệu lực kể từ ngày ký và là căn cứ để thực hiện các bước thu tiền nhận phòng, bàn giao phòng/giường và quản lý lưu trú.
               </p>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', marginTop: '42px', textAlign: 'center' }}>
+              <div className={["lhd-display-033"].filter(Boolean).join(" ")}>
                 <div>
-                  <div style={{ fontWeight: '800', textTransform: 'uppercase' }}>Đại diện bên A</div>
-                  <div style={{ color: '#5f6b6c', fontSize: '13px' }}>(Ký, ghi rõ họ tên)</div>
-                  <div style={{ height: '74px' }} />
-                  <div style={{ fontWeight: '700' }}>{daiDienBenA}</div>
-                  <div style={{ color: '#5f6b6c', fontSize: '13px' }}>Nhân viên sale</div>
+                  <div className={["lhd-display-034"].filter(Boolean).join(" ")}>Đại diện bên A</div>
+                  <div className={["lhd-display-035"].filter(Boolean).join(" ")}>(Ký, ghi rõ họ tên)</div>
+                  <div className={["lhd-display-036"].filter(Boolean).join(" ")} />
+                  <div className={["lhd-display-021"].filter(Boolean).join(" ")}>{daiDienBenA}</div>
+                  <div className={["lhd-display-035"].filter(Boolean).join(" ")}>Nhân viên sale</div>
                 </div>
                 <div>
-                  <div style={{ fontWeight: '800', textTransform: 'uppercase' }}>Bên thuê</div>
-                  <div style={{ color: '#5f6b6c', fontSize: '13px' }}>(Ký, ghi rõ họ tên)</div>
-                  <div style={{ height: '74px' }} />
-                  <div style={{ fontWeight: '700' }}>{savedHD.benThue || '........................'}</div>
+                  <div className={["lhd-display-034"].filter(Boolean).join(" ")}>Bên thuê</div>
+                  <div className={["lhd-display-035"].filter(Boolean).join(" ")}>(Ký, ghi rõ họ tên)</div>
+                  <div className={["lhd-display-036"].filter(Boolean).join(" ")} />
+                  <div className={["lhd-display-021"].filter(Boolean).join(" ")}>{savedHD.benThue || '........................'}</div>
                 </div>
               </div>
             </article>
           </div>
 
-          <div style={{ padding: '14px 20px', borderTop: '1px solid #d9e2e3', backgroundColor: '#fff', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+          <div className={["lhd-display-037"].filter(Boolean).join(" ")}>
             <button onClick={closeModal} className="lhd-btn lhd-btn-primary">Đóng</button>
           </div>
         </div>
@@ -693,143 +695,15 @@ export default function LapHopDongTab() {
     );
   };
 
-  /* ─── STEP 1 ─── */
-  if (step === 1) return (
-    <div className="lhd-container">
-      <StepIndicator current={1} />
-      
-      {errorMsg && (
-        <div className="lhd-alert lhd-alert-danger">
-          <div className="lhd-alert-icon"><Icon name="error" /></div>
-          <div>{errorMsg}</div>
-        </div>
-      )}
-
-      <div className="lhd-card ui-list-toolbar">
-        <label className="lhd-form-group ui-list-search">
-          <span className="lhd-label ui-search-label">Tìm kiếm</span>
-          <Icon name="search" />
-<input
-            className="lhd-input" 
-            placeholder="Tra cứu theo mã phiếu, tên khách hàng, số điện thoại..." 
-            value={searchText} 
-            onChange={e => {
-              const val = e.target.value;
-              setSearchText(val);
-              loadPhieuCocs(val, ngayTaoFilter);
-            }} 
-          />
-        </label>
-        <div className="lhd-form-group">
-          <label className="lhd-label">Ngày tạo</label>
-          <input 
-            type="date" 
-            className="lhd-input" 
-            value={ngayTaoFilter} 
-            onChange={e => {
-              const val = e.target.value;
-              setNgayTaoFilter(val);
-              loadPhieuCocs(searchText, val);
-            }} 
-          />
-        </div>
-      </div>
-
-      <div className="lhd-table-wrapper">
-        <table className="lhd-table">
-          <thead>
-            <tr>
-              <th>PHIẾU CỌC</th>
-              <th>KHÁCH HÀNG</th>
-              <th>VỊ TRÍ</th>
-              <th>THÔNG TIN THUÊ</th>
-              <th className="text-center">TRẠNG THÁI</th>
-              <th className="text-center">THAO TÁC</th>
-            </tr>
-          </thead>
-          <tbody>
-            {phieuCocs.length === 0 ? (
-              <tr>
-                <td colSpan={6} style={{ textAlign: 'center', padding: '24px', color: '#6f797a' }}>
-                  Không tìm thấy phiếu đặt cọc nào chờ lập hợp đồng.
-                </td>
-              </tr>
-            ) : (
-              phieuCocs.map(p => {
-                const statusInfo = getPhieuStatusStyle(p);
-                const waitingForResidence = p.trangThaiHoSoCuTru !== 'Đã duyệt cư trú' && p.trangThaiCoc !== 'Đã lập HĐ';
-                return (
-                <tr key={p.maPhieuDatCoc}>
-                  <td>
-                    <div style={{ fontWeight: '700', color: 'var(--lhd-primary)' }}>{p.maPhieuDatCoc}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--lhd-text-muted)' }}>
-                      {p.thoiDiemDatCoc ? new Date(p.thoiDiemDatCoc).toLocaleDateString('vi-VN') : '-'}
-                    </div>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontWeight: '600', color: 'var(--lhd-text)' }}>{p.hoTenKhachHang}</div>
-                      <div style={{ fontSize: '12px', color: 'var(--lhd-text-muted)' }}>{p.sdt}</div>
-                    </div>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <div style={{ fontWeight: '600', color: 'var(--lhd-text)' }}>{p.viTriThue}</div>
-                      <div style={{ fontSize: '12px', color: 'var(--lhd-text-muted)' }}>{p.hinhThucThue}</div>
-                    </div>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <div style={{ fontWeight: '600', color: 'var(--lhd-text)' }}>{formatRentPerMonth(p.tongGiaThue ?? p.giaThue)}</div>
-                      <div style={{ fontSize: '12px', color: 'var(--lhd-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Icon name="calendar_today" style={{ fontSize: '12px' }} /> 
-                        {p.thoiGianNhanPhong ? new Date(p.thoiGianNhanPhong).toLocaleDateString('vi-VN') : 'Chưa định ngày'}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="text-center">
-                    <span className={`lhd-badge ${statusInfo.class}`}>
-                      {statusInfo.label}
-                    </span>
-                  </td>
-                  <td className="text-center">
-                    {p.coTheLapHopDong ? (
-                      <button 
-                        className="lhd-btn lhd-btn-primary" 
-                        style={{ padding: '7px 16px', fontSize: '13px', width: '160px' }}
-                        onClick={() => handleSelectPhieu(p)}
-                      >
-                        Lập hợp đồng
-                      </button>
-                    ) : waitingForResidence ? (
-                      <button
-                        className="lhd-btn"
-                        disabled
-                        title="Phiếu này phải được quản lý duyệt cư trú trước khi lập hợp đồng."
-                        style={{ backgroundColor: '#bec8c9', color: '#fff', padding: '7px 16px', fontSize: '13px', cursor: 'not-allowed', width: '160px' }}
-                      >
-                        Chờ duyệt cư trú
-                      </button>
-                    ) : (
-                      <button 
-                        className="lhd-btn lhd-btn-outline" 
-                        style={{ padding: '7px 16px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '160px' }}
-                        onClick={() => handleViewContract(p.maPhieuDatCoc)}
-                      >
-                        Xem hợp đồng
-                      </button>
-                    )}
-                  </td>
-                </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-      {renderChiTietModal()}
-    </div>
-  );
+  /* List-first entry; the existing handlers own every contract transition. */
+  if (step === 1) return <div className="lhd-container sale-contract-landing">
+    <SaleContractList rows={phieuCocs} loading={loading} error={errorMsg} search={searchText}
+      onSearch={value => { setSearchText(value); loadPhieuCocs(value, ngayTaoFilter); }}
+      date={ngayTaoFilter} onDate={value => { setNgayTaoFilter(value); loadPhieuCocs(searchText, value); }}
+      onSelect={handleSelectPhieu} onView={handleViewContract} onResidence={onResidence}
+      branch={user?.tenChiNhanh || user?.maChiNhanh} formatRent={formatRentPerMonth} statusInfo={getPhieuStatusStyle} />
+    {renderChiTietModal()}
+  </div>;
 
   /* ─── STEP 2 ─── */
   if (step === 2) {
@@ -843,84 +717,74 @@ export default function LapHopDongTab() {
     return (
       <div className="lhd-container">
         <StepIndicator current={2} />
-        
+
         <div className="lhd-grid-2">
-          <div className="lhd-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h4 style={{ margin: 0, fontSize: '15px', fontWeight: '700', color: 'var(--lhd-text)' }}>Thông tin phiếu đặt cọc</h4>
+          <div className={["lhd-card", "lhd-display-038"].filter(Boolean).join(" ")} >
+            <div className={["lhd-display-039"].filter(Boolean).join(" ")}>
+              <h4 className={["lhd-display-040"].filter(Boolean).join(" ")}>Thông tin phiếu đặt cọc</h4>
               <span className="lhd-badge lhd-badge-warning">{selectedPhieu?.maPhieuDatCoc}</span>
             </div>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '14px', borderBottom: '1px solid var(--lhd-border-light)', paddingBottom: '12px' }}>
-              <span style={{ color: 'var(--lhd-text-muted)' }}>Khách hàng:</span>
-              <span style={{ fontWeight: '700', color: 'var(--lhd-text)' }}>{selectedPhieu?.hoTenKhachHang}</span>
+
+            <div className={["lhd-display-041"].filter(Boolean).join(" ")}>
+              <span className={["lhd-display-042"].filter(Boolean).join(" ")}>Khách hàng:</span>
+              <span className={["lhd-display-043"].filter(Boolean).join(" ")}>{selectedPhieu?.hoTenKhachHang}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '14px', borderBottom: '1px solid var(--lhd-border-light)', paddingBottom: '12px' }}>
-              <span style={{ color: 'var(--lhd-text-muted)' }}>Phòng thuê:</span>
-              <span style={{ fontWeight: '700', color: 'var(--lhd-text)' }}>{selectedPhieu?.viTriThue}</span>
+            <div className={["lhd-display-041"].filter(Boolean).join(" ")}>
+              <span className={["lhd-display-042"].filter(Boolean).join(" ")}>Phòng thuê:</span>
+              <span className={["lhd-display-043"].filter(Boolean).join(" ")}>{selectedPhieu?.viTriThue}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '14px', borderBottom: '1px solid var(--lhd-border-light)', paddingBottom: '12px' }}>
-              <span style={{ color: 'var(--lhd-text-muted)' }}>Giá thuê:</span>
-              <span style={{ fontWeight: '700', color: 'var(--lhd-secondary)' }}>{selectedPhieu?.giaThue?.toLocaleString('vi-VN')}đ/tháng</span>
+            <div className={["lhd-display-041"].filter(Boolean).join(" ")}>
+              <span className={["lhd-display-042"].filter(Boolean).join(" ")}>Giá thuê:</span>
+              <span className={["lhd-display-044"].filter(Boolean).join(" ")}>{selectedPhieu?.giaThue?.toLocaleString('vi-VN')}đ/tháng</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '14px', borderBottom: '1px solid var(--lhd-border-light)', paddingBottom: '12px' }}>
-              <span style={{ color: 'var(--lhd-text-muted)' }}>Trạng thái cọc:</span>
+            <div className={["lhd-display-041"].filter(Boolean).join(" ")}>
+              <span className={["lhd-display-042"].filter(Boolean).join(" ")}>Trạng thái cọc:</span>
               <span className={`lhd-badge ${selectedPhieu?.trangThaiCoc === 'Hiệu lực' ? 'lhd-badge-success' : 'lhd-badge-danger'}`}>
                 {selectedPhieu?.trangThaiCoc}
               </span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
-              <span style={{ color: 'var(--lhd-text-muted)' }}>Thanh toán cọc:</span>
-              <span style={{ fontWeight: '700', color: selectedPhieu?.trangThaiThanhToan === 'Đã TT' ? 'var(--lhd-success)' : 'var(--lhd-secondary)' }}>
+            <div className={["lhd-display-045"].filter(Boolean).join(" ")}>
+              <span className={["lhd-display-042"].filter(Boolean).join(" ")}>Thanh toán cọc:</span>
+              <span className={["lhd-display-021", selectedPhieu?.trangThaiThanhToan === 'Đã TT' ? "lhd-display-046" : "lhd-display-047"].filter(Boolean).join(" ")}>
                 {selectedPhieu?.trangThaiThanhToan === 'Đã TT' ? 'ĐÃ THANH TOÁN CỌC' : 'CHƯA THANH TOÁN CỌC'}
               </span>
             </div>
 
             {dieukienCheck.loading ? (
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', padding: '14px 16px', background: '#edf5f6', border: '1px solid #b7dbdd', borderRadius: '12px', color: '#0f5b5f', marginTop: '4px' }}>
-                <Icon name="sync" className="lhd-rotate" style={{ fontSize: '18px' }} />
-                <span style={{ fontSize: '13px', fontWeight: '500' }}>Đang đối chiếu dữ liệu hệ thống & kiểm tra điều kiện...</span>
+              <div className={["lhd-display-048"].filter(Boolean).join(" ")}>
+                <Icon name="sync" className={["lhd-rotate", "lhd-display-007"].filter(Boolean).join(" ")}  />
+                <span className={["lhd-display-049"].filter(Boolean).join(" ")}>Đang đối chiếu dữ liệu hệ thống & kiểm tra điều kiện...</span>
               </div>
             ) : dieukienCheck.hopLe ? (
-              <div className="lhd-alert lhd-alert-success" style={{ marginTop: '4px' }}>
+              <div className={["lhd-alert lhd-alert-success", "lhd-display-050"].filter(Boolean).join(" ")} >
                 <div className="lhd-alert-icon"><Icon name="check" /></div>
                 <div>
-                  <div style={{ fontWeight: '700', fontSize: '14px', marginBottom: '4px' }}>Đủ điều kiện lập hợp đồng</div>
-                  <div style={{ fontSize: '12px', lineHeight: '1.5' }}>{dieukienCheck.thongBao}</div>
+                  <div className={["lhd-display-051"].filter(Boolean).join(" ")}>Đủ điều kiện lập hợp đồng</div>
+                  <div className={["lhd-display-052"].filter(Boolean).join(" ")}>{dieukienCheck.thongBao}</div>
                 </div>
               </div>
             ) : (
-              <div className="lhd-alert lhd-alert-danger" style={{ marginTop: '4px' }}>
+              <div className={["lhd-alert lhd-alert-danger", "lhd-display-050"].filter(Boolean).join(" ")} >
                 <div className="lhd-alert-icon"><Icon name="close" /></div>
                 <div>
-                  <div style={{ fontWeight: '700', fontSize: '14px', marginBottom: '4px' }}>Không đủ điều kiện</div>
-                  <div style={{ fontSize: '12px', lineHeight: '1.5' }}>{dieukienCheck.thongBao || 'Vui lòng kiểm tra các mục bên phải.'}</div>
+                  <div className={["lhd-display-051"].filter(Boolean).join(" ")}>Không đủ điều kiện</div>
+                  <div className={["lhd-display-052"].filter(Boolean).join(" ")}>{dieukienCheck.thongBao || 'Vui lòng kiểm tra các mục bên phải.'}</div>
                 </div>
               </div>
             )}
           </div>
 
           <div className="lhd-card">
-            <h4 style={{ margin: '0 0 20px', fontSize: '15px', fontWeight: '700', color: 'var(--lhd-text)' }}>Điều kiện lập hợp đồng</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <h4 className={["lhd-display-053"].filter(Boolean).join(" ")}>Điều kiện lập hợp đồng</h4>
+            <div className={["lhd-display-054"].filter(Boolean).join(" ")}>
               {dieuKienItems.map((dk, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', backgroundColor: '#f5f7f8', borderRadius: '10px' }}>
-                  <span style={{ fontSize: '14px', color: 'var(--lhd-text)' }}>{dk.label}</span>
-                  <div style={{
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '50%',
-                    backgroundColor: dieukienCheck.loading ? '#e0e3e3' : (dk.met ? 'var(--lhd-success)' : 'var(--lhd-danger)'),
-                    color: dieukienCheck.loading ? '#6f797a' : '#fff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    <Icon 
-                      name={dieukienCheck.loading ? "sync" : (dk.met ? "check" : "close")} 
-                      className={dieukienCheck.loading ? "lhd-rotate" : ""} 
-                      style={{ fontSize: '14px' }} 
+                <div key={i} className={["lhd-display-055"].filter(Boolean).join(" ")}>
+                  <span className={["lhd-display-056"].filter(Boolean).join(" ")}>{dk.label}</span>
+                  <div className={["lhd-display-062", dieukienCheck.loading ? "lhd-display-057" : dk.met ? "lhd-display-058" : "lhd-display-059", dieukienCheck.loading ? "lhd-display-060" : "lhd-display-061"].filter(Boolean).join(" ")}>
+                    <Icon
+                      name={dieukienCheck.loading ? "sync" : (dk.met ? "check" : "close")}
+                      className={[dieukienCheck.loading ? "lhd-rotate" : "", "lhd-display-063"].filter(Boolean).join(" ")}
+
                     />
                   </div>
                 </div>
@@ -929,7 +793,7 @@ export default function LapHopDongTab() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '32px' }}>
+        <div className={["lhd-display-064"].filter(Boolean).join(" ")}>
           <button className="lhd-btn lhd-btn-outline" onClick={() => setStep(1)}><Icon name="arrow_back" /> Quay lại</button>
           <button
             disabled={!dieukienCheck.hopLe}
@@ -965,29 +829,29 @@ export default function LapHopDongTab() {
     return (
       <div className="lhd-container">
         <StepIndicator current={3} />
-        
+
         {hinhThucThue === 'Ghép giường' && thanhVien.length <= 1 ? (
-          <div className="lhd-card" style={{ marginBottom: '20px' }}>
-            <h4 style={{ margin: '0 0 10px', fontSize: '16px', color: 'var(--lhd-primary)' }}>Xử lý khách đi đơn</h4>
-            <p style={{ margin: 0, fontSize: '14px', color: 'var(--lhd-text-muted)', lineHeight: '1.6' }}>
+          <div className={["lhd-card", "lhd-display-065"].filter(Boolean).join(" ")} >
+            <h4 className={["lhd-display-066"].filter(Boolean).join(" ")}>Xử lý khách đi đơn</h4>
+            <p className={["lhd-display-067"].filter(Boolean).join(" ")}>
               Đối với hình thức thuê <strong>Ghép giường (Khách đi đơn)</strong>, hệ thống lập hợp đồng cho một thành viên cư trú đã đủ điều kiện.
             </p>
-            <div style={{ marginTop: '18px', border: '1px solid var(--lhd-border-light)', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#fff' }}>
-              <div style={{ padding: '14px 16px', backgroundColor: '#f5f7f8', display: 'flex', alignItems: 'center', justifyBetween: 'space-between', gap: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: 'var(--lhd-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800' }}>
+            <div className={["lhd-display-068"].filter(Boolean).join(" ")}>
+              <div className={["lhd-display-069"].filter(Boolean).join(" ")}>
+                <div className={["lhd-display-070"].filter(Boolean).join(" ")}>
+                  <div className={["lhd-display-071"].filter(Boolean).join(" ")}>
                     {(residencePrimary?.ten || residencePrimary?.hoTen || '?').charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <div style={{ fontSize: '16px', fontWeight: '800', color: 'var(--lhd-text)' }}>{residencePrimary?.ten || residencePrimary?.hoTen || '-'}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--lhd-text-muted)' }}>Thành viên hợp đồng</div>
+                    <div className={["lhd-display-072"].filter(Boolean).join(" ")}>{residencePrimary?.ten || residencePrimary?.hoTen || '-'}</div>
+                    <div className={["lhd-display-073"].filter(Boolean).join(" ")}>Thành viên hợp đồng</div>
                   </div>
                 </div>
                 <span className="lhd-badge lhd-badge-success">
                   Đủ điều kiện
                 </span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', padding: '16px', backgroundColor: '#fff' }}>
+              <div className={["lhd-display-074"].filter(Boolean).join(" ")}>
                 {[
                   { label: 'Ngày sinh', value: formatMemberDate(residencePrimary?.ngaySinh) },
                   { label: 'Giới tính', value: residencePrimary?.gioiTinh || '-' },
@@ -996,32 +860,32 @@ export default function LapHopDongTab() {
                   { label: 'Số điện thoại', value: residencePrimary?.sdt || '-' },
                   { label: 'Email', value: residencePrimary?.email || '-' }
                 ].map((item) => (
-                  <div key={item.label} className="lhd-card" style={{ padding: '12px 14px', boxShadow: 'none', backgroundColor: '#f5f7f8', border: '1px solid var(--lhd-border-light)' }}>
-                    <div className="lhd-label" style={{ fontSize: '10px', color: 'var(--lhd-text-muted)', marginBottom: '4px' }}>{item.label}</div>
-                    <div style={{ fontSize: '14px', color: 'var(--lhd-text)', fontWeight: '700' }}>{item.value}</div>
+                  <div key={item.label} className={["lhd-card", "lhd-display-075"].filter(Boolean).join(" ")} >
+                    <div className={["lhd-label", "lhd-display-076"].filter(Boolean).join(" ")} >{item.label}</div>
+                    <div className={["lhd-display-077"].filter(Boolean).join(" ")}>{item.value}</div>
                   </div>
                 ))}
               </div>
             </div>
-            <p style={{ margin: '14px 0 0', fontSize: '13px', color: 'var(--lhd-text-muted)' }}>
+            <p className={["lhd-display-078"].filter(Boolean).join(" ")}>
               * Bạn có thể bấm tiếp tục vì thành viên hợp đồng đã đủ điều kiện ở bước kiểm tra cư trú.
             </p>
           </div>
         ) : (
-          <div className="lhd-grid-2" style={{ gridTemplateColumns: '1fr 300px' }}>
+          <div className={["lhd-grid-2", "lhd-display-079"].filter(Boolean).join(" ")} >
             <div className="lhd-card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+              <div className={["lhd-display-080"].filter(Boolean).join(" ")}>
                 <div>
-                  <h4 style={{ margin: '0 0 4px', fontSize: '15px', fontWeight: '700', color: 'var(--lhd-text)' }}>Danh sách thành viên (Thuê nhóm)</h4>
-                  <p style={{ margin: 0, fontSize: '13px', color: 'var(--lhd-text-muted)' }}>
+                  <h4 className={["lhd-display-081"].filter(Boolean).join(" ")}>Danh sách thành viên (Thuê nhóm)</h4>
+                  <p className={["lhd-display-082"].filter(Boolean).join(" ")}>
                     {cuTruReview ? 'Danh sách được lấy từ hồ sơ cư trú đã được quản lý duyệt.' : 'Nhập đầy đủ danh sách các thành viên sẽ lưu trú cùng căn hộ/phòng.'}
                   </p>
                 </div>
                 {!cuTruReview && (
-                  <button 
-                    onClick={() => setShowAddMember(true)} 
-                    className="lhd-btn lhd-btn-outline"
-                    style={{ padding: '8px 16px', fontSize: '13px' }}
+                  <button
+                    onClick={() => setShowAddMember(true)}
+                    className={["lhd-btn lhd-btn-outline", "lhd-display-083"].filter(Boolean).join(" ")}
+
                   >
                     <Icon name="person_add" /> Thêm thành viên
                   </button>
@@ -1029,19 +893,19 @@ export default function LapHopDongTab() {
               </div>
 
               {cuTruReview && (
-                <div className="lhd-alert lhd-alert-success" style={{ marginBottom: '16px' }}>
-                  <Icon name="fact_check" style={{ fontSize: '20px', marginTop: '1px' }} />
+                <div className={["lhd-alert lhd-alert-success", "lhd-display-084"].filter(Boolean).join(" ")} >
+                  <Icon name="fact_check" className={["lhd-display-085"].filter(Boolean).join(" ")} />
                   <div>
-                    <div style={{ fontWeight: '800', fontSize: '13px' }}>Đã duyệt cư trú trước khi lập hợp đồng</div>
-                    <div style={{ fontSize: '13px', lineHeight: '1.45' }}>
+                    <div className={["lhd-display-086"].filter(Boolean).join(" ")}>Đã duyệt cư trú trước khi lập hợp đồng</div>
+                    <div className={["lhd-display-087"].filter(Boolean).join(" ")}>
                       {thanhVien.length} thành viên đủ điều kiện sẽ được đưa vào hợp đồng.
                       {rejectedResidenceMembers.length > 0 ? ` ${rejectedResidenceMembers.length} thành viên bị từ chối sẽ không được ký và không được sắp xếp vào ở.` : ''}
                     </div>
                   </div>
                 </div>
               )}
-              
-              <div className="lhd-table-wrapper" style={{ border: 'none', boxShadow: 'none' }}>
+
+              <div className={["lhd-table-wrapper", "lhd-display-088"].filter(Boolean).join(" ")} >
                 <table className="lhd-table">
                   <thead>
                     <tr>
@@ -1057,47 +921,47 @@ export default function LapHopDongTab() {
                     {!cuTruReview && (
                       <tr>
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'var(--lhd-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <Icon name="person" style={{ fontSize: '13px' }} />
+                          <div className={["lhd-display-089"].filter(Boolean).join(" ")}>
+                            <div className={["lhd-display-090"].filter(Boolean).join(" ")}>
+                              <Icon name="person" className={["lhd-display-091"].filter(Boolean).join(" ")} />
                             </div>
                             <div>
-                              <div style={{ fontWeight: '600', color: 'var(--lhd-text)', fontSize: '13px' }}>{selectedPhieu?.hoTenKhachHang}</div>
-                              <div style={{ fontSize: '10px', color: 'var(--lhd-primary)', fontWeight: '600' }}>Chủ hợp đồng</div>
+                              <div className={["lhd-display-092"].filter(Boolean).join(" ")}>{selectedPhieu?.hoTenKhachHang}</div>
+                              <div className={["lhd-display-093"].filter(Boolean).join(" ")}>Chủ hợp đồng</div>
                             </div>
                           </div>
                         </td>
-                        <td style={{ fontSize: '13px', color: 'var(--lhd-text-muted)' }}>
+                        <td className={["lhd-display-094"].filter(Boolean).join(" ")}>
                           {selectedPhieu?.ngaySinh ? new Date(selectedPhieu.ngaySinh).toLocaleDateString('vi-VN') : '-'}
                         </td>
-                        <td style={{ fontSize: '13px', color: 'var(--lhd-text-muted)' }}>{selectedPhieu?.gioiTinh}</td>
-                        <td style={{ fontSize: '13px', color: 'var(--lhd-text-muted)' }}>{selectedPhieu?.cccd}</td>
-                        <td style={{ fontSize: '13px', color: 'var(--lhd-text-muted)' }}>{selectedPhieu?.sdt}</td>
-                        <td className="text-center"><span style={{ fontSize: '11px', color: '#9eaaab' }}>-</span></td>
+                        <td className={["lhd-display-094"].filter(Boolean).join(" ")}>{selectedPhieu?.gioiTinh}</td>
+                        <td className={["lhd-display-094"].filter(Boolean).join(" ")}>{selectedPhieu?.cccd}</td>
+                        <td className={["lhd-display-094"].filter(Boolean).join(" ")}>{selectedPhieu?.sdt}</td>
+                        <td className="text-center"><span className={["lhd-display-095"].filter(Boolean).join(" ")}>-</span></td>
                       </tr>
                     )}
                     {thanhVien.map((tv, i) => (
                       <tr key={i}>
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#e0e3e3', color: '#3f494a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <Icon name="person" style={{ fontSize: '13px' }} />
+                          <div className={["lhd-display-089"].filter(Boolean).join(" ")}>
+                            <div className={["lhd-display-096"].filter(Boolean).join(" ")}>
+                              <Icon name="person" className={["lhd-display-091"].filter(Boolean).join(" ")} />
                             </div>
-                            <span style={{ fontWeight: '600', color: 'var(--lhd-text)', fontSize: '13px' }}>{tv.ten}</span>
+                            <span className={["lhd-display-092"].filter(Boolean).join(" ")}>{tv.ten}</span>
                           </div>
                         </td>
-                        <td style={{ fontSize: '13px', color: 'var(--lhd-text-muted)' }}>
+                        <td className={["lhd-display-094"].filter(Boolean).join(" ")}>
                           {tv.ngaySinh ? new Date(tv.ngaySinh).toLocaleDateString('vi-VN') : '-'}
                         </td>
-                        <td style={{ fontSize: '13px', color: 'var(--lhd-text-muted)' }}>{tv.gioiTinh}</td>
-                        <td style={{ fontSize: '13px', color: 'var(--lhd-text-muted)' }}>{tv.cccd}</td>
-                        <td style={{ fontSize: '13px', color: 'var(--lhd-text-muted)' }}>{tv.sdt}</td>
+                        <td className={["lhd-display-094"].filter(Boolean).join(" ")}>{tv.gioiTinh}</td>
+                        <td className={["lhd-display-094"].filter(Boolean).join(" ")}>{tv.cccd}</td>
+                        <td className={["lhd-display-094"].filter(Boolean).join(" ")}>{tv.sdt}</td>
                         <td className="text-center">
                           {cuTruReview ? (
                             <span className="lhd-badge lhd-badge-success">Đủ điều kiện</span>
                           ) : (
-                            <button 
-                              onClick={() => setThanhVien(thanhVien.filter((_, idx) => idx !== i))} 
+                            <button
+                              onClick={() => setThanhVien(thanhVien.filter((_, idx) => idx !== i))}
                               className="lhd-btn-text-danger"
                             >
                               <Icon name="delete" />
@@ -1111,36 +975,33 @@ export default function LapHopDongTab() {
               </div>
 
               {rejectedResidenceMembers.length > 0 && (
-                <div style={{ marginTop: '16px', border: '1px solid #efb8b1', borderRadius: '10px', overflow: 'hidden' }}>
-                  <div style={{ padding: '10px 12px', backgroundColor: '#fff3f1', color: '#9b1c1c', fontSize: '13px', fontWeight: '800' }}>
+                <div className={["lhd-display-097"].filter(Boolean).join(" ")}>
+                  <div className={["lhd-display-098"].filter(Boolean).join(" ")}>
                     Thành viên không được tham gia ký hợp đồng
                   </div>
                   {rejectedResidenceMembers.map((tv, index) => (
-                    <div key={tv.maThanhVienCuTru || index} style={{ padding: '10px 12px', borderTop: '1px solid #f3d0ca', display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                      <span style={{ fontWeight: '700', color: 'var(--lhd-text)', fontSize: '13px' }}>{tv.hoTen || tv.ten}</span>
-                      <span style={{ color: '#9b1c1c', fontSize: '13px', textAlign: 'right' }}>{tv.lyDoTuChoi || 'Không đáp ứng điều kiện cư trú'}</span>
+                    <div key={tv.maThanhVienCuTru || index} className={["lhd-display-099"].filter(Boolean).join(" ")}>
+                      <span className={["lhd-display-100"].filter(Boolean).join(" ")}>{tv.hoTen || tv.ten}</span>
+                      <span className={["lhd-display-101"].filter(Boolean).join(" ")}>{tv.lyDoTuChoi || 'Không đáp ứng điều kiện cư trú'}</span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className={["lhd-display-102"].filter(Boolean).join(" ")}>
               <div className="lhd-capacity-card">
-                <div className="lhd-label" style={{ color: 'rgba(255,255,255,0.7)', fontSize: '11px', marginBottom: '12px' }}>TÓM TẮT THÀNH VIÊN</div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '13px', opacity: 0.9 }}>Số người ở:</span>
-                  <span style={{ fontSize: '28px', fontWeight: '800' }}>{totalCount}<span style={{ fontSize: '16px', opacity: 0.7 }}>/{sucChua}</span></span>
+                <div className={["lhd-label", "lhd-display-103"].filter(Boolean).join(" ")} >TÓM TẮT THÀNH VIÊN</div>
+                <div className={["lhd-display-104"].filter(Boolean).join(" ")}>
+                  <span className={["lhd-display-105"].filter(Boolean).join(" ")}>Số người ở:</span>
+                  <span className={["lhd-display-106"].filter(Boolean).join(" ")}>{totalCount}<span className={["lhd-display-107"].filter(Boolean).join(" ")}>/{sucChua}</span></span>
                 </div>
                 <div className="lhd-progress-track">
-                  <div 
-                    className={`lhd-progress-bar ${totalCount > sucChua ? 'error' : ''}`}
-                    style={{ width: `${Math.min((totalCount / sucChua) * 100, 100)}%` }} 
-                  />
+                  <progress className={`lhd-progress-bar lhd-native-progress ${totalCount > sucChua ? 'error' : ''}`} value={Math.min((totalCount / sucChua) * 100, 100)} max="100" aria-label="Tỷ lệ sức chứa" />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginTop: '8px' }}>
-                  <span style={{ opacity: 0.85 }}>Sức chứa tối đa:</span>
-                  <span style={{ fontWeight: '700' }}>{sucChua} người</span>
+                <div className={["lhd-display-108"].filter(Boolean).join(" ")}>
+                  <span className={["lhd-display-109"].filter(Boolean).join(" ")}>Sức chứa tối đa:</span>
+                  <span className={["lhd-display-021"].filter(Boolean).join(" ")}>{sucChua} người</span>
                 </div>
 
               </div>
@@ -1148,7 +1009,7 @@ export default function LapHopDongTab() {
           </div>
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '32px' }}>
+        <div className={["lhd-display-064"].filter(Boolean).join(" ")}>
           <button className="lhd-btn lhd-btn-outline" onClick={() => setStep(2)}><Icon name="arrow_back" /> Quay lại</button>
           <button
             onClick={hinhThucThue === 'Ghép giường' && !cuTruReview ? () => setStep(4) : handleStep3Continue}
@@ -1160,13 +1021,13 @@ export default function LapHopDongTab() {
 
         {showAddMember && (
           <div className="ktp-modal-overlay" onClick={() => setShowAddMember(false)}>
-            <div className="ktp-modal" onClick={e => e.stopPropagation()} style={{ width: '480px' }}>
+            <div className={["ktp-modal", "lhd-display-110"].filter(Boolean).join(" ")} onClick={e => e.stopPropagation()} >
               <div className="ktp-modal-header">
-                <h3 style={{ margin: 0, fontSize: '16px', color: '#191c1d' }}>Thêm thành viên</h3>
+                <h3 className={["lhd-display-111"].filter(Boolean).join(" ")}>Thêm thành viên</h3>
                 <button className="ktp-modal-close" onClick={() => setShowAddMember(false)}><Icon name="close" /></button>
               </div>
-              <div className="ktp-modal-body" style={{ padding: '20px', display: 'block' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+              <div className={["ktp-modal-body", "lhd-display-112"].filter(Boolean).join(" ")} >
+                <div className={["lhd-display-113"].filter(Boolean).join(" ")}>
                   <div className="lhd-form-group">
                     <label className="lhd-label">Họ và tên *</label>
                     <input className="lhd-input" type="text" placeholder="Nguyễn Văn A" value={newMember.ten} onChange={e => setNewMember({ ...newMember, ten: e.target.value })} />
@@ -1196,15 +1057,15 @@ export default function LapHopDongTab() {
                   </div>
                 </div>
               </div>
-              <div className="ktp-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <div className={["ktp-modal-footer", "lhd-display-114"].filter(Boolean).join(" ")} >
                 <button className="lhd-btn lhd-btn-outline" onClick={() => setShowAddMember(false)}>Hủy</button>
-                <button 
-                  className="lhd-btn lhd-btn-primary" 
-                  onClick={() => { 
-                    if (newMember.ten && newMember.cccd && newMember.sdt) { 
-                      setThanhVien([...thanhVien, newMember]); 
-                      setNewMember({ ten: '', ngaySinh: '', gioiTinh: 'Nam', cccd: '', sdt: '', email: '', quocTich: 'Việt Nam' }); 
-                      setShowAddMember(false); 
+                <button
+                  className="lhd-btn lhd-btn-primary"
+                  onClick={() => {
+                    if (newMember.ten && newMember.cccd && newMember.sdt) {
+                      setThanhVien([...thanhVien, newMember]);
+                      setNewMember({ ten: '', ngaySinh: '', gioiTinh: 'Nam', cccd: '', sdt: '', email: '', quocTich: 'Việt Nam' });
+                      setShowAddMember(false);
                     } else {
                       alert('Vui lòng điền đầy đủ các thông tin bắt buộc (*).');
                     }
@@ -1224,12 +1085,12 @@ export default function LapHopDongTab() {
   if (step === 4) return (
     <div className="lhd-container">
       <StepIndicator current={4} />
-      <div className="lhd-grid-2" style={{ gridTemplateColumns: '1fr 320px' }}>
+      <div className={["lhd-grid-2", "lhd-display-115"].filter(Boolean).join(" ")} >
         <div className="lhd-card">
           <h4 className="lhd-card-title">
             <Icon name="description" /> Thông tin hợp đồng
           </h4>
-          <div className="lhd-grid-form" style={{ marginTop: '20px' }}>
+          <div className={["lhd-grid-form", "lhd-display-116"].filter(Boolean).join(" ")} >
             <div className="lhd-form-group"><label className="lhd-label">Mã phiếu cọc</label><input className="lhd-input" value={selectedPhieu?.maPhieuDatCoc || ''} readOnly /></div>
             <div className="lhd-form-group"><label className="lhd-label">Khách hàng</label><input className="lhd-input" value={selectedPhieu?.hoTenKhachHang || ''} readOnly /></div>
             <div className="lhd-form-group"><label className="lhd-label">Phòng/Giường</label><input className="lhd-input" value={getDisplayViTriThue() || ''} readOnly /></div>
@@ -1241,19 +1102,19 @@ export default function LapHopDongTab() {
               </select>
             </div>
             <div className="lhd-form-group"><label className="lhd-label">Ngày ký</label><input type="date" className="lhd-input" value={ngayKy} readOnly disabled /></div>
-            <div className="lhd-form-group"><label className="lhd-label">Giá thuê niêm yết</label><div style={{ position: 'relative' }}><input className="lhd-input" value={basePrice?.toLocaleString('vi-VN') || 0} readOnly style={{ paddingRight: '50px' }} /><span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px', color: 'var(--lhd-text-muted)', fontWeight: '600' }}>VND</span></div></div>
+            <div className="lhd-form-group"><label className="lhd-label">Giá thuê niêm yết</label><div className={["lhd-display-117"].filter(Boolean).join(" ")}><input className={["lhd-input", "lhd-display-118"].filter(Boolean).join(" ")} value={basePrice?.toLocaleString('vi-VN') || 0} readOnly  /><span className={["lhd-display-119"].filter(Boolean).join(" ")}>VND</span></div></div>
             <div className="lhd-form-group"><label className="lhd-label">Ngày bắt đầu</label><input type="date" className="lhd-input" value={ngayBatDau} min={new Date().toISOString().split('T')[0]} onChange={e => setNgayBatDau(e.target.value)} /></div>
             <div className="lhd-form-group"><label className="lhd-label">Ngày kết thúc (Dự kiến)</label><input type="date" className="lhd-input" value={ngayKetThuc} min={ngayBatDau || new Date().toISOString().split('T')[0]} onChange={e => setNgayKetThuc(e.target.value)} /></div>
-            <div className="lhd-form-group" style={{ gridColumn: '1/-1' }}><label className="lhd-label">Ghi chú hợp đồng</label><textarea className="lhd-input" rows={3} placeholder="Nhập các thỏa thuận riêng hoặc yêu cầu đặc biệt..." value={ghiChu} onChange={e => setGhiChu(e.target.value)} style={{ resize: 'vertical' }} /></div>
+            <div className={["lhd-form-group", "lhd-display-120"].filter(Boolean).join(" ")} ><label className="lhd-label">Ghi chú hợp đồng</label><textarea className={["lhd-input", "lhd-display-121"].filter(Boolean).join(" ")} rows={3} placeholder="Nhập các thỏa thuận riêng hoặc yêu cầu đặc biệt..." value={ghiChu} onChange={e => setGhiChu(e.target.value)}  /></div>
           </div>
         </div>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+        <div className={["lhd-display-102"].filter(Boolean).join(" ")}>
           <div className="lhd-card">
             <h4 className="lhd-card-title">
               <Icon name="electric_bolt" /> Dịch vụ đăng ký
             </h4>
-            <div className="service-select-grid" style={{ marginTop: '16px' }}>
+            <div className={["service-select-grid", "lhd-display-122"].filter(Boolean).join(" ")} >
               {services.map(dv => {
                 const isXe = isXeService(dv);
                 const isSelected = !!selectedServices[dv.maDichVu];
@@ -1271,7 +1132,7 @@ export default function LapHopDongTab() {
                       </div>
                       <div className="service-card-desc">
                         {isXe && isSelected
-                          ? <span style={{ color: 'var(--lhd-primary)', fontWeight: '600' }}>
+                          ? <span className={["lhd-display-123"].filter(Boolean).join(" ")}>
                               Tổng: {(soXeGuiXe * dv.donGia)?.toLocaleString('vi-VN')}đ/tháng
                             </span>
                           : 'Áp dụng hợp đồng'
@@ -1279,41 +1140,24 @@ export default function LapHopDongTab() {
                       </div>
                     </div>
                     {isXe && isSelected ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0 }} onClick={e => e.preventDefault()}>
-                        <div style={{ fontSize: '11px', color: 'var(--lhd-text-muted)', fontWeight: '600' }}>
+                      <div className={["lhd-display-124"].filter(Boolean).join(" ")} onClick={e => e.preventDefault()}>
+                        <div className={["lhd-display-125"].filter(Boolean).join(" ")}>
                           {dv.donGia?.toLocaleString('vi-VN')}đ / xe
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0', border: '1.5px solid var(--lhd-primary)', borderRadius: '8px', overflow: 'hidden', height: '30px' }}>
+                        <div className={["lhd-display-126"].filter(Boolean).join(" ")}>
                           <button
                             type="button"
                             onClick={() => setSoXeGuiXe(v => Math.max(1, v - 1))}
-                            style={{
-                              width: '28px', height: '30px',
-                              border: 'none', borderRight: '1px solid var(--lhd-primary)',
-                              background: 'var(--lhd-primary-soft)', color: 'var(--lhd-primary)',
-                              fontWeight: '700', fontSize: '16px', cursor: 'pointer',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center'
-                            }}
+                            className={["lhd-display-127"].filter(Boolean).join(" ")}
                           >−</button>
-                          <span style={{
-                            width: '32px', textAlign: 'center',
-                            fontSize: '14px', fontWeight: '700',
-                            color: 'var(--lhd-primary)', background: '#fff',
-                            lineHeight: '30px', display: 'block'
-                          }}>{soXeGuiXe}</span>
+                          <span className={["lhd-display-128"].filter(Boolean).join(" ")}>{soXeGuiXe}</span>
                           <button
                             type="button"
                             onClick={() => setSoXeGuiXe(v => Math.min(10, v + 1))}
-                            style={{
-                              width: '28px', height: '30px',
-                              border: 'none', borderLeft: '1px solid var(--lhd-primary)',
-                              background: 'var(--lhd-primary-soft)', color: 'var(--lhd-primary)',
-                              fontWeight: '700', fontSize: '16px', cursor: 'pointer',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center'
-                            }}
+                            className={["lhd-display-129"].filter(Boolean).join(" ")}
                           >+</button>
                         </div>
-                        <div style={{ fontSize: '10px', color: 'var(--lhd-text-muted)' }}>xe gửi</div>
+                        <div className={["lhd-display-130"].filter(Boolean).join(" ")}>xe gửi</div>
                       </div>
                     ) : (
                       <div className="service-card-price">
@@ -1327,23 +1171,23 @@ export default function LapHopDongTab() {
             </div>
           </div>
 
-          <div className="lhd-card" style={{ padding: '16px' }}>
-            <div className="lhd-label" style={{ marginBottom: '10px' }}>THÀNH VIÊN CƯ TRÚ ({getContractMembers().length})</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div className={["lhd-card", "lhd-display-131"].filter(Boolean).join(" ")} >
+            <div className={["lhd-label", "lhd-display-016"].filter(Boolean).join(" ")} >THÀNH VIÊN CƯ TRÚ ({getContractMembers().length})</div>
+            <div className={["lhd-display-132"].filter(Boolean).join(" ")}>
               {getContractMembers().map((tv, i) => (
-                <div key={i} style={{ fontSize: '13px', color: i === 0 ? 'var(--lhd-text)' : 'var(--lhd-text-muted)' }}>{i + 1}. {tv.ten}</div>
+                <div key={i} className={["lhd-display-091", i === 0 ? "lhd-display-133" : "lhd-display-042"].filter(Boolean).join(" ")}>{i + 1}. {tv.ten}</div>
               ))}
             </div>
           </div>
-          
+
           <div className="lhd-capacity-card">
-            <div style={{ fontSize: '11px', fontWeight: '700', opacity: 0.85, marginBottom: '6px' }}>DỰ TÍNH PHÍ HÀNG THÁNG</div>
-            <div style={{ fontSize: '24px', fontWeight: '800' }}>{totalPrice?.toLocaleString('vi-VN') || 0} VND</div>
-            <div style={{ fontSize: '11px', opacity: 0.75, marginTop: '4px' }}>* Đã bao gồm các dịch vụ đăng ký cố định</div>
+            <div className={["lhd-display-134"].filter(Boolean).join(" ")}>DỰ TÍNH PHÍ HÀNG THÁNG</div>
+            <div className={["lhd-display-135"].filter(Boolean).join(" ")}>{totalPrice?.toLocaleString('vi-VN') || 0} VND</div>
+            <div className={["lhd-display-136"].filter(Boolean).join(" ")}>* Đã bao gồm các dịch vụ đăng ký cố định</div>
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '32px' }}>
+      <div className={["lhd-display-064"].filter(Boolean).join(" ")}>
         <button className="lhd-btn lhd-btn-outline" onClick={() => setStep(3)}><Icon name="arrow_back" /> Quay lại</button>
         <button className="lhd-btn lhd-btn-primary" onClick={() => setStep(5)}>Tiếp tục <Icon name="arrow_forward" /></button>
       </div>
@@ -1358,33 +1202,33 @@ export default function LapHopDongTab() {
     return (
       <div className="lhd-container">
         <StepIndicator current={5} />
-        
-        {loading && <div style={{ textAlign: 'center', padding: '20px', fontWeight: '600' }}>Đang lưu hợp đồng... Vui lòng đợi.</div>}
 
-        <div className="lhd-grid-2" style={{ gridTemplateColumns: '1fr 300px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {loading && <div className={["lhd-display-137"].filter(Boolean).join(" ")}>Đang lưu hợp đồng... Vui lòng đợi.</div>}
+
+        <div className={["lhd-grid-2", "lhd-display-079"].filter(Boolean).join(" ")} >
+          <div className={["lhd-display-102"].filter(Boolean).join(" ")}>
             <div className="lhd-card">
               <h4 className="lhd-card-title">
                 <Icon name="description" /> Thông tin hợp đồng
               </h4>
-              <div className="lhd-grid-form" style={{ marginTop: '20px' }}>
-                {[{ l: 'Ngày lập', v: new Date(ngayKy).toLocaleDateString('vi-VN') }, 
-                  { l: 'Chủ hợp đồng', v: selectedPhieu?.hoTenKhachHang, s: 'lg' }, 
-                  { l: 'Căn hộ / Phòng', v: 'Phòng ' + selectedPhieu?.viTriThue, s: 'lg' }, 
-                  { l: 'Thời hạn thuê', v: `${new Date(ngayBatDau).toLocaleDateString('vi-VN')} - ${new Date(ngayKetThuc).toLocaleDateString('vi-VN')}` }, 
+              <div className={["lhd-grid-form", "lhd-display-116"].filter(Boolean).join(" ")} >
+                {[{ l: 'Ngày lập', v: new Date(ngayKy).toLocaleDateString('vi-VN') },
+                  { l: 'Chủ hợp đồng', v: selectedPhieu?.hoTenKhachHang, s: 'lg' },
+                  { l: 'Căn hộ / Phòng', v: 'Phòng ' + selectedPhieu?.viTriThue, s: 'lg' },
+                  { l: 'Thời hạn thuê', v: `${new Date(ngayBatDau).toLocaleDateString('vi-VN')} - ${new Date(ngayKetThuc).toLocaleDateString('vi-VN')}` },
                   { l: 'Giá thuê hàng tháng', v: basePrice?.toLocaleString('vi-VN') + ' VND', c: 'var(--lhd-secondary)', s: 'lg' }
                 ].map((f, i) => (
                   <div key={i} className="lhd-form-group">
-                    <div className="lhd-label" style={{ marginBottom: '4px' }}>{f.l}</div>
-                    <div style={{ fontWeight: '750', fontSize: f.s === 'lg' ? '15px' : '14px', color: f.c || 'var(--lhd-text)' }}>{f.v}</div>
+                    <div className={["lhd-label", "lhd-display-138"].filter(Boolean).join(" ")} >{f.l}</div>
+                    <div className={["lhd-display-140", f.s === 'lg' ? "lhd-display-139" : "lhd-display-063", f.c ? "lhd-display-047" : "lhd-display-133"].filter(Boolean).join(" ")}>{f.v}</div>
                   </div>
                 ))}
               </div>
-              <div style={{ marginTop: '20px', padding: '12px 16px', backgroundColor: '#f5f7f8', borderRadius: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '13px', color: 'var(--lhd-text-muted)' }}>Khoản tiền cọc đã nhận:</span>
-                <span style={{ fontWeight: '800', fontSize: '16px', color: 'var(--lhd-text)' }}>{selectedPhieu?.soTienCoc?.toLocaleString('vi-VN')} VND</span>
+              <div className={["lhd-display-141"].filter(Boolean).join(" ")}>
+                <span className={["lhd-display-094"].filter(Boolean).join(" ")}>Khoản tiền cọc đã nhận:</span>
+                <span className={["lhd-display-142"].filter(Boolean).join(" ")}>{selectedPhieu?.soTienCoc?.toLocaleString('vi-VN')} VND</span>
               </div>
-              <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'flex-end' }}>
+              <div className={["lhd-display-143"].filter(Boolean).join(" ")}>
                 <span className="lhd-badge lhd-badge-success">Đã thanh toán cọc</span>
               </div>
             </div>
@@ -1393,28 +1237,28 @@ export default function LapHopDongTab() {
               <h4 className="lhd-card-title">
                 <Icon name="description" /> Thành viên & Dịch vụ
               </h4>
-              <div style={{ marginBottom: '20px', marginTop: '16px' }}>
-                <div className="lhd-label" style={{ marginBottom: '10px' }}>DỊCH VỤ ĐĂNG KÝ</div>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <div className={["lhd-display-144"].filter(Boolean).join(" ")}>
+                <div className={["lhd-label", "lhd-display-016"].filter(Boolean).join(" ")} >DỊCH VỤ ĐĂNG KÝ</div>
+                <div className={["lhd-display-145"].filter(Boolean).join(" ")}>
                   {activeServices.map(dv => (
-                    <span key={dv.maDichVu} className="lhd-badge lhd-badge-success" style={{ borderRadius: '20px' }}>
-                      <Icon name={getServiceIcon(dv.tenDichVu)} style={{ fontSize: '14px' }} /> 
+                    <span key={dv.maDichVu} className={["lhd-badge lhd-badge-success", "lhd-display-146"].filter(Boolean).join(" ")} >
+                      <Icon name={getServiceIcon(dv.tenDichVu)} className={["lhd-display-063"].filter(Boolean).join(" ")} />
                       {dv.tenDichVu} ({dv.donGia?.toLocaleString('vi-VN')}đ)
                     </span>
                   ))}
                 </div>
               </div>
               <div>
-                <div className="lhd-label" style={{ marginBottom: '10px' }}>THÀNH VIÊN CƯ TRÚ ({allTV.length})</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '12px' }}>
+                <div className={["lhd-label", "lhd-display-016"].filter(Boolean).join(" ")} >THÀNH VIÊN CƯ TRÚ ({allTV.length})</div>
+                <div className={["lhd-display-147"].filter(Boolean).join(" ")}>
                   {allTV.map((tv, i) => (
-                    <div key={i} style={{ backgroundColor: '#f5f7f8', borderRadius: '12px', padding: '12px', display: 'flex', alignItems: 'center', gap: '10px', border: '1px solid var(--lhd-border-light)' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: i === 0 ? 'var(--lhd-primary)' : 'var(--lhd-secondary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '700', flexShrink: 0 }}>
+                    <div key={i} className={["lhd-display-148"].filter(Boolean).join(" ")}>
+                      <div className={["lhd-display-151", i === 0 ? "lhd-display-149" : "lhd-display-150"].filter(Boolean).join(" ")}>
                         {tv.ten?.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div style={{ fontWeight: '700', fontSize: '13px', color: 'var(--lhd-text)' }}>{tv.ten}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--lhd-text-muted)' }}>{tv.vaiTro}</div>
+                        <div className={["lhd-display-152"].filter(Boolean).join(" ")}>{tv.ten}</div>
+                        <div className={["lhd-display-153"].filter(Boolean).join(" ")}>{tv.vaiTro}</div>
                       </div>
                     </div>
                   ))}
@@ -1422,35 +1266,35 @@ export default function LapHopDongTab() {
               </div>
             </div>
           </div>
-          
-          <div style={{ position: 'sticky', top: '20px', alignSelf: 'start' }}>
+
+          <div className={["lhd-display-154"].filter(Boolean).join(" ")}>
             <div className="lhd-card">
               <h4 className="lhd-card-title">
                 <Icon name="fact_check" /> Xác nhận hợp đồng
               </h4>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', margin: '20px 0' }}>
-                <label style={{ display: 'flex', gap: '10px', cursor: 'pointer', alignItems: 'flex-start' }}>
-                  <input type="checkbox" checked={confirmKH} onChange={e => setConfirmKH(e.target.checked)} style={{ accentColor: 'var(--lhd-primary)', marginTop: '2px', flexShrink: 0 }} />
-                  <span style={{ fontSize: '13px', color: 'var(--lhd-text-muted)', lineHeight: '1.5' }}>Khách hàng đã kiểm tra thông tin và đồng ý ký hợp đồng</span>
+
+              <div className={["lhd-display-155"].filter(Boolean).join(" ")}>
+                <label className={["lhd-display-156"].filter(Boolean).join(" ")}>
+                  <input type="checkbox" checked={confirmKH} onChange={e => setConfirmKH(e.target.checked)} className={["lhd-display-157"].filter(Boolean).join(" ")} />
+                  <span className={["lhd-display-158"].filter(Boolean).join(" ")}>Khách hàng đã kiểm tra thông tin và đồng ý ký hợp đồng</span>
                 </label>
-                <label style={{ display: 'flex', gap: '10px', cursor: 'pointer', alignItems: 'flex-start' }}>
-                  <input type="checkbox" checked={confirmNV} onChange={e => setConfirmNV(e.target.checked)} style={{ accentColor: 'var(--lhd-primary)', marginTop: '2px', flexShrink: 0 }} />
-                  <span style={{ fontSize: '13px', color: 'var(--lhd-text-muted)', lineHeight: '1.5' }}>Nhân viên Sale xác nhận thông tin hợp đồng là chính xác</span>
+                <label className={["lhd-display-156"].filter(Boolean).join(" ")}>
+                  <input type="checkbox" checked={confirmNV} onChange={e => setConfirmNV(e.target.checked)} className={["lhd-display-157"].filter(Boolean).join(" ")} />
+                  <span className={["lhd-display-158"].filter(Boolean).join(" ")}>Nhân viên Sale xác nhận thông tin hợp đồng là chính xác</span>
                 </label>
               </div>
-              <button 
-                onClick={handleLuu} 
-                disabled={!confirmKH || !confirmNV || loading} 
-                className="lhd-btn lhd-btn-primary"
-                style={{ width: '100%', padding: '12px', marginBottom: '10px' }}
+              <button
+                onClick={handleLuu}
+                disabled={!confirmKH || !confirmNV || loading}
+                className={["lhd-btn lhd-btn-primary", "lhd-display-159"].filter(Boolean).join(" ")}
+
               >
                 <Icon name="save" /> {loading ? 'Đang xử lý...' : 'Lập hợp đồng thuê'}
               </button>
-              <button onClick={() => setStep(4)} className="lhd-btn lhd-btn-outline" style={{ width: '100%', marginBottom: '10px' }}><Icon name="arrow_back" /> Quay lại</button>
-              <button onClick={handleReset} className="lhd-btn-text-danger" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}><Icon name="delete" /> Hủy lập hợp đồng</button>
-              <div style={{ marginTop: '16px', padding: '10px', backgroundColor: 'var(--lhd-primary-soft)', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--lhd-primary)', fontWeight: '600' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--lhd-primary)', flexShrink: 0, display: 'inline-block' }}></span>
+              <button onClick={() => setStep(4)} className={["lhd-btn lhd-btn-outline", "lhd-display-160"].filter(Boolean).join(" ")} ><Icon name="arrow_back" /> Quay lại</button>
+              <button onClick={handleReset} className={["lhd-btn-text-danger", "lhd-display-161"].filter(Boolean).join(" ")} ><Icon name="delete" /> Hủy lập hợp đồng</button>
+              <div className={["lhd-display-162"].filter(Boolean).join(" ")}>
+                <span className={["lhd-display-163"].filter(Boolean).join(" ")}></span>
                 Dữ liệu đã được kiểm chứng trên hệ thống
               </div>
             </div>
@@ -1461,20 +1305,20 @@ export default function LapHopDongTab() {
         {showSuccessModal && savedHD && (
           <div className="ktp-modal-overlay">
             <div className="lhd-success-modal">
-              <div className="lhd-success-icon-wrap"><Icon name="check" style={{ fontSize: '32px' }} /></div>
+              <div className="lhd-success-icon-wrap"><Icon name="check" className={["lhd-display-164"].filter(Boolean).join(" ")} /></div>
               <h3 className="lhd-success-title">Lập hợp đồng thuê thành công</h3>
               <p className="lhd-success-text">Hệ thống đã ghi nhận và lưu trữ thông tin hợp đồng vào cơ sở dữ liệu.</p>
-              <div style={{ backgroundColor: '#f5f7f8', borderRadius: '12px', padding: '16px', textAlign: 'left', marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '10px', border: '1px solid var(--lhd-border-light)' }}>
+              <div className={["lhd-display-165"].filter(Boolean).join(" ")}>
                 {[{ label: 'MÃ HỢP ĐỒNG', value: savedHD.maHopDong, bold: true }, { label: 'KHÁCH HÀNG', value: savedHD.benThue }, { label: 'PHÒNG', value: savedHD.tenPhongDayDu }, { label: 'TRẠNG THÁI', badge: savedHD.trangThaiKy }].map((row, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
-                    <span className="lhd-label" style={{ fontSize: '11px' }}>{row.label}</span>
-                    {row.badge ? <span className="lhd-badge lhd-badge-success">{row.badge}</span> : <span style={{ fontWeight: row.bold ? '700' : '600', color: 'var(--lhd-text)' }}>{row.value}</span>}
+                  <div key={i} className={["lhd-display-166"].filter(Boolean).join(" ")}>
+                    <span className={["lhd-label", "lhd-display-167"].filter(Boolean).join(" ")} >{row.label}</span>
+                    {row.badge ? <span className="lhd-badge lhd-badge-success">{row.badge}</span> : <span className={["lhd-display-133", row.bold ? "lhd-display-021" : "lhd-display-168"].filter(Boolean).join(" ")}>{row.value}</span>}
                   </div>
                 ))}
               </div>
-              <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
-                <button onClick={handleReset} className="lhd-btn lhd-btn-outline" style={{ flex: 1, padding: '10px' }}><Icon name="arrow_back" /> Quay lại</button>
-                <button onClick={() => { setShowSuccessModal(false); setShowChiTiet(true); }} className="lhd-btn lhd-btn-primary" style={{ flex: 1, padding: '10px' }}><Icon name="description" /> Xem hợp đồng</button>
+              <div className={["lhd-display-169"].filter(Boolean).join(" ")}>
+                <button onClick={handleReset} className={["lhd-btn lhd-btn-outline", "lhd-display-170"].filter(Boolean).join(" ")} ><Icon name="arrow_back" /> Quay lại</button>
+                <button onClick={() => { setShowSuccessModal(false); setShowChiTiet(true); }} className={["lhd-btn lhd-btn-primary", "lhd-display-170"].filter(Boolean).join(" ")} ><Icon name="description" /> Xem hợp đồng</button>
               </div>
             </div>
           </div>

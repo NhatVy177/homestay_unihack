@@ -1,10 +1,12 @@
 # Việc giao cho AI (Codex hoặc AI khác)
 
-Lập 2026-11-11 (J-C059), kèm [audit-2026-11-11.md](audit-2026-11-11.md). Mỗi khối dưới đây là một prompt dán nguyên văn. **Thứ tự và mức ưu tiên là đề xuất, chờ Vy chốt.**
+Lập 2026-11-11 (J-C059), cập nhật 09:40 cùng ngày (J-C060), kèm [audit-2026-11-11.md](audit-2026-11-11.md). Mỗi khối dưới đây là một prompt dán nguyên văn. Thứ tự và mức ưu tiên theo **D-037** (Vy đã chốt).
+
+**Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036). **Việc kế tiếp:** Vy xin faucet → A2 → A3; song song B1, C6.
 
 ## Cách dùng
 
-- Mỗi việc một nhánh riêng, một thư mục riêng: `git worktree add ../HomeStayDorm-<ten> -b <nhanh> origin/main`.
+- Mỗi việc một nhánh riêng, một thư mục riêng: `git worktree add ../HomeStayDorm-<ten> -b <nhanh> origin/main`. **Chỉ tạo từ `origin/main` sau khi Vy đã merge nhánh `integration/2026-11-11`**; nếu chưa merge thì tạo từ `origin/integration/2026-11-11`. Không tạo từ `main` cũ (`dcc1a59`): nhánh Sale đã làm vậy nên thiếu AGENTS.md mới và xung đột 6 file.
 - Việc cùng nhóm B có thể chạy song song (mỗi việc một file). Nhóm A làm tuần tự. C1 phải xong trước khi tạo hồ sơ demo trên Fuji.
 - Mọi prompt đều ngầm định dòng mở đầu sau, **dán kèm ở đầu**:
 
@@ -16,17 +18,17 @@ Lập 2026-11-11 (J-C059), kèm [audit-2026-11-11.md](audit-2026-11-11.md). Mỗ
 
 | Ngày | Việc |
 |---|---|
-| 11/11 | A1, C1 (song song) |
-| 12/11 | A2 → A3; B1 |
+| 11/11 | ~~A1~~, ~~C1~~ (xong); Vy xin faucet; A2 |
+| 12/11 | A3; B1; C6 |
 | 13–15/11 | B2 → B5; C2, C3, C4 |
-| 16–17/11 | B6, C5, E1; dự phòng |
+| 16–17/11 | B6, B7, C5, E1; dự phòng |
 | 18–19/11 | D1, D2, D3; E2, E3 nếu còn thời gian |
 
 ---
 
 ## Nhóm A — Đưa lên Fuji (làm trước mọi việc khác)
 
-### A1 — Tạo ví vận hành và chuẩn bị deploy
+### A1 — Tạo ví vận hành và chuẩn bị deploy (ĐÃ XONG, J-X058)
 
 ```
 Việc: chuẩn bị ví thử cho Fuji mà không để khóa bí mật lộ ra màn hình hay Git. Nhánh: chore/fuji-setup.
@@ -45,7 +47,9 @@ Xong thì báo Vy địa chỉ ví deployer để xin faucet (hai ví còn lại
 ### A2 — Deploy, verify source, chuyển cấu hình sang Fuji
 
 ```
-Điều kiện: Vy đã chạy fuji:keygen, xin faucet cho ví deployer, chạy fuji:fund. Nhánh: chore/fuji-deploy.
+Điều kiện: ví deployer 0x7bb2e96898Db7e387e118eB92a9C390E29f54B2f đã có AVAX thử (Vy xin faucet). Nhánh: chore/fuji-deploy. File khóa nằm ở D:\HomeStayDorm-fuji\blockchain (.env và .fuji-backend-env.local, bị Git bỏ qua): chạy các lệnh Fuji tại thư mục đó hoặc nhờ Vy chép hai file sang thư mục làm việc mới; không in nội dung file.
+
+0. Sửa blockchain/scripts/fuji-fund.mjs trước khi chạy: mỗi ví phụ chỉ cần 0,1 AVAX; bỏ qua ví đã có từ 0,1 AVAX trở lên để chạy lại không gửi tiếp; cập nhật test fuji-setup. Sửa npm script deploy:fuji để nạp blockchain/.env (node --env-file=.env …). Rồi chạy npm run fuji:fund.
 
 1. cd blockchain && npm test && npm run deploy:fuji (script đọc .env; nếu thiếu --env-file thì sửa npm script cho đúng). Kết quả ghi vào blockchain/deployments/fuji.json — file này commit được vì không có bí mật.
 2. Verify source trên explorer Fuji bằng artifacts/standard-input.json (solc 0.8.38, optimizer 200, evmVersion cancun, constructor args manager + accountant). Tra tài liệu hiện hành của Snowtrace/Routescan hoặc Sourcify trước khi làm; viết thành blockchain/scripts/verify-fuji.mjs. Xong thì sửa sourceVerification trong fuji.json thành "verified" kèm link.
@@ -93,14 +97,28 @@ File chính: <FILE>. Tham khảo bố cục (chỉ xem, không chép code): màn
 | B5 | Trang kiểm chứng + cổng ví mô phỏng | `pages/avalanche/AvalancheVerifyPage.jsx`, `pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx` | — | landing |
 | B6 | Trang chủ + đăng nhập/đăng ký (rà lần cuối) | `pages/TrangChu.jsx` | 0 | landing, auth |
 
+| B7 | Sale: việc nhỏ còn lại sau D-036 (prompt riêng bên dưới) | `pages/nhanVienSale/*` | — | sale |
+
 Ghi chú B1: `KhachHangPortalPage.jsx` dài 4.346 dòng. Chỉ sửa phần tab Hợp đồng; tách phần đó thành component riêng nếu cần, không đụng các tab khác.
 Ghi chú B5: trang kiểm chứng là màn giám khảo nhìn kỹ nhất. Phải rõ 3 kết quả: khớp, file bị sửa, không đọc được chuỗi; có link explorer.
+
+### B7 — Việc nhỏ còn lại của không gian Sale
+
+```
+Việc: sửa các điểm còn lại sau đợt xem nhánh feat/ui-sale-workspace (J-C060). Nhánh: feat/ui-sale-followup.
+1. Tổng quan: "Xử lý đặt cọc / thu tiền tại quầy" đang là một dòng chữ nhỏ; đưa thành thẻ hành động thứ năm ngang hàng 4 thẻ còn lại. Màn Lập hợp đồng: "Hỗ trợ khai thông tin người ở" đưa thành nút phụ cạnh "Hợp đồng đã lập".
+2. Ô chọn ngày đang hiện mm/dd/yyyy theo trình duyệt: hiện dd/mm/yyyy (đặt lang="vi" cho thẻ html hoặc dùng cách hiển thị sẵn có của dự án).
+3. web/frontend/src/styles/contractPresentation.css có 170 lớp đánh số (lhd-display-001…) sinh ra khi chuyển style viết tay: gộp các lớp trùng nội dung, đổi tên theo ý nghĩa cho các lớp dùng từ 3 lần trở lên; bản in hợp đồng (window.print) phải giữ nguyên hình thức. Không cần xử lý hết nếu quá 2 giờ.
+4. DangKyTraPhongTab.jsx và CSS của nó không còn được dùng sau D-036: xóa nếu tìm kiếm import xác nhận không ai gọi; giữ API backend.
+5. Nhờ Vy đăng nhập tài khoản Sale thật, đi một lượt: tiếp nhận hồ sơ → lập lịch → thu cọc tiền mặt → lập hợp đồng → tải ảnh hợp đồng đã ký. Ghi lỗi gặp phải và sửa.
+Kiểm tra: build, test:avalanche-ui, test:handover-ui, ui-sale-workspace.mjs.
+```
 
 ---
 
 ## Nhóm C — Phần T-22 phải có
 
-### C1 — Điều khoản hợp đồng và phiên bản chính sách trong gói bàn giao (D-027, D-031)
+### C1 — Điều khoản hợp đồng và phiên bản chính sách trong gói bàn giao (ĐÃ XONG, J-X061)
 
 ```
 Việc: bổ sung nội dung gói bằng chứng bàn giao. Nhánh: feat/t22-handover-bundle. KHÔNG sửa contract.
@@ -141,7 +159,7 @@ Việc: tự thanh lý hợp đồng khi tiền đã xong. Nhánh: feat/t22-auto
 2. Quản lý bấm "Đã thu chìa khóa" → phòng/giường về Trống.
 3. Gói bằng chứng cuối (Web2): thêm mã băm chứng từ chi/thu, số tiền, thời điểm; khách tải được; gửi email. Trang kiểm chứng hiện phần này và ghi rõ "thông tin do bên cho thuê ghi nhận, không nằm trên chuỗi".
 4. Khách không phản hồi: email nhắc sau 24 giờ và 72 giờ; quá 7 ngày đánh dấu "Quá hạn phản hồi". Không bao giờ tự chấp nhận thay trên chuỗi.
-5. Nếu Vy đã chốt đề xuất P-01 trong audit: thêm thao tác "Thanh lý không có xác nhận của khách" cho quản lý, bắt buộc lý do và file bằng chứng; gói bằng chứng ghi rõ trạng thái này. Chưa chốt thì không làm.
+5. Theo D-038 (đã chốt): thêm thao tác "Thanh lý không có xác nhận của khách" cho quản lý, chỉ bật khi đã quá 7 ngày kể từ lúc gửi (biên bản bàn giao hoặc đối soát) hoặc đối soát đang bị phản đối; bắt buộc lý do và file bằng chứng đã liên hệ. Không gọi contract; gói bằng chứng cuối và trang kiểm chứng ghi rõ "đóng không có xác nhận của khách". Trường hợp bàn giao chưa từng được xác nhận: đối soát chỉ chạy ở Web2, không ghi lên chuỗi.
 ```
 
 ### C5 — Hoàn tất phần giữ chỗ đã có code (D-026)
@@ -152,6 +170,16 @@ Việc: tiếp nhánh feat/t22-backend (đã có SP_KhachGiuCho, SP_KhachKhongTh
 2. Viết scripts/khach-giu-cho-verify.mjs: thử từng SP trong transaction rồi rollback (gửi được; phòng ngoài buổi xem bị chặn; từ chối đưa hồ sơ về "Đã tiếp nhận"; khách không đến; không thuê nữa).
 3. Bổ sung: Sale cũng bấm được "Không thuê nữa"; chặn tạo buổi xem thứ hai cho một hồ sơ (dời giờ vẫn được).
 4. Giao diện khách: nút "Giữ chỗ" trên thẻ buổi đã xem (chọn phòng, hình thức, giường), lời nhắn chờ quản lý tối đa 12 giờ, nút "Không thuê nữa"; thanh tiến trình Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ. Giao diện Sale: nút "Khách không đến".
+```
+
+### C6 — Điều khoản xác nhận điện tử và ô đồng ý dữ liệu cá nhân (D-038)
+
+```
+Việc nhỏ, chỉ sửa chữ và một ô tích. Nhánh: feat/t22-consent-wording.
+1. Mẫu hợp đồng in trong web/frontend/src/pages/nhanVienSale/LapHopDongTab.jsx (khối #print-area-wrapper): thêm một điều khoản, đặt trước phần chữ ký: "Hai bên đồng ý sử dụng xác nhận điện tử trên hệ thống HomeStayDorm cho biên bản bàn giao phòng và bảng đối soát tiền cọc. Bên thuê có 7 ngày kể từ khi nhận thông báo để xác nhận hoặc phản hồi; quá thời hạn này Bên cho thuê được xử lý theo hợp đồng và ghi nhận rõ là chưa có xác nhận của Bên thuê." Hỏi Vy nếu muốn đổi câu chữ.
+2. Rà chữ hiển thị ở frontend và email: chỗ nào gọi "chữ ký số", "ký số", "ký blockchain" thì đổi thành "xác nhận điện tử". Không đổi tên biến, API, chữ trong test đang so khớp (nếu test so khớp chuỗi đó thì sửa cả test).
+3. Màn khai người ở (NhanPhongTab.jsx và màn khách tự khai nếu đã có): thêm ô tích bắt buộc "Tôi xác nhận các thành viên có tên trên đây đồng ý cung cấp thông tin để làm thủ tục thuê phòng và đăng ký tạm trú." Chưa tích thì không gửi được. Chỉ chặn ở giao diện, không đổi SP.
+4. Kiểm tra: build, test:avalanche-ui, test:handover-ui; chụp ảnh hợp đồng in và màn khai người ở.
 ```
 
 ---
