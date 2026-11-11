@@ -20,9 +20,10 @@ description: Quy chuẩn giao diện HomeStayDorm (React + CSS thường). Dùng
 - Lớp chung trong `src/styles/`:
   - `global.css`: `ui-btn` (`--primary`, `--secondary`, `--ghost`, `--danger`, `--sm`), `ui-card`, `ui-table`, `ui-badge` (`--success`, `--warning`, `--danger`, `--info`, `--neutral`), `ui-input`, `ui-textarea`, `ui-tabs`, `ui-stat`, `ui-empty`.
   - `patterns.css`: `ui-form-field`, `ui-field-control`, `ui-required`, `ui-form-stepper`, `ui-dialog-heading`, `ui-icon--sm/--lg`.
-  - `lists.css`: `ui-overview-grid`, `ui-overview-card`, `ui-list-toolbar`, `ui-list-search`, `ui-list-table-card`.
+  - `lists.css`: `ui-overview-grid`, `ui-overview-card`, `ui-list-toolbar`, `ui-list-search`, `ui-list-table-card`, `ui-list-count`, `ui-list-alert`, `ui-pagination`; ô bảng `ui-num` (số tiền, cột hành động canh phải), `ui-cell-code`, `ui-cell-main`, `ui-cell-sub` (`--warning`, `--strong`). Bảng `ktp-table`/`ui-table`/`admin-table` trong khung đã có sẵn tiêu đề cột, khoảng cách, màu hover; không viết lại.
   - `shell.css`: khung trang, thanh bên, đầu trang.
-- Component: `src/components/common/` — `PageHeader`, `OverviewCards`, `StatusBadge`, `StatusFilterTabs`, `EmptyState`, `FormInput`, `Icon`, `ResultModal`, `BranchChip`.
+- Component: `src/components/common/` — `PageHeader`, `OverviewCards` (truyền `activeKey` + `onSelect` để thẻ lọc được như chip), `StatusBadge` (có `tone` khi nhãn không nằm trong bảng màu sẵn), `StatusFilterTabs`, `ListSearch` (+ `ListCount`), `TableState` (`kind` = loading/error/empty), `ListPagination`, `EmptyState`, `FormInput`, `Icon`, `ResultModal`, `BranchChip`.
+- Mẫu một màn danh sách (theo bên Hằng): `OverviewCards` bấm được → `ui-list-toolbar` gồm `ListSearch` + `StatusFilterTabs` (+ `ListCount` nếu không phân trang) → `ktp-table-section ui-list-table-card` chứa bảng, `TableState`, `ListPagination`. Nút trong bảng: `ui-btn ui-btn--sm` (`--primary` cho việc cần làm, `--secondary` cho xem).
 
 Thiếu thì thêm vào lớp/component chung, không viết riêng trong trang.
 

@@ -225,3 +225,9 @@
   .admin-page .admin-modal-actions { flex-wrap: wrap; }
   .kp-page .ui-registration-form .ktp-modal-footer > button { flex: 1; min-width: 0; }
 }
+
+/* Short confirmation toast (J-C064). Pages render it with role="status" so screen readers announce it. */
+.ui-toast { position: fixed; right: var(--space-6); bottom: var(--space-6); z-index: 200; display: flex; align-items: center; gap: var(--space-2); max-width: min(420px, calc(100vw - 32px)); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-text); color: var(--color-surface); box-shadow: var(--shadow-md); font-size: 14px; font-weight: 600; --ui-icon-size: var(--icon-md); }
+.ui-toast--success { background: var(--color-success); }
+.ui-toast--error { background: var(--color-danger); }
+@media (max-width: 600px) { .ui-toast { right: var(--space-4); left: var(--space-4); bottom: var(--space-4); } }

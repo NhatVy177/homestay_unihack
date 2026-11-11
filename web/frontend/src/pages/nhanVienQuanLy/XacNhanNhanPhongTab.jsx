@@ -4,6 +4,10 @@ import { Icon } from '../../components/common/Icon.jsx';
 import { datCocApi } from '../datCoc/datCoc.api.js';
 import ResultModal from '../../components/common/ResultModal.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
+import SharedStatusBadge from '../../components/common/StatusBadge.jsx';
+import ListSearch from '../../components/common/ListSearch.jsx';
+import ListPagination from '../../components/common/ListPagination.jsx';
+import TableState from '../../components/common/TableState.jsx';
 
 // DC02 - Xác nhận khả năng nhận cọc (tác nhân: Nhân viên quản lý).
 // GUI: HienThi() = loadDanhSach() -> getDanhSachChoXacNhan() -> SP_DanhSachChoXacNhanCoc.
@@ -25,31 +29,18 @@ const thoiGianCho = (item) => item.phutDaCho == null ? null
 
 // Nguồn cấu hình DUY NHẤT cho trạng thái phiếu ở màn Quản lý duyệt.
 const STATUS_CONFIG = {
-  'Chờ xác nhận cọc': { chip: 'Chờ duyệt',  badgeLabel: 'Chờ duyệt',  badge: { bg: '#fff4e5', fg: '#b45309' }, action: 'xu-ly' },
-  'Xác nhận cọc':     { chip: 'Đã duyệt',   badgeLabel: 'Đã duyệt',   badge: { bg: '#e6f6ec', fg: '#15803d' }, action: 'chi-tiet' },
-  'Từ chối':          { chip: 'Bị từ chối', badgeLabel: 'Bị từ chối', badge: { bg: '#fdecec', fg: '#b91c1c' }, action: 'ly-do' },
+  'Chờ xác nhận cọc': { chip: 'Chờ duyệt',  badgeLabel: 'Chờ duyệt',  tone: 'warning', action: 'xu-ly' },
+  'Xác nhận cọc':     { chip: 'Đã duyệt',   badgeLabel: 'Đã duyệt',   tone: 'success', action: 'chi-tiet' },
+  'Từ chối':          { chip: 'Bị từ chối', badgeLabel: 'Bị từ chối', tone: 'danger', action: 'ly-do' },
 };
 const STATUS_ORDER = ['Chờ xác nhận cọc', 'Xác nhận cọc', 'Từ chối'];
 
 const StatusBadge = ({ trangThai }) => {
   const cfg = STATUS_CONFIG[trangThai];
-  const s = cfg ? cfg.badge : { bg: '#eef2f3', fg: '#3f494a' };
-  return (
-    <span style={{ background: s.bg, color: s.fg, padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>
-      {cfg ? cfg.badgeLabel : trangThai}
-    </span>
-  );
+  return <SharedStatusBadge status={cfg ? cfg.badgeLabel : trangThai} tone={cfg?.tone || 'neutral'} />;
 };
 
 const PAGE_SIZE = 10;
-const pageBtnStyle = (active, disabled) => ({
-  minWidth: '34px', height: '34px', padding: '0 10px', borderRadius: '8px',
-  cursor: disabled ? 'not-allowed' : 'pointer',
-  border: active ? '1px solid #00666d' : '1px solid #d7dcdc',
-  background: active ? '#00666d' : '#fff',
-  color: active ? '#fff' : (disabled ? '#c4c7c8' : '#3f494a'),
-  fontSize: '13px', fontWeight: 600
-});
 
 export default function XacNhanNhanPhongTab() {
 
@@ -124,14 +115,6 @@ export default function XacNhanNhanPhongTab() {
     () => filteredList.slice((pageSafe - 1) * PAGE_SIZE, pageSafe * PAGE_SIZE),
     [filteredList, pageSafe]
   );
-  const pageNumbers = useMemo(() => {
-    const arr = [];
-    let start = Math.max(1, pageSafe - 2);
-    const end = Math.min(totalPages, start + 4);
-    start = Math.max(1, end - 4);
-    for (let i = start; i <= end; i += 1) arr.push(i);
-    return arr;
-  }, [pageSafe, totalPages]);
 
   const openXuLy = (item) => {
     setSelected(item);
@@ -190,19 +173,11 @@ export default function XacNhanNhanPhongTab() {
     <div className="ktp-container">
       {/* Table Section */}
       <>
-<OverviewCards items={[{ key: 'all', label: 'Tất cả' }, ...STATUS_ORDER.map((s) => ({ key: s, label: STATUS_CONFIG[s].chip }))]} counts={counts} />
+{/* Hồ sơ xử lý theo hàng đợi, nên không có lọc ngày hay bộ chọn sắp xếp. */}
+<OverviewCards items={[{ key: 'all', label: 'Tất cả' }, ...STATUS_ORDER.map((s) => ({ key: s, label: STATUS_CONFIG[s].chip }))]} counts={counts} activeKey={statusFilter} onSelect={chonChip} />
 <div className="ui-list-toolbar">
-          <label className="ui-list-search">
-            <span className="ui-search-label">Tìm kiếm</span>
-            <Icon name="search" />
-<input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tên khách hàng, SĐT hoặc mã phiếu..." className="ktp-input"  />
-          </label>
-          {search && (
-            <button type="button" onClick={() => setSearch('')} className="ktp-btn-cancel" >Xóa lọc</button>
-          )}
-
+          <ListSearch value={search} onChange={setSearch} placeholder="Tên khách hàng, SĐT hoặc mã phiếu..." />
 <StatusFilterTabs
-          className="status-pill-tabs-offset"
           items={[{ key: 'all', label: 'Tất cả' }, ...STATUS_ORDER.map((s) => ({ key: s, label: STATUS_CONFIG[s].chip }))]}
           activeKey={statusFilter}
           counts={counts}
@@ -210,12 +185,6 @@ export default function XacNhanNhanPhongTab() {
         />
 </div>
 <section className="ktp-table-section ui-list-table-card">
-        {/* Thanh tìm kiếm (đã bỏ lọc ngày & sắp xếp — xử lý theo hàng đợi) */}
-
-
-        {/* Segmented control: lọc theo trạng thái + số đếm (căn thẳng lề trái với ô tìm kiếm) */}
-
-
         <table className="ktp-table">
           <thead>
             <tr>
@@ -224,41 +193,41 @@ export default function XacNhanNhanPhongTab() {
               <th>SĐT</th>
               <th>Phòng/Giường</th>
               <th>Ngày đăng ký</th>
-              <th className="text-center">Trạng thái</th>
-              <th className="text-center">Hành động</th>
+              <th>Trạng thái</th>
+              <th className="ui-num">Hành động</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#6f797a' }}>Đang tải...</td></tr>
+              <TableState kind="loading" colSpan={7} />
             ) : loadError ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#b3261e' }}>{loadError}</td></tr>
+              <TableState kind="error" colSpan={7} message={loadError} />
             ) : filteredList.length === 0 ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#6f797a' }}>Không có phiếu nào ở nhóm này</td></tr>
+              <TableState kind="empty" colSpan={7} message="Không có phiếu nào ở nhóm này" />
             ) : pagedList.map((item) => {
               const action = STATUS_CONFIG[item.trangThai]?.action;
               return (
                 <tr key={item.maDangKy}>
-                  <td><span style={{ fontWeight: '700', color: '#00666d' }}>{item.maDangKy}</span></td>
-                  <td><p style={{ margin: 0, fontWeight: '600', fontSize: '14px', color: '#191c1d' }}>{item.hoTen}</p></td>
-                  <td style={{ fontSize: '14px', color: '#414753' }}>{item.soDienThoai || '—'}</td>
-                  <td style={{ fontSize: '14px', color: '#414753' }}>{moTaPhong(item)}
+                  <td className="ui-cell-code">{item.maDangKy}</td>
+                  <td><p className="ui-cell-main">{item.hoTen}</p></td>
+                  <td>{item.soDienThoai || '—'}</td>
+                  <td>{moTaPhong(item)}
                     {item.trangThai === 'Chờ xác nhận cọc' && item.yeuCauCungPhong >= 2 &&
-                      <small style={{ display: 'block', color: '#b45309' }}>Phòng {item.maPhong} có {item.yeuCauCungPhong} yêu cầu</small>}
+                      <small className="ui-cell-sub ui-cell-sub--warning">Phòng {item.maPhong} có {item.yeuCauCungPhong} yêu cầu</small>}
                     {item.trangThai === 'Chờ xác nhận cọc' && item.yeuCauCungPhong >= 2 && item.laYeuCauDau &&
-                      <small style={{ display: 'block', color: '#00666d', fontWeight: 700 }}>Yêu cầu gửi trước</small>}
+                      <small className="ui-cell-sub ui-cell-sub--strong">Yêu cầu gửi trước</small>}
                   </td>
-                  <td style={{ fontSize: '14px', color: '#414753' }}>{formatNgay(item.ngayDangKy)}
-                    {item.trangThai === 'Chờ xác nhận cọc' && <small style={{ display: 'block' }}>{thoiGianCho(item)}</small>}
+                  <td>{formatNgay(item.ngayDangKy)}
+                    {item.trangThai === 'Chờ xác nhận cọc' && <small className="ui-cell-sub">{thoiGianCho(item)}</small>}
                   </td>
-                  <td className="text-center"><StatusBadge trangThai={item.trangThai} /></td>
-                  <td className="text-center">
+                  <td><StatusBadge trangThai={item.trangThai} /></td>
+                  <td className="ui-num">
                     {action === 'xu-ly' ? (
-                      <button className="ktp-btn-action-fill" onClick={() => openXuLy(item)}>Xử lý</button>
+                      <button type="button" className="ui-btn ui-btn--primary ui-btn--sm" onClick={() => openXuLy(item)}>Xử lý</button>
                     ) : action === 'ly-do' ? (
-                      <button className="ktp-btn-action" style={{ border: '1px solid #f0c0c0', backgroundColor: '#fff', color: '#b91c1c', padding: '6px 12px', fontSize: '13px' }} onClick={() => openXuLy(item)}>Xem lý do</button>
+                      <button type="button" className="ui-btn ui-btn--secondary ui-btn--sm ui-btn--danger-text" onClick={() => openXuLy(item)}>Xem lý do</button>
                     ) : (
-                      <button className="ktp-btn-action" style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#00666d', padding: '6px 12px', fontSize: '13px' }} onClick={() => openXuLy(item)}>Xem chi tiết</button>
+                      <button type="button" className="ui-btn ui-btn--secondary ui-btn--sm" onClick={() => openXuLy(item)}>Xem chi tiết</button>
                     )}
                   </td>
                 </tr>
@@ -267,22 +236,7 @@ export default function XacNhanNhanPhongTab() {
           </tbody>
         </table>
 
-        <div className="ktp-pagination" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '14px', color: '#414753', marginRight: 'auto', fontWeight: '500' }}>
-            {filteredList.length === 0
-              ? 'Không có phiếu'
-              : `Hiển thị ${(pageSafe - 1) * PAGE_SIZE + 1}–${Math.min(pageSafe * PAGE_SIZE, filteredList.length)} / ${filteredList.length} phiếu`}
-          </span>
-          {totalPages > 1 && (
-            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-              <button type="button" disabled={pageSafe <= 1} onClick={() => setPage(pageSafe - 1)} style={pageBtnStyle(false, pageSafe <= 1)}>‹</button>
-              {pageNumbers.map((n) => (
-                <button key={n} type="button" onClick={() => setPage(n)} style={pageBtnStyle(n === pageSafe, false)}>{n}</button>
-              ))}
-              <button type="button" disabled={pageSafe >= totalPages} onClick={() => setPage(pageSafe + 1)} style={pageBtnStyle(false, pageSafe >= totalPages)}>›</button>
-            </div>
-          )}
-        </div>
+        <ListPagination page={pageSafe} pageSize={PAGE_SIZE} total={filteredList.length} noun="phiếu" onChange={setPage} />
       </section>
 </>
 

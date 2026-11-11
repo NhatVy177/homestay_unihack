@@ -14,6 +14,7 @@
     "residence-flow:db:migrate": "node scripts/residence-flow-db.mjs",
     "residence-flow:db:verify": "node scripts/residence-flow-verify.mjs",
     "handover-bundle:db:migrate": "node scripts/handover-bundle-db.mjs",
+    "checkout-photos:db:migrate": "node scripts/checkout-photos-db.mjs",
     "test": "node --test test/*.test.mjs",
     "privy:keygen": "node scripts/privy-jwt-keygen.mjs"
   },

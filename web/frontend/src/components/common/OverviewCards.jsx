@@ -9,23 +9,33 @@ function appearance(label = '') {
 }
 
 // Read the same display counts as the existing filters. Never calculate domain totals here.
-export default function OverviewCards({ items, counts }) {
+// With onSelect, each card also works as the status filter (same keys as StatusFilterTabs).
+export default function OverviewCards({ items, counts, activeKey, onSelect }) {
   const cards = items.map(item => ({ ...item, value: item.count ?? counts?.[item.key] ?? item.value }))
     .filter(item => item.value !== undefined && item.value !== null);
   if (!cards.length) return null;
 
   return (
-    <div className="ui-overview-grid" role="group" aria-label="Tổng quan danh sách">
+    <div className="ui-overview-grid" role="group" aria-label={onSelect ? 'Tổng quan danh sách, bấm để lọc' : 'Tổng quan danh sách'}>
       {cards.map(item => {
         const { tone, icon } = appearance(item.label);
-        return (
-          <article className={`ui-overview-card ui-overview-card--${tone}`} key={item.key || item.label}>
+        const className = `ui-overview-card ui-overview-card--${tone}`;
+        const content = (
+          <>
             <div className="ui-overview-caption">
               <span className="ui-overview-icon"><Icon name={item.icon || icon} /></span>
               <span className="ui-overview-label">{item.label}</span>
             </div>
             <strong className="ui-overview-value">{item.value}</strong>
-          </article>
+          </>
+        );
+        if (!onSelect) return <article className={className} key={item.key || item.label}>{content}</article>;
+        const active = activeKey === item.key;
+        return (
+          <button type="button" className={`${className} is-clickable${active ? ' is-active' : ''}`} key={item.key || item.label}
+            aria-pressed={active} onClick={() => onSelect(item.key)}>
+            {content}
+          </button>
         );
       })}
     </div>

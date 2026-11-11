@@ -19,5 +19,6 @@ export function getAuthenticatedHomePath(user) {
     return '/nhan-vien-admin';
   }
 
-  return '/dashboard';
+  // No other signed-in role exists; the legacy /dashboard of the old app was removed (J-C061).
+  return '/';
 }

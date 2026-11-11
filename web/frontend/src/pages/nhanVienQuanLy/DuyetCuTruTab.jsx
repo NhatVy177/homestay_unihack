@@ -3,6 +3,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { cuTruApi } from '../nhanPhong/cuTru.api.js';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
+import SharedStatusBadge from '../../components/common/StatusBadge.jsx';
+import ListSearch from '../../components/common/ListSearch.jsx';
+import TableState from '../../components/common/TableState.jsx';
 import '../nhanPhong/cuTru.css';
 
 const demoHoSo = [
@@ -90,32 +93,15 @@ function normalizeHoSo(row = {}) {
 }
 
 const RESIDENCE_STATUS_CONFIG = {
-  'Chờ duyệt cư trú': { chip: 'Chờ duyệt',    badgeLabel: 'Chờ duyệt',    badge: { bg: '#fff4e5', fg: '#b45309' } },
-  'Đã duyệt cư trú':   { chip: 'Đã duyệt',     badgeLabel: 'Đã duyệt',     badge: { bg: '#e6f6ec', fg: '#15803d' } },
-  'Từ chối cư trú':    { chip: 'Từ chối',      badgeLabel: 'Từ chối',      badge: { bg: '#fee2e2', fg: '#b91c1c' } }
+  'Chờ duyệt cư trú': { chip: 'Chờ duyệt',    badgeLabel: 'Chờ duyệt',    tone: 'warning' },
+  'Đã duyệt cư trú':   { chip: 'Đã duyệt',     badgeLabel: 'Đã duyệt',     tone: 'success' },
+  'Từ chối cư trú':    { chip: 'Từ chối',      badgeLabel: 'Từ chối',      tone: 'danger' }
 };
 const RESIDENCE_STATUS_ORDER = ['Chờ duyệt cư trú', 'Đã duyệt cư trú', 'Từ chối cư trú'];
 
 function StatusBadge({ value }) {
   const cfg = RESIDENCE_STATUS_CONFIG[value];
-  const badgeStyle = cfg ? cfg.badge : { bg: '#eef2f3', fg: '#6f797a' };
-  const label = cfg ? cfg.badgeLabel : value;
-  
-  return (
-    <span style={{
-      background: badgeStyle.bg,
-      color: badgeStyle.fg,
-      padding: '4px 12px',
-      borderRadius: '999px',
-      fontSize: '12px',
-      fontWeight: 600,
-      whiteSpace: 'nowrap',
-      display: 'inline-block',
-      textAlign: 'center'
-    }}>
-      {label}
-    </span>
-  );
+  return <SharedStatusBadge status={cfg ? cfg.badgeLabel : value} tone={cfg?.tone || 'neutral'} />;
 }
 
 function getInitials(name = '') {
@@ -306,24 +292,9 @@ export default function DuyetCuTruTab() {
               { key: 'Chờ duyệt cư trú', label: 'Chờ duyệt' },
               { key: 'Đã duyệt cư trú', label: 'Đã duyệt' },
               { key: 'Từ chối cư trú', label: 'Từ chối' }
-            ]} counts={statusCounts} />
+            ]} counts={statusCounts} activeKey={statusFilter} onSelect={setStatusFilter} />
 <div className="ui-list-toolbar">
-            <label className="ui-list-search">
-              <span className="ui-search-label">Tìm kiếm</span>
-              <Icon name="search" />
-<input
-                type="text"
-                value={searchText}
-                onChange={(event) => { setSearchText(event.target.value); loadData(event.target.value); }}
-                placeholder="Nhập mã hồ sơ, mã phiếu, tên khách"
-                className="ktp-input"
-
-              />
-            </label>
-            {searchText && (
-              <button type="button" onClick={() => { setSearchText(''); loadData(''); }} className="ktp-btn-cancel" >Xóa lọc</button>
-            )}
-
+            <ListSearch value={searchText} onChange={(value) => { setSearchText(value); loadData(value); }} placeholder="Nhập mã hồ sơ, mã phiếu, tên khách" />
 <StatusFilterTabs
             items={[
               { key: 'all', label: 'Tất cả' },
@@ -355,12 +326,12 @@ export default function DuyetCuTruTab() {
                 <th>Phòng / giường</th>
                 <th>Ngày cập nhật</th>
                 <th>Trạng thái</th>
-                <th className="text-center">Hành động</th>
+                <th className="ui-num">Hành động</th>
               </tr>
             </thead>
             <tbody>
-              {loading && <tr><td colSpan="7" className="text-center">Đang tải dữ liệu...</td></tr>}
-              {!loading && filteredList.length === 0 && <tr><td colSpan="7" className="text-center">Không có hồ sơ cần duyệt.</td></tr>}
+              {loading && <TableState kind="loading" colSpan={7} message="Đang tải dữ liệu..." />}
+              {!loading && filteredList.length === 0 && <TableState kind="empty" colSpan={7} message="Không có hồ sơ cần duyệt." />}
               {!loading && filteredList.map((item) => (
                 <tr key={item.maHoSoCuTru}>
                   <td><strong className="residence-code">{item.maHoSoCuTru}</strong></td>
@@ -375,18 +346,13 @@ export default function DuyetCuTruTab() {
                   </td>
                   <td>{formatDate(item.ngayCapNhat)}</td>
                   <td><StatusBadge value={item.trangThaiHoSo} /></td>
-                  <td className="text-center">
+                  <td className="ui-num">
                     {item.trangThaiHoSo === 'Chờ duyệt cư trú' ? (
-                      <button className="ktp-btn-action-fill" type="button" style={{ width: '96px' }} onClick={() => openDetail(item)}>
+                      <button className="ui-btn ui-btn--primary ui-btn--sm" type="button" onClick={() => openDetail(item)}>
                         Duyệt
                       </button>
                     ) : (
-                      <button
-                        className="ktp-btn-action-fill"
-                        type="button"
-                        style={{ backgroundColor: '#2f6765', borderColor: '#2f6765', width: '96px' }}
-                        onClick={() => openDetail(item)}
-                      >
+                      <button className="ui-btn ui-btn--secondary ui-btn--sm" type="button" onClick={() => openDetail(item)}>
                         Chi tiết
                       </button>
                     )}

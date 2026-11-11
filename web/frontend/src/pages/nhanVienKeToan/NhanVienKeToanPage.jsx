@@ -1,141 +1,35 @@
-import NavigationToggle from '../../components/common/NavigationToggle.jsx';
-import BranchChip from '../../components/common/BranchChip.jsx';
-import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { lazy, Suspense, useState } from 'react';
 import { useAuth } from '../../auth/AuthContext.jsx';
+import WorkspaceShell from '../../components/common/WorkspaceShell.jsx';
 import '../khachHang/khachHangPortal.css'; // Reuse main layout styles
 import './nhanVienKeToanPortal.css'; // Use specific styles for content
-import { Icon } from '../../components/common/Icon.jsx';
 import XacNhanThanhToanTab from '../nhanVienQuanLy/XacNhanThanhToanTab.jsx';
 import TienMatChoNopQuyTab from './TienMatChoNopQuyTab.jsx';
 import ThuNhanPhongTab from './ThuNhanPhongTab.jsx';
 import QuyetToanTraPhongTab from './QuyetToanTraPhongTab.jsx';
 const KeToanXacNhanTab = lazy(() => import('../../components/xacNhan/KeToanXacNhanTab.jsx'));
 
-function Brand() {
-  return (
-    <Link className="kp-brand" to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '16px 20px', textDecoration: 'none' }}>
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9.5L12 3l9 6.5V21H3V9.5z"/><path d="M9 21V12h6v9"/>
-      </svg>
-      <span style={{ fontSize: '19px', fontFamily: 'var(--font-heading)', fontWeight: '700', letterSpacing: '0' }}>
-        <span style={{ color: 'var(--color-primary)' }}>Homestay</span><span style={{ color: 'var(--color-accent)' }}>Dorm</span>
-      </span>
-    </Link>
-  );
-}
-
-function firstName(name = '') {
-  const parts = String(name).trim().split(/\s+/).filter(Boolean);
-  return parts[parts.length - 1] || 'bạn';
-}
+const navItems = [
+  { id: 'xac-nhan-tien-ve', label: 'Xác nhận tiền về', icon: 'payments' },
+  { id: 'nop-quy', label: 'Tiền mặt chờ nộp quỹ', icon: 'account_balance' },
+  { id: 'thu-nhan-phong', label: 'Thu nhận phòng', icon: 'login' },
+  { id: 'quyet-toan', label: 'Quyết toán trả phòng', icon: 'account_balance_wallet' },
+  { id: 'xac-nhan-doi-soat', label: 'Khách xác nhận đối soát', icon: 'receipt_long' }
+];
 
 export default function NhanVienKeToanPage() {
   const { user, dangXuat } = useAuth();
   const [activeTab, setActiveTab] = useState('xac-nhan-tien-ve');
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const navItems = [
-    { id: 'xac-nhan-tien-ve', label: 'Xác nhận tiền về', icon: 'payments' },
-    { id: 'nop-quy', label: 'Tiền mặt chờ nộp quỹ', icon: 'account_balance' },
-    { id: 'thu-nhan-phong', label: 'Thu nhận phòng', icon: 'login' },
-    { id: 'quyet-toan', label: 'Quyết toán trả phòng', icon: 'account_balance_wallet' },
-    { id: 'xac-nhan-doi-soat', label: 'Khách xác nhận đối soát', icon: 'receipt_long' }
-  ];
 
   return (
-    <div className="kp-page kh-page ui-employee-shell">
-      <aside className="kp-sidebar" style={{ borderRight: '1px solid var(--color-border)' }}>
-        <div className="kp-sidebar-brand">
-          <Brand />
-          <span className="ui-role-label">Nhân viên Kế toán</span>
-        </div>
-        <nav className="ktp-sidebar-nav" aria-label="Menu kế toán">
-          {navItems.map((item) => (
-            <button
-              className={`ktp-side-item ${activeTab === item.id ? 'is-active' : ''}`}
-              type="button"
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-            >
-              <Icon name={item.icon} />
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
-
-      <div className="kp-app">
-        <header className="kp-topbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <NavigationToggle />
-          <div>
-            <h1>Chào {firstName(user?.hoTen)},</h1>
-            <p>Đây là không gian làm việc của bạn hôm nay.</p>
-          </div>
-          
-          <div className="kp-top-actions">
-            <BranchChip user={user} />
-            <div ref={dropdownRef} className="kp-user-box" style={{ position: 'relative' }}>
-              <button
-                type="button"
-                className="kp-user-box-btn"
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '10px', transition: 'background 0.18s' }}
-                onClick={() => setShowDropdown((prev) => !prev)}
-                aria-expanded={showDropdown}
-                aria-haspopup="true"
-              >
-                <span className="kp-avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'var(--color-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px' }}>
-                  {firstName(user?.hoTen).charAt(0).toUpperCase()}
-                </span>
-                <div style={{ textAlign: 'left' }}>
-                  <strong style={{ display: 'block', fontSize: '14px', color: 'var(--color-text)' }}>{user?.hoTen || 'Nhân viên'}</strong>
-                  <small style={{ display: 'block', fontSize: '10px', fontWeight: '700', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    NHÂN VIÊN KẾ TOÁN
-                  </small>
-                </div>
-                <svg style={{ marginLeft: '2px', opacity: 0.5, transition: 'transform 0.2s', transform: showDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
-              </button>
-              {showDropdown && (
-                <>
-                  <div style={{ position: 'fixed', inset: 0, zIndex: 59 }} onClick={() => setShowDropdown(false)} aria-hidden="true" />
-                  <div className="kh-account-menu" style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, width: '220px', background: 'var(--color-surface)', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', padding: '8px', zIndex: 60, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <button type="button" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', border: 'none', background: 'none', width: '100%', textAlign: 'left', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', color: 'var(--color-text)' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--color-surface-alt)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'} onClick={(e) => { e.stopPropagation(); setShowDropdown(false); }}>
-                      <Icon name="account_circle" style={{ fontSize: '18px' }} /> Thông tin tài khoản
-                    </button>
-                    <button type="button" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', border: 'none', background: 'none', width: '100%', textAlign: 'left', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', color: 'var(--color-danger)' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--color-surface-alt)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'} onClick={(e) => { e.stopPropagation(); setShowDropdown(false); dangXuat(); }}>
-                      <Icon name="logout" style={{ fontSize: '18px' }} /> Đăng xuất
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </header>
-
-        <main className="kp-main" style={{ padding: 0 }}>
-          {activeTab === 'xac-nhan-tien-ve' && <XacNhanThanhToanTab />}
-          {activeTab === 'nop-quy' && <TienMatChoNopQuyTab />}
-          {activeTab === 'thu-nhan-phong' && <ThuNhanPhongTab />}
-          {activeTab === 'quyet-toan' && <QuyetToanTraPhongTab />}
-          {activeTab === 'xac-nhan-doi-soat' && <Suspense fallback={null}><KeToanXacNhanTab /></Suspense>}
-          {(activeTab !== 'xac-nhan-tien-ve' && activeTab !== 'nop-quy' && activeTab !== 'thu-nhan-phong' && activeTab !== 'quyet-toan' && activeTab !== 'xac-nhan-doi-soat') && (
-            <div className="ktp-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-              <h2 style={{ color: 'var(--color-text-muted)' }}>Đang phát triển chức năng: {navItems.find(i => i.id === activeTab)?.label}</h2>
-            </div>
-          )}
-        </main>
-      </div>
-    </div>
+    <WorkspaceShell roleLabel="Nhân viên Kế toán" eyebrow="Không gian Kế toán"
+      title={navItems.find(item => item.id === activeTab)?.label} items={navItems}
+      activeTab={activeTab} onSelect={setActiveTab} user={user} onLogout={dangXuat}>
+      {activeTab === 'xac-nhan-tien-ve' && <XacNhanThanhToanTab />}
+      {activeTab === 'nop-quy' && <TienMatChoNopQuyTab />}
+      {activeTab === 'thu-nhan-phong' && <ThuNhanPhongTab />}
+      {activeTab === 'quyet-toan' && <QuyetToanTraPhongTab />}
+      {activeTab === 'xac-nhan-doi-soat' && <Suspense fallback={null}><KeToanXacNhanTab /></Suspense>}
+    </WorkspaceShell>
   );
 }

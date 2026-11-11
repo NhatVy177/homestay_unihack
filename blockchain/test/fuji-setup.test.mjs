@@ -49,37 +49,65 @@ test('keygen prints only three addresses, keeps unrelated config and refuses to 
 function fixture(balance = parseEther('1'), chainId = 43113, status = 'success') {
   const calls = [], output = [];
   const addresses = { deployer: '0x' + '1'.repeat(40), accountant: '0x' + '2'.repeat(40), relayer: '0x' + '3'.repeat(40) };
+  const balances = { [addresses.deployer]: balance, [addresses.accountant]: 0n, [addresses.relayer]: 0n };
   return {
-    calls, output, addresses,
+    calls, output, addresses, balances,
     log: line => output.push(line),
     client: {
       getChainId: async () => chainId,
-      getBalance: async ({ address }) => address === addresses.deployer ? balance : 0n,
+      getBalance: async ({ address }) => balances[address],
       getGasPrice: async () => 1_000_000_000n,
       estimateGas: async () => 21000n,
-      waitForTransactionReceipt: async () => ({ status }),
+      waitForTransactionReceipt: async () => {
+        if (status === 'success') {
+          const tx = calls.at(-1);
+          balances[tx.to] += tx.value;
+          balances[addresses.deployer] -= tx.value;
+        }
+        return { status };
+      },
     },
     wallet: { account: { address: addresses.deployer }, sendTransaction: async tx => { calls.push(tx); return '0x' + 'a'.repeat(64); } },
   };
 }
 
 test('funding refuses wrong network, zero or insufficient balance before any transfer', async () => {
-  for (const [balance, chainId, message] of [[parseEther('1'), 1, /not Avalanche Fuji/], [0n, 43113, /no test AVAX/], [parseEther('0.6'), 43113, /plus gas/]]) {
+  for (const [balance, chainId, message] of [[parseEther('1'), 1, /not Avalanche Fuji/], [0n, 43113, /no test AVAX/], [parseEther('0.2'), 43113, /plus gas/]]) {
     const f = fixture(balance, chainId);
     await assert.rejects(fundFuji(f), message);
     assert.equal(f.calls.length, 0);
   }
 });
 
-test('funding sends exactly 0.3 to each wallet and checks receipts; failure stops the next send', async () => {
+test('funding tops each wallet up to 0.1 and a successful rerun sends nothing', async () => {
   const f = fixture();
   await fundFuji(f);
   assert.deepEqual(f.calls.map(({ to, value }) => ({ to, value })), [
-    { to: f.addresses.accountant, value: parseEther('0.3') },
-    { to: f.addresses.relayer, value: parseEther('0.3') },
+    { to: f.addresses.accountant, value: parseEther('0.1') },
+    { to: f.addresses.relayer, value: parseEther('0.1') },
   ]);
-  assert.equal(f.output.filter(line => line.includes('test AVAX')).length, 8);
+  assert.equal(f.balances[f.addresses.accountant], parseEther('0.1'));
+  assert.equal(f.balances[f.addresses.relayer], parseEther('0.1'));
+  f.balances[f.addresses.deployer] = 0n;
+  await fundFuji(f);
+  assert.equal(f.calls.length, 2, 'already funded wallets do not need another transfer or deployer gas');
+});
+
+test('funding skips an existing wallet, tops up a partial balance and supports check only', async () => {
+  const f = fixture();
+  f.balances[f.addresses.accountant] = parseEther('0.2');
+  f.balances[f.addresses.relayer] = parseEther('0.04');
+  await fundFuji({ ...f, dryRun: true });
+  assert.equal(f.calls.length, 0);
+  await fundFuji(f);
+  assert.equal(f.calls.length, 1);
+  assert.equal(f.calls[0].to, f.addresses.relayer);
+  assert.equal(f.calls[0].value, parseEther('0.06'));
+});
+
+test('failed receipt stops the next funding transfer and leaves its hash in diagnostics', async () => {
   const failed = fixture(parseEther('1'), 43113, 'reverted');
   await assert.rejects(fundFuji(failed), /transaction failed/);
   assert.equal(failed.calls.length, 1);
+  assert.ok(failed.output.some(line => line.includes('Broadcast')));
 });

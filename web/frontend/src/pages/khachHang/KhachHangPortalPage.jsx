@@ -1,10 +1,11 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { khachMoiApi } from '../khachMoi/khachMoi.api.js';
 import { datCocApi } from '../datCoc/datCoc.api.js';
 import DepositPolicyPanel from '../../components/common/DepositPolicyPanel.jsx';
 import ResultModal from '../../components/common/ResultModal.jsx';
+import WorkspaceShell from '../../components/common/WorkspaceShell.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import '../khamPhaPhong/khamPhaPhong.css';
 import './khachHangPortal.css';
@@ -639,18 +640,6 @@ function displayValue(value, fallback = 'Chưa cập nhật') {
   return value;
 }
 
-function Brand() {
-  return (
-    <Link className="kp-brand" to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '16px 20px', textDecoration: 'none' }}>
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9.5L12 3l9 6.5V21H3V9.5z"/><path d="M9 21V12h6v9"/>
-      </svg>
-      <span style={{ fontSize: '19px', fontFamily: 'var(--font-heading)', fontWeight: '700', letterSpacing: '0' }}>
-        <span style={{ color: 'var(--color-primary)' }}>Homestay</span><span style={{ color: 'var(--color-accent)' }}>Dorm</span>
-      </span>
-    </Link>
-  );
-}
 
 function Empty({ title, children, action }) {
   return (
@@ -884,7 +873,6 @@ export default function KhachHangPortalPage() {
   const [profileDetailLoading, setProfileDetailLoading] = useState(false);
   const [scheduleDetailModal, setScheduleDetailModal] = useState(null);
   const [scheduleDetailLoading, setScheduleDetailLoading] = useState(false);
-  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [datCocList, setDatCocList] = useState(null);
   const [datCocLoading, setDatCocLoading] = useState(false);
   const [datCocSelected, setDatCocSelected] = useState(null);
@@ -922,14 +910,16 @@ export default function KhachHangPortalPage() {
   const registrationLockedMessage = overview?.trangThai?.thongBaoKhoaDangKy
     || 'Bạn đang có phiếu đăng ký/đặt cọc/hợp đồng chưa kết thúc. Chỉ được tạo phiếu đăng ký mới khi luồng thuê hiện tại kết thúc.';
 
+  // Icon names follow the shared Icon set used by WorkspaceShell.
   const navItems = [
-    { id: 'kham-pha', icon: 'explore', title: 'Khám phá phòng' },
-    { id: 'ho-so', icon: 'profile', title: 'Hồ sơ đăng ký' },
-    { id: 'lich-xem', icon: 'calendar', title: 'Lịch xem phòng' },
-    { id: 'dat-coc', icon: 'deposit', title: 'Đặt cọc' },
-    { id: 'hop-dong', icon: 'contract', title: 'Hợp đồng' },
+    { id: 'kham-pha', icon: 'search', title: 'Khám phá phòng' },
+    { id: 'ho-so', icon: 'description', title: 'Hồ sơ đăng ký' },
+    { id: 'lich-xem', icon: 'event_note', title: 'Lịch xem phòng' },
+    { id: 'dat-coc', icon: 'payments', title: 'Đặt cọc' },
+    { id: 'hop-dong', icon: 'article', title: 'Hợp đồng' },
     { id: 'tra-phong', icon: 'logout', title: 'Trả phòng' }
   ];
+  const extraTitles = { 'tai-khoan': 'Thông tin tài khoản' };
 
   async function loadPortal(nextFilters = filters) {
     setLoading(true);
@@ -1574,19 +1564,6 @@ export default function KhachHangPortalPage() {
           setToast('Đã gửi yêu cầu hủy hẹn. Vui lòng chờ nhân viên xác nhận.');
         }}
       />
-    );
-  }
-
-  function renderSimpleUnlocked(tab, title, icon) {
-    if (locks[tab]) return renderLocked(tab);
-    return (
-      <section>
-        <article className="kp-info-panel kh-unlocked-panel">
-          <Icon name={icon} />
-          <strong>Dữ liệu bước này đã tồn tại trong hệ thống</strong>
-          <p>Trang này đang được mở theo tiến trình của khách hàng. Bạn có thể bổ sung bảng chi tiết ở bước tiếp theo nếu cần hiển thị sâu hơn.</p>
-        </article>
-      </section>
     );
   }
 
@@ -3785,89 +3762,23 @@ export default function KhachHangPortalPage() {
     if (activeTab === 'dat-coc') return renderDatCoc();
     if (activeTab === 'hop-dong') return renderHopDongTab();
     if (activeTab === 'tra-phong') return renderHopDong();
-    if (activeTab === 'phong-giuong') return renderSimpleUnlocked('phong-giuong', 'Phòng/Giường của tôi', 'room');
-    if (activeTab === 'hoa-don') return renderSimpleUnlocked('hoa-don', 'Hóa đơn', 'invoice');
-    if (activeTab === 'bao-tri') return renderSimpleUnlocked('bao-tri', 'Bảo trì', 'repair');
     if (activeTab === 'tai-khoan') return renderAccount();
     return renderExplore();
   }
 
   return (
-    <div className="kp-page kh-page">
-      <aside className="kp-sidebar">
-        <div className="kp-sidebar-brand"><button type="button" className="kp-brand-btn" onClick={() => goTo('tai-khoan')}><Brand /></button></div>
-        <nav className="kp-sidebar-nav" aria-label="Menu khách hàng">
-          {navItems.map((item) => (
-            <button
-              className={`kp-side-item ${activeTab === item.id ? 'is-active' : ''} ${locks[item.id] ? 'is-locked' : ''}`}
-              type="button"
-              key={item.id}
-              onClick={() => goTo(item.id)}
-            >
-              <Icon name={item.icon} />
-              <span>{item.title}</span>
-              {locks[item.id] && <Icon name="lock" className="kp-lock-icon" />}
-            </button>
-          ))}
-        </nav>
-        <div className="kp-support-mini"><span>Hỗ trợ 24/7</span><strong>1900 6789</strong></div>
-      </aside>
-
-      <div className="kp-app">
-        <header className="kp-topbar">
-          <div>
-            <h1>Chào {firstName(user?.hoTen)},</h1>
-            <p>Tìm kiếm không gian sống lý tưởng của bạn.</p>
-          </div>
-          <div className="kp-top-actions">
-            <div className="kp-user-box" style={{ position: 'relative' }}>
-              <button
-                type="button"
-                className="kp-user-box-btn"
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '10px', transition: 'background 0.18s' }}
-                onClick={() => setAccountMenuOpen((prev) => !prev)}
-                aria-expanded={accountMenuOpen}
-                aria-haspopup="true"
-              >
-                <span className="kp-avatar">{initials(user?.hoTen)}</span>
-                <div><strong>{user?.hoTen || 'Khách hàng'}</strong><small>Khách hàng</small></div>
-                <svg style={{ marginLeft: '2px', opacity: 0.5, transition: 'transform 0.2s', transform: accountMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
-              </button>
-              {accountMenuOpen && (
-                <>
-                  <div
-                    style={{ position: 'fixed', inset: 0, zIndex: 59 }}
-                    onClick={() => setAccountMenuOpen(false)}
-                    aria-hidden="true"
-                  />
-                  <div className="kh-account-menu">
-                    <button
-                      type="button"
-                      onClick={() => { setAccountMenuOpen(false); goTo('tai-khoan'); }}
-                    >
-                      <Icon name="profile" /> Thông tin tài khoản
-                    </button>
-                    <button
-                      type="button"
-                      style={{ color: 'var(--color-danger)' }}
-                      onClick={() => { setAccountMenuOpen(false); logout(); }}
-                    >
-                      <Icon name="lock" /> Đăng xuất
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </header>
-
-        <main className="kp-main kh-main">
+    <>
+    <WorkspaceShell roleLabel="Khách hàng" eyebrow="Cổng khách hàng"
+      title={navItems.find(item => item.id === activeTab)?.title || extraTitles[activeTab] || 'Cổng khách hàng'}
+      items={navItems.map(item => ({ id: item.id, label: item.title, icon: item.icon, locked: Boolean(locks[item.id]) }))}
+      activeTab={activeTab} onSelect={goTo} user={user} showBranch={false}
+      onAccount={() => goTo('tai-khoan')} onLogout={logout} mainClassName="kh-main"
+      footer={<div className="kp-support-mini"><span>Hỗ trợ 24/7</span><strong>1900 6789</strong></div>}>
           {loading && <div className="kp-loading"><span /><p>Đang tải cổng khách hàng...</p></div>}
           {!loading && error && <div className="kp-message error">{error}</div>}
           {!loading && !error && renderCurrentTab()}
           {detailLoading && <div className="kh-detail-overlay"><span className="kh-detail-spinner" /></div>}
-        </main>
-      </div>
+    </WorkspaceShell>
 
       {registrationNoticeOpen && (
         <div className="kp-modal-backdrop" onMouseDown={() => setRegistrationNoticeOpen(false)}>
@@ -4343,6 +4254,6 @@ export default function KhachHangPortalPage() {
           </form>
         </div>
       )}
-    </div>
+    </>
   );
 }

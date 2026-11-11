@@ -1,26 +1,7 @@
-/* Sale workspace: independently written presentation, scoped to this role. */
+/* Sale workspace content. The frame itself lives in shell.css (.ui-workspace). */
 .sale-workspace { --sale-wood: var(--color-primary); --sale-paper: var(--color-primary-soft); }
-.sale-workspace.ui-employee-shell .kp-sidebar { background: var(--color-bg); border-right: 1px solid var(--color-border); }
-.sale-workspace .ui-role-label { color: var(--color-primary); }
-.sale-brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; font-family: var(--font-heading); font-size: 20px; font-weight: 600; color: var(--color-primary); }
-.sale-brand > .ui-icon { font-size: 28px; }
-.sale-brand > span > span { color: var(--sale-wood); }
-.sale-workspace.ui-employee-shell .ktp-side-item { min-height: 52px; border-radius: var(--radius-pill); font-size: 15px; color: var(--color-text-muted); }
-.sale-workspace.ui-employee-shell .ktp-side-item .ui-icon { font-size: var(--icon-md); }
-.sale-workspace.ui-employee-shell .ktp-side-item.is-active { background: var(--sale-wood); color: var(--color-surface); box-shadow: var(--shadow-md); }
 .sale-workspace .ui-btn--secondary { border: 1px solid var(--color-border); }
-.sale-workspace .ktp-side-item:not(.is-active):hover { background: var(--color-surface); color: var(--color-primary); }
-.sale-workspace .ktp-side-item:disabled { opacity: .5; cursor: not-allowed; }
-.sale-sidebar-footer { margin-top: auto; padding: var(--space-6); display: flex; gap: var(--space-3); align-items: center; color: var(--color-text-muted); font-size: 12px; }
-.sale-sidebar-footer p { margin: 0; line-height: 1.6; }
-.sale-sidebar-mark { display: grid; place-items: center; width: 40px; height: 40px; color: var(--color-primary); background: var(--color-surface); border-radius: var(--radius-md); }
-.sale-workspace .sale-topbar { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); }
-.sale-workspace .sale-topbar h1 { margin: 0; font-size: 22px; }
 .sale-eyebrow { color: var(--sale-wood, var(--color-accent)); font-size: 10px; font-weight: 600; letter-spacing: .1em; margin: 0 0 var(--space-2); }
-.sale-account { display: inline-flex; align-items: center; gap: var(--space-3); padding: var(--space-2); border: 0; border-radius: var(--radius-md); background: transparent; text-align: left; cursor: pointer; color: var(--color-text); }
-.sale-account small { display: block; color: var(--color-text-muted); margin-top: var(--space-1); }
-.sale-account .kp-avatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-pill); background: var(--color-primary-soft); color: var(--color-primary); font-weight: 600; }
-.ui-employee-shell.sale-workspace .kp-main { padding: var(--space-8) !important; }
 .sale-view { display: flex; flex-direction: column; gap: var(--space-6); min-width: 0; }
 .sale-workspace .lhd-container { min-width: 0; padding: 0; background: var(--color-bg); --lhd-bg: var(--color-bg); --lhd-white: var(--color-surface); }
 .sale-workspace .lhd-container { --lhd-primary: var(--color-primary); --lhd-primary-dark: var(--color-primary-hover); --lhd-primary-light: var(--color-primary-soft); --lhd-secondary: var(--color-primary-hover); --lhd-success: var(--color-success); --lhd-danger: var(--color-danger); --lhd-text: var(--color-text); --lhd-text-muted: var(--color-text-muted); --lhd-border: var(--color-border); --lhd-border-light: var(--color-border); }
@@ -172,9 +153,6 @@
 @media (max-width: 800px) { .sale-overview-columns, .sale-customer-columns, .sale-booking-time { grid-template-columns: minmax(0, 1fr); } .sale-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sale-booking-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 1000px) { .sale-lookup-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) {
-  .ui-employee-shell.sale-workspace .kp-main { padding: var(--space-4) !important; }
-  .sale-workspace .sale-topbar { align-items: stretch; }
-  .sale-account > span:last-child { display: none; }
   .sale-workspace .kp-top-actions { flex-wrap: wrap; }
   .sale-view { gap: var(--space-4); }
   .sale-stat, .sale-panel { padding: var(--space-4); }

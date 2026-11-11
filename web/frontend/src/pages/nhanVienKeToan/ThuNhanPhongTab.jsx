@@ -3,11 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { thuNhanPhongApi } from './thuNhanPhong.api.js';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
+import StatusBadge from '../../components/common/StatusBadge.jsx';
+import ListSearch from '../../components/common/ListSearch.jsx';
+import TableState from '../../components/common/TableState.jsx';
 
 // Cấu hình trạng thái thu tiền: chip label, badge label, màu badge (giống DatCocTab).
 const TNP_STATUS_CONFIG = {
-  'Chưa thanh toán': { chip: 'Chờ thu tiền',    badgeLabel: 'Chờ thu tiền',    badge: { bg: '#fff4e5', fg: '#b45309' } },
-  'Đã thanh toán':   { chip: 'Đã thanh toán',   badgeLabel: 'Đã thanh toán',   badge: { bg: '#e6f6ec', fg: '#15803d' } },
+  'Chưa thanh toán': { chip: 'Chờ thu tiền',    badgeLabel: 'Chờ thu tiền',    tone: 'warning' },
+  'Đã thanh toán':   { chip: 'Đã thanh toán',   badgeLabel: 'Đã thanh toán',   tone: 'success' },
 };
 const TNP_STATUS_ORDER = ['Chưa thanh toán', 'Đã thanh toán'];
 
@@ -286,26 +289,10 @@ export default function ThuNhanPhongTab() {
 
       {/* Table */}
       <>
-<OverviewCards items={[{ key: 'all', label: 'Tất cả' }, ...TNP_STATUS_ORDER.map((s) => ({ key: s, label: TNP_STATUS_CONFIG[s].chip }))]} counts={statusCounts} />
+<OverviewCards items={[{ key: 'all', label: 'Tất cả' }, ...TNP_STATUS_ORDER.map((s) => ({ key: s, label: TNP_STATUS_CONFIG[s].chip }))]} counts={statusCounts} activeKey={trangThai} onSelect={setTrangThai} />
 <div className="ui-list-toolbar">
-          <label className="ui-list-search">
-            <span className="ui-search-label">Tìm kiếm</span>
-            <Icon name="search" />
-<input
-              type="text"
-              value={tuKhoa}
-              onChange={(e) => { setTuKhoa(e.target.value); loadContracts({ tuKhoa: e.target.value }); }}
-              placeholder="Mã hợp đồng, tên khách hàng, SĐT..."
-              className="ktp-input"
-
-            />
-          </label>
-          {tuKhoa && (
-            <button type="button" onClick={() => { setTuKhoa(''); loadContracts({ tuKhoa: '' }); }} className="ktp-btn-cancel" >Xóa lọc</button>
-          )}
-
+          <ListSearch value={tuKhoa} onChange={(value) => { setTuKhoa(value); loadContracts({ tuKhoa: value }); }} placeholder="Mã hợp đồng, tên khách hàng, SĐT..." />
 <StatusFilterTabs
-          className="status-pill-tabs-offset"
           items={[{ key: 'all', label: 'Tất cả' }, ...TNP_STATUS_ORDER.map((s) => ({ key: s, label: TNP_STATUS_CONFIG[s].chip }))]}
           activeKey={trangThai}
           counts={statusCounts}
@@ -317,10 +304,7 @@ export default function ThuNhanPhongTab() {
 
 
 
-        {loading && <div className="tnp-state tnp-state-loading">Đang tải dữ liệu...</div>}
-        {errorMsg && <div className="tnp-state tnp-state-error">{errorMsg}</div>}
-        
-        {!loading && !errorMsg && (
+        {(
           <div className="tnp-table-scroll">
             <table className="ktp-table">
               <thead>
@@ -329,26 +313,21 @@ export default function ThuNhanPhongTab() {
                   <th>Khách hàng</th>
                   <th>Phòng / Giường</th>
                   <th>Ngày bắt đầu</th>
-                  <th>Cần thu kỳ đầu</th>
-                  <th className="text-center">Trạng thái</th>
-                  <th className="text-center">Hành động</th>
+                  <th className="ui-num">Cần thu kỳ đầu</th>
+                  <th>Trạng thái</th>
+                  <th className="ui-num">Hành động</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredContracts.length === 0 ? (
-                  <tr>
-                    <td colSpan="7">
-                      <div className="tnp-empty-state">
-                        <Icon name="receipt_long" />
-                        <strong>Không tìm thấy hợp đồng nào</strong>
-                        <p>Thử đổi trạng thái thu tiền hoặc nhập từ khóa khác.</p>
-                      </div>
-                    </td>
-                  </tr>
+                {loading ? (
+                  <TableState kind="loading" colSpan={7} message="Đang tải dữ liệu..." />
+                ) : errorMsg ? (
+                  <TableState kind="error" colSpan={7} message={errorMsg} />
+                ) : filteredContracts.length === 0 ? (
+                  <TableState kind="empty" colSpan={7} message="Không tìm thấy hợp đồng nào. Thử đổi trạng thái thu tiền hoặc nhập từ khóa khác." />
                 ) : (
                   filteredContracts.map(contract => {
                     const cfg = TNP_STATUS_CONFIG[contract.TrangThaiThuTien];
-                    const badgeStyle = cfg ? cfg.badge : { bg: '#eef2f3', fg: '#3f494a' };
                     return (
                       <tr key={contract.MaHopDong}>
                         <td><span className="tnp-contract-code">{contract.MaHopDong}</span></td>
@@ -364,17 +343,15 @@ export default function ThuNhanPhongTab() {
                           <p className="tnp-room-cell">{contract.PhongGiuong}</p>
                         </td>
                         <td>{formatDate(contract.NgayBatDau)}</td>
-                        <td className="tnp-money-cell">{formatCurrency(contract.TongTien)}</td>
-                        <td className="text-center">
-                          <span style={{ background: badgeStyle.bg, color: badgeStyle.fg, padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', display: 'inline-block', textAlign: 'center' }}>
-                            {cfg ? cfg.badgeLabel : contract.TrangThaiThuTien}
-                          </span>
+                        <td className="tnp-money-cell ui-num">{formatCurrency(contract.TongTien)}</td>
+                        <td>
+                          <StatusBadge status={cfg ? cfg.badgeLabel : contract.TrangThaiThuTien} tone={cfg?.tone || 'neutral'} />
                         </td>
-                        <td className="text-center">
+                        <td className="ui-num">
                           {contract.TrangThaiThuTien === 'Đã thanh toán' ? (
-                            <button className="tnp-row-action is-muted" onClick={() => handleOpenDetailModal(contract.MaHopDong)}>Xem hóa đơn</button>
+                            <button type="button" className="ui-btn ui-btn--secondary ui-btn--sm" onClick={() => handleOpenDetailModal(contract.MaHopDong)}>Xem hóa đơn</button>
                           ) : (
-                            <button className="tnp-row-action" onClick={() => handleOpenCreateModal(contract.MaHopDong)}>Ghi nhận thu tiền</button>
+                            <button type="button" className="ui-btn ui-btn--primary ui-btn--sm" onClick={() => handleOpenCreateModal(contract.MaHopDong)}>Ghi nhận thu tiền</button>
                           )}
                         </td>
                       </tr>

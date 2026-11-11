@@ -2,7 +2,15 @@
 
 Lập 2026-11-11 (J-C059), cập nhật 09:40 cùng ngày (J-C060), kèm [audit-2026-11-11.md](audit-2026-11-11.md). Mỗi khối dưới đây là một prompt dán nguyên văn. Thứ tự và mức ưu tiên theo **D-037** (Vy đã chốt).
 
-**Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036). **Việc kế tiếp:** Vy xin faucet → A2 → A3; song song B1, C6.
+**Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036), B0 khung chung (J-C061), C2 + B3 (J-C064); **A2 funding/deploy/source verification thật (J-X068)**, config riêng tại worktree A2 và kiểm route config/read roles khớp. **Tiếp A3:** đưa cấu hình vào phiên ứng dụng đầy đủ, chuẩn bị hợp đồng demo và chạy trọn luồng SQL/SMTP/OTP Privy; chưa chạy các bước đó. Song song B1, C6.
+
+**Ai làm việc nào:** mỗi file chỉ một người sửa. **Chia lại 2026-11-11 15:3x (Vy chọn, J-C064)** vì Codex đang chờ AVAX cho A2 nên chuỗi trả phòng đứng yên; thay bảng chia lúc 10:11 (J-C061).
+- **Claude:** chuỗi trả phòng C2 (gộp B3, **xong**), C3 (gộp B4), C4; D1–D3 (bản nháp xong). C5: chưa đổi người, đề xuất Claude làm sau C4 vì backend đã viết ở `feat/t22-backend`. Codex **không** sửa: `pages/nhanVienQuanLy/{KiemTraTraPhong,XuLyTraPhongTab,thanhlytraphong,GhiNhanBanGiaoRa,XacNhanPhanHoi}.jsx`, `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx`, `web/backend/services/{doiSoat*,khauTruDoiSoat,thuThemDoiSoat,hoanCocDoiSoat,kiemTraTraPhong,traPhongSoSanh,thanhlytraphong}*.js`, `styles/lists.css` (chỉ thêm ở cuối nếu cần).
+- **Codex:** A2, A3 (Fuji, làm trước); sau đó B1, B2, B5, B7, C6; E1–E3. Được sửa `components/common/WorkspaceShell.jsx`, `styles/shell.css`, `KhachHangPortalPage.jsx`, các file còn lại trong `components/xacNhan/`, `pages/avalanche/*`, `pages/thanhToanMoPhong/*`, `BanGiaoPhongTab.jsx` khi làm B1/B2/B5.
+
+**Bộ danh sách chung (J-C062, Claude):** `ListSearch`, `TableState`, `ListPagination`, `OverviewCards` lọc được, `StatusBadge` có icon; CSS ở `styles/lists.css` (Claude giữ file này, Codex chỉ thêm quy tắc ở cuối file nếu cần). Codex dùng chúng khi làm B3, B4, B7, C4.
+
+**Quy tắc D-039:** chức năng đã bỏ thì bỏ luôn tab, mục menu, trang, route; nếu chức năng thay thế chưa xong thì bỏ trong cùng việc làm chức năng thay thế.
 
 ## Cách dùng
 
@@ -19,9 +27,9 @@ Lập 2026-11-11 (J-C059), cập nhật 09:40 cùng ngày (J-C060), kèm [audit-
 | Ngày | Việc |
 |---|---|
 | 11/11 | ~~A1~~, ~~C1~~ (xong); Vy xin faucet; A2 |
-| 12/11 | A3; B1; C6 |
-| 13–15/11 | B2 → B5; C2, C3, C4 |
-| 16–17/11 | B6, B7, C5, E1; dự phòng |
+| 12/11 | A3 (Codex + Vy); C6, B7 (Codex); B1 (Claude) |
+| 13–15/11 | C2+B3, C3+B4, C4 (Codex); B5, B2, giao diện C5 (Claude) |
+| 16–17/11 | backend C5, E1 (Codex); B6 nếu kịp (Claude); dự phòng |
 | 18–19/11 | D1, D2, D3; E2, E3 nếu còn thời gian |
 
 ---
@@ -44,7 +52,7 @@ Việc: chuẩn bị ví thử cho Fuji mà không để khóa bí mật lộ ra
 Xong thì báo Vy địa chỉ ví deployer để xin faucet (hai ví còn lại nhận AVAX từ fuji:fund).
 ```
 
-### A2 — Deploy, verify source, chuyển cấu hình sang Fuji
+### A2 — Deploy, verify source, chuyển cấu hình sang Fuji (J-X068: deploy/source đã xác minh; env riêng đã chuẩn bị, chưa restart app đầy đủ)
 
 ```
 Điều kiện: ví deployer 0x7bb2e96898Db7e387e118eB92a9C390E29f54B2f đã có AVAX thử (Vy xin faucet). Nhánh: chore/fuji-deploy. File khóa nằm ở D:\HomeStayDorm-fuji\blockchain (.env và .fuji-backend-env.local, bị Git bỏ qua): chạy các lệnh Fuji tại thư mục đó hoặc nhờ Vy chép hai file sang thư mục làm việc mới; không in nội dung file.
@@ -68,7 +76,7 @@ Việc: soạn bảng kiểm và sửa lỗi phát sinh khi Vy chạy luồng th
    hợp đồng ở trạng thái chờ bàn giao → quản lý lập biên bản (có ảnh) → khách mở tab Hợp đồng, yêu cầu chỉnh sửa → quản lý phát hành bản mới → khách xác nhận (nhập OTP Privy thật) → kế toán lập đối soát bản 1 → khách phản đối có lý do → kế toán lập bản 2 → khách đồng ý → tải bản lưu → trang /kiem-chung-avalanche báo khớp → sửa một số trong file, trang báo lệch.
 2. Ghi rõ cách chuẩn bị một hợp đồng demo (dùng luồng Web2 thật hoặc script có sẵn; không sửa dữ liệu khác trong HOMEDORM4).
 3. Khi Vy báo lỗi ở bước nào: tìm nguyên nhân, sửa, thêm test nếu được. Ghi lại thời hạn phiên Privy quan sát được (D-028).
-4. Kết thúc: cập nhật T-08 trong spec/progress.md với link 5 giao dịch (ghi biên bản, khách xác nhận, đối soát bản 1, phản đối, đồng ý bản 2).
+4. Kết thúc: cập nhật T-08 trong spec/progress.md và bảng giao dịch ở README mục 3.4 với link 6 giao dịch (ghi biên bản, khách xác nhận, đối soát bản 1, phản đối, đối soát bản 2, đồng ý bản 2); ghi phí gas đo được.
 ```
 
 ---
@@ -82,7 +90,7 @@ Việc: làm lại trình bày màn <TÊN MÀN> theo skill .agents/skills/homest
 File chính: <FILE>. Tham khảo bố cục (chỉ xem, không chép code): màn tương ứng trong D:\Nam4\Contest\Homestay-Dorm\apps\frontend\src\features\<VAI TRÒ>.
 
 1. Chụp ảnh màn hiện tại ở 1440px và 390px với dữ liệu thật trên máy (nhờ Vy đăng nhập nếu cần), lưu vào web/frontend/.ui-screens/.
-2. Bỏ toàn bộ style={{…}} trong file: chuyển sang lớp chung (ui-btn, ui-card, ui-table, ui-badge, ui-form-field…) và component chung (PageHeader, StatusBadge, EmptyState, OverviewCards, FormInput). Thiếu lớp thì thêm vào src/styles/, không viết riêng trong trang.
+2. Bỏ toàn bộ style={{…}} trong file: chuyển sang lớp chung (ui-btn, ui-card, ui-table, ui-badge, ui-form-field…) và component chung (PageHeader, StatusBadge, EmptyState, OverviewCards, FormInput). Danh sách làm theo mẫu trong skill (J-C062): OverviewCards có onSelect, ListSearch, StatusFilterTabs, TableState, ListPagination; xem XacNhanThanhToanTab.jsx làm ví dụ. Thiếu lớp thì thêm vào src/styles/, không viết riêng trong trang.
 3. Một tiêu đề, một nút chính mỗi màn; đủ trạng thái đang tải / rỗng / lỗi / thành công; bảng cuộn trong thẻ ở màn hẹp.
 4. KHÔNG đổi: API, state, điều kiện hiển thị, chữ nghiệp vụ, logic trong components/xacNhan và lib/avalanche. Nếu file quá dài, được tách component con trong cùng thư mục nhưng giữ nguyên hành vi.
 5. Kiểm tra: npm run build; npm run test:avalanche-ui; chụp lại ảnh sau; báo số style={{ trước và sau.
@@ -90,17 +98,21 @@ File chính: <FILE>. Tham khảo bố cục (chỉ xem, không chép code): màn
 
 | Mã | Màn | File chính | `style` hiện có | Vai trò mẫu |
 |---|---|---|---|---|
-| B1 | Khách: tab Hợp đồng + khu xác nhận biên bản/đối soát | `pages/khachHang/KhachHangPortalPage.jsx` (chỉ phần tab Hợp đồng), `components/xacNhan/HopDongXacNhanSection.jsx`, `DocumentView.jsx` | 78 (cả file) | customer |
-| B2 | Quản lý: Bàn giao phòng + "Khách xác nhận biên bản" | `pages/nhanVienQuanLy/BanGiaoPhongTab.jsx`, `components/xacNhan/QuanLyXacNhanTab.jsx` | 140 | manager |
-| B3 | Quản lý: Kiểm tra trả phòng | `pages/nhanVienQuanLy/KiemTraTraPhong.jsx` | 144 | manager |
-| B4 | Kế toán: Quyết toán trả phòng + "Khách xác nhận đối soát" | `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx` | 46 | accountant |
-| B5 | Trang kiểm chứng + cổng ví mô phỏng | `pages/avalanche/AvalancheVerifyPage.jsx`, `pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx` | — | landing |
-| B6 | Trang chủ + đăng nhập/đăng ký (rà lần cuối) | `pages/TrangChu.jsx` | 0 | landing, auth |
+| B1 (Codex, sau Fuji) | Khách: tab Hợp đồng + khu xác nhận biên bản/đối soát | `pages/khachHang/KhachHangPortalPage.jsx` (chỉ phần tab Hợp đồng), `components/xacNhan/HopDongXacNhanSection.jsx`, `DocumentView.jsx` | 78 (cả file) | customer |
+| B2 (Codex, sau Fuji) | Quản lý: Bàn giao phòng + "Khách xác nhận biên bản" | `pages/nhanVienQuanLy/BanGiaoPhongTab.jsx`, `components/xacNhan/QuanLyXacNhanTab.jsx` | 140 | manager |
+| B3 (Claude, cùng C2, **xong J-C064**) | Quản lý: Kiểm tra trả phòng | `pages/nhanVienQuanLy/KiemTraTraPhong.jsx` | 144 → 0 | manager |
+| B4 (Claude, cùng C3) | Kế toán: Quyết toán trả phòng + "Khách xác nhận đối soát" | `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx` | 46 | accountant |
+| B5 (Codex, sau Fuji) | Trang kiểm chứng + cổng ví mô phỏng | `pages/avalanche/AvalancheVerifyPage.jsx`, `pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx` | — | landing |
+| B6 (Claude, nếu kịp) | Trang chủ + đăng nhập/đăng ký (rà lần cuối) | `pages/TrangChu.jsx` | 0 | landing, auth |
 
-| B7 | Sale: việc nhỏ còn lại sau D-036 (prompt riêng bên dưới) | `pages/nhanVienSale/*` | — | sale |
+| B7 (Codex) | Sale: việc nhỏ còn lại sau D-036 (prompt riêng bên dưới) | `pages/nhanVienSale/*` | — | sale |
 
 Ghi chú B1: `KhachHangPortalPage.jsx` dài 4.346 dòng. Chỉ sửa phần tab Hợp đồng; tách phần đó thành component riêng nếu cần, không đụng các tab khác.
 Ghi chú B5: trang kiểm chứng là màn giám khảo nhìn kỹ nhất. Phải rõ 3 kết quả: khớp, file bị sửa, không đọc được chuỗi; có link explorer.
+
+### B0 — Khung chung (ĐÃ XONG, J-C061)
+
+Tất cả vai trò dùng `components/common/WorkspaceShell.jsx`; CSS ở `styles/shell.css` (lớp `.ui-workspace`). Kiểm tra: `npm run test:shell-ui`.
 
 ### B7 — Việc nhỏ còn lại của không gian Sale
 
@@ -109,7 +121,7 @@ Việc: sửa các điểm còn lại sau đợt xem nhánh feat/ui-sale-workspa
 1. Tổng quan: "Xử lý đặt cọc / thu tiền tại quầy" đang là một dòng chữ nhỏ; đưa thành thẻ hành động thứ năm ngang hàng 4 thẻ còn lại. Màn Lập hợp đồng: "Hỗ trợ khai thông tin người ở" đưa thành nút phụ cạnh "Hợp đồng đã lập".
 2. Ô chọn ngày đang hiện mm/dd/yyyy theo trình duyệt: hiện dd/mm/yyyy (đặt lang="vi" cho thẻ html hoặc dùng cách hiển thị sẵn có của dự án).
 3. web/frontend/src/styles/contractPresentation.css có 170 lớp đánh số (lhd-display-001…) sinh ra khi chuyển style viết tay: gộp các lớp trùng nội dung, đổi tên theo ý nghĩa cho các lớp dùng từ 3 lần trở lên; bản in hợp đồng (window.print) phải giữ nguyên hình thức. Không cần xử lý hết nếu quá 2 giờ.
-4. DangKyTraPhongTab.jsx và CSS của nó không còn được dùng sau D-036: xóa nếu tìm kiếm import xác nhận không ai gọi; giữ API backend.
+4. Theo D-039, xóa các tab Sale đã bỏ khỏi nghiệp vụ mà file vẫn còn: DangKyTraPhongTab.jsx (trả phòng, D-036), TraCuuPhongTab.jsx (Kiểm tra phòng/giường, D-035) cùng CSS chỉ chúng dùng; tìm import trước khi xóa; giữ API backend.
 5. Nhờ Vy đăng nhập tài khoản Sale thật, đi một lượt: tiếp nhận hồ sơ → lập lịch → thu cọc tiền mặt → lập hợp đồng → tải ảnh hợp đồng đã ký. Ghi lỗi gặp phải và sửa.
 Kiểm tra: build, test:avalanche-ui, test:handover-ui, ui-sale-workspace.mjs.
 ```
@@ -132,7 +144,7 @@ Hiện trạng: web/backend/integrations/avalanche/sources.js (handover) trả i
 Chưa rõ tên cột nào thì đọc database/CreateDB/app.sql trước, không đoán.
 ```
 
-### C2 — Màn kiểm tra trả phòng so trước/sau (D-030 mục 1)
+### C2 — Màn kiểm tra trả phòng so trước/sau (D-030 mục 1) (ĐÃ XONG, Claude, J-C064; nhánh `feat/t22-checkout`)
 
 ```
 Việc: trên màn Kiểm tra trả phòng của quản lý, hiện cạnh nhau tình trạng lúc bàn giao vào (biên bản khách đã xác nhận, kèm ảnh nếu có) và ô nhập tình trạng hiện tại cho từng tài sản. Nhánh: feat/t22-checkout-compare.
@@ -141,7 +153,7 @@ Việc: trên màn Kiểm tra trả phòng của quản lý, hiện cạnh nhau 
 3. Làm sau hoặc cùng B3 để tránh hai nhánh cùng sửa KiemTraTraPhong.jsx.
 ```
 
-### C3 — Bản nháp đối soát tự soạn (D-030 mục 2, 3)
+### C3 — Bản nháp đối soát tự soạn (D-030 mục 2, 3) (Claude)
 
 ```
 Việc: khảo sát rồi bổ sung. Nhánh: feat/t22-settlement-draft.
@@ -151,7 +163,7 @@ Việc: khảo sát rồi bổ sung. Nhánh: feat/t22-settlement-draft.
 4. Test SQL chạy trong transaction rồi rollback, theo mẫu scripts/deposit-flow-verify.mjs.
 ```
 
-### C4 — Tự thanh lý và gói bằng chứng cuối (D-030 mục 5, D-031 mục 1)
+### C4 — Tự thanh lý và gói bằng chứng cuối (D-030 mục 5, D-031 mục 1) (Claude)
 
 ```
 Việc: tự thanh lý hợp đồng khi tiền đã xong. Nhánh: feat/t22-auto-liquidation. KHÔNG sửa contract.
@@ -159,6 +171,7 @@ Việc: tự thanh lý hợp đồng khi tiền đã xong. Nhánh: feat/t22-auto
 2. Quản lý bấm "Đã thu chìa khóa" → phòng/giường về Trống.
 3. Gói bằng chứng cuối (Web2): thêm mã băm chứng từ chi/thu, số tiền, thời điểm; khách tải được; gửi email. Trang kiểm chứng hiện phần này và ghi rõ "thông tin do bên cho thuê ghi nhận, không nằm trên chuỗi".
 4. Khách không phản hồi: email nhắc sau 24 giờ và 72 giờ; quá 7 ngày đánh dấu "Quá hạn phản hồi". Không bao giờ tự chấp nhận thay trên chuỗi.
+6. Theo D-039: khi tự thanh lý đã chạy, bỏ tab con "Thanh lý trả phòng" trong pages/nhanVienQuanLy/XuLyTraPhongTab.jsx (và file thanhlytraphong.jsx nếu không còn ai dùng); nếu "Ghi nhận bàn giao ra" được thay bằng nút "Đã thu chìa khóa" thì bỏ luôn tab con đó. Không để lại tab chết.
 5. Theo D-038 (đã chốt): thêm thao tác "Thanh lý không có xác nhận của khách" cho quản lý, chỉ bật khi đã quá 7 ngày kể từ lúc gửi (biên bản bàn giao hoặc đối soát) hoặc đối soát đang bị phản đối; bắt buộc lý do và file bằng chứng đã liên hệ. Không gọi contract; gói bằng chứng cuối và trang kiểm chứng ghi rõ "đóng không có xác nhận của khách". Trường hợp bàn giao chưa từng được xác nhận: đối soát chỉ chạy ở Web2, không ghi lên chuỗi.
 ```
 
@@ -172,7 +185,7 @@ Việc: tiếp nhánh feat/t22-backend (đã có SP_KhachGiuCho, SP_KhachKhongTh
 4. Giao diện khách: nút "Giữ chỗ" trên thẻ buổi đã xem (chọn phòng, hình thức, giường), lời nhắn chờ quản lý tối đa 12 giờ, nút "Không thuê nữa"; thanh tiến trình Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ. Giao diện Sale: nút "Khách không đến".
 ```
 
-### C6 — Điều khoản xác nhận điện tử và ô đồng ý dữ liệu cá nhân (D-038)
+### C6 — Điều khoản xác nhận điện tử và ô đồng ý dữ liệu cá nhân (D-038) (Codex, sau Fuji)
 
 ```
 Việc nhỏ, chỉ sửa chữ và một ô tích. Nhánh: feat/t22-consent-wording.
@@ -186,15 +199,15 @@ Việc nhỏ, chỉ sửa chữ và một ô tích. Nhánh: feat/t22-consent-wor
 
 ## Nhóm D — Hồ sơ nộp
 
-### D1 — README nộp bài
+### D1 — README nộp bài (BẢN NHÁP XONG, J-C063; điền số liệu Fuji sau A2/A3, ghi công sau Q-07)
 
 ```
 Việc: viết lại README.md gốc cho giám khảo. Nhánh: docs/submission.
-Thứ tự: một đoạn bài toán và người dùng → ảnh hoặc sơ đồ luồng → phần trên Avalanche (địa chỉ contract, link explorer, link 5 giao dịch mẫu từ spec/progress.md, vì sao on-chain) → cách chạy từ đầu (dùng lệnh của việc E1) → kiểm thử → phần MÔ PHỎNG (cổng thanh toán, dữ liệu giả) → giới hạn (pháp lý, mất ví, một cặp khóa vận hành) → phần có sẵn từ đồ án nhóm trước cuộc thi và phần làm trong cuộc thi, ghi công (hỏi Vy nội dung Q-07) → thư viện bên thứ ba.
+Thứ tự: một đoạn bài toán và người dùng → ảnh hoặc sơ đồ luồng → phần trên Avalanche (địa chỉ contract, link explorer, link 6 giao dịch mẫu từ spec/progress.md, vì sao on-chain) → cách chạy từ đầu (dùng lệnh của việc E1) → kiểm thử → phần MÔ PHỎNG (cổng thanh toán, dữ liệu giả) → giới hạn (pháp lý, mất ví, một cặp khóa vận hành) → phần có sẵn từ đồ án nhóm trước cuộc thi và phần làm trong cuộc thi, ghi công (hỏi Vy nội dung Q-07) → thư viện bên thứ ba.
 Không viết điều chưa có bằng chứng; không nói đã kiểm toán hay có người dùng thật. Chuyển phần cấu hình chi tiết hiện có sang docs/cau-hinh.md.
 ```
 
-### D2 — Dàn ý slide
+### D2 — Dàn ý slide (BẢN NHÁP XONG, J-C063: `hackathon/slides.md`)
 
 ```
 Việc: soạn nội dung slide (8–10 trang) thành hackathon/slides.md để Vy dựng trên Canva/Google Slides.
@@ -202,7 +215,7 @@ Trang 1 nói ngay phần nào là mô phỏng. Các trang: người dùng và n�
 Mỗi trang tối đa 3 ý, kèm lời nói 2–3 câu. Số liệu nào chưa kiểm chứng thì ghi rõ là giả định.
 ```
 
-### D3 — Kịch bản video 2:30–2:50
+### D3 — Kịch bản video 2:30–2:50 (BẢN NHÁP XONG, J-C063: `hackathon/video-script.md`)
 
 ```
 Việc: viết hackathon/video-script.md theo D-018 và luồng trong spec/kiem-thu-fuji.md: bảng 3 cột (giây, hình trên màn, lời nói). Mở đầu 10 giây nêu vấn đề và nói rõ phần mô phỏng; 110 giây demo liền mạch từ hợp đồng chờ bàn giao đến trang kiểm chứng và explorer; 30 giây vì sao Avalanche và giới hạn. Liệt kê dữ liệu cần chuẩn bị trước khi quay.

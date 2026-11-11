@@ -1,4 +1,6 @@
+import multer from 'multer';
 import { kiemTraTraPhongService } from '../services/kiemTraTraPhong.service.js';
+import { checkoutComparison } from '../services/traPhongSoSanh.service.js';
 
 export const quanLyDanhSachChoXuLy = async (req, res, next) => {
   try {
@@ -43,3 +45,25 @@ export const quanLyLapBienBanKiemTra = async (req, res, next) => {
     next(error);
   }
 };
+
+// C2 / D-030 (1): move-in condition next to the inspection, and private inspection photos.
+const parsePhoto = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024, files: 1 } }).single('file');
+export const anhUpload = (req, res, next) => parsePhoto(req, res, error => next(error
+  ? Object.assign(new Error('Chọn một ảnh tối đa 5 MB.'), { statusCode: 400 }) : undefined));
+const handle = fn => async (req, res, next) => { try { await fn(req, res); } catch (error) { next(error); } };
+
+export const quanLyBanGiaoVao = handle(async (req, res) => res.json(await checkoutComparison.moveIn(req.user, req.params.maPhieuTra)));
+export const quanLyDanhSachAnh = handle(async (req, res) => res.json(await checkoutComparison.photos(req.user, req.params.maPhieuTra)));
+export const quanLyTaiAnh = handle(async (req, res) => res.status(201)
+  .json(await checkoutComparison.upload(req.user, req.params.maPhieuTra, req.file, req.body?.keyTaiSan)));
+export const quanLyXoaAnh = handle(async (req, res) => {
+  await checkoutComparison.remove(req.user, req.params.maPhieuTra, req.params.maAnh);
+  res.json({ message: 'Đã xóa ảnh.' });
+});
+export const quanLyFileAnh = handle(async (req, res) => {
+  const { photo, buffer } = await checkoutComparison.read(req.user, req.params.maPhieuTra, req.params.maAnh);
+  res.setHeader('Content-Type', photo.mediaType);
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.send(buffer);
+});

@@ -35,6 +35,14 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 
 Theo yêu cầu Vy ngày 11/11: tạo ba ví mới (deployer kiêm manager, accountant, relayer), chỉ in địa chỉ; khóa lưu trong `.env` và `.fuji-backend-env.local` bị ignore, từ chối ghi đè khóa cũ. Script chia 0,3 AVAX thử cho accountant và relayer, kiểm tra đúng Fuji và đủ tiền/gas trước giao dịch, in số dư ba ví; chưa deploy. Khóa vận hành không phải khóa ví khách. Không chạy SQL hoặc đổi cấu hình ứng dụng trong A1; deploy/verify/nghiệm thu thật vẫn thuộc F-09/A2–A3.
 
+### C2 — Kiểm tra trả phòng so trước/sau (D-030 mục 1)
+
+- Màn kiểm tra trả phòng của quản lý hiện cột "Lúc nhận phòng" cạnh hiện trạng từng tài sản, ảnh lúc nhận phòng và trạng thái biên bản: bản khách đã xác nhận điện tử (kèm phiên bản, giờ), bản mới nhất chưa xác nhận, hoặc chỉ có biên bản Web2. Ghép theo mã tài sản khi tra được, nếu không theo tên; không đổi cấu trúc bản đã ký.
+- Món đã ghi hư hỏng lúc nhận phòng mà quản lý chọn hư hỏng thì hiện cảnh báo "hư hỏng cũ không tính cho khách"; chỉ cảnh báo, không chặn, vì món đó có thể hư thêm.
+- Quản lý tải tối đa 10 ảnh PNG/JPG/WebP (5 MB mỗi ảnh), gắn cả phòng hoặc một món; file lưu riêng trong `web/backend/secrets/checkout-photos/`, bảng `KiemTraTraPhongAnh` giữ tên file và SHA-256. Sau khi lưu biên bản kiểm tra thì không thêm/xóa ảnh. Chỉ quản lý đúng chi nhánh dùng được; kế toán và khách xem ảnh sẽ thêm ở C3.
+
+**A2 (J-X067, theo việc cho agent bản 11/11 09:40):** thay mức nạp A1 bằng mục tiêu 0,1 AVAX mỗi ví phụ; bỏ qua ví đủ tiền, ví thiếu chỉ nhận phần chênh lệch. Có chế độ chỉ kiểm tra, dự phòng gas và kiểm receipt. Deploy tự nạp env, kiểm mạng/vai trò/phí, giữ pending hash để tiếp tục đọc receipt, không ghi đè manifest Fuji. Verify source dùng Sourcify API v2, đối chiếu input/compiler/constructor và yêu cầu creation/runtime exact match; chưa có kết quả thật thì giữ pending. Trang kiểm chứng hiện link contract khi cấu hình Fuji hợp lệ. Không thay contract hoặc quy tắc xác nhận; đổi env ứng dụng sau khi có deployment/verification thật, rồi nghiệm thu A3.
+
 ### C1 — Điều khoản và bản chụp hợp đồng trong bàn giao v2 (D-027/D-031/D-034)
 
 - Payload `homestaydorm.handover.v2`: `contractTerms` chứa mã hợp đồng, giá thuê, ngày bắt đầu/kết thúc, kỳ thanh toán, cọc theo `PhieuDatCoc.SoTienCoc`; chưa trừ hoàn một phần. Không thêm thông tin định danh cá nhân vào điều khoản.

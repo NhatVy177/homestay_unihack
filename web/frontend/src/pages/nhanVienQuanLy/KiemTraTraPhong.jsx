@@ -1,10 +1,14 @@
-import OverviewCards from '../../components/common/OverviewCards.jsx';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
-import { kiemTraTraPhongApi } from './kiemTraTraPhong.api.js';
+import OverviewCards from '../../components/common/OverviewCards.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
-import '../nhanVienSale/dangKyTraPhongTab.css';
+import StatusBadge from '../../components/common/StatusBadge.jsx';
+import ListSearch from '../../components/common/ListSearch.jsx';
+import TableState from '../../components/common/TableState.jsx';
+import { kiemTraTraPhongApi } from './kiemTraTraPhong.api.js';
+import './kiemTraTraPhong.css';
 
+const MAX_ANH = 10;
 
 function fmtDate(d) {
   if (!d) return '';
@@ -13,38 +17,27 @@ function fmtDate(d) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   return `${day}/${month}/${date.getFullYear()}`;
 }
+const fmtDateTime = (d) => (d ? new Date(d).toLocaleString('vi-VN') : '');
+const fmtTien = (v) => `${v != null ? Number(v).toLocaleString() : 0}đ`;
 
-const AssetRow = ({ asset, onChange, readOnly }) => {
+// C2: tìm dòng biên bản lúc nhận phòng tương ứng một tài sản đang kiểm tra.
+// Biên bản đã khóa chỉ có tên tài sản; backend gắn thêm mã khi tra được, còn lại so theo tên dài nhất khớp đầu.
+function timLucNhanPhong(asset, moveIn) {
+  const ds = moveIn?.taiSan || [];
+  if (!ds.length) return null;
+  const goc = asset.maTaiSanGoc || asset.maTaiSan;
+  return ds.find(t => t.maTaiSan && t.maTaiSan === goc)
+    || ds.filter(t => t.ten && String(asset.tenTaiSan || '').startsWith(t.ten)).sort((a, b) => b.ten.length - a.ten.length)[0]
+    || null;
+}
+
+const AssetRow = ({ asset, onChange, readOnly, lucVao, coBienBanVao }) => {
   const [status, setStatus] = useState(asset.mucDoHuHong || 'Bình thường');
   const [soLuongLoi, setSoLuongLoi] = useState(asset.soLuongHuMat || 0);
   const [note, setNote] = useState(asset.moTaHuHong || '');
   const [cost, setCost] = useState(asset.chiPhiSuaChua || 0);
 
   const isNormal = status === 'Bình thường';
-
-  const getStatusStyle = () => {
-    switch (status) {
-      case 'Hư hỏng nhẹ': return { color: '#b06000', bg: '#fef7e0', border: '#fbbc04' };
-      case 'Hư hỏng nặng': return { color: '#c5221f', bg: '#fce8e6', border: '#ea4335' };
-      case 'Mất mát': return { color: '#ba1a1a', bg: '#fce8e6', border: '#ba1a1a' };
-      default: return { color: '#137333', bg: 'transparent', border: '#137333' };
-    }
-  };
-
-  const statusStyle = getStatusStyle();
-
-  const inputStyle = {
-    width: '100%',
-    height: '42px',
-    padding: '8px 12px',
-    border: '1px solid #e1e3e4',
-    borderRadius: '6px',
-    fontSize: '14px',
-    outline: 'none',
-    backgroundColor: isNormal ? '#f3f4f5' : '#ffffff',
-    color: '#191c1d',
-    boxSizing: 'border-box'
-  };
 
   const updateCost = (newStatus, newSl) => {
     if (newStatus === 'Bình thường') {
@@ -77,23 +70,29 @@ const AssetRow = ({ asset, onChange, readOnly }) => {
   else if (status === 'Hư hỏng nặng') tyLeStr = '60%';
   else if (status === 'Mất mát') tyLeStr = '100%';
 
+  // D-030 (1): hư hỏng đã ghi lúc nhận phòng không được tính cho khách; chỉ cảnh báo vì món đó có thể hư thêm.
+  const canhBaoHuCu = !isNormal && lucVao?.coHuHongLucVao;
+
   return (
-    <tr style={{
-      borderBottom: '1px solid #e1e3e4',
-      backgroundColor: statusStyle.bg,
-      borderLeft: isNormal ? 'none' : `3px solid ${statusStyle.border}`
-    }}>
-      <td style={{ padding: '12px 10px', fontSize: '14px', color: '#191c1d' }}>
-        <div style={{ fontWeight: '600', marginBottom: '4px' }}>{asset.tenTaiSan}</div>
+    <tr data-status={status}>
+      <td>
+        <div className="kttp-asset-name">{asset.tenTaiSan}</div>
         {asset.donGiaBoiThuong > 0 && (
-          <div style={{ fontSize: '12px', color: '#6f797a' }}>Đơn giá: {Number(asset.donGiaBoiThuong).toLocaleString()}đ</div>
+          <div className="kttp-asset-price">Đơn giá: {Number(asset.donGiaBoiThuong).toLocaleString()}đ</div>
         )}
       </td>
-      <td style={{ padding: '12px 10px', fontSize: '14px', color: '#3f494a', textAlign: 'center' }}>
-        {asset.soLuongBanGiao}
+      <td>
+        {lucVao ? (
+          <div className={`kttp-movein-cell${lucVao.coHuHongLucVao ? ' is-defect' : ''}`}>{lucVao.tinhTrang}</div>
+        ) : (
+          <div className="kttp-movein-cell is-missing">{coBienBanVao ? 'Không có trong biên bản' : '—'}</div>
+        )}
       </td>
-      <td style={{ padding: '12px 10px' }}>
+      <td className="is-center">{asset.soLuongBanGiao}</td>
+      <td>
         <select
+          className="kttp-control kttp-control--status"
+          aria-label={`Hiện trạng ${asset.tenTaiSan}`}
           value={status}
           onChange={(e) => {
             const newStatus = e.target.value;
@@ -109,17 +108,24 @@ const AssetRow = ({ asset, onChange, readOnly }) => {
             }
           }}
           disabled={readOnly}
-          style={{ ...inputStyle, border: `1px solid ${statusStyle.border}`, color: statusStyle.color, fontWeight: '500', cursor: 'pointer', textAlign: 'center' }}
         >
           <option value="Bình thường">Bình thường</option>
           <option value="Hư hỏng nhẹ">Hư hỏng nhẹ</option>
           <option value="Hư hỏng nặng">Hư hỏng nặng</option>
           <option value="Mất mát">Mất mát</option>
         </select>
+        {canhBaoHuCu && (
+          <p className="kttp-warning" role="note">
+            <Icon name="warning" />
+            <span>Lúc nhận phòng đã ghi: “{lucVao.tinhTrang}”. Hư hỏng có từ trước không tính cho khách; chỉ tính phần hư thêm.</span>
+          </p>
+        )}
       </td>
-      <td style={{ padding: '12px 10px' }}>
+      <td>
         <input
           type="text"
+          className="kttp-control is-center"
+          aria-label={`Số lượng hư/mất ${asset.tenTaiSan}`}
           value={isNormal ? '-' : soLuongLoi}
           onChange={(e) => {
             const valStr = e.target.value.replace(/[^0-9]/g, '');
@@ -134,24 +140,18 @@ const AssetRow = ({ asset, onChange, readOnly }) => {
             updateCost(status, val);
           }}
           disabled={isNormal || readOnly}
-          style={{ ...inputStyle, textAlign: 'center', backgroundColor: isNormal ? '#f3f4f5' : '#ffffff' }}
         />
       </td>
-      <td style={{ padding: '12px 10px', fontSize: '14px', color: statusStyle.color, textAlign: 'center', fontWeight: '600' }}>
-        {tyLeStr}
-      </td>
-      <td style={{ padding: '12px 10px' }}>
-        <div style={{ ...inputStyle, display: 'flex', alignItems: 'center', backgroundColor: '#f3f4f5', color: '#3f494a', fontWeight: '600' }}>
-          {Number(cost).toLocaleString()}đ
-        </div>
-      </td>
-      <td style={{ padding: '12px 10px' }}>
+      <td className="is-center">{tyLeStr}</td>
+      <td><div className="kttp-cost">{Number(cost).toLocaleString()}đ</div></td>
+      <td>
         <textarea
           rows="2"
+          className="kttp-control"
+          aria-label={`Mô tả hư/mất ${asset.tenTaiSan}`}
           value={note}
           onChange={e => setNote(e.target.value)}
           placeholder={isNormal ? "Không có hư hỏng" : "Mô tả..."}
-          style={{ ...inputStyle, height: 'auto', resize: 'vertical', lineHeight: '1.4' }}
           disabled={isNormal}
           spellCheck={false}
         />
@@ -160,9 +160,135 @@ const AssetRow = ({ asset, onChange, readOnly }) => {
   );
 };
 
+function MoveInCard({ moveIn, loading, error }) {
+  let status;
+  if (loading) status = <span>Đang tải biên bản lúc nhận phòng...</span>;
+  else if (error) status = <span>{error}</span>;
+  else if (!moveIn || moveIn.nguon === 'khong-co') status = <span>Không tìm thấy biên bản lúc nhận phòng của hợp đồng này.</span>;
+  else if (moveIn.nguon === 'web2') status = <><StatusBadge status="Chỉ có biên bản Web2" tone="neutral" /><span>Khách chưa xác nhận điện tử biên bản này.</span></>;
+  else if (moveIn.khachDaXacNhan) status = <><StatusBadge status="Khách đã xác nhận" tone="success" /><span>Bản {moveIn.phienBan}{moveIn.xacNhanLuc ? `, xác nhận lúc ${fmtDateTime(moveIn.xacNhanLuc)}` : ''}</span></>;
+  else status = <><StatusBadge status="Khách chưa xác nhận" tone="warning" /><span>Đang dùng bản {moveIn.phienBan} mới nhất đã phát hành.</span></>;
+
+  return (
+    <section className="kttp-card" aria-label="Biên bản lúc nhận phòng">
+      <h4 className="kttp-card-title"><Icon name="verified_user" /> Biên bản lúc nhận phòng</h4>
+      <div className="kttp-movein-status">{status}</div>
+      {moveIn?.ghiChu && <p className="kttp-movein-note">Ghi chú lúc nhận phòng: {moveIn.ghiChu}</p>}
+      {moveIn?.anh?.length > 0 && (
+        <div className="kttp-photos">
+          {moveIn.anh.map((a, i) => (
+            <figure className="kttp-photo" key={`${a.ten}-${i}`}>
+              <img src={`data:${a.mediaType};base64,${a.dataBase64}`} alt={`Ảnh lúc nhận phòng: ${a.ten}`} />
+              <figcaption>{a.ten}</figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function CheckoutPhotos({ maPhieuTra, taiSan, readOnly, onToast }) {
+  const [photos, setPhotos] = useState([]);
+  const [urls, setUrls] = useState({});
+  const [keyTaiSan, setKeyTaiSan] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const inputRef = useRef(null);
+  const urlsRef = useRef({});
+
+  const load = useCallback(async () => {
+    try {
+      const { data } = await kiemTraTraPhongApi.quanLyDanhSachAnh(maPhieuTra);
+      setPhotos(data || []);
+      setError('');
+      const next = {};
+      for (const p of data || []) {
+        if (urlsRef.current[p.maAnh]) { next[p.maAnh] = urlsRef.current[p.maAnh]; continue; }
+        try {
+          const res = await kiemTraTraPhongApi.quanLyFileAnh(maPhieuTra, p.maAnh);
+          next[p.maAnh] = URL.createObjectURL(res.data);
+        } catch { /* thumbnail missing: the caption still shows */ }
+      }
+      Object.entries(urlsRef.current).forEach(([id, url]) => { if (!next[id]) URL.revokeObjectURL(url); });
+      urlsRef.current = next;
+      setUrls(next);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Không tải được ảnh lúc trả phòng.');
+    }
+  }, [maPhieuTra]);
+
+  useEffect(() => { load(); }, [load]);
+  useEffect(() => () => Object.values(urlsRef.current).forEach(url => URL.revokeObjectURL(url)), []);
+
+  const upload = async (file) => {
+    if (!file) return;
+    setBusy(true);
+    try {
+      await kiemTraTraPhongApi.quanLyTaiAnh(maPhieuTra, file, keyTaiSan);
+      await load();
+    } catch (err) {
+      onToast(err.response?.data?.message || 'Không tải ảnh lên được.');
+    } finally {
+      setBusy(false);
+      if (inputRef.current) inputRef.current.value = '';
+    }
+  };
+  const remove = async (maAnh) => {
+    setBusy(true);
+    try {
+      await kiemTraTraPhongApi.quanLyXoaAnh(maPhieuTra, maAnh);
+      await load();
+    } catch (err) {
+      onToast(err.response?.data?.message || 'Không xóa được ảnh.');
+    } finally {
+      setBusy(false);
+    }
+  };
+  const tenTaiSan = Object.fromEntries((taiSan || []).map(t => [t.maTaiSan, t.tenTaiSan]));
+
+  return (
+    <section className="kttp-card" aria-label="Ảnh lúc trả phòng">
+      <h4 className="kttp-card-title"><Icon name="image" /> Ảnh lúc trả phòng <span className="kttp-card-aside">{photos.length}/{MAX_ANH}</span></h4>
+      {error && <p className="kttp-field-error">{error}</p>}
+      {photos.length > 0 ? (
+        <div className="kttp-photos">
+          {photos.map(p => (
+            <figure className="kttp-photo" key={p.maAnh}>
+              {urls[p.maAnh] ? <img src={urls[p.maAnh]} alt={`Ảnh lúc trả phòng: ${p.tenGoc}`} /> : <span className="kttp-photo-placeholder" aria-hidden="true" />}
+              <figcaption>{p.keyTaiSan ? (tenTaiSan[p.keyTaiSan] || p.keyTaiSan) : 'Cả phòng'}</figcaption>
+              {!readOnly && (
+                <button type="button" className="kttp-photo-remove" onClick={() => remove(p.maAnh)} disabled={busy} aria-label={`Xóa ảnh ${p.tenGoc}`}>
+                  <Icon name="close" />
+                </button>
+              )}
+            </figure>
+          ))}
+        </div>
+      ) : (
+        <p className="kttp-empty-note">{readOnly ? 'Không có ảnh lúc trả phòng.' : 'Chưa có ảnh. Chụp những món khác lúc nhận phòng để kế toán và khách đối chiếu.'}</p>
+      )}
+      {!readOnly && photos.length < MAX_ANH && (
+        <div className="kttp-photo-add">
+          <select value={keyTaiSan} onChange={e => setKeyTaiSan(e.target.value)} aria-label="Ảnh này chụp món nào">
+            <option value="">Cả phòng</option>
+            {(taiSan || []).map(t => <option key={t.maTaiSan} value={t.maTaiSan}>{t.tenTaiSan}</option>)}
+          </select>
+          <input ref={inputRef} id={`kttp-photo-${maPhieuTra}`} className="kttp-file-input" type="file" accept="image/png,image/jpeg,image/webp"
+            onChange={e => upload(e.target.files?.[0])} disabled={busy} />
+          <label htmlFor={`kttp-photo-${maPhieuTra}`} className="ui-btn ui-btn--secondary ui-btn--sm">
+            <Icon name="upload" /> {busy ? 'Đang tải...' : 'Thêm ảnh'}
+          </label>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function KiemTraTraPhong() {
   const [dsPhieu, setDsPhieu] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('Chờ xử lý');
   const [toast, setToast] = useState('');
@@ -186,6 +312,9 @@ export default function KiemTraTraPhong() {
   const [chiTiet, setChiTiet] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [moveIn, setMoveIn] = useState(null);
+  const [moveInLoading, setMoveInLoading] = useState(false);
+  const [moveInError, setMoveInError] = useState('');
 
   // Form State
   const [ngayTraThucTe, setNgayTraThucTe] = useState(new Date().toISOString().split('T')[0]);
@@ -198,8 +327,9 @@ export default function KiemTraTraPhong() {
     try {
       const res = await kiemTraTraPhongApi.quanLyDanhSachChoXuLy('Tất cả');
       setDsPhieu(res.data.danhSach || []);
+      setLoadError('');
     } catch (err) {
-      alert(err?.response?.data?.message || 'Lỗi tải danh sách');
+      setLoadError(err?.response?.data?.message || 'Lỗi tải danh sách');
     } finally {
       setLoading(false);
     }
@@ -209,7 +339,19 @@ export default function KiemTraTraPhong() {
     loadDanhSach();
   }, [loadDanhSach]);
 
-
+  const loadMoveIn = async (maPhieuTra) => {
+    setMoveIn(null);
+    setMoveInError('');
+    setMoveInLoading(true);
+    try {
+      const { data } = await kiemTraTraPhongApi.quanLyBanGiaoVao(maPhieuTra);
+      setMoveIn(data);
+    } catch (err) {
+      setMoveInError(err?.response?.data?.message || 'Không tải được biên bản lúc nhận phòng.');
+    } finally {
+      setMoveInLoading(false);
+    }
+  };
 
   const openModal = async (phieu) => {
     setSelectedPhieu(phieu);
@@ -219,6 +361,7 @@ export default function KiemTraTraPhong() {
     setDsHuHong({});
     setIsSubmitted(false);
     setErrors({});
+    if (phieu.loaiNguon === 'HopDong') loadMoveIn(phieu.maPhieuTra);
 
     try {
       const res = await kiemTraTraPhongApi.quanLyChiTietPhieu(phieu.maPhieuTra);
@@ -234,7 +377,7 @@ export default function KiemTraTraPhong() {
         setTinhTrangPhong(data.tinhTrangPhongThucTe);
       }
     } catch (err) {
-      alert(err?.response?.data?.message || 'Không thể tải chi tiết phiếu');
+      setToast(err?.response?.data?.message || 'Không thể tải chi tiết phiếu');
       setModalType(null);
     } finally {
       setLoadingDetail(false);
@@ -304,6 +447,12 @@ export default function KiemTraTraPhong() {
   const countTatCa = dsPhieu.length;
   const countChoXuLy = dsPhieu.filter(p => p.trangThai === 'Chờ xử lý').length;
   const countDaXuLy = dsPhieu.filter(p => p.trangThai !== 'Chờ xử lý').length;
+  const filterItems = [
+    { key: 'Tất cả', label: 'Tất cả' },
+    { key: 'Chờ xử lý', label: 'Chờ xử lý' },
+    { key: 'Đã xử lý', label: 'Đã xử lý' }
+  ];
+  const filterCounts = { 'Tất cả': countTatCa, 'Chờ xử lý': countChoXuLy, 'Đã xử lý': countDaXuLy };
 
   const filteredItems = dsPhieu.filter(p => {
     const q = searchQuery.toLowerCase();
@@ -314,335 +463,197 @@ export default function KiemTraTraPhong() {
     return true;
   });
 
+  const readOnly = selectedPhieu?.trangThai !== 'Chờ xử lý';
+  const hoaDonNo = chiTiet?.nghiaVu?.filter(nv => nv.LoaiNghiaVu === 'HoaDon') || [];
+  const viPham = chiTiet?.nghiaVu?.filter(nv => nv.LoaiNghiaVu === 'ViPham') || [];
+  const trangThaiHoSo = chiTiet ? (chiTiet.maHopDong ? chiTiet.trangThaiHopDong : chiTiet.trangThaiCoc) : '';
+  const coBienBanVao = Boolean(moveIn?.taiSan?.length);
+
   return (
     <div>
-      <>
-<OverviewCards items={[
-            { key: 'Tất cả', label: 'Tất cả' },
-            { key: 'Chờ xử lý', label: 'Chờ xử lý' },
-            { key: 'Đã xử lý', label: 'Đã xử lý' }
-          ]} counts={{ 'Tất cả': countTatCa, 'Chờ xử lý': countChoXuLy, 'Đã xử lý': countDaXuLy }} />
-<div className="ui-list-toolbar">
-          <label className="ui-list-search">
-            <span className="ui-search-label">Tìm kiếm</span>
-            <Icon name="search" />
-<input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Tên khách hàng, SĐT hoặc mã phiếu..."
-              className="ktp-input"
-
-              spellCheck={false}
-            />
-          </label>
-          {searchQuery && (
-            <button type="button" onClick={() => setSearchQuery('')} className="ktp-btn-cancel" >Xóa lọc</button>
-          )}
-
-<StatusFilterTabs
-          className="status-pill-tabs-offset"
-          items={[
-            { key: 'Tất cả', label: 'Tất cả' },
-            { key: 'Chờ xử lý', label: 'Chờ xử lý' },
-            { key: 'Đã xử lý', label: 'Đã xử lý' }
-          ]}
-          activeKey={filterStatus}
-          counts={{ 'Tất cả': countTatCa, 'Chờ xử lý': countChoXuLy, 'Đã xử lý': countDaXuLy }}
-          onChange={setFilterStatus}
-        />
-</div>
-<section className="ktp-table-section ui-list-table-card">
-        {/* Thanh tìm kiếm */}
-
-
-
-
-        {loading ? (
-          <div style={{ padding: '20px', textAlign: 'center' }}>Đang tải...</div>
-        ) : (
-          <table className="ktp-table">
-            <thead>
-              <tr>
-                <th>Mã phiếu</th>
-                <th>Khách hàng</th>
-                <th>Phòng/Giường</th>
-                <th>Hồ sơ</th>
-                <th>Dự kiến trả</th>
-                <th className="text-center">Trạng thái</th>
-                <th className="text-center">Thao tác</th>
+      <OverviewCards items={filterItems} counts={filterCounts} activeKey={filterStatus} onSelect={setFilterStatus} />
+      <div className="ui-list-toolbar">
+        <ListSearch value={searchQuery} onChange={setSearchQuery} placeholder="Tên khách hàng, SĐT hoặc mã phiếu..." />
+        <StatusFilterTabs items={filterItems} activeKey={filterStatus} counts={filterCounts} onChange={setFilterStatus} />
+      </div>
+      <section className="ktp-table-section ui-list-table-card">
+        <table className="ktp-table">
+          <thead>
+            <tr>
+              <th>Mã phiếu</th>
+              <th>Khách hàng</th>
+              <th>Phòng/Giường</th>
+              <th>Hồ sơ</th>
+              <th>Dự kiến trả</th>
+              <th>Trạng thái</th>
+              <th className="ui-num">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <TableState kind="loading" colSpan={7} />
+            ) : loadError ? (
+              <TableState kind="error" colSpan={7} message={loadError} />
+            ) : filteredItems.length === 0 ? (
+              <TableState kind="empty" colSpan={7} message="Không có phiếu trả phòng nào phù hợp." />
+            ) : filteredItems.map((row) => (
+              <tr key={row.maPhieuTra}>
+                <td className="ui-cell-code">{row.maPhieuTra}</td>
+                <td>
+                  <p className="ui-cell-main">{row.hoTenKhach}</p>
+                  <span className="ui-cell-sub">{row.sdtKhach}</span>
+                </td>
+                <td>{row.tenPhong}</td>
+                <td>
+                  <StatusBadge status={row.loaiNguon === 'HopDong' ? 'Hợp đồng' : 'Phiếu đặt cọc'} tone={row.loaiNguon === 'HopDong' ? 'info' : 'neutral'} />
+                  <span className="ui-cell-sub">{row.maNguon}</span>
+                </td>
+                <td>{fmtDate(row.ngayDuKienTra)}</td>
+                <td><StatusBadge status={row.trangThai || 'Chờ xử lý'} tone={row.trangThai === 'Chờ xử lý' || !row.trangThai ? 'warning' : 'success'} /></td>
+                <td className="ui-num">
+                  {row.trangThai === 'Chờ xử lý' ? (
+                    <button type="button" className="ui-btn ui-btn--primary ui-btn--sm" onClick={() => openModal(row)}>
+                      {row.loaiNguon === 'HopDong' ? 'Lập biên bản' : 'Xác nhận'}
+                    </button>
+                  ) : (
+                    <button type="button" className="ui-btn ui-btn--secondary ui-btn--sm" onClick={() => openModal(row)}>
+                      Xem chi tiết
+                    </button>
+                  )}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {filteredItems.length === 0 ? (
-                <tr><td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>Không có phiếu trả phòng nào phù hợp.</td></tr>
-              ) : filteredItems.map((row) => (
-                <tr key={row.maPhieuTra}>
-                  <td style={{ fontWeight: 600, color: '#2f6765' }}>{row.maPhieuTra}</td>
-                  <td>
-                    <div style={{ fontWeight: 600 }}>{row.hoTenKhach}</div>
-                    <div style={{ fontSize: 12, color: '#6f797a' }}>{row.sdtKhach}</div>
-                  </td>
-                  <td>
-                    <div style={{ fontWeight: 500 }}>{row.tenPhong}</div>
-                  </td>
-                  <td>
-                    <span className={`tp-loai-badge ${row.loaiNguon === 'HopDong' ? 'hd' : 'dc'}`} style={{ fontSize: 11 }}>
-                      {row.loaiNguon === 'HopDong' ? 'Hợp đồng' : 'Phiếu đặt cọc'}
-                    </span>
-                    <div style={{ fontSize: 12, marginTop: 2 }}>{row.maNguon}</div>
-                  </td>
-                  <td>{fmtDate(row.ngayDuKienTra)}</td>
-                  <td className="text-center">
-                    <span
-                      className="ktp-badge"
-                      style={{
-                        backgroundColor: row.trangThai === 'Chờ xử lý' ? '#fff3cd' : '#e5f3eb',
-                        color: row.trangThai === 'Chờ xử lý' ? '#856404' : '#137333',
-                        borderColor: row.trangThai === 'Chờ xử lý' ? '#ffeeba' : '#c3e6cb'
-                      }}
-                    >
-                      {row.trangThai || 'Chờ xử lý'}
-                    </span>
-                  </td>
-                  <td className="text-center">
-                    {row.trangThai === 'Chờ xử lý' ? (
-                      <button
-                        className="ktp-btn-action-fill"
-                        onClick={() => openModal(row)}
-                      >
-                        {row.loaiNguon === 'HopDong' ? 'Lập biên bản' : 'Xác nhận'}
-                      </button>
-                    ) : (
-                      <button
-                        className="tp-btn-detail-outline"
-                        onClick={() => openModal(row)}
-                      >
-                        Xem chi tiết
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+            ))}
+          </tbody>
+        </table>
       </section>
-</>
 
       {/* Modal Overlay */}
       {modalType && (
         <div className="ktp-modal-overlay" onClick={() => setModalType(null)}>
-          <div className="ktp-modal" style={{ maxWidth: '900px', width: '90%', padding: '0', backgroundColor: '#ffffff', borderRadius: '12px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="ktp-modal-header" style={{ padding: '16px 24px', backgroundColor: '#3b8280', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '12px 12px 0 0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h2 className="ktp-modal-title" style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#ffffff' }}>
+          <div className="ktp-modal kttp-modal" role="dialog" aria-modal="true" aria-labelledby="kttp-title" onClick={(e) => e.stopPropagation()}>
+            <div className="ktp-modal-header">
+              <div className="ui-dialog-heading">
+                <span className="ui-heading-symbol"><Icon name="fact_check" /></span>
+                <h3 id="kttp-title">
                   {modalType === 'kiem-tra-hd' ? (selectedPhieu?.trangThai === 'Chờ xử lý' ? 'Lập biên bản kiểm tra trả phòng' : 'Chi tiết biên bản kiểm tra trả phòng') : (selectedPhieu?.trangThai === 'Chờ xử lý' ? 'Xác nhận hồ sơ trả phòng' : 'Chi tiết xác nhận hồ sơ trả phòng')}
-                </h2>
+                </h3>
               </div>
-              <button className="ktp-modal-close" onClick={() => setModalType(null)} style={{ color: '#ffffff', background: 'transparent', border: 'none', cursor: 'pointer' }}><Icon name="close" /></button>
+              <button type="button" className="ktp-modal-close" onClick={() => setModalType(null)} aria-label="Đóng"><Icon name="close" /></button>
             </div>
 
-            <div className="ktp-modal-body" style={{ padding: '16px 24px', maxHeight: '70vh', overflowY: 'auto', backgroundColor: '#f8f9fa', gap: '0' }}>
+            <div className="ktp-modal-body">
               {loadingDetail ? (
-                <div style={{ textAlign: 'center', padding: '20px' }}>Đang tải dữ liệu...</div>
+                <p className="kttp-empty-note">Đang tải dữ liệu...</p>
               ) : chiTiet ? (
                 <>
-                  {/* Top Ticket Info */}
-                  <div style={{ backgroundColor: '#ffffff', border: '1px solid #e1e3e4', borderRadius: '8px', padding: '16px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#00666d', fontWeight: '700', fontSize: '14px' }}>
-                      <Icon name="info" style={{ fontSize: '18px' }} /> Thông tin phiếu trả phòng
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', fontSize: '13px' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <span style={{ color: '#6f797a', whiteSpace: 'nowrap' }}>Mã phiếu trả phòng</span>
-                        <strong style={{ color: '#191c1d' }}>{chiTiet.maPhieuTra}</strong>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <span style={{ color: '#6f797a', whiteSpace: 'nowrap' }}>Ngày đăng ký</span>
-                        <strong style={{ color: '#191c1d' }}>{fmtDate(chiTiet.ngayDangKyTra)}</strong>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <span style={{ color: '#6f797a', whiteSpace: 'nowrap' }}>Ngày dự kiến trả</span>
-                        <strong style={{ color: '#191c1d' }}>{fmtDate(chiTiet.ngayDuKienTra)}</strong>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <span style={{ color: '#6f797a', whiteSpace: 'nowrap' }}>Trạng thái hiện tại</span>
-                        <div>
-                          <span style={{ backgroundColor: '#fef7e0', color: '#b06000', padding: '4px 12px', borderRadius: '4px', fontWeight: '600', whiteSpace: 'nowrap' }}>{chiTiet.trangThai}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <section className="kttp-card">
+                    <h4 className="kttp-card-title"><Icon name="info" /> Thông tin phiếu trả phòng</h4>
+                    <dl className="kttp-facts">
+                      <div><dt>Mã phiếu trả phòng</dt><dd>{chiTiet.maPhieuTra}</dd></div>
+                      <div><dt>Ngày đăng ký</dt><dd>{fmtDate(chiTiet.ngayDangKyTra)}</dd></div>
+                      <div><dt>Ngày dự kiến trả</dt><dd>{fmtDate(chiTiet.ngayDuKienTra)}</dd></div>
+                      <div><dt>Trạng thái hiện tại</dt><dd><StatusBadge status={chiTiet.trangThai} tone={chiTiet.trangThai === 'Chờ xử lý' ? 'warning' : 'success'} /></dd></div>
+                    </dl>
+                  </section>
 
-                  {/* Form Info Section */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '16px' }}>
-                    {/* Card 1: Khách hàng */}
-                    <div style={{ backgroundColor: '#ffffff', border: '1px solid #e1e3e4', borderRadius: '8px', padding: '16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#00666d', fontWeight: '700', fontSize: '14px' }}>
-                        <Icon name="person" style={{ fontSize: '18px' }} /> Khách hàng
-                      </div>
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-                        <span style={{ color: '#6f797a' }}>Họ tên:</span>
-                        <span style={{ fontWeight: '600', color: '#191c1d' }}>{chiTiet.hoTenKhach}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-                        <span style={{ color: '#6f797a' }}>SĐT:</span>
-                        <span style={{ fontWeight: '600', color: '#191c1d' }}>{chiTiet.sdtKhach || '—'}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-                        <span style={{ color: '#6f797a' }}>CMND/CCCD:</span>
-                        <span style={{ fontWeight: '600', color: '#191c1d' }}>{chiTiet.cccdKhach || '—'}</span>
-                      </div>
-                    </div>
-
-                    {/* Card 2: Hồ sơ */}
-                    <div style={{ backgroundColor: '#ffffff', border: '1px solid #e1e3e4', borderRadius: '8px', padding: '16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#00666d', fontWeight: '700', fontSize: '14px'}}>
-                        <Icon name="assignment" style={{ fontSize: '18px' }} /> Hồ sơ
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-                        <span style={{ color: '#6f797a' }}>Loại hồ sơ:</span>
-                        <span style={{ fontWeight: '600', color: '#191c1d' }}>{chiTiet.maHopDong ? 'Hợp đồng thuê' : 'Phiếu đặt cọc'}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-                        <span style={{ color: '#6f797a' }}>Mã hồ sơ:</span>
-                        <span style={{ fontWeight: '600', color: '#191c1d' }}>{chiTiet.maHopDong ? chiTiet.maHopDong : chiTiet.maPhieuDatCoc}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontSize: '13px' }}>
-                        <span style={{ color: '#6f797a' }}>Trạng thái hồ sơ:</span>
-                        <span style={{ fontWeight: '600', backgroundColor: (chiTiet.maHopDong ? chiTiet.trangThaiHopDong : chiTiet.trangThaiCoc)?.includes('Đã') ? '#f1f3f4' : '#e5f3eb', color: (chiTiet.maHopDong ? chiTiet.trangThaiHopDong : chiTiet.trangThaiCoc)?.includes('Đã') ? '#3f494a' : '#137333', padding: '2px 8px', borderRadius: '4px', fontSize: '11px' }}>
-                          {chiTiet.maHopDong ? chiTiet.trangThaiHopDong : chiTiet.trangThaiCoc}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Card 3: Phòng/Giường */}
-                    <div style={{ backgroundColor: '#ffffff', border: '1px solid #e1e3e4', borderRadius: '8px', padding: '16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#00666d', fontWeight: '700', fontSize: '14px' }}>
-                        <Icon name="bed" style={{ fontSize: '18px' }} /> Phòng/Giường
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-                        <span style={{ color: '#6f797a' }}>Khu vực:</span>
-                        <span style={{ fontWeight: '600', color: '#191c1d' }}>{chiTiet.tenChiNhanh || '—'}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-                        <span style={{ color: '#6f797a' }}>Phòng/Giường:</span>
-                        <span style={{ fontWeight: '600', color: '#191c1d' }}>
-                          {chiTiet.hinhThucThue === 'Nguyên phòng' 
-                            ? chiTiet.tenPhong 
-                            : (chiTiet.maGiuong 
-                                ? `${chiTiet.tenPhong}-G${String(chiTiet.maGiuong).replace(/giường/i, '').trim().replace(/^G/i, '').padStart(2, '0')}` 
+                  <div className="kttp-grid-3">
+                    <section className="kttp-card">
+                      <h4 className="kttp-card-title"><Icon name="person" /> Khách hàng</h4>
+                      <dl className="kttp-rows">
+                        <div><dt>Họ tên:</dt><dd>{chiTiet.hoTenKhach}</dd></div>
+                        <div><dt>SĐT:</dt><dd>{chiTiet.sdtKhach || '—'}</dd></div>
+                        <div><dt>CMND/CCCD:</dt><dd>{chiTiet.cccdKhach || '—'}</dd></div>
+                      </dl>
+                    </section>
+                    <section className="kttp-card">
+                      <h4 className="kttp-card-title"><Icon name="description" /> Hồ sơ</h4>
+                      <dl className="kttp-rows">
+                        <div><dt>Loại hồ sơ:</dt><dd>{chiTiet.maHopDong ? 'Hợp đồng thuê' : 'Phiếu đặt cọc'}</dd></div>
+                        <div><dt>Mã hồ sơ:</dt><dd>{chiTiet.maHopDong ? chiTiet.maHopDong : chiTiet.maPhieuDatCoc}</dd></div>
+                        <div><dt>Trạng thái hồ sơ:</dt><dd><StatusBadge status={trangThaiHoSo} tone={trangThaiHoSo?.includes('Đã') ? 'neutral' : 'success'} /></dd></div>
+                      </dl>
+                    </section>
+                    <section className="kttp-card">
+                      <h4 className="kttp-card-title"><Icon name="bed" /> Phòng/Giường</h4>
+                      <dl className="kttp-rows">
+                        <div><dt>Khu vực:</dt><dd>{chiTiet.tenChiNhanh || '—'}</dd></div>
+                        <div><dt>Phòng/Giường:</dt><dd>
+                          {chiTiet.hinhThucThue === 'Nguyên phòng'
+                            ? chiTiet.tenPhong
+                            : (chiTiet.maGiuong
+                                ? `${chiTiet.tenPhong}-G${String(chiTiet.maGiuong).replace(/giường/i, '').trim().replace(/^G/i, '').padStart(2, '0')}`
                                 : chiTiet.tenPhong)}
-                        </span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-                        <span style={{ color: '#6f797a' }}>Hình thức thuê:</span>
-                        <span style={{ fontWeight: '600', color: '#191c1d' }}>{chiTiet.hinhThucThue || '—'}</span>
-                      </div>
-                    </div>
+                        </dd></div>
+                        <div><dt>Hình thức thuê:</dt><dd>{chiTiet.hinhThucThue || '—'}</dd></div>
+                      </dl>
+                    </section>
                   </div>
 
                   {modalType === 'kiem-tra-hd' && (
                     <>
-                      {/* Nghĩa vụ liên quan */}
                       {chiTiet.nghiaVu?.length > 0 && (
-                        <div style={{ marginBottom: '16px' }}>
-                          <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#191c1d', margin: '0 0 4px 0' }}>Nghĩa vụ liên quan</h4>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                            {/* Khung Hóa đơn nợ */}
-                            <div style={{ backgroundColor: '#ffffff', border: '1px solid #e1e3e4', borderRadius: '8px', overflow: 'hidden' }}>
-                              <div style={{ padding: '12px 16px', borderBottom: '1px solid #e1e3e4', backgroundColor: '#f8f9fa' }}>
-                                <h5 style={{ fontSize: '14px', fontWeight: '700', color: '#00666d', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <Icon name="receipt_long" style={{ fontSize: '18px' }} /> Hóa đơn chưa thanh toán/nợ
-                                </h5>
-                              </div>
-                              {chiTiet.nghiaVu.filter(nv => nv.LoaiNghiaVu === 'HoaDon').length > 0 ? (
-                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                                  <thead style={{ borderBottom: '1px solid #e1e3e4' }}>
-                                    <tr>
-                                      <th style={{ padding: '8px 16px', textAlign: 'left', color: '#3f494a', fontWeight: '600' }}>Kỳ hóa đơn</th>
-                                      <th style={{ padding: '8px 16px', textAlign: 'center', color: '#3f494a', fontWeight: '600' }}>Trạng thái</th>
-                                      <th style={{ padding: '8px 16px', textAlign: 'center', color: '#3f494a', fontWeight: '600' }}>Số tiền</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {chiTiet.nghiaVu.filter(nv => nv.LoaiNghiaVu === 'HoaDon').map((nv, i) => (
-                                      <tr key={i} style={{ borderBottom: '1px solid #f1f3f4' }}>
-                                        <td style={{ padding: '8px 16px', color: '#191c1d' }}>{nv.Ten.replace('Hóa đơn kỳ ', '')}</td>
-                                        <td style={{ padding: '8px 16px', textAlign: 'center', color: '#b06000', fontWeight: '500' }}>{nv.TrangThai}</td>
-                                        <td style={{ padding: '8px 16px', textAlign: 'center', color: '#191c1d' }}>{nv.SoTien != null ? Number(nv.SoTien).toLocaleString() + 'đ' : '0đ'}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              ) : (
-                                <div style={{ padding: '16px', color: '#6f797a', fontStyle: 'italic', fontSize: '13px', textAlign: 'center' }}>Không có hóa đơn nợ</div>
-                              )}
-                            </div>
-
-                            {/* Khung Biên bản vi phạm */}
-                            <div style={{ backgroundColor: '#ffffff', border: '1px solid #e1e3e4', borderRadius: '8px', overflow: 'hidden' }}>
-                              <div style={{ padding: '12px 16px', borderBottom: '1px solid #e1e3e4', backgroundColor: '#f8f9fa' }}>
-                                <h5 style={{ fontSize: '14px', fontWeight: '700', color: '#00666d', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <Icon name="gavel" style={{ fontSize: '18px' }} /> Biên bản vi phạm
-                                </h5>
-                              </div>
-                              {chiTiet.nghiaVu.filter(nv => nv.LoaiNghiaVu === 'ViPham').length > 0 ? (
-                                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                                  <thead style={{ borderBottom: '1px solid #e1e3e4' }}>
-                                    <tr>
-                                      <th style={{ padding: '8px 16px', textAlign: 'left', color: '#3f494a', fontWeight: '600' }}>Nội dung vi phạm</th>
-                                      <th style={{ padding: '8px 16px', textAlign: 'left', color: '#3f494a', fontWeight: '600' }}>Thời gian</th>
-                                      <th style={{ padding: '8px 16px', textAlign: 'right', color: '#3f494a', fontWeight: '600' }}>Mức phạt</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {chiTiet.nghiaVu.filter(nv => nv.LoaiNghiaVu === 'ViPham').map((nv, i) => (
-                                      <tr key={i} style={{ borderBottom: '1px solid #f1f3f4' }}>
-                                        <td style={{ padding: '8px 16px', color: '#191c1d' }}>{nv.Ten}</td>
-                                        <td style={{ padding: '8px 16px', color: '#191c1d' }}>{nv.ThoiGian || '—'}</td>
-                                        <td style={{ padding: '8px 16px', textAlign: 'right', color: '#191c1d' }}>{nv.SoTien != null ? Number(nv.SoTien).toLocaleString() + 'đ' : '0đ'}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              ) : (
-                                <div style={{ padding: '16px', color: '#6f797a', fontStyle: 'italic', fontSize: '13px', textAlign: 'center' }}>Không có lỗi vi phạm chưa xử lý</div>
-                              )}
-                            </div>
-                          </div>
+                        <div className="kttp-grid-2">
+                          <section className="kttp-card">
+                            <h4 className="kttp-card-title"><Icon name="receipt_long" /> Hóa đơn chưa thanh toán/nợ</h4>
+                            {hoaDonNo.length > 0 ? (
+                              <table className="kttp-mini-table">
+                                <thead><tr><th>Kỳ hóa đơn</th><th>Trạng thái</th><th className="ui-num">Số tiền</th></tr></thead>
+                                <tbody>
+                                  {hoaDonNo.map((nv, i) => (
+                                    <tr key={i}><td>{nv.Ten.replace('Hóa đơn kỳ ', '')}</td><td>{nv.TrangThai}</td><td className="ui-num">{fmtTien(nv.SoTien)}</td></tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            ) : <p className="kttp-empty-note">Không có hóa đơn nợ</p>}
+                          </section>
+                          <section className="kttp-card">
+                            <h4 className="kttp-card-title"><Icon name="warning" /> Biên bản vi phạm</h4>
+                            {viPham.length > 0 ? (
+                              <table className="kttp-mini-table">
+                                <thead><tr><th>Nội dung vi phạm</th><th>Thời gian</th><th className="ui-num">Mức phạt</th></tr></thead>
+                                <tbody>
+                                  {viPham.map((nv, i) => (
+                                    <tr key={i}><td>{nv.Ten}</td><td>{nv.ThoiGian || '—'}</td><td className="ui-num">{fmtTien(nv.SoTien)}</td></tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            ) : <p className="kttp-empty-note">Không có lỗi vi phạm chưa xử lý</p>}
+                          </section>
                         </div>
                       )}
 
-                      <div style={{ backgroundColor: '#ffffff', border: '1px solid #e1e3e4', borderRadius: '8px', padding: '12px 16px', marginBottom: '16px' }}>
-                        <div style={{ marginBottom: '12px' }}>
-                          <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#3f494a', marginBottom: '8px' }}>Ngày kiểm tra</label>
-                          <input type="date" value={ngayTraThucTe} onChange={(e) => setNgayTraThucTe(e.target.value)} disabled={selectedPhieu?.trangThai !== 'Chờ xử lý'} style={{ width: '250px', padding: '10px 12px', border: '1px solid #e1e3e4', borderRadius: '6px', color: '#191c1d', backgroundColor: selectedPhieu?.trangThai !== 'Chờ xử lý' ? '#f3f4f5' : '#f8f9fa', fontSize: '14px', outline: 'none', cursor: selectedPhieu?.trangThai !== 'Chờ xử lý' ? 'not-allowed' : 'text', fontFamily: 'inherit' }} />
-                        </div>
-                        <div style={{ marginBottom: '0' }}>
-                          <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#3f494a', marginBottom: '8px' }}>Tình trạng thực tế của phòng/giường <span style={{ color: '#c5221f' }}>*</span></label>
-                          <textarea rows="3" value={tinhTrangPhong} onChange={(e) => { setTinhTrangPhong(e.target.value); setErrors(prev => ({...prev, tinhTrang: null})); }} placeholder="Nhập đánh giá" style={{ width: '100%', padding: '12px', border: `1px solid ${errors.tinhTrang ? '#c5221f' : '#e1e3e4'}`, borderRadius: '6px', fontSize: '14px', resize: 'vertical', display: 'block' }} disabled={selectedPhieu?.trangThai !== 'Chờ xử lý'} spellCheck={false}></textarea>
-                          {errors.tinhTrang && <div style={{ color: '#c5221f', fontSize: '13px', marginTop: '6px' }}>{errors.tinhTrang}</div>}
-                        </div>
-                      </div>
+                      <MoveInCard moveIn={moveIn} loading={moveInLoading} error={moveInError} />
 
-                      {/* Asset List Section */}
+                      <section className="kttp-card">
+                        <label className="ui-form-field kttp-date">
+                          <span>Ngày kiểm tra</span>
+                          <input type="date" className="ui-input" value={ngayTraThucTe} onChange={(e) => setNgayTraThucTe(e.target.value)} disabled={readOnly} />
+                        </label>
+                        {errors.ngayTra && <p className="kttp-field-error">{errors.ngayTra}</p>}
+                        <label className="ui-form-field">
+                          <span>Tình trạng thực tế của phòng/giường <span className="ui-required">*</span></span>
+                          <textarea rows="3" className="ui-input" value={tinhTrangPhong} aria-invalid={Boolean(errors.tinhTrang)}
+                            onChange={(e) => { setTinhTrangPhong(e.target.value); setErrors(prev => ({ ...prev, tinhTrang: null })); }}
+                            placeholder="Nhập đánh giá" disabled={readOnly} spellCheck={false} />
+                        </label>
+                        {errors.tinhTrang && <p className="kttp-field-error">{errors.tinhTrang}</p>}
+                      </section>
+
                       {chiTiet.taiSan?.length > 0 && (
-                        <div>
-                          <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#191c1d', margin: '0 0 12px 0' }}>Danh mục tài sản kiểm tra</h4>
-                          <div style={{ backgroundColor: '#ffffff', border: '1px solid #e1e3e4', borderRadius: '8px', overflow: 'hidden' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                              <thead style={{ backgroundColor: '#f3f4f5', borderBottom: '1px solid #e1e3e4' }}>
+                        <section aria-label="Danh mục tài sản kiểm tra">
+                          <h4 className="kttp-card-title">Danh mục tài sản kiểm tra</h4>
+                          <div className="kttp-table-wrap">
+                            <table className="kttp-assets">
+                              <thead>
                                 <tr>
-                                  <th style={{ padding: '12px 10px', fontSize: '13px', fontWeight: '600', color: '#3f494a', width: '150px' }}>Tài sản</th>
-                                  <th style={{ padding: '12px 10px', fontSize: '13px', fontWeight: '600', color: '#3f494a', textAlign: 'center', width: '90px', whiteSpace: 'nowrap' }}>SL bàn giao</th>
-                                  <th style={{ padding: '12px 10px', fontSize: '13px', fontWeight: '600', color: '#3f494a', textAlign: 'center', width: '150px' }}>Hiện trạng</th>
-                                  <th style={{ padding: '12px 10px', fontSize: '13px', fontWeight: '600', color: '#3f494a', textAlign: 'center', width: '80px', whiteSpace: 'nowrap' }}>SL hư/mất</th>
-                                  <th style={{ padding: '12px 10px', fontSize: '13px', fontWeight: '600', color: '#3f494a', textAlign: 'center', width: '70px' }}>Tỷ lệ</th>
-                                  <th style={{ padding: '12px 10px', fontSize: '13px', fontWeight: '600', color: '#3f494a', width: '120px' }}>Phí tạm tính</th>
-                                  <th style={{ padding: '12px 10px', fontSize: '13px', fontWeight: '600', color: '#3f494a', minWidth: '200px' }}>Mô tả hư/mất</th>
+                                  <th>Tài sản</th>
+                                  <th>Lúc nhận phòng</th>
+                                  <th className="is-center">SL bàn giao</th>
+                                  <th className="is-center">Hiện trạng</th>
+                                  <th className="is-center">SL hư/mất</th>
+                                  <th className="is-center">Tỷ lệ</th>
+                                  <th>Phí tạm tính</th>
+                                  <th>Mô tả hư/mất</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -651,38 +662,38 @@ export default function KiemTraTraPhong() {
                                     key={asset.maTaiSan}
                                     asset={asset}
                                     onChange={handleAssetChange}
-                                    readOnly={selectedPhieu?.trangThai !== 'Chờ xử lý'}
+                                    readOnly={readOnly}
+                                    lucVao={timLucNhanPhong(asset, moveIn)}
+                                    coBienBanVao={coBienBanVao}
                                   />
                                 ))}
                               </tbody>
                             </table>
                           </div>
-                        </div>
+                        </section>
                       )}
+
+                      <CheckoutPhotos maPhieuTra={chiTiet.maPhieuTra} taiSan={chiTiet.taiSan} readOnly={readOnly} onToast={setToast} />
                     </>
                   )}
-
                 </>
               ) : null}
             </div>
 
-            <div className="ktp-modal-footer" style={{ padding: '16px 24px', borderTop: '1px solid #e1e3e4', display: 'flex', justifyContent: modalType === 'kiem-tra-hd' ? 'space-between' : 'flex-end', alignItems: 'center', backgroundColor: '#ffffff', borderRadius: '0 0 12px 12px' }}>
+            <div className={`ktp-modal-footer${modalType === 'kiem-tra-hd' ? '' : ' is-end'}`}>
               {modalType === 'kiem-tra-hd' && (
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', backgroundColor: '#fff8e1', padding: '8px 12px', borderRadius: '6px', flex: 1, marginRight: '16px' }}>
-                  <Icon name="info" style={{ color: '#b06000', fontSize: '18px', marginTop: '2px' }} />
-                  <div>
-                    <strong style={{ color: '#b06000', fontSize: '13px', display: 'block', marginBottom: '2px' }}>Lưu ý:</strong>
-                    <span style={{ color: '#b06000', fontSize: '12px' }}>Vui lòng kiểm tra, đối chiếu đầy đủ thông tin với hồ sơ, chứng từ và tình trạng thực tế trước khi xác nhận lưu biên bản.</span>
-                  </div>
-                </div>
+                <p className="kttp-footer-note">
+                  <Icon name="info" />
+                  <span><strong>Lưu ý:</strong> Vui lòng kiểm tra, đối chiếu đầy đủ thông tin với hồ sơ, chứng từ và tình trạng thực tế trước khi xác nhận lưu biên bản.</span>
+                </p>
               )}
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button onClick={() => setModalType(null)} style={{ backgroundColor: '#ffffff', border: '1px solid #004c52', color: '#004c52', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>Hủy</button>
+              <div className="kttp-actions">
+                <button type="button" className="ui-btn ui-btn--secondary" onClick={() => setModalType(null)}>Hủy</button>
                 {!isSubmitted && modalType === 'kiem-tra-hd' && selectedPhieu?.trangThai === 'Chờ xử lý' && (
-                  <button className="ktp-btn-action-fill" onClick={submitKiemTra} style={{ padding: '10px 24px' }}>Xác nhận lưu biên bản</button>
+                  <button type="button" className="ui-btn ui-btn--primary" onClick={submitKiemTra}>Xác nhận lưu biên bản</button>
                 )}
                 {!isSubmitted && modalType === 'xac-nhan-pdc' && selectedPhieu?.trangThai === 'Chờ xử lý' && (
-                  <button className="ktp-btn-action-fill" onClick={submitXacNhanHuyCoc} style={{ padding: '10px 24px' }}>Xác nhận hồ sơ</button>
+                  <button type="button" className="ui-btn ui-btn--primary" onClick={submitXacNhanHuyCoc}>Xác nhận hồ sơ</button>
                 )}
               </div>
             </div>
@@ -690,12 +701,8 @@ export default function KiemTraTraPhong() {
         </div>
       )}
 
-      {/* Toast Notification */}
-      <div className={`tp-toast ${toast ? 'show' : ''}`}>{toast}</div>
-      <div className={`dktp-toast ${successToast ? 'dktp-toast-show' : ''}`}>
-        <Icon name="check_circle" style={{ fontSize: '18px' }} />
-        {successToast}
-      </div>
+      {toast && <div className="ui-toast ui-toast--error" role="alert"><Icon name="error_outline" />{toast}</div>}
+      {successToast && <div className="ui-toast ui-toast--success" role="status"><Icon name="check_circle" />{successToast}</div>}
     </div>
   );
 }

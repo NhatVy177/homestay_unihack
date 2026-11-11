@@ -60,6 +60,35 @@
 .auth-page-split { font-family: var(--font-body); }
 .auth-page-split .auth-card h2 { font-family: var(--font-heading); font-weight: 600; }
 
+/* Shared workspace frame (WorkspaceShell, D-037 B0): one look for Sale, Quản lý, Kế toán, Khách, Admin. */
+.ui-workspace.ui-employee-shell .kp-sidebar { background: var(--color-bg); border-right: 1px solid var(--color-border); }
+.ui-workspace .ui-role-label { color: var(--color-primary); }
+.ui-workspace-brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; font-family: var(--font-heading); font-size: 20px; font-weight: 600; color: var(--color-primary); }
+.ui-workspace-brand > .ui-icon { width: 28px; height: 28px; }
+.ui-workspace-brand > span > span { color: var(--color-accent); }
+.ui-workspace.ui-employee-shell .ktp-sidebar-nav { flex: 1; overflow-y: auto; margin-top: 0; }
+.ui-workspace.ui-employee-shell .ktp-side-item { min-height: 52px; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: 15px; font-weight: 500; letter-spacing: 0; white-space: normal; color: var(--color-text-muted); }
+.ui-workspace.ui-employee-shell .ktp-side-item .ui-icon { width: var(--icon-md); height: var(--icon-md); flex-shrink: 0; }
+.ui-workspace.ui-employee-shell .ktp-side-item.is-active { background: var(--color-primary); color: var(--color-surface); box-shadow: var(--shadow-md); font-weight: 600; }
+.ui-workspace.ui-employee-shell .ktp-side-item:not(.is-active):hover { background: var(--color-surface); color: var(--color-primary); }
+.ui-workspace .ktp-side-item:disabled { opacity: .5; cursor: not-allowed; }
+.ui-workspace .ktp-side-item.is-locked:not(.is-active) { color: var(--color-text-muted); opacity: .6; }
+.ui-workspace-lock { margin-left: auto; width: var(--icon-sm) !important; height: var(--icon-sm) !important; }
+.ui-workspace-footer { margin-top: auto; padding: var(--space-6); display: flex; gap: var(--space-3); align-items: center; color: var(--color-text-muted); font-size: 12px; }
+.ui-workspace-footer p { margin: 0; line-height: 1.6; }
+.ui-workspace-footer strong { color: var(--color-text); }
+.ui-workspace-mark { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; color: var(--color-primary); background: var(--color-surface); border-radius: var(--radius-md); }
+.ui-workspace .ui-workspace-topbar { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); }
+.ui-workspace .ui-workspace-topbar h1 { margin: 0; font-size: 22px; }
+.ui-workspace-eyebrow { margin: 0 0 var(--space-2); color: var(--color-primary); font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.ui-workspace-account { display: inline-flex; align-items: center; gap: var(--space-3); padding: var(--space-2); border: 0; border-radius: var(--radius-md); background: transparent; text-align: left; color: var(--color-text); }
+button.ui-workspace-account { cursor: pointer; }
+button.ui-workspace-account:hover { background: var(--color-surface-alt); }
+.ui-workspace-account strong { display: block; font-size: 14px; }
+.ui-workspace-account small { display: block; margin-top: var(--space-1); color: var(--color-text-muted); font-size: 12px; }
+.ui-workspace-account .kp-avatar { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: var(--radius-pill); background: var(--color-primary-soft); color: var(--color-primary); font-weight: 600; }
+.ui-workspace .kp-support-mini { margin: auto var(--space-4) var(--space-4); border-radius: var(--radius-md); border-top: 0; }
+
 @media (max-width: 1180px) {
   .ui-employee-shell .kp-topbar, .ui-employee-shell .admin-topbar { flex-wrap: wrap; }
   .ui-employee-shell .kp-top-actions { width: auto; }
@@ -94,6 +123,8 @@
   .ui-employee-shell .ktp-filter-section { grid-template-columns: minmax(0, 1fr); }
   .ui-employee-shell .ktp-header, .ui-employee-shell .ktp-section-header { flex-wrap: wrap; gap: var(--space-3); }
   .ui-employee-shell .ui-branch-chip { font-size: 11px; }
+  .ui-workspace .ui-workspace-topbar { align-items: stretch; }
+  .ui-workspace-account > span:last-child { display: none; }
   .main-content { padding: var(--space-4); }
   .ui-card, .card, .ui-stat { padding: var(--space-4); }
 }
