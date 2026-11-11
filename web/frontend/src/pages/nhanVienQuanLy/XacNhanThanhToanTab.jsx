@@ -4,32 +4,23 @@ import { Icon } from '../../components/common/Icon.jsx';
 import { datCocApi } from '../datCoc/datCoc.api.js';
 import ResultModal from '../../components/common/ResultModal.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
+import SharedStatusBadge from '../../components/common/StatusBadge.jsx';
+import ListSearch from '../../components/common/ListSearch.jsx';
+import ListPagination from '../../components/common/ListPagination.jsx';
+import TableState from '../../components/common/TableState.jsx';
 
 // Cấu hình trạng thái thanh toán (DC05)
 const STATUS_CONFIG = {
-  'Chờ TT':  { chip: 'Chờ xác nhận', badgeLabel: 'Chờ xác nhận', badge: { bg: '#fff4e5', fg: '#b45309' } },
-  'Đã TT':   { chip: 'Đã xác nhận',  badgeLabel: 'Đã xác nhận',  badge: { bg: '#e6f6ec', fg: '#15803d' } },
-  'Hết hạn': { chip: 'Hết hạn',      badgeLabel: 'Hết hạn',      badge: { bg: '#fdecec', fg: '#b91c1c' } },
+  'Chờ TT':  { chip: 'Chờ xác nhận', badgeLabel: 'Chờ xác nhận', tone: 'warning' },
+  'Đã TT':   { chip: 'Đã xác nhận',  badgeLabel: 'Đã xác nhận',  tone: 'success' },
+  'Hết hạn': { chip: 'Hết hạn',      badgeLabel: 'Hết hạn',      tone: 'danger' },
 };
 const STATUS_ORDER = ['Chờ TT', 'Đã TT', 'Hết hạn'];
 const StatusBadge = ({ trangThai }) => {
   const cfg = STATUS_CONFIG[trangThai];
-  const s = cfg ? cfg.badge : { bg: '#eef2f3', fg: '#3f494a' };
-  return (
-    <span style={{ background: s.bg, color: s.fg, padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>
-      {cfg ? cfg.badgeLabel : (trangThai || '—')}
-    </span>
-  );
+  return <SharedStatusBadge status={cfg ? cfg.badgeLabel : (trangThai || '—')} tone={cfg?.tone || 'neutral'} />;
 };
 const PAGE_SIZE = 10;
-const pageBtnStyle = (active, disabled) => ({
-  minWidth: '34px', height: '34px', padding: '0 10px', borderRadius: '8px',
-  cursor: disabled ? 'not-allowed' : 'pointer',
-  border: active ? '1px solid #00666d' : '1px solid #d7dcdc',
-  background: active ? '#00666d' : '#fff',
-  color: active ? '#fff' : (disabled ? '#c4c7c8' : '#3f494a'),
-  fontSize: '13px', fontWeight: 600
-});
 
 // Kế toán đối chiếu chứng từ chuyển khoản trước khi xác nhận tiền về.
 // GUI: HienThi() = loadDanhSach() -> getDanhSachChoXacNhanThanhToan() -> SP_DanhSachChoXacNhanThanhToan.
@@ -115,14 +106,6 @@ export default function XacNhanThanhToanTab() {
     () => filteredList.slice((pageSafe - 1) * PAGE_SIZE, pageSafe * PAGE_SIZE),
     [filteredList, pageSafe]
   );
-  const pageNumbers = useMemo(() => {
-    const arr = [];
-    let start = Math.max(1, pageSafe - 2);
-    const end = Math.min(totalPages, start + 4);
-    start = Math.max(1, end - 4);
-    for (let i = start; i <= end; i += 1) arr.push(i);
-    return arr;
-  }, [pageSafe, totalPages]);
 
   // Chỉ phiếu 'Chờ TT' còn hạn mới cho xác nhận
   const canXuLy = (it) => it.trangThaiThanhToan === 'Chờ TT'
@@ -165,19 +148,11 @@ export default function XacNhanThanhToanTab() {
     <div className="ktp-container">
       {/* Table Section */}
       <>
-<OverviewCards items={[{ key: 'all', label: 'Tất cả' }, ...STATUS_ORDER.map((s) => ({ key: s, label: STATUS_CONFIG[s].chip }))]} counts={counts} />
+{/* Phiếu sắp hết hạn luôn lên đầu, nên không có bộ chọn sắp xếp. */}
+<OverviewCards items={[{ key: 'all', label: 'Tất cả' }, ...STATUS_ORDER.map((s) => ({ key: s, label: STATUS_CONFIG[s].chip }))]} counts={counts} activeKey={statusFilter} onSelect={chonChip} />
 <div className="ui-list-toolbar">
-          <label className="ui-list-search">
-            <span className="ui-search-label">Tìm kiếm</span>
-            <Icon name="search" />
-<input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tên khách hàng, SĐT hoặc mã phiếu cọc..." className="ktp-input"  />
-          </label>
-          {search && (
-            <button type="button" onClick={() => setSearch('')} className="ktp-btn-cancel" >Xóa lọc</button>
-          )}
-
+          <ListSearch value={search} onChange={setSearch} placeholder="Tên khách hàng, SĐT hoặc mã phiếu cọc..." />
 <StatusFilterTabs
-          className="status-pill-tabs-offset"
           items={[{ key: 'all', label: 'Tất cả' }, ...STATUS_ORDER.map((s) => ({ key: s, label: STATUS_CONFIG[s].chip }))]}
           activeKey={statusFilter}
           counts={counts}
@@ -185,44 +160,38 @@ export default function XacNhanThanhToanTab() {
         />
 </div>
 <section className="ktp-table-section ui-list-table-card">
-        {/* Thanh tìm kiếm (đã bỏ bộ chọn sắp xếp — phiếu sắp hết hạn luôn lên đầu) */}
-
-
-        {/* Segmented control theo trạng thái */}
-
-
         <table className="ktp-table">
           <thead>
             <tr>
               <th>Mã phiếu</th>
               <th>Khách hàng</th>
               <th>Phòng</th>
-              <th className="text-right">Số tiền đặt cọc</th>
+              <th className="ui-num">Số tiền đặt cọc</th>
               <th>Hạn thanh toán</th>
-              <th className="text-center">Trạng thái</th>
-              <th className="text-center">Hành động</th>
+              <th>Trạng thái</th>
+              <th className="ui-num">Hành động</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#6f797a' }}>Đang tải...</td></tr>
+              <TableState kind="loading" colSpan={7} />
             ) : loadError ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#b3261e' }}>{loadError}</td></tr>
+              <TableState kind="error" colSpan={7} message={loadError} />
             ) : filteredList.length === 0 ? (
-              <tr><td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#6f797a' }}>Không có chứng từ nào ở nhóm này</td></tr>
+              <TableState kind="empty" colSpan={7} message="Không có chứng từ nào ở nhóm này" />
             ) : pagedList.map((item) => (
               <tr key={item.maPhieuDatCoc}>
-                <td><span style={{ fontWeight: '700', color: '#00666d' }}>{item.maPhieuDatCoc}</span></td>
-                <td><p style={{ margin: 0, fontWeight: '600', fontSize: '14px', color: '#191c1d' }}>{item.hoTen}</p></td>
-                <td style={{ fontSize: '14px', color: '#414753' }}>{moTaPhong(item)}</td>
-                <td className="text-right" style={{ fontSize: '14px', fontWeight: '500', color: '#191c1d' }}>{formatTien(item.soTienCoc)}đ</td>
-                <td style={{ fontSize: '13px', color: '#414753' }}>{formatHan(item.thoiHanThanhToan)}</td>
-                <td className="text-center"><StatusBadge trangThai={item.trangThaiThanhToan} /></td>
-                <td className="text-center">
+                <td className="ui-cell-code">{item.maPhieuDatCoc}</td>
+                <td><p className="ui-cell-main">{item.hoTen}</p></td>
+                <td>{moTaPhong(item)}</td>
+                <td className="ui-num">{formatTien(item.soTienCoc)}đ</td>
+                <td>{formatHan(item.thoiHanThanhToan)}</td>
+                <td><StatusBadge trangThai={item.trangThaiThanhToan} /></td>
+                <td className="ui-num">
                   {canXuLy(item) ? (
-                    <button className="ktp-btn-action-fill" onClick={() => openXuLy(item)}>Xử lý</button>
+                    <button type="button" className="ui-btn ui-btn--primary ui-btn--sm" onClick={() => openXuLy(item)}>Xử lý</button>
                   ) : (
-                    <button className="ktp-btn-action" style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#00666d', padding: '6px 12px', fontSize: '13px' }} onClick={() => openXuLy(item)}>Xem chi tiết</button>
+                    <button type="button" className="ui-btn ui-btn--secondary ui-btn--sm" onClick={() => openXuLy(item)}>Xem chi tiết</button>
                   )}
                 </td>
               </tr>
@@ -230,22 +199,7 @@ export default function XacNhanThanhToanTab() {
           </tbody>
         </table>
 
-        <div className="ktp-pagination" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '14px', color: '#414753', marginRight: 'auto', fontWeight: '500' }}>
-            {filteredList.length === 0
-              ? 'Không có chứng từ'
-              : `Hiển thị ${(pageSafe - 1) * PAGE_SIZE + 1}–${Math.min(pageSafe * PAGE_SIZE, filteredList.length)} / ${filteredList.length} chứng từ`}
-          </span>
-          {totalPages > 1 && (
-            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-              <button type="button" disabled={pageSafe <= 1} onClick={() => setPage(pageSafe - 1)} style={pageBtnStyle(false, pageSafe <= 1)}>‹</button>
-              {pageNumbers.map((n) => (
-                <button key={n} type="button" onClick={() => setPage(n)} style={pageBtnStyle(n === pageSafe, false)}>{n}</button>
-              ))}
-              <button type="button" disabled={pageSafe >= totalPages} onClick={() => setPage(pageSafe + 1)} style={pageBtnStyle(false, pageSafe >= totalPages)}>›</button>
-            </div>
-          )}
-        </div>
+        <ListPagination page={pageSafe} pageSize={PAGE_SIZE} total={filteredList.length} noun="chứng từ" onChange={setPage} />
       </section>
 </>
 

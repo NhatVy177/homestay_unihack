@@ -8,6 +8,8 @@ Lập 2026-11-11 (J-C059), cập nhật 09:40 cùng ngày (J-C060), kèm [audit-
 - **Claude:** B1, B5, B2, phần giao diện C5, D1–D3. Codex **không** sửa các file này: `components/common/WorkspaceShell.jsx`, `styles/shell.css`, các trang khung `NhanVien*Page.jsx`, `AdminPage.jsx` (phần khung), `KhachHangPortalPage.jsx`, `components/xacNhan/*`, `pages/avalanche/*`, `pages/thanhToanMoPhong/*`, `BanGiaoPhongTab.jsx`.
 - **Codex:** A2, A3, C6, B7, C2 (gộp B3), C3 (gộp B4), C4, phần backend C5, E1–E3.
 
+**Bộ danh sách chung (J-C062, Claude):** `ListSearch`, `TableState`, `ListPagination`, `OverviewCards` lọc được, `StatusBadge` có icon; CSS ở `styles/lists.css` (Claude giữ file này, Codex chỉ thêm quy tắc ở cuối file nếu cần). Codex dùng chúng khi làm B3, B4, B7, C4.
+
 **Quy tắc D-039:** chức năng đã bỏ thì bỏ luôn tab, mục menu, trang, route; nếu chức năng thay thế chưa xong thì bỏ trong cùng việc làm chức năng thay thế.
 
 ## Cách dùng
@@ -88,7 +90,7 @@ Việc: làm lại trình bày màn <TÊN MÀN> theo skill .agents/skills/homest
 File chính: <FILE>. Tham khảo bố cục (chỉ xem, không chép code): màn tương ứng trong D:\Nam4\Contest\Homestay-Dorm\apps\frontend\src\features\<VAI TRÒ>.
 
 1. Chụp ảnh màn hiện tại ở 1440px và 390px với dữ liệu thật trên máy (nhờ Vy đăng nhập nếu cần), lưu vào web/frontend/.ui-screens/.
-2. Bỏ toàn bộ style={{…}} trong file: chuyển sang lớp chung (ui-btn, ui-card, ui-table, ui-badge, ui-form-field…) và component chung (PageHeader, StatusBadge, EmptyState, OverviewCards, FormInput). Thiếu lớp thì thêm vào src/styles/, không viết riêng trong trang.
+2. Bỏ toàn bộ style={{…}} trong file: chuyển sang lớp chung (ui-btn, ui-card, ui-table, ui-badge, ui-form-field…) và component chung (PageHeader, StatusBadge, EmptyState, OverviewCards, FormInput). Danh sách làm theo mẫu trong skill (J-C062): OverviewCards có onSelect, ListSearch, StatusFilterTabs, TableState, ListPagination; xem XacNhanThanhToanTab.jsx làm ví dụ. Thiếu lớp thì thêm vào src/styles/, không viết riêng trong trang.
 3. Một tiêu đề, một nút chính mỗi màn; đủ trạng thái đang tải / rỗng / lỗi / thành công; bảng cuộn trong thẻ ở màn hẹp.
 4. KHÔNG đổi: API, state, điều kiện hiển thị, chữ nghiệp vụ, logic trong components/xacNhan và lib/avalanche. Nếu file quá dài, được tách component con trong cùng thư mục nhưng giữ nguyên hành vi.
 5. Kiểm tra: npm run build; npm run test:avalanche-ui; chụp lại ảnh sau; báo số style={{ trước và sau.

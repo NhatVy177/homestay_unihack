@@ -22,9 +22,9 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy đ�
 
 | Nhánh | Nội dung | Trạng thái |
 |---|---|---|
-| `main` (`dcc1a59`) | T-19, T-20, T-21 đợt đầu, hồ sơ D-026 → D-032 | Gốc cũ; **chưa có** các nhánh dưới |
-| **`integration/2026-11-11`** (Claude) | Gộp sẵn 5 nhánh: `feat/ui-refresh-1`, `chore/audit-cleanup`, `chore/fuji-setup` (A1), `feat/t22-handover-bundle` (C1), `feat/ui-sale-workspace` (Sale); đã gỡ xung đột và chạy lại toàn bộ test | **Chờ Vy merge một PR này vào `main`**; khi đó 5 nhánh kia coi như đã merge |
-| `feat/ui-shared-shell` (Claude) | B0: khung chung cho 5 vai trò; bỏ tab của ứng dụng cũ (D-039); sửa lỗi tab kế toán | Tạo từ `integration/2026-11-11`; chờ Vy xem, merge sau nhánh tích hợp |
+| `main` (`3725840`) | Đã có nhánh tích hợp `integration/2026-11-11` (PR #4): ui-refresh-1, audit, A1, C1, không gian Sale | Gốc cho mọi nhánh mới |
+| `feat/ui-shared-shell` (Claude) | B0: khung chung cho 5 vai trò; bỏ tab của ứng dụng cũ (D-039); sửa lỗi tab kế toán | Chờ Vy merge |
+| `feat/ui-list-b1` (Claude) | Tạo từ `feat/ui-shared-shell` (nên chứa luôn B0). Bộ danh sách chung theo mẫu bên Hằng (J-C062); sau đó B1 và hồ sơ nộp D1–D3 | Đang làm; merge PR này là có cả B0 |
 | `feat/t22-backend` (Claude) | Khách tự giữ chỗ, từ chối → "Đã xem", "Không thuê nữa", "Khách không đến" | Có code + test đầu vào; SQL chưa chạy lên HOMEDORM4; chưa nối giao diện; chưa gộp vào nhánh tích hợp (việc C5) |
 | `docs/review-branch-workflow` | Quy tắc "không push main" | Nội dung đã có trong AGENTS.md; xóa được |
 
@@ -47,7 +47,7 @@ Sau khi merge nhánh tích hợp, xóa được trên GitHub: 5 nhánh đã gộ
 | T-08 | Deploy, verify source, nghiệm thu Fuji | A1 xong (J-X058): script `fuji:keygen`, `fuji:fund`, 3 ví trong `D:\HomeStayDorm-fuji\blockchain` (file bị Git bỏ qua). Số dư 0, chưa deploy | Vy xin faucet → A2 → A3 |
 | T-11 / T-14 | Bàn giao Web2 → email → OTP → ký | Có code, test tự động qua, **chưa chạy thật** | Chạy thật trong A3 |
 | T-22 | Luồng D-026 → D-038 | C1 xong code + test + migration HOMEDORM4 (J-X061, J-X062); 4 mục giữ chỗ có code backend ở `feat/t22-backend`; còn lại chưa làm | Bảng mức ưu tiên bên dưới |
-| T-21 | Giao diện | Khung, token, form, danh sách (D-032, D-033); không gian Sale (D-035, D-036); **B0 xong (J-C061)**: cả 5 vai trò dùng chung một khung `WorkspaceShell` | Claude: B1, B5, B2. Codex: B7, và B3/B4 gộp vào C2/C3 |
+| T-21 | Giao diện | Khung, token, form, danh sách (D-032, D-033); không gian Sale (D-035, D-036); **B0 xong (J-C061)**: cả 5 vai trò dùng chung một khung `WorkspaceShell`; **bộ danh sách chung (J-C062)**: ô tìm kiếm có nút xóa, thẻ tổng quan bấm để lọc, nhãn trạng thái có icon, hàng đang tải/lỗi/rỗng, phân trang; đã áp vào 5 màn danh sách không thuộc việc của Codex | Claude: B1, B5, B2. Codex: B7, và B3/B4 gộp vào C2/C3 |
 | T-09 | Hồ sơ nộp | Chưa bắt đầu | D1–D3 |
 | T-04 | Nguồn tiền cọc và dữ liệu demo | Nguồn cọc đã chốt (D-034, D-038). HOMEDORM4 có 2 phiếu cọc, **0 hợp đồng** | Tạo một hợp đồng demo bằng luồng Web2 trước A3 |
 | T-13 | Privy JWT (bỏ OTP) | Tạm dừng, chờ BTC (Q-10) | Giữ OTP |
@@ -94,6 +94,7 @@ Nguyên tắc: mỗi file chỉ một người sửa. Chi tiết và prompt: [vi
 - `blockchain npm test`: 18 qua, 1 bỏ qua (test SQL), 0 lỗi.
 - `web/backend npm test`: 31 qua, 1 bỏ qua, 0 lỗi.
 - `web/frontend`: `vite build` qua (cảnh báo kích thước gói); `test:avalanche-ui` qua; `test:handover-ui` qua.
+- Nhánh `feat/ui-list-b1` (J-C062, 2026-11-11 15:1x): build qua; `test:avalanche-ui` qua; `test:shell-ui` qua; `test:list-kit` mới qua (Kế toán xác nhận tiền về, tiền mặt chờ nộp quỹ, Quản lý duyệt nhận cọc, trạng thái đang tải; 1440 và 390px; dữ liệu giả).
 - Nhánh `feat/ui-shared-shell` (J-C061): build qua; `test:avalanche-ui`, `test:handover-ui` qua; `test:shell-ui` mới qua (5 vai trò dùng chung khung, menu điện thoại mở/chuyển/đóng bằng Escape, mở được mọi tab không khóa của khách, Sale, quản lý, kế toán; Admin chỉ kiểm khung và menu); 14 ảnh `ui-screens` không lỗi, không tràn ngang; backend 31 qua.
 - **Không chạy**: test cần SQL Server, luồng qua giao diện với tài khoản thật, Privy thật, Fuji. Các script chụp ảnh giao diện của Codex (`ui-sale-*.mjs`) không chạy lại.
 

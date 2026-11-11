@@ -116,6 +116,72 @@
 .admin-page .admin-filter-row { padding: var(--space-4) var(--space-6); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
 .admin-page .admin-filter-row input { min-height: 48px; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-bg); color: var(--color-text); }
 
+/* List kit (J-C062): search clear button, result count, cards that filter, table rows and states. */
+.ui-list-search-clear { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 32px; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--color-text-muted); cursor: pointer; }
+.ui-list-search-clear:hover { background: var(--color-surface-alt); color: var(--color-text); }
+.ui-list-search-clear:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.ui-list-alert { margin: 0 0 var(--space-4); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-danger-soft); color: var(--color-danger); font-weight: 600; }
+.ui-list-count { margin-left: auto; color: var(--color-text-muted); font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+button.ui-overview-card { display: block; width: 100%; font: inherit; text-align: left; color: inherit; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+button.ui-overview-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+button.ui-overview-card:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.ui-overview-card.is-active { border-color: var(--color-accent); background: var(--color-accent-soft); box-shadow: inset 0 0 0 1px var(--color-accent); }
+.ui-overview-card--success.is-active { border-color: var(--color-success); background: var(--color-success-soft); box-shadow: inset 0 0 0 1px var(--color-success); }
+.ui-overview-card--warning.is-active { border-color: var(--color-warning); background: var(--color-warning-soft); box-shadow: inset 0 0 0 1px var(--color-warning); }
+.ui-overview-card--danger.is-active { border-color: var(--color-danger); background: var(--color-danger-soft); box-shadow: inset 0 0 0 1px var(--color-danger); }
+.ui-overview-card.is-active .ui-overview-icon { background: var(--color-surface); }
+
+.ui-badge > .ui-icon { --ui-icon-size: 14px; }
+
+/* Data tables inside a workspace: same header, spacing and hover on every list. */
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) { width: 100%; border-collapse: collapse; }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) th { padding: 14px var(--space-4); background: var(--color-surface-alt); border-bottom: 1px solid var(--color-border); color: var(--color-text-muted); font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; white-space: nowrap; }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) td { padding: 13px var(--space-4); border-bottom: 1px solid var(--color-border); font-size: 14px; color: var(--color-text); vertical-align: middle; }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) :is(th, td):first-child { padding-left: var(--space-6); }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) :is(th, td):last-child { padding-right: var(--space-6); }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) tbody tr:last-child td { border-bottom: 0; }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) tbody tr:not(.ui-table-state, .ui-table-skeleton):hover { background: var(--color-accent-soft); }
+.ui-workspace .ui-list-table-card { border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) td .ui-btn { border-radius: var(--radius-pill); white-space: nowrap; }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) td .ui-btn--secondary { background: var(--color-primary-soft); border-color: var(--color-primary-soft); color: var(--color-primary); }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) td .ui-btn--secondary:hover { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-surface); }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) td .ui-btn--danger-text { background: var(--color-danger-soft); border-color: var(--color-danger-soft); color: var(--color-danger); }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) td .ui-btn--danger-text:hover { background: var(--color-danger); border-color: var(--color-danger); color: var(--color-surface); }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) td.ui-cell-code { color: var(--color-primary); }
+.ui-workspace :is(.ktp-table, .ui-table, .admin-table) td.ui-num .ui-btn + .ui-btn { margin-left: var(--space-2); }
+.ui-num { text-align: right !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ui-cell-code { font-family: var(--font-heading); font-weight: 600; color: var(--color-primary); white-space: nowrap; }
+.ui-cell-main { margin: 0; font-weight: 600; color: var(--color-text); }
+.ui-cell-sub { display: block; margin: 2px 0 0; color: var(--color-text-muted); font-size: 12px; }
+.ui-cell-sub--warning { color: var(--color-warning); }
+.ui-cell-sub--strong { color: var(--color-primary); font-weight: 700; }
+.ui-btn--danger-text { color: var(--color-danger); }
+.ui-btn--danger-text:hover { border-color: var(--color-danger); background: var(--color-danger-soft); }
+
+.ui-pagination { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-3); padding: var(--space-4) var(--space-6); border-top: 1px solid var(--color-border); }
+.ui-pagination-summary { margin-right: auto; color: var(--color-text-muted); font-size: 13px; font-weight: 600; }
+.ui-pagination-pages { display: flex; gap: var(--space-1); }
+.ui-pagination-pages button { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; height: 36px; padding: 0 var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-surface); color: var(--color-text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; --ui-icon-size: var(--icon-sm); }
+.ui-pagination-pages button:hover:not(:disabled) { border-color: var(--color-primary); }
+.ui-pagination-pages button.is-active { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-surface); }
+.ui-pagination-pages button:disabled { color: var(--color-border); cursor: not-allowed; }
+
+.ui-workspace .ui-table-state td,
+.ui-table-state td { padding: var(--space-10) var(--space-6); text-align: center; color: var(--color-text-muted); }
+.ui-table-state .ui-icon { display: block; margin: 0 auto var(--space-3); --ui-icon-size: 40px; color: var(--color-text-muted); opacity: .45; }
+.ui-table-state p { margin: 0; font-size: 14px; font-weight: 600; }
+.ui-table-state--error td { color: var(--color-danger) !important; }
+.ui-table-state--error .ui-icon { color: var(--color-danger); opacity: .7; }
+.ui-skeleton { display: block; width: min(96px, 80%); height: 12px; border-radius: var(--radius-sm); background: var(--color-surface-alt); animation: ui-skeleton-pulse 1.2s ease-in-out infinite; }
+.ui-table-skeleton td:first-child .ui-skeleton { width: min(72px, 80%); }
+@keyframes ui-skeleton-pulse { 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) {
+  .ui-skeleton { animation: none; }
+  button.ui-overview-card { transition: none; }
+  button.ui-overview-card:hover { transform: none; }
+}
+
 @media (max-width: 600px) {
   .lhd-container { padding: 0; }
   .ui-overview-grid, .admin-page .admin-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
@@ -128,6 +194,9 @@
   .ui-list-toolbar .ui-list-search { flex-basis: 100%; }
   .ui-list-toolbar .status-pill-tabs { width: 100%; }
   .ui-list-toolbar .status-pill-tab { flex: 1 1 auto; padding: var(--space-2) var(--space-3); font-size: 12px; }
+  .ui-list-count { margin-left: 0; }
+  .ui-workspace :is(.ktp-table, .ui-table, .admin-table) :is(th, td):first-child { padding-left: var(--space-4); }
+  .ui-workspace :is(.ktp-table, .ui-table, .admin-table) :is(th, td):last-child { padding-right: var(--space-4); }
   .admin-page .admin-stat-card { grid-template-columns: 32px minmax(0, 1fr); gap: var(--space-2); }
   .admin-page .admin-stat-icon { width: 32px; height: 32px; }
   .admin-page .admin-stat-card p { font-size: 10px; }

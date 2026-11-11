@@ -1,5 +1,6 @@
 import React from 'react';
 import { getStatusLabel } from '../../constants/status.js';
+import { Icon } from './Icon.jsx';
 
 const tones = {
   'Phù hợp': 'success', 'Đã thanh toán': 'success', 'Hoàn tất': 'success',
@@ -15,7 +16,16 @@ const tones = {
   'Đã tiếp nhận': 'info', 'Đã xem': 'info',
 };
 
-export default function StatusBadge({ status }) {
+// One icon per tone so the state reads without relying on colour alone.
+export const toneIcons = { success: 'check_circle', warning: 'hourglass_empty', danger: 'cancel', info: 'info', neutral: 'description' };
+
+export default function StatusBadge({ status, tone }) {
   const label = getStatusLabel(status);
-  return <span className={`status-badge ui-badge ui-badge--${tones[label] || 'neutral'}`}>{label}</span>;
+  const resolved = tone || tones[label] || 'neutral';
+  return (
+    <span className={`status-badge ui-badge ui-badge--${resolved}`}>
+      <Icon name={toneIcons[resolved]} />
+      {label}
+    </span>
+  );
 }
