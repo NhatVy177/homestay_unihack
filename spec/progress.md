@@ -26,7 +26,8 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy loc
 | `chore/fuji-deploy` (Codex) | A2; worktree `D:\HomeStayDorm-fuji-deploy` từ `origin/main` `3725840`; khóa gốc giữ ở A1 | Funding/deploy/verify thật xong; env riêng A2 đã chuẩn bị, config route/roles khớp; chưa restart ứng dụng đầy đủ/A3 |
 | `feat/ui-shared-shell` (Claude) | B0: khung chung cho 5 vai trò; bỏ tab của ứng dụng cũ (D-039); sửa lỗi tab kế toán | Chờ Vy merge |
 | `feat/ui-list-b1` (Claude) | Tạo từ `feat/ui-shared-shell` (nên chứa luôn B0). Bộ danh sách chung theo mẫu bên Hằng (J-C062); bản nháp hồ sơ nộp D1–D3 (J-C063) | Chờ Vy merge; merge PR này là có cả B0 |
-| **`feat/t22-checkout`** (Claude) | Tạo từ `feat/ui-list-b1`, đã gộp `chore/fuji-deploy` (J-C065). **Một PR chứa:** B0, bộ danh sách chung, D1–D3 bản nháp, C2 + B3, A2 | **Chờ Vy merge PR này vào main**; sau đó Codex tạo nhánh mới từ main. C3, C4 làm ở nhánh mới |
+| `feat/t22-checkout` (Claude) | B0, bộ danh sách chung, D1–D3 bản nháp, C2 + B3, A2 | **Đã merge vào main (PR #5)** |
+| `feat/t22-settlement` (Claude) | Từ main sau PR #5. C3: tỷ lệ hoàn theo chính sách đã khóa (D-040), khách trả thu thêm qua ví mô phỏng, kế toán xem đối chiếu và ảnh trả phòng (J-C066); tiếp theo B4, C4 | Đang làm; **migration thu thêm chưa chạy lên HOMEDORM4 (chờ Vy cho phép)** |
 | `feat/t22-backend` (Claude) | Khách tự giữ chỗ, từ chối → "Đã xem", "Không thuê nữa", "Khách không đến" | Có code + test đầu vào; SQL chưa chạy lên HOMEDORM4; chưa nối giao diện; chưa gộp vào nhánh tích hợp (việc C5) |
 | `docs/review-branch-workflow` | Quy tắc "không push main" | Nội dung đã có trong AGENTS.md; xóa được |
 
@@ -60,7 +61,7 @@ Nhánh tích hợp đã vào main; các nhánh cũ đã gộp có thể được
 |---|---|---|---|
 | **Phải có** (trên đường demo) | Điều khoản hợp đồng + phiên bản chính sách + mã băm ảnh hợp đồng vào gói bàn giao | D-027, D-031, D-034 | **Xong code + test (C1)**; migration đã chạy; chưa chạy thật qua giao diện |
 | | Màn kiểm tra trả phòng so trước/sau | D-030 | **Xong code + test (C2, J-C064)**; bảng ảnh đã tạo; HOMEDORM4 chưa có phiếu trả phòng của hợp đồng nên chưa thử dữ liệu thật |
-| | Bản nháp đối soát tự soạn; thu thêm qua ví | D-030 | Chưa làm (C3) |
+| | Bản nháp đối soát tự soạn; thu thêm qua ví | D-030, D-040 | **Xong code + test (C3, J-C066)**: phần tự điền đã có sẵn; thêm tỷ lệ theo chính sách đã khóa, thu thêm qua ví, kế toán xem đối chiếu. Migration `settlement-topup:db:migrate` chưa chạy; giao diện màn Quyết toán (B4) chưa làm lại |
 | | Tự thanh lý 3 trường hợp + gói bằng chứng cuối + "Thanh lý không có xác nhận của khách" | D-030, D-031, D-038 | Chưa làm (C4) |
 | | Điều khoản xác nhận điện tử trong mẫu hợp đồng; ô đồng ý dữ liệu cá nhân | D-038 | Chưa làm (C6) |
 | | Danh sách "Chờ khách xác nhận", nhắc 24/72 giờ | D-028 | Có nút nhắc tay; chưa tự nhắc (trong C4) |

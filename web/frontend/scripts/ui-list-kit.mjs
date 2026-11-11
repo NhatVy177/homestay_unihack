@@ -54,7 +54,8 @@ try {
         await page.locator('.ui-table-skeleton').first().waitFor({ timeout: 5000 });
         check.skeletonRows = await page.locator('.ui-table-skeleton').count();
       } else {
-        await page.locator('.ktp-table tbody tr').first().waitFor({ timeout: 5000 });
+        // Wait for data rows, not the loading placeholder rows.
+        await page.locator(screen.tab ? '.ktp-table tbody tr:not(.ui-table-skeleton)' : '.ktp-table .ui-badge').first().waitFor({ timeout: 5000 });
         check.badgeIcons = await page.locator('.ktp-table .ui-badge svg').count();
         const cards = page.locator('button.ui-overview-card');
         check.clickableCards = await cards.count();

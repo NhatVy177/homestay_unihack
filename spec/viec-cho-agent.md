@@ -153,7 +153,10 @@ Việc: trên màn Kiểm tra trả phòng của quản lý, hiện cạnh nhau 
 3. Làm sau hoặc cùng B3 để tránh hai nhánh cùng sửa KiemTraTraPhong.jsx.
 ```
 
-### C3 — Bản nháp đối soát tự soạn (D-030 mục 2, 3) (Claude)
+### C3 — Bản nháp đối soát tự soạn (D-030 mục 2, 3) (Claude, ĐÃ XONG CODE J-C066; còn chạy migration và B4)
+
+Ghi chú cho Codex: C3 đã thêm `pages/khachHang/ThuThemDoiSoatWalletCard.jsx` và **một dòng** gắn thẻ này ngay dưới `ThuNhanPhongWalletCard` trong `KhachHangPortalPage.jsx` (tab Hợp đồng), và sửa 2 chỗ chữ trong `pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx` cho loại đơn `thu-them-doi-soat`. Khi làm B1/B5 giữ nguyên hai thay đổi này.
+
 
 ```
 Việc: khảo sát rồi bổ sung. Nhánh: feat/t22-settlement-draft.

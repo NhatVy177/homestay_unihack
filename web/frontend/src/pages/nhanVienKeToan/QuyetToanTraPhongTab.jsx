@@ -1,4 +1,5 @@
 import OverviewCards from '../../components/common/OverviewCards.jsx';
+import DoiChieuTraPhong from '../../components/traPhong/DoiChieuTraPhong.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { doiSoatApi } from './doiSoat.api.js';
@@ -361,7 +362,11 @@ function calculatePreview(detail, form) {
     ? safeNumber(doiSoat.tyLeHoanCocHienTai)
     : 80;
 
-  if (!detail.doiSoat) {
+  if (!detail.doiSoat && Number.isFinite(Number(detail.tinhToanTam?.tyLeHoanCocHienTai))) {
+    // D-040: the backend reads the rate from the policy locked on the deposit slip; show the same number.
+    tyLeHoanCocHienTai = safeNumber(detail.tinhToanTam.tyLeHoanCocHienTai);
+    soThangLuuTru = safeNumber(detail.tinhToanTam.soThangLuuTru);
+  } else if (!detail.doiSoat) {
     if (detail.loaiHoSo === LOAI_HO_SO.HOP_DONG_THUE) {
       soThangLuuTru = calculateStayMonths(
         detail.hopDong?.ngayBatDau,
@@ -2123,6 +2128,13 @@ export default function QuyetToanTraPhongTab() {
                 <AdjustmentRequestBox value={adjustmentRequestText} />
               )}
 
+              {selected?.loaiHoSo === LOAI_HO_SO.HOP_DONG_THUE && selected?.phieuTraPhong?.maPhieuTra && (
+                <section className="ktp-section ktp-info-box-outline">
+                  <h4 className="ktp-section-title"><Icon name="fact_check" /> Đối chiếu lúc nhận phòng và lúc trả phòng</h4>
+                  <DoiChieuTraPhong maPhieuTra={selected.phieuTraPhong.maPhieuTra} />
+                </section>
+              )}
+
               <section className="ktp-section ktp-info-box-outline">
                 <h4 className="ktp-section-title"><Icon name="money_off" /> 3. Các khoản khấu trừ</h4>
                 <div className="qt-deduction-grid">
@@ -2279,6 +2291,13 @@ export default function QuyetToanTraPhongTab() {
                   <SummaryLine label="Tiền cọc ban đầu" value={formatMoney(preview?.tienCocBanDau)} tone="primary" />
                   <SummaryLine label="Số tháng lưu trú" value={preview?.soThangLuuTru ?? 0} />
                   <SummaryLine label="Tỷ lệ hoàn cọc" value={`${preview?.tyLeHoanCocHienTai ?? 0}%`} />
+                  {!selected?.doiSoat && selected?.chinhSachHoanCoc && (
+                    <p className="qt-rate-source">
+                      {selected.chinhSachHoanCoc.nguon === 'chinh-sach'
+                        ? `Theo chính sách hoàn cọc khách đã nhận lúc cọc, phiên bản ${selected.chinhSachHoanCoc.phienBan}.`
+                        : selected.chinhSachHoanCoc.lyDo}
+                    </p>
+                  )}
                   <SummaryLine label="Cọc được hoàn" value={formatMoney(preview?.tienCocDuocHoan)} tone="primary" />
                   <SummaryLine label="Tổng khấu trừ" value={formatMoney(preview?.tongKhauTru)} tone="deduction" />
                   <SummaryLine label="Số tiền hoàn thực tế" value={formatMoney(preview?.soTienHoanThucTe)} tone={preview?.soTienHoanThucTe > 0 ? 'success' : 'normal'} />
