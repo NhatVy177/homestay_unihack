@@ -76,7 +76,7 @@ Việc: soạn bảng kiểm và sửa lỗi phát sinh khi Vy chạy luồng th
    hợp đồng ở trạng thái chờ bàn giao → quản lý lập biên bản (có ảnh) → khách mở tab Hợp đồng, yêu cầu chỉnh sửa → quản lý phát hành bản mới → khách xác nhận (nhập OTP Privy thật) → kế toán lập đối soát bản 1 → khách phản đối có lý do → kế toán lập bản 2 → khách đồng ý → tải bản lưu → trang /kiem-chung-avalanche báo khớp → sửa một số trong file, trang báo lệch.
 2. Ghi rõ cách chuẩn bị một hợp đồng demo (dùng luồng Web2 thật hoặc script có sẵn; không sửa dữ liệu khác trong HOMEDORM4).
 3. Khi Vy báo lỗi ở bước nào: tìm nguyên nhân, sửa, thêm test nếu được. Ghi lại thời hạn phiên Privy quan sát được (D-028).
-4. Kết thúc: cập nhật T-08 trong spec/progress.md với link 5 giao dịch (ghi biên bản, khách xác nhận, đối soát bản 1, phản đối, đồng ý bản 2).
+4. Kết thúc: cập nhật T-08 trong spec/progress.md và bảng giao dịch ở README mục 3.4 với link 6 giao dịch (ghi biên bản, khách xác nhận, đối soát bản 1, phản đối, đối soát bản 2, đồng ý bản 2); ghi phí gas đo được.
 ```
 
 ---
@@ -199,15 +199,15 @@ Việc nhỏ, chỉ sửa chữ và một ô tích. Nhánh: feat/t22-consent-wor
 
 ## Nhóm D — Hồ sơ nộp
 
-### D1 — README nộp bài
+### D1 — README nộp bài (BẢN NHÁP XONG, J-C063; điền số liệu Fuji sau A2/A3, ghi công sau Q-07)
 
 ```
 Việc: viết lại README.md gốc cho giám khảo. Nhánh: docs/submission.
-Thứ tự: một đoạn bài toán và người dùng → ảnh hoặc sơ đồ luồng → phần trên Avalanche (địa chỉ contract, link explorer, link 5 giao dịch mẫu từ spec/progress.md, vì sao on-chain) → cách chạy từ đầu (dùng lệnh của việc E1) → kiểm thử → phần MÔ PHỎNG (cổng thanh toán, dữ liệu giả) → giới hạn (pháp lý, mất ví, một cặp khóa vận hành) → phần có sẵn từ đồ án nhóm trước cuộc thi và phần làm trong cuộc thi, ghi công (hỏi Vy nội dung Q-07) → thư viện bên thứ ba.
+Thứ tự: một đoạn bài toán và người dùng → ảnh hoặc sơ đồ luồng → phần trên Avalanche (địa chỉ contract, link explorer, link 6 giao dịch mẫu từ spec/progress.md, vì sao on-chain) → cách chạy từ đầu (dùng lệnh của việc E1) → kiểm thử → phần MÔ PHỎNG (cổng thanh toán, dữ liệu giả) → giới hạn (pháp lý, mất ví, một cặp khóa vận hành) → phần có sẵn từ đồ án nhóm trước cuộc thi và phần làm trong cuộc thi, ghi công (hỏi Vy nội dung Q-07) → thư viện bên thứ ba.
 Không viết điều chưa có bằng chứng; không nói đã kiểm toán hay có người dùng thật. Chuyển phần cấu hình chi tiết hiện có sang docs/cau-hinh.md.
 ```
 
-### D2 — Dàn ý slide
+### D2 — Dàn ý slide (BẢN NHÁP XONG, J-C063: `hackathon/slides.md`)
 
 ```
 Việc: soạn nội dung slide (8–10 trang) thành hackathon/slides.md để Vy dựng trên Canva/Google Slides.
@@ -215,7 +215,7 @@ Trang 1 nói ngay phần nào là mô phỏng. Các trang: người dùng và n�
 Mỗi trang tối đa 3 ý, kèm lời nói 2–3 câu. Số liệu nào chưa kiểm chứng thì ghi rõ là giả định.
 ```
 
-### D3 — Kịch bản video 2:30–2:50
+### D3 — Kịch bản video 2:30–2:50 (BẢN NHÁP XONG, J-C063: `hackathon/video-script.md`)
 
 ```
 Việc: viết hackathon/video-script.md theo D-018 và luồng trong spec/kiem-thu-fuji.md: bảng 3 cột (giây, hình trên màn, lời nói). Mở đầu 10 giây nêu vấn đề và nói rõ phần mô phỏng; 110 giây demo liền mạch từ hợp đồng chờ bàn giao đến trang kiểm chứng và explorer; 30 giây vì sao Avalanche và giới hạn. Liệt kê dữ liệu cần chuẩn bị trước khi quay.

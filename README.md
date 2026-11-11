@@ -1,79 +1,212 @@
-# HomeStayDorm
+# HomeStayDorm: xác nhận bàn giao phòng và đối soát tiền cọc trên Avalanche
 
-Hệ thống quản lý thuê phòng HomeStayDorm, được dùng làm nền tảng cho bài thi Team1 Vietnam UniHack 2026 và phần tích hợp Avalanche.
+HomeStayDorm là hệ thống quản lý thuê phòng ký túc/homestay (đăng ký, xem phòng, cọc, hợp đồng, hóa đơn, trả phòng). Bài thi Team1 Vietnam UniHack 2026 thêm hai lần **khách thuê tự xác nhận trên Avalanche**: xác nhận biên bản bàn giao lúc nhận phòng, và xác nhận kết quả đối soát tiền cọc lúc trả phòng. Chuỗi không giữ tiền. Nó giữ bằng chứng rằng khách đã đồng ý đúng phiên bản nào, để khách tự kiểm tra lại bằng file mình giữ mà không phải xin bên cho thuê.
 
-## Cấu trúc repository
+> **English summary.** A dorm/homestay rental system (React + Express + SQL Server). On Avalanche C-Chain, the tenant signs (EIP-712, embedded wallet, gas paid by a relayer) the exact version of the move-in inspection report and of the deposit settlement. Disputes create a new version and keep the old one. Anyone holding the evidence file can verify it against the chain without the operator's API. No funds are held on-chain.
+
+## Trạng thái bản nộp
+
+Cập nhật 11/11/2026. Ô nào còn "chưa có" sẽ được điền sau khi chạy thật; README không ghi kết quả chưa có bằng chứng.
+
+| Phần | Trạng thái |
+|---|---|
+| Web2: năm vai trò (khách, Sale, quản lý, kế toán, Admin), nhiều chi nhánh | Chạy trên máy local với SQL Server |
+| Contract `DormSettlement` (EIP-712), relayer trả gas, ví nhúng Privy, trang kiểm chứng | Chạy và có test trên chain local (Hardhat 31337) |
+| Triển khai Fuji, verify source, giao dịch thật | **Chưa có.** Điền ở mục [3.4](#34-triển-khai-trên-fuji) |
+| Cổng thanh toán ví điện tử | **Mô phỏng**, xem [mục 6](#6-phần-mô-phỏng) |
+| Dữ liệu | Dữ liệu giả, không có người dùng thật |
+
+## 1. Bài toán và người dùng
+
+Khi trả phòng, chủ nhà và người thuê hay tranh cãi tiền cọc. Một vết rách có từ trước có thể bị tính là hư hỏng mới. Biên bản giấy lúc nhận phòng thường qua nhiều tay và dễ thất lạc. Bảng trừ cọc chỉ nằm trong máy của bên cho thuê, có thể sửa mà khách không biết.
+
+Người dùng:
+
+- **Người thuê** (sinh viên, người đi làm thuê giường/phòng): muốn biết chính xác mình đã đồng ý với nội dung nào và giữ được bằng chứng.
+- **Bên cho thuê** (quản lý chi nhánh, kế toán): muốn hồ sơ bàn giao và đối soát rõ ràng, giảm thời gian tranh cãi.
+
+HomeStayDorm giữ toàn bộ nghiệp vụ trên Web2. Chỉ hai thời điểm cần sự đồng ý của cả hai bên mới được ghi lên chuỗi. Khách xác nhận ngay trong tab **Hợp đồng** của mình: không cài ví, không cần AVAX, không thấy địa chỉ ví hay mã giao dịch.
+
+## 2. Luồng
+
+```mermaid
+flowchart LR
+  A[Đăng ký, xem phòng] --> B[Giữ chỗ] --> C[Trả cọc] --> D[Khai người ở] --> E[Hợp đồng + kỳ đầu]
+  E --> F[Bàn giao phòng]
+  F --> M1{{Mốc 1 trên Avalanche<br/>Khách xác nhận biên bản}}
+  M1 --> G[Đang ở: hóa đơn tháng] --> H[Trả phòng, kiểm tra]
+  H --> I[Kế toán lập đối soát v1]
+  I -->|Khách phản đối, ghi lý do| J[Kế toán lập v2, giữ v1]
+  J --> M2{{Mốc 2 trên Avalanche<br/>Khách đồng ý đối soát}}
+  I --> M2
+  M2 --> K[Hoàn/thu thêm tiền trên Web2, đóng hồ sơ]
+  classDef web2 fill:#f1f4f0,stroke:#c9cfc7,color:#5e655c
+  classDef chain fill:#4a6549,stroke:#3d553c,color:#ffffff,font-weight:bold
+  class A,B,C,D,E,F,G,H,I,J,K web2
+  class M1,M2 chain
+```
+
+- Khách yêu cầu sửa biên bản thì quản lý phát hành bản mới ở Web2. Chỉ bản khách bấm xác nhận mới lên chuỗi.
+- Biên bản bàn giao (gói v2) gồm điều khoản chính của hợp đồng, phiên bản chính sách hoàn cọc khách đã thấy lúc cọc, mã băm ảnh tình trạng phòng và mã băm bản chụp hợp đồng giấy đã ký.
+- Không ai xác nhận thay khách. Nếu khách im lặng quá hạn, quản lý có thao tác Web2 "Thanh lý không có xác nhận của khách" (bắt buộc lý do và bằng chứng đã liên hệ). Chuỗi vẫn ghi đúng là khách chưa đồng ý.
+
+Chi tiết từng giai đoạn: [spec/luong-tong-hop.md](spec/luong-tong-hop.md).
+
+## 3. Phần trên Avalanche
+
+### 3.1 Contract
+
+[`blockchain/contracts/DormSettlement.sol`](blockchain/contracts/DormSettlement.sol), Solidity 0.8.38, OpenZeppelin `EIP712` + `SignatureChecker`.
+
+| Hàm | Ai gọi | Việc |
+|---|---|---|
+| `proposeHandover` | Khóa vận hành "quản lý" (máy chủ) | Ghi commitment của biên bản bàn giao, ví khách, số cọc, mã băm chính sách |
+| `proposeSettlement` | Khóa vận hành "kế toán" (máy chủ) | Ghi phiên bản đối soát mới; contract tự tính số hoàn hoặc số thu thêm |
+| `confirm` | Bất kỳ ai trả gas (relayer) | Chỉ thành công khi có chữ ký EIP-712 hợp lệ của **đúng khách**: xác nhận biên bản (1), đồng ý đối soát (2), phản đối kèm mã băm lý do (3) |
+
+Trạng thái: `HandoverProposed → Active → SettlementProposed → (Disputed → SettlementProposed) → Accepted`.
+
+Chữ ký ràng buộc loại hành động, mã hồ sơ, phiên bản, commitment, nonce, hạn dùng và domain (chain ID, địa chỉ contract). Vì vậy không dùng lại được chữ ký cũ, không ký nhầm bản cũ hay sai mạng. Relayer chỉ gửi giao dịch, không ký thay khách.
+
+### 3.2 Lên chuỗi những gì
+
+Chỉ có mã hồ sơ khó đoán, địa chỉ ví khách, commitment (mã băm có salt), số phiên bản, trạng thái và số tiền cần cho phép tính hoàn/thu. **Không** có tên, CCCD, địa chỉ, ảnh hay nội dung biên bản. Nội dung nằm trong **gói bằng chứng** (JSON gồm nội dung, salt, phiên bản, chain ID, contract). Khách tải gói này bất cứ lúc nào và nhận kèm email sau khi giao dịch thành công.
+
+Trang [`/kiem-chung-avalanche`](web/frontend/src/pages/avalanche/AvalancheVerifyPage.jsx) chỉ cần gói bằng chứng và RPC công khai. Trang báo một trong ba kết quả: khớp, file đã bị sửa, hoặc không đọc được chuỗi. Nếu khớp, trang cho biết thêm phiên bản đang xem có phải bản mới nhất không.
+
+### 3.3 Vì sao on-chain, vì sao Avalanche
+
+- **Vì sao on-chain:** cả hai bên cùng có một lịch sử mà không bên nào sửa kín được. Khách tự kiểm chứng bằng file của mình, kể cả khi bên cho thuê không còn cung cấp tài liệu. Chữ ký gắn với đúng phiên bản, nên "bản khách đồng ý" không thể bị thay sau.
+- **Cách khác giải quyết được một phần:** PDF ký số, dịch vụ đóng dấu thời gian, nhật ký DB. Chúng hoặc vẫn do một bên giữ, hoặc cần người thuê có chữ ký số. Chuỗi không chứng minh vết rách có thật và không thay hợp đồng giấy.
+- **Vì sao Avalanche C-Chain:**
+  - Tương thích EVM, nên dùng thẳng Solidity, OpenZeppelin và viem.
+  - Fuji có AVAX thử miễn phí và explorer để verify source.
+  - Phí gas trên Fuji sẽ được đo và ghi ở mục 3.4; không suy ra chi phí mainnet từ testnet.
+
+### 3.4 Triển khai trên Fuji
+
+| Mục | Giá trị |
+|---|---|
+| Mạng | Avalanche Fuji C-Chain, chain ID `43113` |
+| Địa chỉ contract | chưa có (việc A2) |
+| Verify source | chưa có |
+| Ví vận hành | Deployer kiêm "quản lý" `0x7bb2e96898Db7e387e118eB92a9C390E29f54B2f`; "kế toán" và relayer: chưa ghi |
+| Phí gas đo được | chưa có |
+
+Giao dịch mẫu của một luồng đầy đủ (điền sau việc A3):
+
+| # | Bước | Link explorer |
+|---|---|---|
+| 1 | Quản lý ghi biên bản bàn giao (`proposeHandover`) | chưa có |
+| 2 | Khách xác nhận biên bản (`confirm`, hành động 1) | chưa có |
+| 3 | Kế toán lập đối soát v1 (`proposeSettlement`) | chưa có |
+| 4 | Khách phản đối v1 (`confirm`, hành động 3) | chưa có |
+| 5 | Kế toán lập đối soát v2 (`proposeSettlement`) | chưa có |
+| 6 | Khách đồng ý v2 (`confirm`, hành động 2) | chưa có |
+
+## 4. Chạy thử từ đầu
+
+Yêu cầu: Windows, Node.js 24, SQL Server (driver `msnodesqlv8`), Chrome để chạy các script kiểm tra giao diện.
+
+1. **CSDL:** tạo CSDL từ các script trong [`database/`](database/) (CreateDB → GenData → SP → Trigger), rồi chạy các lệnh migration trong `web/backend` theo thứ tự ở [docs/cau-hinh.md](docs/cau-hinh.md). *Lệnh dựng CSDL bằng một lệnh (`npm run db:setup`, việc E1) chưa có.*
+2. **Cấu hình:** chép `web/backend/.env.example` thành `.env`, và làm tương tự cho `web/frontend` và `blockchain`. Muốn thử nhanh không cần Fuji thì dùng chain local như hướng dẫn trong [docs/cau-hinh.md](docs/cau-hinh.md).
+3. **Cài và chạy:**
+
+   ```powershell
+   cd blockchain;   npm ci; npm test
+   cd ..\web\backend;  npm ci
+   cd ..\frontend;     npm ci
+   cd ..\..;           .\run.ps1
+   ```
+
+   Frontend `http://localhost:5173`, backend `http://localhost:5000`.
+
+Cấu hình đầy đủ (Privy, email, chu kỳ quét, cổng mô phỏng): [docs/cau-hinh.md](docs/cau-hinh.md).
+
+## 5. Kiểm thử
+
+| Phần | Lệnh | Kết quả gần nhất (11/11/2026) |
+|---|---|---|
+| Contract + luồng tích hợp trên chain local | `cd blockchain && npm test` | 18 qua, 1 bỏ qua (SQL) |
+| Backend | `cd web/backend && npm test` | 31 qua, 1 bỏ qua |
+| Build frontend | `cd web/frontend && npm run build` | Qua |
+| Màn xác nhận, kiểm chứng, cổng mô phỏng (API giả) | `npm run test:avalanche-ui` | Qua |
+| Gói bàn giao v2, khung trang, danh sách (API giả) | `npm run test:handover-ui`, `test:shell-ui`, `test:list-kit` | Qua |
+| SQL Server | `TEST_SQL=true npm run test:sql`, `node scripts/deposit-flow-verify.mjs` | Cần SQL Server; tự rollback |
+
+Test luồng tích hợp trong `blockchain/test/workflow.test.mjs` gồm các ca sau:
+
+- chạy trọn bàn giao → phản đối v1 → v2 → đồng ý → kiểm chứng độc lập, khách không trả gas;
+- từ chối chữ ký dùng lại, sai người ký, sai domain, sai hành động, sai commitment, chữ ký hết hạn;
+- từ chối ký bản cũ và lý do phản đối bị thay;
+- chain thành công mà SQL lỗi thì phục hồi đúng một lần;
+- số dư hoàn, thu thêm và bằng 0;
+- email nhắc hay ví chưa có không bao giờ được tính là khách đã xác nhận.
+
+Kiểm thử bằng API giả không thay cho chạy thật trên Fuji.
+
+## 6. Phần mô phỏng
+
+- **Cổng thanh toán ví điện tử là cổng tự dựng**, không phải API của nhà cung cấp nào, không dùng thương hiệu thật, không nhận tiền thật. Cổng có IPN ký HMAC, từ chối sai chữ ký hoặc sai số tiền, và chỉ ghi nhận một lần khi IPN gửi lặp.
+- **Dữ liệu là dữ liệu giả.** Hồ sơ demo được chuẩn bị trước tới bước "Chờ bàn giao".
+- **Fuji là mạng thử.** AVAX thử chỉ dùng trả phí gas, không có giá trị.
+
+## 7. Giới hạn
+
+- **Pháp lý:**
+  - Thao tác trên Avalanche là **xác nhận điện tử** theo thỏa thuận ghi trong hợp đồng giấy. Đây không phải chữ ký số và không thay hợp đồng thuê.
+  - Chưa được tư vấn pháp lý; nếu triển khai thật cần đối chiếu Luật Giao dịch điện tử và quy định bảo vệ dữ liệu cá nhân hiện hành.
+  - Dự án không dùng tiền mã hóa để thanh toán.
+- **Chuỗi không phân xử:** chuỗi không biết vết rách có thật hay không và không tự chuyển tiền hoàn. "Đã thống nhất đối soát" không có nghĩa là "đã nhận tiền".
+- **Khóa vận hành:** contract nhận một địa chỉ "quản lý" và một địa chỉ "kế toán" cho cả hệ thống. Hai khóa này nằm trên máy chủ và đại diện cho bên cho thuê; mất khóa thì phải deploy contract mới. Chưa có multisig.
+- **Ví khách:** ví nhúng Privy, mở bằng mã OTP gửi về email tài khoản. Mất quyền vào email thì mất quyền vào ví. Đổi ví không đổi người ký của hồ sơ cũ. Cách ví đi theo phiên đăng nhập (JWT) cần gói Privy trả phí, nên chưa dùng.
+- **Riêng tư:** mã băm có salt, nhưng không khẳng định bảo đảm ẩn danh tuyệt đối.
+- Contract chưa được kiểm toán bảo mật.
+
+## 8. Phần có sẵn và phần làm trong cuộc thi
+
+- **Có sẵn trước cuộc thi:** nền Web2 HomeStayDorm từ đồ án môn học của nhóm, mốc `d1dd520`. Ban tổ chức đã đồng ý cho dùng dự án cũ và thi một người.
+- **Làm trong cuộc thi (từ 04/11/2026):**
+  - Module `blockchain/` (contract, gói bằng chứng, test), relayer và đồng bộ ở `web/backend/integrations/avalanche/`, ví nhúng và các màn xác nhận, trang kiểm chứng.
+  - Cổng thanh toán mô phỏng; luồng đặt cọc, nhận phòng, hợp đồng và trả phòng thiết kế lại (D-023 → D-038).
+  - Giao diện làm lại theo hệ thống token chung.
+  - Lịch sử thay đổi có trong Git và [spec/journal.md](spec/journal.md).
+- **Ghi công thành viên nhóm cũ:** *chờ Vy điền (Q-07): tên, phần đóng góp, phạm vi đồng ý.*
+- **Công cụ AI:** dùng trợ lý lập trình AI (Claude Code, Codex) để viết code, test và tài liệu. Vy quyết định nghiệp vụ, duyệt và chạy thử; các quyết định có ghi nguồn trong [spec/decisions.md](spec/decisions.md).
+
+## 9. Thư viện bên thứ ba
+
+| Thư viện | Dùng cho | Giấy phép |
+|---|---|---|
+| React 18, React Router, Vite, axios | Frontend | MIT |
+| Express, mssql, multer, cors | Backend | MIT |
+| msnodesqlv8 | Kết nối SQL Server | Apache-2.0 |
+| nodemailer | Gửi email | MIT-0 |
+| dotenv | Đọc biến môi trường | BSD-2-Clause |
+| viem | Đọc/ghi chuỗi, ký EIP-712 | MIT |
+| @privy-io/react-auth | Ví nhúng | Apache-2.0 |
+| OpenZeppelin Contracts 5.6.1 | `EIP712`, `SignatureChecker` | MIT |
+| Hardhat 3, solc 0.8.38 | Biên dịch, chain local, test | MIT |
+| playwright-core | Script chụp và kiểm tra giao diện | Apache-2.0 |
+
+Giao diện tham khảo cách bố trí của dự án nhóm khác (không chép code). Icon là SVG tự vẽ trong `Icon.jsx`.
+
+## 10. Tài liệu thêm
+
+- [docs/cau-hinh.md](docs/cau-hinh.md): cấu hình chi tiết.
+- [blockchain/README.md](blockchain/README.md): ví Fuji, deploy, cấu trúc module.
+- [spec/luong-tong-hop.md](spec/luong-tong-hop.md): luồng đầy đủ.
+- [spec/decisions.md](spec/decisions.md): các quyết định có ngày và lý do.
+- [spec/progress.md](spec/progress.md): tiến độ hiện tại.
+- [hackathon/](hackathon/): thể lệ, kế hoạch, slide, kịch bản video.
 
 ```text
 HomeStayDorm/
-├─ database/       # Schema, seed data, stored procedures và trigger SQL Server
-├─ blockchain/     # Khung riêng: contract, test, scripts, shared và deployment
-├─ web/
-│  ├─ backend/     # REST API Node.js + Express
-│  ├─ frontend/    # React + Vite
-│  └─ scripts/     # Công cụ hỗ trợ phân tích code
-├─ hackathon/      # Bối cảnh, proposal và kế hoạch UniHack/Avalanche
-├─ spec/           # Phạm vi, quyết định, tiến độ và nhật ký làm việc
-├─ .agents/skills/ # Quy chuẩn giao diện cho AI (homestaydorm-ui)
-├─ AGENTS.md       # Hướng dẫn AI đọc và cập nhật hồ sơ mỗi phiên
-├─ run.bat         # Chạy nhanh trên Command Prompt
-└─ run.ps1         # Chạy nhanh trên PowerShell
+├─ database/        Schema, dữ liệu mẫu, stored procedure, trigger (SQL Server)
+├─ blockchain/      Contract, gói bằng chứng, test, script deploy
+├─ web/backend/     REST API Node.js + Express, relayer, email
+├─ web/frontend/    React + Vite
+├─ docs/            Cấu hình chi tiết
+├─ hackathon/       Thể lệ, kế hoạch, slide, kịch bản video
+└─ spec/            Phạm vi, quyết định, tiến độ, nhật ký
 ```
-
-Phần Avalanche nằm trong [module riêng](blockchain/README.md) (contract `DormSettlement`, Hardhat 3 + solc 0.8.38 + viem). Ví nhúng/ký ở `web/frontend/src/components/xacNhan/` và `web/frontend/src/lib/avalanche/`; relayer, đồng bộ và email ở `web/backend/integrations/avalanche/`. Trạng thái thực tế (đã test gì, đã lên Fuji chưa) theo [spec/progress.md](spec/progress.md).
-
-**Công nghệ:** React 18 + Vite, Node.js 24 + Express, SQL Server; Avalanche Fuji C-Chain, Solidity 0.8.38, OpenZeppelin EIP-712, viem; Privy embedded wallet (khách nhập mã OTP email một lần; JWT-based auth chỉ bật được khi có gói Privy Scale); nodemailer.
-
-## Chạy local
-
-Yêu cầu: Node.js, npm và SQL Server đã được cấu hình theo `web/backend/.env.example`.
-
-Trên Windows, chạy một trong hai lệnh tại thư mục gốc:
-
-```powershell
-.\run.ps1
-```
-
-hoặc:
-
-```bat
-run.bat
-```
-
-Có thể chạy riêng từng phần:
-
-```powershell
-cd web/backend
-npm install
-npm run dev
-
-cd ../frontend
-npm install
-npm run dev
-```
-
-- Frontend: `http://localhost:5173`
-- Backend: `http://localhost:5000`
-
-## Xác nhận bàn giao/đối soát trên Avalanche và thanh toán mô phỏng
-
-Luồng (D-009 → D-013 trong [spec/decisions.md](spec/decisions.md)): quản lý lập biên bản bàn giao Web2 → hệ thống tự gửi bản xem vào tab **Hợp đồng** của khách (kèm email) → khách **xác nhận** hoặc **yêu cầu chỉnh sửa** → quản lý phát hành bản mới → chỉ bản khách xác nhận được ghi lên Avalanche, khách ký bằng ví nhúng trong tài khoản, ứng dụng trả phí gas. Kế toán gửi bảng đối soát cọc; khách đồng ý hoặc phản hồi; mọi phiên bản được giữ và tự kiểm chứng được tại `/kiem-chung-avalanche`. Khi chưa cấu hình, Web2 vẫn chạy bình thường và phần xác nhận tự ẩn.
-
-1. **CSDL** (thêm bảng xác nhận/thanh toán mô phỏng, mở rộng `HoaDon.PhuongThucThanhToan` và cập nhật các SP liên quan): `cd web/backend && npm run avalanche:db:migrate`.
-2. **Contract**: `cd blockchain && npm install && npm test`. Local: `npm run chain` (cửa sổ riêng) rồi `npm run deploy:local`. Fuji: điền `blockchain/.env` theo `.env.example` rồi `node --env-file=.env scripts/deploy.mjs fuji` (sau `npm run compile`); verify source bằng `artifacts/standard-input.json`.
-3. **Backend** `web/backend/.env`: `AVALANCHE_ENABLED=true`, `AVALANCHE_CONTRACT_ADDRESS`, khóa thử của manager/accountant/relayer (chỉ trên server). Ví nhúng: tạo app trên Privy, đặt `PRIVY_APP_ID`; mặc định `PRIVY_AUTH_MODE=email` (khách nhập mã OTP email một lần khi xác nhận, gói Privy miễn phí). Nếu có gói Privy Scale: `npm run privy:keygen`, dán public key vào Dashboard (JWT-based auth, claim `sub`), đặt `PRIVY_AUTH_MODE=jwt` và `PRIVY_JWT_PRIVATE_KEY_FILE`.
-   - **Chain local:** đặt `AVALANCHE_CHAIN_ID=31337`, `AVALANCHE_RPC_URL=http://127.0.0.1:8545`, `AVALANCHE_CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3` và khóa ví dev công khai của Hardhat (chỉ dùng local). `run.ps1` khi thấy cấu hình này sẽ tự mở cửa sổ chain và deploy contract (`npm run local:ensure`). Chain local mất dữ liệu khi tắt: hồ sơ xác nhận tạo trước đó sẽ không dùng tiếp được. Email: không đặt `SMTP_HOST` thì chỉ in ra console; `MAIL_REDIRECT_TO` gom email demo về một hộp thư.
-4. **Frontend** `web/frontend/.env`: `VITE_PRIVY_APP_ID`, `VITE_AVALANCHE_CONTRACT_ADDRESS`, `VITE_AVALANCHE_CHAIN_ID`.
-5. **Thanh toán cọc và khoản thu kỳ đầu bằng ví điện tử (mô phỏng)**: bật mặc định; đặt `PAYMENT_SIM_SECRET` (≥ 16 ký tự). Khách mở phiếu cọc hoặc vào tab **Hợp đồng** để trả khoản thu kỳ đầu; sau IPN thành công, hóa đơn kỳ đầu thành “Đã TT” và quản lý có thể bàn giao. Kế toán vẫn thu tay bằng tiền mặt/chuyển khoản như trước. Cổng tự dựng để demo, không phải API của nhà cung cấp thật và không nhận tiền thật. API mới: `GET/POST /api/thanh-toan-mo-phong/thu-nhan-phong/:maHopDong` (xem khoản phải thu/tạo đơn, chỉ chủ hợp đồng).
-6. **Đặt cọc (D-023)**: chạy `cd web/backend && npm run auto-deposit:db:migrate` một lần để có tài khoản hệ thống `NVAUTO`, rồi `npm run deposit-flow:db:migrate` để thêm lựa chọn cọc, sổ email, theo dõi nộp quỹ và các SP mới. Hai lệnh migration có thể chạy lại. Sale chọn hình thức/giường khi gửi; quản lý nhận email, duyệt là tạo phiếu và chốt trong một transaction. Yêu cầu chờ quá 8 giờ nhắc quản lý một lần, quá 12 giờ tự từ chối; phiếu đã phát hành có hạn trả 24 giờ, nhắc khách khi còn tối đa 3 giờ. Tiền mặt do Sale thu kèm ảnh biên nhận, kế toán đánh dấu đã nộp quỹ; chuyển khoản tay do kế toán xác nhận. Link email mở đúng phiếu sau đăng nhập. `DAT_COC_YEU_CAU_INTERVAL_MS` và `DAT_COC_HET_HAN_INTERVAL_MS` đặt chu kỳ quét (mặc định 300000 ms); `AVALANCHE_APP_ORIGIN` hoặc `CLIENT_URL` đặt gốc link email. `MAIL_REDIRECT_TO` nên trỏ tới hộp thư demo để tránh gửi tới địa chỉ dữ liệu mẫu. Công tắc tự chốt cũ trong Admin không còn tham gia luồng này.
-7. **Nhận phòng (D-024)**: sau bước 6, chạy `cd web/backend && npm run residence-flow:db:migrate` để áp SP tự duyệt cư trú theo ngoại lệ; có thể chạy lại. Kiểm tra SQL trên dữ liệu tổng hợp có rollback bằng `npm run residence-flow:db:verify`. Hồ sơ đủ điều kiện được `NVAUTO` duyệt, trường hợp khác chuyển quản lý kèm lý do; email gửi khi cọc đã trả, có thành viên bị từ chối, lập hợp đồng, gần ngày nhận phòng mà chưa trả kỳ đầu, và khi kỳ đầu đã trả. Mail theo `MAIL_REDIRECT_TO` và chống lặp theo lần gửi duyệt; cần cấu hình SMTP để gửi thật.
-
-Kiểm thử: `cd blockchain && npm test` (contract + luồng tích hợp trên chain local), `TEST_SQL=true npm run test:sql` (cần SQL Server), `cd web/backend && npm test && node scripts/deposit-flow-verify.mjs` (script cuối tạo hồ sơ tạm và rollback; cần SQL Server), `cd web/frontend && npm run build && npm run test:avalanche-ui`.
-
-## Tài liệu UniHack
-
-- [Tiến độ hiện tại](spec/progress.md), [luồng và quyết định đã gộp](spec/luong-tong-hop.md), [nhật ký có thời gian](spec/journal.md); cách ghi hồ sơ ở [spec/README.md](spec/README.md).
-- [Tổng quan cuộc thi](hackathon/README.md)
-- [Kế hoạch thực hiện](hackathon/plan.md)
-- [Proposal](hackathon/Proposal.md)
-- [Bối cảnh Avalanche](hackathon/Unihack_Context.md)

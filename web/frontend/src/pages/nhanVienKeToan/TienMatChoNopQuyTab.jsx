@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { datCocApi } from '../datCoc/datCoc.api.js';
-import OverviewCards from '../../components/common/OverviewCards.jsx';
 import ListSearch, { ListCount } from '../../components/common/ListSearch.jsx';
 import TableState from '../../components/common/TableState.jsx';
 
@@ -30,13 +29,8 @@ export default function TienMatChoNopQuyTab() {
     if (!q) return rows;
     return rows.filter(row => [row.maPhieuDatCoc, row.hoTen, row.maPhong].some(v => String(v || '').toLowerCase().includes(q)));
   }, [rows, search]);
-  const tongTien = rows.reduce((sum, row) => sum + Number(row.soTienCoc || 0), 0);
 
   return <div className="ktp-container">
-    <OverviewCards items={[
-      { key: 'phieu', label: 'Phiếu chờ nộp quỹ', value: rows.length, icon: 'receipt_long' },
-      { key: 'tien', label: 'Tổng tiền mặt đang giữ', value: formatTien(tongTien), icon: 'account_balance' }
-    ]} />
     {error && rows.length > 0 && <p role="alert" className="ui-list-alert">{error}</p>}
     <div className="ui-list-toolbar">
       <ListSearch value={search} onChange={setSearch} placeholder="Mã phiếu, tên khách hoặc phòng..." />

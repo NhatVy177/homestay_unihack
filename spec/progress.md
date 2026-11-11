@@ -15,7 +15,7 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy đ�
 | Technical (25) | Contract + 18 test, backend 31 test, build frontend qua; gói bàn giao v2 có điều khoản hợp đồng | Chạy trọn luồng thật một lần; README cài DB từ đầu |
 | Avalanche (25) | Contract EIP-712, relayer trả gas, ví nhúng, trang kiểm chứng (chạy local); ví Fuji đã tạo | **Faucet → deploy + verify source Fuji → giao dịch thật, link explorer** |
 | Creativity (15), Impact (15) | Bài toán thật, luồng D-026 → D-038 đã chốt | Slide nêu người dùng, giới hạn pháp lý, vì sao on-chain |
-| Pitch (10) | Kịch bản video 2:50 đề xuất ở J-041 (chưa chốt) | Slide, video, README nộp |
+| Pitch (10) | Bản nháp README nộp bài, dàn ý 10 slide, kịch bản video 2:40 (J-C063) | Điền địa chỉ contract, 6 link giao dịch, phí gas sau A2/A3; ghi công (Q-07); Vy dựng slide và quay video |
 | UI/UX (10) | Khung trang mọi vai trò; không gian Sale đã làm lại | 5 màn trên đường demo (B1–B5) còn `style` viết tay |
 
 ## Nhánh
