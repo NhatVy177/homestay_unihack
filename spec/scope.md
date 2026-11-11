@@ -35,6 +35,8 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 
 Theo yêu cầu Vy ngày 11/11: tạo ba ví mới (deployer kiêm manager, accountant, relayer), chỉ in địa chỉ; khóa lưu trong `.env` và `.fuji-backend-env.local` bị ignore, từ chối ghi đè khóa cũ. Script chia 0,3 AVAX thử cho accountant và relayer, kiểm tra đúng Fuji và đủ tiền/gas trước giao dịch, in số dư ba ví; chưa deploy. Khóa vận hành không phải khóa ví khách. Không chạy SQL hoặc đổi cấu hình ứng dụng trong A1; deploy/verify/nghiệm thu thật vẫn thuộc F-09/A2–A3.
 
+**A2 (J-X067, theo việc cho agent bản 11/11 09:40):** thay mức nạp A1 bằng mục tiêu 0,1 AVAX mỗi ví phụ; bỏ qua ví đủ tiền, ví thiếu chỉ nhận phần chênh lệch. Có chế độ chỉ kiểm tra, dự phòng gas và kiểm receipt. Deploy tự nạp env, kiểm mạng/vai trò/phí, giữ pending hash để tiếp tục đọc receipt, không ghi đè manifest Fuji. Verify source dùng Sourcify API v2, đối chiếu input/compiler/constructor và yêu cầu creation/runtime exact match; chưa có kết quả thật thì giữ pending. Trang kiểm chứng hiện link contract khi cấu hình Fuji hợp lệ. Không thay contract hoặc quy tắc xác nhận; đổi env ứng dụng sau khi có deployment/verification thật, rồi nghiệm thu A3.
+
 ### C1 — Điều khoản và bản chụp hợp đồng trong bàn giao v2 (D-027/D-031/D-034)
 
 - Payload `homestaydorm.handover.v2`: `contractTerms` chứa mã hợp đồng, giá thuê, ngày bắt đầu/kết thúc, kỳ thanh toán, cọc theo `PhieuDatCoc.SoTienCoc`; chưa trừ hoàn một phần. Không thêm thông tin định danh cá nhân vào điều khoản.

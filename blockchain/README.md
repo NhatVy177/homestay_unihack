@@ -25,17 +25,58 @@ Nếu `.env` đã có khóa hoặc `.fuji-backend-env.local` đã tồn tại, s
 
 Lấy **địa chỉ deployer / manager** in trên console để xin AVAX thử tại [Avalanche Console](https://build.avax.network/console) hoặc [faucet Team1VN](https://team1vn.xyz/faucet.html). Không cần xin riêng cho hai ví còn lại.
 
-Khi deployer đã có **hơn 0,6 AVAX thử và đủ phí gas**, chạy:
+Theo bước A2 mới, hai ví phụ cần **mỗi ví tối thiểu 0,1 AVAX thử**. Deployer cần đủ khoản còn thiếu của hai ví cộng phí gas, và giữ tiền cho deploy/manager. Kiểm tra trước rồi mới gửi:
 
 ```powershell
+npm run fuji:fund -- --check
 npm run fuji:fund
 ```
 
-Script kiểm tra RPC đúng Fuji (chain ID `43113`), in số dư ba ví, kiểm tra tiền và phí ước tính trước khi gửi, chuyển **0,3 AVAX thử mỗi ví** cho accountant và relayer, đợi receipt thành công rồi in số dư mới. Deployer giữ phần còn lại cho deploy và thao tác manager. Nếu chưa có tiền hoặc không đủ, script dừng trước giao dịch đầu tiên và nhắc xin faucet. Có thể đặt `FUJI_RPC_URL` trong `.env` hoặc môi trường tiến trình.
+Script kiểm tra RPC đúng Fuji (`43113`), in số dư ba ví, bỏ qua ví đã có từ 0,1 AVAX; ví có ít hơn chỉ nhận phần còn thiếu để đạt 0,1. Kiểm tra đủ tiền cho cả đợt và dự phòng gấp đôi phí ước tính trước giao dịch đầu tiên; đợi từng receipt trước khi gửi tiếp. `--check` không gửi giao dịch. Có thể đặt `FUJI_RPC_URL` trong `.env` hoặc môi trường tiến trình.
 
-**Mỗi lần chạy thành công chuyển thêm 0,3 AVAX cho mỗi ví**; không phải lệnh kiểm tra số dư thuần túy. Nếu RPC lỗi giữa chừng, kiểm tra số dư và transaction trên explorer trước khi chạy lại để tránh chuyển lặp. Lỗi thư viện được rút gọn, không in raw exception chứa khóa.
+Chạy lại sau khi hai ví đủ tiền không gửi thêm. Nếu RPC lỗi sau khi broadcast, giữ mã giao dịch đã in và kiểm tra receipt trên explorer trước khi chạy lại; giao dịch còn pending có thể chưa phản ánh trong số dư. Lỗi thư viện được rút gọn, không in raw exception chứa khóa.
 
-A1 chỉ chuẩn bị ví và script chia tiền thử, **không deploy**, không đổi `.env` đang chạy của backend/frontend. Deploy và verify source thuộc A2; `deploy:fuji` hiện cần nạp biến môi trường theo hướng dẫn A2 trước khi chạy.
+A1 chỉ chuẩn bị ví và script. A2 bổ sung deploy, source verification và hướng dẫn cấu hình bên dưới; trạng thái chạy thật xem `spec/progress.md`.
+
+## Deploy và verify Fuji (A2)
+
+Từ `blockchain/` có bộ khóa Fuji gốc trong `.env` và `.fuji-backend-env.local`, sau khi hai ví phụ được nạp:
+
+```powershell
+npm run compile
+node --env-file=.env scripts/deploy.mjs fuji --check
+npm run deploy:fuji
+npm run verify:fuji
+```
+
+`deploy:fuji` tự nạp `.env`. `--check` chỉ đọc chain/số dư và ước tính phí, không deploy. Script từ chối sai mạng, vai trò trùng/zero, thiếu gas hoặc manifest Fuji đã tồn tại. Sau broadcast lưu mã giao dịch vào `deployments/fuji.pending.json` (ignore); nếu đọc receipt lỗi, chạy lại sẽ theo mã cũ. Sau receipt thành công và đọc `manager()`/`accountant()` khớp mới ghi manifest công khai `deployments/fuji.json`. Không xóa manifest để deploy lại; hồ sơ chain local cũ không được chuyển thành hồ sơ Fuji.
+
+Verify dùng [Sourcify API v2](https://docs.sourcify.dev/docs/api/) (không dùng API v1 đã ngừng), hỗ trợ chain 43113. Gửi `artifacts/standard-input.json`, solc 0.8.38, optimizer 200, EVM Cancun và creation transaction; constructor `(manager, accountant)` lưu công khai trong manifest. SHA-256 input phải khớp lúc deploy. Job ID được lưu để chạy tiếp khi chờ lâu; chỉ đánh dấu `sourceVerification: verified` khi **creation và runtime đều exact match**, đúng chain/address/creation tx. Manifest có link Sourcify và explorer; xác minh ở Sourcify không đồng nghĩa explorer khác đã index source. Lỗi/chưa có manifest không được báo đã verify.
+
+### Worktree A2 và bộ khóa ở thư mục A1
+
+Không tạo lại khóa hoặc in nội dung hai file. Bộ khóa vẫn ở `D:\HomeStayDorm-fuji\blockchain`; code A2 ở `D:\HomeStayDorm-fuji-deploy\blockchain`. Cài dependencies/compile/test trong worktree A2, rồi chạy code mới với thư mục hiện hành là chỗ chứa khóa gốc:
+
+```powershell
+$fujiCode = 'D:\HomeStayDorm-fuji-deploy\blockchain'
+Set-Location 'D:\HomeStayDorm-fuji\blockchain'
+node "$fujiCode/scripts/fuji-fund.mjs" --check
+# Chỉ chạy khi kiểm tra đủ tiền và không có giao dịch pending chưa rõ kết quả:
+node "$fujiCode/scripts/fuji-fund.mjs"
+node --env-file=.env "$fujiCode/scripts/deploy.mjs" fuji --check
+node --env-file=.env "$fujiCode/scripts/deploy.mjs" fuji
+node "$fujiCode/scripts/verify-fuji.mjs"
+```
+
+Artifacts và manifest nằm trong worktree A2; khóa ở nguyên thư mục A1. `sourceCommit` lấy từ worktree chứa code, không lấy từ thư mục khóa.
+
+### Chuyển ứng dụng sau khi deploy và verify thành công
+
+1. Sao lưu env hiện tại của backend/frontend thành `.env.local-chain` tại đúng thư mục tương ứng (đã ignore). Chưa đổi cấu hình ứng dụng khi chưa có contract thật và manifest xác nhận.
+2. Backend `.env`: `AVALANCHE_ENABLED=true`, `AVALANCHE_CHAIN_ID=43113`, `AVALANCHE_RPC_URL=https://api.avax-test.network/ext/bc/C/rpc`, `AVALANCHE_CONTRACT_ADDRESS` lấy từ manifest; ba khóa `AVALANCHE_*_PRIVATE_KEY` lấy **tại máy** từ `.fuji-backend-env.local`. Giữ cấu hình SQL/SMTP/Privy khác; không gửi khóa qua chat. Giữ `PRIVY_AUTH_MODE=email` theo D-015.
+3. Frontend `.env`: cùng chain/RPC/contract ở `VITE_AVALANCHE_CHAIN_ID`, `VITE_AVALANCHE_RPC_URL`, `VITE_AVALANCHE_CONTRACT_ADDRESS`; giữ `VITE_PRIVY_APP_ID`, tuyệt đối không thêm private key vào `VITE_*`.
+4. Khởi động lại backend, build/chạy frontend. `GET /api/avalanche/config` phải trả đúng chain 43113/address; đọc `manager()`/`accountant()` khớp manifest. Quản lý/kế toán có link giao dịch Fuji; trang kiểm chứng có link contract khi cấu hình Fuji hợp lệ. Hồ sơ local có thể báo "Deployment đã đổi" đúng thiết kế, không sửa dữ liệu cũ.
+5. A3 mới nghiệm thu OTP Privy, SQL/SMTP/giao diện và trọn luồng thật. Không coi compile/test/mock là kết quả đó.
 
 ## Code và kiểm tra
 

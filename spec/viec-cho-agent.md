@@ -2,7 +2,7 @@
 
 Lập 2026-11-11 (J-C059), cập nhật 09:40 cùng ngày (J-C060), kèm [audit-2026-11-11.md](audit-2026-11-11.md). Mỗi khối dưới đây là một prompt dán nguyên văn. Thứ tự và mức ưu tiên theo **D-037** (Vy đã chốt).
 
-**Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036). **Việc kế tiếp:** Vy xin faucet → A2 → A3; song song B1, C6.
+**Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036). **Đang làm A2 (J-X067):** code deploy/funding/verify và kiểm tra local đã chuẩn bị; deployer nhận 0,05 AVAX, chờ nạp thêm để cấp hai ví phụ rồi mới triển khai thật. A3 sau A2; song song B1, C6.
 
 ## Cách dùng
 
@@ -44,7 +44,7 @@ Việc: chuẩn bị ví thử cho Fuji mà không để khóa bí mật lộ ra
 Xong thì báo Vy địa chỉ ví deployer để xin faucet (hai ví còn lại nhận AVAX từ fuji:fund).
 ```
 
-### A2 — Deploy, verify source, chuyển cấu hình sang Fuji
+### A2 — Deploy, verify source, chuyển cấu hình sang Fuji (code chuẩn bị J-X067; chưa deploy)
 
 ```
 Điều kiện: ví deployer 0x7bb2e96898Db7e387e118eB92a9C390E29f54B2f đã có AVAX thử (Vy xin faucet). Nhánh: chore/fuji-deploy. File khóa nằm ở D:\HomeStayDorm-fuji\blockchain (.env và .fuji-backend-env.local, bị Git bỏ qua): chạy các lệnh Fuji tại thư mục đó hoặc nhờ Vy chép hai file sang thư mục làm việc mới; không in nội dung file.

@@ -18,7 +18,8 @@
     "test:sql": "node --env-file=../web/backend/.env --test test/sql.test.mjs",
     "chain": "hardhat node --network local --hostname 127.0.0.1",
     "deploy:local": "npm run compile && node scripts/deploy.mjs local",
-    "deploy:fuji": "npm run compile && node scripts/deploy.mjs fuji",
+    "deploy:fuji": "npm run compile && node --env-file=.env scripts/deploy.mjs fuji",
+    "verify:fuji": "node scripts/verify-fuji.mjs",
     "fuji:keygen": "node scripts/fuji-keygen.mjs",
     "fuji:fund": "node scripts/fuji-fund.mjs",
     "local:ensure": "node scripts/ensure-local.mjs"

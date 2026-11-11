@@ -29,7 +29,7 @@ export async function loadFujiFunding(directory = process.cwd()) {
   };
 }
 
-export async function fundFuji({ client, wallet, addresses, log = console.log }) {
+export async function fundFuji({ client, wallet, addresses, log = console.log, dryRun = false }) {
   if (await client.getChainId() !== avalancheFuji.id) {
     throw new FujiSetupError('RPC is not Avalanche Fuji (43113). No funds sent.');
   }
@@ -38,28 +38,43 @@ export async function fundFuji({ client, wallet, addresses, log = console.log })
     Object.entries(addresses).forEach(([role, address], i) => log(`${role}: ${address} — ${formatEther(balances[i])} test AVAX`));
     return balances;
   };
-  const [balance] = await printBalances();
+  const [balance, accountantBalance, relayerBalance] = await printBalances();
+  const target = parseEther('0.1');
+  const transfers = ['accountant', 'relayer'].flatMap((role, i) => {
+    const current = [accountantBalance, relayerBalance][i];
+    if (current >= target) { log(`${role}: already funded; skipped.`); return []; }
+    return [{ account: wallet.account, to: addresses[role], value: target - current }];
+  });
+  if (!transfers.length) return { ready: true, transactions: [] };
   if (balance === 0n) throw new FujiSetupError('Deployer has no test AVAX. Request faucet funds for its address, then run fuji:fund again.');
-
-  const value = parseEther('0.3');
-  const transfers = ['accountant', 'relayer'].map(role => ({ account: wallet.account, to: addresses[role], value }));
+  const total = transfers.reduce((sum, transfer) => sum + transfer.value, 0n);
+  if (balance < total) throw new FujiSetupError(`Deployer needs at least ${formatEther(total - balance)} more test AVAX plus gas. No funds sent.`);
   const gasPrice = await client.getGasPrice();
   const gas = await Promise.all(transfers.map(transfer => client.estimateGas(transfer)));
   // Reserve twice the quoted gas cost to allow for fee changes before submission.
-  if (balance < value * 2n + gas.reduce((sum, amount) => sum + amount, 0n) * gasPrice * 2n) {
-    throw new FujiSetupError('Deployer needs more than 0.6 test AVAX plus gas. No funds sent; request more from the faucet.');
+  const required = total + gas.reduce((sum, amount) => sum + amount, 0n) * gasPrice * 2n;
+  log(`Funding requires ${formatEther(required)} test AVAX including a gas reserve.`);
+  if (balance < required) {
+    throw new FujiSetupError(`Deployer needs ${formatEther(required - balance)} more test AVAX for funding plus gas. No funds sent.`);
   }
+  if (dryRun) { log('Check only; no transactions sent.'); return { ready: true, required, transactions: [] }; }
+  const transactions = [];
   for (const transfer of transfers) {
     const hash = await wallet.sendTransaction(transfer);
+    log(`Broadcast ${formatEther(transfer.value)} test AVAX to ${transfer.to}: ${hash}`);
     const receipt = await client.waitForTransactionReceipt({ hash });
     if (receipt.status !== 'success') throw new FujiSetupError('Funding transaction failed. Check balances and the explorer before retrying.');
-    log(`Sent 0.3 test AVAX to ${transfer.to}: ${hash}`);
+    transactions.push(hash);
   }
   await printBalances();
+  return { ready: true, required, transactions };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  try { await fundFuji(await loadFujiFunding()); }
+  try {
+    if (process.argv.slice(2).some(arg => arg !== '--check')) throw new FujiSetupError('Usage: fuji:fund [--check]');
+    await fundFuji({ ...await loadFujiFunding(), dryRun: process.argv.includes('--check') });
+  }
   catch (error) {
     console.error(error instanceof FujiSetupError ? error.message
       : 'Fuji funding failed. Check wallet files, RPC connectivity and transaction status before retrying.');
