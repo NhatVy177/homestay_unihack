@@ -12,7 +12,8 @@ Cập nhật 11/11/2026. Ô nào còn "chưa có" sẽ được điền sau khi 
 |---|---|
 | Web2: năm vai trò (khách, Sale, quản lý, kế toán, Admin), nhiều chi nhánh | Chạy trên máy local với SQL Server |
 | Contract `DormSettlement` (EIP-712), relayer trả gas, ví nhúng Privy, trang kiểm chứng | Chạy và có test trên chain local (Hardhat 31337) |
-| Triển khai Fuji, verify source, giao dịch thật | **Chưa có.** Điền ở mục [3.4](#34-triển-khai-trên-fuji) |
+| Triển khai Fuji, verify source | **Đã có** (11/11/2026): contract và mã nguồn verify khớp chính xác, xem mục [3.4](#34-triển-khai-trên-fuji) |
+| Giao dịch nghiệp vụ thật trên Fuji (bàn giao, đối soát) | **Chưa có**, điền sau việc A3 |
 | Cổng thanh toán ví điện tử | **Mô phỏng**, xem [mục 6](#6-phần-mô-phỏng) |
 | Dữ liệu | Dữ liệu giả, không có người dùng thật |
 
@@ -88,10 +89,12 @@ Trang [`/kiem-chung-avalanche`](web/frontend/src/pages/avalanche/AvalancheVerify
 | Mục | Giá trị |
 |---|---|
 | Mạng | Avalanche Fuji C-Chain, chain ID `43113` |
-| Địa chỉ contract | chưa có (việc A2) |
-| Verify source | chưa có |
-| Ví vận hành | Deployer kiêm "quản lý" `0x7bb2e96898Db7e387e118eB92a9C390E29f54B2f`; "kế toán" và relayer: chưa ghi |
-| Phí gas đo được | chưa có |
+| Địa chỉ contract | [`0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C`](https://testnet.snowtrace.io/address/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C) |
+| Giao dịch deploy | [`0x40dd64ee…d945e`](https://testnet.snowtrace.io/tx/0x40dd64ee77434c21b0e47242d2edda9f8d4a0d9a448a77cd8905b101b4dd945e), block `60882820`, gas `1.585.340` |
+| Verify source | [Sourcify](https://repo.sourcify.dev/43113/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C): creation và runtime khớp chính xác (exact match) |
+| Ví vận hành | "Quản lý" (deployer) `0x7bb2e96898Db7e387e118eB92a9C390E29f54B2f`; "kế toán" `0x9F86a6119723f46d2e8236C2935f660918cCbf0D`; relayer `0x8C8D363E9430bD7e8ED72752Fb1356Bec0fe62f9` |
+| Manifest | [blockchain/deployments/fuji.json](blockchain/deployments/fuji.json) (compiler, constructor, source commit, receipt) |
+| Phí gas các giao dịch nghiệp vụ | chưa đo (sau A3) |
 
 Giao dịch mẫu của một luồng đầy đủ (điền sau việc A3):
 

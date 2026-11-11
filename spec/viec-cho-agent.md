@@ -2,7 +2,7 @@
 
 Lập 2026-11-11 (J-C059), cập nhật 09:40 cùng ngày (J-C060), kèm [audit-2026-11-11.md](audit-2026-11-11.md). Mỗi khối dưới đây là một prompt dán nguyên văn. Thứ tự và mức ưu tiên theo **D-037** (Vy đã chốt).
 
-**Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036), B0 khung chung (J-C061).
+**Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036), B0 khung chung (J-C061), C2 + B3 (J-C064); **A2 funding/deploy/source verification thật (J-X068)**, config riêng tại worktree A2 và kiểm route config/read roles khớp. **Tiếp A3:** đưa cấu hình vào phiên ứng dụng đầy đủ, chuẩn bị hợp đồng demo và chạy trọn luồng SQL/SMTP/OTP Privy; chưa chạy các bước đó. Song song B1, C6.
 
 **Ai làm việc nào:** mỗi file chỉ một người sửa. **Chia lại 2026-11-11 15:3x (Vy chọn, J-C064)** vì Codex đang chờ AVAX cho A2 nên chuỗi trả phòng đứng yên; thay bảng chia lúc 10:11 (J-C061).
 - **Claude:** chuỗi trả phòng C2 (gộp B3, **xong**), C3 (gộp B4), C4; D1–D3 (bản nháp xong). C5: chưa đổi người, đề xuất Claude làm sau C4 vì backend đã viết ở `feat/t22-backend`. Codex **không** sửa: `pages/nhanVienQuanLy/{KiemTraTraPhong,XuLyTraPhongTab,thanhlytraphong,GhiNhanBanGiaoRa,XacNhanPhanHoi}.jsx`, `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx`, `web/backend/services/{doiSoat*,khauTruDoiSoat,thuThemDoiSoat,hoanCocDoiSoat,kiemTraTraPhong,traPhongSoSanh,thanhlytraphong}*.js`, `styles/lists.css` (chỉ thêm ở cuối nếu cần).
@@ -52,7 +52,7 @@ Việc: chuẩn bị ví thử cho Fuji mà không để khóa bí mật lộ ra
 Xong thì báo Vy địa chỉ ví deployer để xin faucet (hai ví còn lại nhận AVAX từ fuji:fund).
 ```
 
-### A2 — Deploy, verify source, chuyển cấu hình sang Fuji
+### A2 — Deploy, verify source, chuyển cấu hình sang Fuji (J-X068: deploy/source đã xác minh; env riêng đã chuẩn bị, chưa restart app đầy đủ)
 
 ```
 Điều kiện: ví deployer 0x7bb2e96898Db7e387e118eB92a9C390E29f54B2f đã có AVAX thử (Vy xin faucet). Nhánh: chore/fuji-deploy. File khóa nằm ở D:\HomeStayDorm-fuji\blockchain (.env và .fuji-backend-env.local, bị Git bỏ qua): chạy các lệnh Fuji tại thư mục đó hoặc nhờ Vy chép hai file sang thư mục làm việc mới; không in nội dung file.

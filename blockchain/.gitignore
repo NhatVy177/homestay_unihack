@@ -17,3 +17,4 @@ broadcast/
 # Ephemeral local chain data; keep verified public deployment manifests
 .local/
 deployments/local/
+deployments/fuji.pending.json
