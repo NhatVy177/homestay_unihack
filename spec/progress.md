@@ -1,6 +1,6 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-11 09:40 +07:00** (J-C060). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-11 10:11 +07:00** (J-C061). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
 
@@ -24,6 +24,7 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy đ�
 |---|---|---|
 | `main` (`dcc1a59`) | T-19, T-20, T-21 đợt đầu, hồ sơ D-026 → D-032 | Gốc cũ; **chưa có** các nhánh dưới |
 | **`integration/2026-11-11`** (Claude) | Gộp sẵn 5 nhánh: `feat/ui-refresh-1`, `chore/audit-cleanup`, `chore/fuji-setup` (A1), `feat/t22-handover-bundle` (C1), `feat/ui-sale-workspace` (Sale); đã gỡ xung đột và chạy lại toàn bộ test | **Chờ Vy merge một PR này vào `main`**; khi đó 5 nhánh kia coi như đã merge |
+| `feat/ui-shared-shell` (Claude) | B0: khung chung cho 5 vai trò; bỏ tab của ứng dụng cũ (D-039); sửa lỗi tab kế toán | Tạo từ `integration/2026-11-11`; chờ Vy xem, merge sau nhánh tích hợp |
 | `feat/t22-backend` (Claude) | Khách tự giữ chỗ, từ chối → "Đã xem", "Không thuê nữa", "Khách không đến" | Có code + test đầu vào; SQL chưa chạy lên HOMEDORM4; chưa nối giao diện; chưa gộp vào nhánh tích hợp (việc C5) |
 | `docs/review-branch-workflow` | Quy tắc "không push main" | Nội dung đã có trong AGENTS.md; xóa được |
 
@@ -46,7 +47,7 @@ Sau khi merge nhánh tích hợp, xóa được trên GitHub: 5 nhánh đã gộ
 | T-08 | Deploy, verify source, nghiệm thu Fuji | A1 xong (J-X058): script `fuji:keygen`, `fuji:fund`, 3 ví trong `D:\HomeStayDorm-fuji\blockchain` (file bị Git bỏ qua). Số dư 0, chưa deploy | Vy xin faucet → A2 → A3 |
 | T-11 / T-14 | Bàn giao Web2 → email → OTP → ký | Có code, test tự động qua, **chưa chạy thật** | Chạy thật trong A3 |
 | T-22 | Luồng D-026 → D-038 | C1 xong code + test + migration HOMEDORM4 (J-X061, J-X062); 4 mục giữ chỗ có code backend ở `feat/t22-backend`; còn lại chưa làm | Bảng mức ưu tiên bên dưới |
-| T-21 | Giao diện | Khung, token, form, danh sách (D-032, D-033); không gian Sale làm lại (D-035, D-036, J-X064 → J-X066) | B1–B5, rồi B7 (việc nhỏ còn lại của Sale) |
+| T-21 | Giao diện | Khung, token, form, danh sách (D-032, D-033); không gian Sale (D-035, D-036); **B0 xong (J-C061)**: cả 5 vai trò dùng chung một khung `WorkspaceShell` | Claude: B1, B5, B2. Codex: B7, và B3/B4 gộp vào C2/C3 |
 | T-09 | Hồ sơ nộp | Chưa bắt đầu | D1–D3 |
 | T-04 | Nguồn tiền cọc và dữ liệu demo | Nguồn cọc đã chốt (D-034, D-038). HOMEDORM4 có 2 phiếu cọc, **0 hợp đồng** | Tạo một hợp đồng demo bằng luồng Web2 trước A3 |
 | T-13 | Privy JWT (bỏ OTP) | Tạm dừng, chờ BTC (Q-10) | Giữ OTP |
@@ -69,11 +70,23 @@ Sau khi merge nhánh tích hợp, xóa được trên GitHub: 5 nhánh đã gộ
 | | Đổi người đại diện bằng email mời | D-026 | Giữ cách tạm |
 | **Sau bản thi** | Mốc chuỗi 3; cấp lại ví khi mất email (P-04) | D-031 | Không làm |
 
+## Chia việc giữa Claude và Codex (Vy đồng ý 2026-11-11, J-C061)
+
+Nguyên tắc: mỗi file chỉ một người sửa. Chi tiết và prompt: [viec-cho-agent.md](viec-cho-agent.md).
+
+| Người | Việc |
+|---|---|
+| **Claude** | Giao diện chung và màn khách/giám khảo nhìn: B0 (xong), B1, B5, B2; phần giao diện C5; hồ sơ nộp D1–D3 |
+| **Codex** | Fuji A2, A3; C6; B7; chuỗi trả phòng C2 (+B3), C3 (+B4), C4; phần backend C5; dọn dẹp E1–E3 |
+| **Vy** | Faucet; merge PR; chạy luồng thật cùng A3 (OTP, các vai trò); trả lời Q-07; dựng slide, quay video |
+
 ## Lưu ý khi chạy thật (từ đợt xem code J-C060)
 
 - **Bàn giao giờ cần 2 điều kiện trước** (C1, D-034): khách đã thấy bản chính sách lưu theo phiếu cọc (2 phiếu cũ phải bấm xác nhận bổ sung), và Sale đã tải ảnh hợp đồng đã ký ở màn Lập hợp đồng. Thiếu thì màn quản lý báo lý do, biên bản chưa tới khách.
 - **Sale không còn lối đăng ký trả phòng** (D-036): khách tự gửi yêu cầu trả phòng trên cổng khách.
 - Không gian Sale mới chỉ thử với API giả; chưa thử bằng tài khoản Sale thật.
+- **Đã sửa lỗi có sẵn trên `main`** (J-C061): tab "Tiền mặt chờ nộp quỹ" của kế toán bị trắng trang khi mở do thiếu `import React`. Cổng khách trên điện thoại trước đây không có menu; nay có.
+- Đã bỏ trang `/dashboard` của ứng dụng cũ (HappyRoom) và 3 tab giữ chỗ trống của khách ("Phòng/Giường của tôi", "Hóa đơn", "Bảo trì"). Tab "Thanh lý trả phòng" của quản lý còn giữ cho tới khi C4 làm xong tự thanh lý (D-039).
 - `fuji:fund` gửi 0,3 AVAX cho mỗi ví phụ và **chạy lại sẽ gửi tiếp**; cần ví deployer có hơn 0,6 AVAX. Việc A2 có bước sửa (giảm còn 0,1 và bỏ qua ví đã có tiền).
 
 ## Kiểm tra gần nhất (2026-11-11 09:3x, chạy trên nhánh tích hợp, J-C060)
@@ -81,6 +94,7 @@ Sau khi merge nhánh tích hợp, xóa được trên GitHub: 5 nhánh đã gộ
 - `blockchain npm test`: 18 qua, 1 bỏ qua (test SQL), 0 lỗi.
 - `web/backend npm test`: 31 qua, 1 bỏ qua, 0 lỗi.
 - `web/frontend`: `vite build` qua (cảnh báo kích thước gói); `test:avalanche-ui` qua; `test:handover-ui` qua.
+- Nhánh `feat/ui-shared-shell` (J-C061): build qua; `test:avalanche-ui`, `test:handover-ui` qua; `test:shell-ui` mới qua (5 vai trò dùng chung khung, menu điện thoại mở/chuyển/đóng bằng Escape, mở được mọi tab không khóa của khách, Sale, quản lý, kế toán; Admin chỉ kiểm khung và menu); 14 ảnh `ui-screens` không lỗi, không tràn ngang; backend 31 qua.
 - **Không chạy**: test cần SQL Server, luồng qua giao diện với tài khoản thật, Privy thật, Fuji. Các script chụp ảnh giao diện của Codex (`ui-sale-*.mjs`) không chạy lại.
 
 ## Môi trường local (không chứa giá trị bí mật)

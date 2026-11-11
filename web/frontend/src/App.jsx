@@ -2,15 +2,9 @@ import React, { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext.jsx';
 import { getAuthenticatedHomePath } from './auth/auth.routes.js';
-import MainLayout from './layouts/MainLayout.jsx';
 
 import TrangChu from './pages/TrangChu.jsx';
 import KhamPhaPhongPage from './pages/khamPhaPhong/KhamPhaPhongPage.jsx';
-import DashboardPage from './pages/dashboard/DashboardPage.jsx';
-import DangKyThuePage from './pages/dangKyThue/DangKyThuePage.jsx';
-import LichXemPhongPage from './pages/lichXemPhong/LichXemPhongPage.jsx';
-import DatCocPage from './pages/datCoc/DatCocPage.jsx';
-import NhanPhongPage from './pages/nhanPhong/NhanPhongPage.jsx';
 import KhachHangPortalPage from './pages/khachHang/KhachHangPortalPage.jsx';
 import NhanVienSalePage from './pages/nhanVienSale/NhanVienSalePage.jsx';
 import NhanVienQuanLyPage from './pages/nhanVienQuanLy/NhanVienQuanLyPage.jsx';
@@ -120,20 +114,6 @@ export default function App() {
           </ProtectedRoute>
         )}
       />
-      <Route
-        path="/dashboard"
-        element={(
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        )}
-      >
-        <Route index element={<DashboardPage />} />
-        <Route path="dang-ky-thue" element={<DangKyThuePage />} />
-        <Route path="lich-xem-phong" element={<LichXemPhongPage />} />
-        <Route path="dat-coc" element={<DatCocPage />} />
-        <Route path="nhan-phong" element={<NhanPhongPage />} />
-      </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

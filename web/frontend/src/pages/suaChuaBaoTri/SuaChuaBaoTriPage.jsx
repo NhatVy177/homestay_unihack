@@ -1,3 +1,4 @@
+import React from 'react';
 import PageHeader from '../../components/common/PageHeader.jsx';
 
 export default function SuaChuaBaoTriPage() {

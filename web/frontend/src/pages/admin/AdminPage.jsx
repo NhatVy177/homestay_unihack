@@ -1,7 +1,5 @@
-import NavigationToggle from '../../components/common/NavigationToggle.jsx';
-import BranchChip from '../../components/common/BranchChip.jsx';
+import WorkspaceShell from '../../components/common/WorkspaceShell.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { Icon } from '../../components/common/Icon.jsx';
 import { getLockedRoomIds, setRoomLocked } from '../../utils/lockedRooms.js';
@@ -250,17 +248,6 @@ function RequiredLabel({ children }) {
   );
 }
 
-function AdminBrand() {
-  return (
-    <Link className="admin-brand" to="/">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M3 9.5 12 3l9 6.5V21H3V9.5Z" />
-        <path d="M9 21v-9h6v9" />
-      </svg>
-      <span><strong>Homestay</strong>Dorm</span>
-    </Link>
-  );
-}
 
 function StatusPill({ children }) {
   const text = String(children);
@@ -3002,16 +2989,6 @@ const adminTabMeta = {
   logs: { label: 'Nhật ký hệ thống', eyebrow: 'Admin · Nhật ký hệ thống' }
 };
 
-function getUserInitials(user) {
-  const name = user?.hoTen || user?.tenDangNhap || 'Admin';
-  return String(name)
-    .split(' ')
-    .filter(Boolean)
-    .slice(-2)
-    .map((part) => part.charAt(0))
-    .join('')
-    .toUpperCase() || 'AD';
-}
 
 function BackupView() {
   const [backups, setBackups] = useState([]);
@@ -3264,53 +3241,11 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="admin-page ui-employee-shell">
-      <aside className="admin-sidebar">
-        <div className="admin-sidebar-brand">
-          <AdminBrand />
-          <span className="ui-role-label">Admin</span>
-        </div>
-        <nav className="admin-nav" aria-label="Admin">
-          {navItems.map((item) => (
-            <button
-              className={`admin-nav-item ${activeTab === item.id ? 'active' : ''}`}
-              key={item.id}
-              type="button"
-              onClick={() => setActiveTab(item.id)}
-            >
-              <Icon name={item.icon} />
-              <span>{adminTabMeta[item.id]?.label || item.label}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
-
-      <div className="admin-app">
-        <header className="admin-topbar">
-          <NavigationToggle />
-          <div>
-            <span className="admin-eyebrow">{activeMeta.eyebrow}</span>
-            <h1>Chào {user?.hoTen?.split(' ').slice(-1)[0] || 'Admin'},</h1>
-            <p>Quản trị dữ liệu lõi và cấu hình vận hành HomeStayDorm.</p>
-          </div>
-
-          <BranchChip user={user} />
-          <div className="admin-account">
-            <span className="admin-avatar">{getUserInitials(user)}</span>
-            <div>
-              <strong>{user?.hoTen || 'Admin'}</strong>
-              <small>@{user?.maNhanVien || user?.tenDangNhap || 'admin'}</small>
-            </div>
-            <button className="admin-icon-btn" type="button" aria-label="Đăng xuất" onClick={dangXuat}>
-              <Icon name="logout" />
-            </button>
-          </div>
-        </header>
-
-        <main className="admin-main">
-          {renderActiveView()}
-        </main>
-      </div>
-    </div>
+    <WorkspaceShell className="admin-page" roleLabel="Admin" eyebrow={activeMeta.eyebrow}
+      title={activeMeta.label}
+      items={navItems.map(item => ({ ...item, label: adminTabMeta[item.id]?.label || item.label }))}
+      activeTab={activeTab} onSelect={setActiveTab} user={user} onLogout={dangXuat} mainClassName="admin-main">
+      {renderActiveView()}
+    </WorkspaceShell>
   );
 }

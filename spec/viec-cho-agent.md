@@ -2,7 +2,13 @@
 
 Lập 2026-11-11 (J-C059), cập nhật 09:40 cùng ngày (J-C060), kèm [audit-2026-11-11.md](audit-2026-11-11.md). Mỗi khối dưới đây là một prompt dán nguyên văn. Thứ tự và mức ưu tiên theo **D-037** (Vy đã chốt).
 
-**Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036). **Việc kế tiếp:** Vy xin faucet → A2 → A3; song song B1, C6.
+**Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036), B0 khung chung (J-C061).
+
+**Ai làm việc nào (Vy đồng ý 11/11):** mỗi file chỉ một người sửa.
+- **Claude:** B1, B5, B2, phần giao diện C5, D1–D3. Codex **không** sửa các file này: `components/common/WorkspaceShell.jsx`, `styles/shell.css`, các trang khung `NhanVien*Page.jsx`, `AdminPage.jsx` (phần khung), `KhachHangPortalPage.jsx`, `components/xacNhan/*`, `pages/avalanche/*`, `pages/thanhToanMoPhong/*`, `BanGiaoPhongTab.jsx`.
+- **Codex:** A2, A3, C6, B7, C2 (gộp B3), C3 (gộp B4), C4, phần backend C5, E1–E3.
+
+**Quy tắc D-039:** chức năng đã bỏ thì bỏ luôn tab, mục menu, trang, route; nếu chức năng thay thế chưa xong thì bỏ trong cùng việc làm chức năng thay thế.
 
 ## Cách dùng
 
@@ -19,9 +25,9 @@ Lập 2026-11-11 (J-C059), cập nhật 09:40 cùng ngày (J-C060), kèm [audit-
 | Ngày | Việc |
 |---|---|
 | 11/11 | ~~A1~~, ~~C1~~ (xong); Vy xin faucet; A2 |
-| 12/11 | A3; B1; C6 |
-| 13–15/11 | B2 → B5; C2, C3, C4 |
-| 16–17/11 | B6, B7, C5, E1; dự phòng |
+| 12/11 | A3 (Codex + Vy); C6, B7 (Codex); B1 (Claude) |
+| 13–15/11 | C2+B3, C3+B4, C4 (Codex); B5, B2, giao diện C5 (Claude) |
+| 16–17/11 | backend C5, E1 (Codex); B6 nếu kịp (Claude); dự phòng |
 | 18–19/11 | D1, D2, D3; E2, E3 nếu còn thời gian |
 
 ---
@@ -90,17 +96,21 @@ File chính: <FILE>. Tham khảo bố cục (chỉ xem, không chép code): màn
 
 | Mã | Màn | File chính | `style` hiện có | Vai trò mẫu |
 |---|---|---|---|---|
-| B1 | Khách: tab Hợp đồng + khu xác nhận biên bản/đối soát | `pages/khachHang/KhachHangPortalPage.jsx` (chỉ phần tab Hợp đồng), `components/xacNhan/HopDongXacNhanSection.jsx`, `DocumentView.jsx` | 78 (cả file) | customer |
-| B2 | Quản lý: Bàn giao phòng + "Khách xác nhận biên bản" | `pages/nhanVienQuanLy/BanGiaoPhongTab.jsx`, `components/xacNhan/QuanLyXacNhanTab.jsx` | 140 | manager |
-| B3 | Quản lý: Kiểm tra trả phòng | `pages/nhanVienQuanLy/KiemTraTraPhong.jsx` | 144 | manager |
-| B4 | Kế toán: Quyết toán trả phòng + "Khách xác nhận đối soát" | `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx` | 46 | accountant |
-| B5 | Trang kiểm chứng + cổng ví mô phỏng | `pages/avalanche/AvalancheVerifyPage.jsx`, `pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx` | — | landing |
-| B6 | Trang chủ + đăng nhập/đăng ký (rà lần cuối) | `pages/TrangChu.jsx` | 0 | landing, auth |
+| B1 (Claude) | Khách: tab Hợp đồng + khu xác nhận biên bản/đối soát | `pages/khachHang/KhachHangPortalPage.jsx` (chỉ phần tab Hợp đồng), `components/xacNhan/HopDongXacNhanSection.jsx`, `DocumentView.jsx` | 78 (cả file) | customer |
+| B2 (Claude) | Quản lý: Bàn giao phòng + "Khách xác nhận biên bản" | `pages/nhanVienQuanLy/BanGiaoPhongTab.jsx`, `components/xacNhan/QuanLyXacNhanTab.jsx` | 140 | manager |
+| B3 (Codex, làm cùng C2) | Quản lý: Kiểm tra trả phòng | `pages/nhanVienQuanLy/KiemTraTraPhong.jsx` | 144 | manager |
+| B4 (Codex, làm cùng C3) | Kế toán: Quyết toán trả phòng + "Khách xác nhận đối soát" | `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx` | 46 | accountant |
+| B5 (Claude) | Trang kiểm chứng + cổng ví mô phỏng | `pages/avalanche/AvalancheVerifyPage.jsx`, `pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx` | — | landing |
+| B6 (Claude, nếu kịp) | Trang chủ + đăng nhập/đăng ký (rà lần cuối) | `pages/TrangChu.jsx` | 0 | landing, auth |
 
-| B7 | Sale: việc nhỏ còn lại sau D-036 (prompt riêng bên dưới) | `pages/nhanVienSale/*` | — | sale |
+| B7 (Codex) | Sale: việc nhỏ còn lại sau D-036 (prompt riêng bên dưới) | `pages/nhanVienSale/*` | — | sale |
 
 Ghi chú B1: `KhachHangPortalPage.jsx` dài 4.346 dòng. Chỉ sửa phần tab Hợp đồng; tách phần đó thành component riêng nếu cần, không đụng các tab khác.
 Ghi chú B5: trang kiểm chứng là màn giám khảo nhìn kỹ nhất. Phải rõ 3 kết quả: khớp, file bị sửa, không đọc được chuỗi; có link explorer.
+
+### B0 — Khung chung (ĐÃ XONG, J-C061)
+
+Tất cả vai trò dùng `components/common/WorkspaceShell.jsx`; CSS ở `styles/shell.css` (lớp `.ui-workspace`). Kiểm tra: `npm run test:shell-ui`.
 
 ### B7 — Việc nhỏ còn lại của không gian Sale
 
@@ -109,7 +119,7 @@ Việc: sửa các điểm còn lại sau đợt xem nhánh feat/ui-sale-workspa
 1. Tổng quan: "Xử lý đặt cọc / thu tiền tại quầy" đang là một dòng chữ nhỏ; đưa thành thẻ hành động thứ năm ngang hàng 4 thẻ còn lại. Màn Lập hợp đồng: "Hỗ trợ khai thông tin người ở" đưa thành nút phụ cạnh "Hợp đồng đã lập".
 2. Ô chọn ngày đang hiện mm/dd/yyyy theo trình duyệt: hiện dd/mm/yyyy (đặt lang="vi" cho thẻ html hoặc dùng cách hiển thị sẵn có của dự án).
 3. web/frontend/src/styles/contractPresentation.css có 170 lớp đánh số (lhd-display-001…) sinh ra khi chuyển style viết tay: gộp các lớp trùng nội dung, đổi tên theo ý nghĩa cho các lớp dùng từ 3 lần trở lên; bản in hợp đồng (window.print) phải giữ nguyên hình thức. Không cần xử lý hết nếu quá 2 giờ.
-4. DangKyTraPhongTab.jsx và CSS của nó không còn được dùng sau D-036: xóa nếu tìm kiếm import xác nhận không ai gọi; giữ API backend.
+4. Theo D-039, xóa các tab Sale đã bỏ khỏi nghiệp vụ mà file vẫn còn: DangKyTraPhongTab.jsx (trả phòng, D-036), TraCuuPhongTab.jsx (Kiểm tra phòng/giường, D-035) cùng CSS chỉ chúng dùng; tìm import trước khi xóa; giữ API backend.
 5. Nhờ Vy đăng nhập tài khoản Sale thật, đi một lượt: tiếp nhận hồ sơ → lập lịch → thu cọc tiền mặt → lập hợp đồng → tải ảnh hợp đồng đã ký. Ghi lỗi gặp phải và sửa.
 Kiểm tra: build, test:avalanche-ui, test:handover-ui, ui-sale-workspace.mjs.
 ```
@@ -159,6 +169,7 @@ Việc: tự thanh lý hợp đồng khi tiền đã xong. Nhánh: feat/t22-auto
 2. Quản lý bấm "Đã thu chìa khóa" → phòng/giường về Trống.
 3. Gói bằng chứng cuối (Web2): thêm mã băm chứng từ chi/thu, số tiền, thời điểm; khách tải được; gửi email. Trang kiểm chứng hiện phần này và ghi rõ "thông tin do bên cho thuê ghi nhận, không nằm trên chuỗi".
 4. Khách không phản hồi: email nhắc sau 24 giờ và 72 giờ; quá 7 ngày đánh dấu "Quá hạn phản hồi". Không bao giờ tự chấp nhận thay trên chuỗi.
+6. Theo D-039: khi tự thanh lý đã chạy, bỏ tab con "Thanh lý trả phòng" trong pages/nhanVienQuanLy/XuLyTraPhongTab.jsx (và file thanhlytraphong.jsx nếu không còn ai dùng); nếu "Ghi nhận bàn giao ra" được thay bằng nút "Đã thu chìa khóa" thì bỏ luôn tab con đó. Không để lại tab chết.
 5. Theo D-038 (đã chốt): thêm thao tác "Thanh lý không có xác nhận của khách" cho quản lý, chỉ bật khi đã quá 7 ngày kể từ lúc gửi (biên bản bàn giao hoặc đối soát) hoặc đối soát đang bị phản đối; bắt buộc lý do và file bằng chứng đã liên hệ. Không gọi contract; gói bằng chứng cuối và trang kiểm chứng ghi rõ "đóng không có xác nhận của khách". Trường hợp bàn giao chưa từng được xác nhận: đối soát chỉ chạy ở Web2, không ghi lên chuỗi.
 ```
 
