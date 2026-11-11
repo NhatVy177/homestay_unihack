@@ -806,9 +806,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả); đã xem ảnh hộp thoại lập đối soát 1440px.
 - Chưa làm: ô tìm kiếm và phân trang của bộ danh sách chung cho 3 bảng của màn Quyết toán; C4.
 
-## 2026-11-11 23:30:00 +07:00 — J-C068 — B4 (tiếp): tìm kiếm và phân trang màn Quyết toán
+## 2026-11-11 23:23:49 +07:00 — J-C068 — B4 (tiếp): tìm kiếm và phân trang màn Quyết toán
 
 - Người thực hiện: Claude, nhánh `feat/b4-settlement-ui`. `QuyetToanTraPhongTab.jsx`: 3 ô tìm kiếm viết tay đổi sang `ListSearch` (nút xóa từ khóa trong ô thay nút "Xóa lọc"); dòng "Đang tải danh sách..." đổi sang dòng khung xương `TableState`; 3 bảng (thu thêm/hoàn cọc, kết quả đối soát, lập đối soát) có `ListPagination` 10 dòng/trang, đổi bộ lọc hay từ khóa thì về trang 1. Không đổi logic nghiệp vụ.
 - `scripts/ui-settlement-c3.mjs` thêm 12 phiếu giả, kiểm tra "Hiển thị 1–10 / 12 phiếu".
-- Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả). Giờ ghi là ước lượng sau khi chạy xong kiểm tra.
+- Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả).
 - Còn: C4.
