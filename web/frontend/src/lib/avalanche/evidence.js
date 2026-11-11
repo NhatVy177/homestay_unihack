@@ -1,4 +1,4 @@
-import { documentHash, handoverCommitment, settlementCommitment, validateStatement } from '@homestaydorm/settlement/evidence';
+import { documentHash, handoverCommitment, settlementCommitment, validateStatement, validateHandover } from '@homestaydorm/settlement/evidence';
 // Reconstruct the signed commitment from the same local bundle displayed to the customer.
 export async function checkSnapshot(client, deployment, abi, bundle, message) {
   const read = (functionName, args) => client.readContract({ address: deployment.address, abi, functionName, args });
@@ -8,6 +8,7 @@ export async function checkSnapshot(client, deployment, abi, bundle, message) {
   let commitment;
   if (message.action === 1) {
     const { handover, policy } = bundle.documents;
+    validateHandover(handover.payload, policy.payload);
     if (handover.payload.agreementId !== bundle.agreementId || handover.payload.tenant.toLowerCase() !== a.tenant.toLowerCase() ||
       BigInt(handover.payload.depositHeldVnd) !== a.depositHeld) throw new Error('Thông tin bàn giao không khớp.');
     const manager = await read('manager'), accountant = await read('accountant');

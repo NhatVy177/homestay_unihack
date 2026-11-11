@@ -13,7 +13,7 @@ Thư mục Markdown gọn để Vy và AI tiếp nối công việc: hiểu đan
 | [decisions.md](decisions.md) | Đã thống nhất điều gì, căn cứ đâu, điều gì còn mở? |
 | [journal.md](journal.md) | Ngày giờ nào thảo luận/sửa gì, trong file nào, kiểm tra ra sao? |
 
-AI mới đọc theo thứ tự bảng, rồi phần liên quan trong [plan hiện hành](../hackathon/plan.md) và [handoff lịch sử](../hackathon/handoff.md). Hướng dẫn áp dụng toàn repo nằm ở [AGENTS.md](../AGENTS.md).
+AI mới **chỉ cần đọc `progress.md` và mục liên quan trong [luong-tong-hop.md](luong-tong-hop.md)**; các file còn lại mở khi cần tra đúng mã `D-xxx`/`F-xxx`/`J-xxx`. [plan](../hackathon/plan.md) là kế hoạch chi tiết, [handoff](../hackathon/handoff.md) và `archive/` là lịch sử. Hướng dẫn áp dụng toàn repo nằm ở [AGENTS.md](../AGENTS.md).
 
 ## Nguồn và cách giải quyết mâu thuẫn
 
@@ -28,14 +28,14 @@ AI mới đọc theo thứ tự bảng, rồi phần liên quan trong [plan hi�
 1. Trước khi làm: xem trạng thái và xác định mã chức năng/công việc liên quan.
 2. Có kết luận từ trao đổi: ghi nhật ký, thêm quyết định nếu cần; chỉ sửa scope/plan khi phạm vi thực sự đổi.
 3. Sửa file: ghi đường dẫn và nội dung thay đổi cụ thể, lý do, kết quả kiểm tra. Một mục cho một đợt cùng mục đích; ghi cả file tài liệu/quy tắc làm việc đã đổi.
-4. Kết thúc: cập nhật tiến độ, việc tiếp theo, commit/push theo quy ước. Phiên chỉ thảo luận vẫn ghi nhật ký; câu xã giao không cần mục riêng.
+4. Kết thúc: cập nhật tiến độ, việc tiếp theo, commit/push theo quy ước. Phiên thảo luận có kết luận ảnh hưởng yêu cầu vẫn ghi nhật ký; khởi động lại server, chạy lại test, trả lời câu hỏi thì không.
 
 Mọi thời gian mới dùng **giờ Việt Nam `+07:00`**, lấy từ đồng hồ thực tế. Phân biệt thời gian sự kiện và thời gian ghi lại. Với lịch sử chỉ biết ngày, viết `2026-11-04 (không rõ giờ; ghi lại ngày ...)`.
 
 Mẫu thêm vào cuối `journal.md`:
 
 ```markdown
-## YYYY-MM-DD HH:mm:ss +07:00 — J-xxx — Tiêu đề
+## YYYY-MM-DD HH:mm:ss +07:00 — J-C### (Claude) / J-X### (Codex) — Tiêu đề
 
 - Người thực hiện: Vy / AI đang làm việc.
 - Trao đổi/yêu cầu: ...

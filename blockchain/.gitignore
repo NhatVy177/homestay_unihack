@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+*.local
 
 # Toolchain dependencies and generated output
 node_modules/

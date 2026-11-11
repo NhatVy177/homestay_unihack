@@ -1,22 +1,41 @@
 # Hướng dẫn làm việc trong HomeStayDorm
 
-Áp dụng cho toàn repo. Giao tiếp với Vy bằng tiếng Việt dễ hiểu.
+Áp dụng cho toàn repo và mọi AI (Claude, Codex, AI khác). Giao tiếp với Vy bằng tiếng Việt dễ hiểu. Repo hiện hành: `NhatVy177/homestay_unihack`; không tự chuyển lại repo cũ theo handoff.
 
-## Đầu mỗi phiên
+## Đầu mỗi phiên: đọc ít, đúng chỗ
 
-1. Đọc `spec/README.md`, `spec/progress.md`, `spec/scope.md`, `spec/decisions.md` và các mục mới nhất trong `spec/journal.md`.
-2. Đọc phần liên quan trong `hackathon/plan.md`; khi cần bối cảnh trao đổi cũ, đọc `hackathon/handoff.md`. `Proposal.md` là lịch sử ý tưởng, không phải scope hiện hành.
-3. Kiểm tra branch, remote, `git status` và code thực tế trước khi khẳng định tiến độ. Repo hiện hành là `NhatVy177/homestay_unihack`; không tự chuyển lại repo cũ theo handoff.
+1. Đọc [spec/progress.md](spec/progress.md): trạng thái hiện tại, việc đang làm, việc kế tiếp.
+2. Đọc mục liên quan đến việc được giao trong [spec/luong-tong-hop.md](spec/luong-tong-hop.md): luồng và quyết định đã gộp.
+3. Chạy `git fetch`, xem branch, `git status` và code thực tế trước khi khẳng định tiến độ.
 
-## Trong và cuối mỗi đợt làm việc
+**Chỉ mở khi cần tra chi tiết**, không đọc cả file: `spec/decisions.md` (tìm đúng mã `D-xxx`), `spec/scope.md` (đúng mã `F-xxx`), `spec/journal.md` (vài mục cuối), `hackathon/plan.md` (đúng mục). `spec/archive/`, `hackathon/handoff.md`, `hackathon/Proposal.md` là lịch sử, không phải phạm vi hiện hành.
 
-- Ghi mọi trao đổi có ảnh hưởng đến yêu cầu, quyết định, câu hỏi còn mở và mọi đợt sửa file vào `spec/journal.md`, kể cả phiên chỉ thảo luận. Gộp thao tác cùng mục đích thành một mục; không chép toàn bộ hội thoại hay từng lệnh đọc file.
-- Ghi thời gian thực theo `YYYY-MM-DD HH:mm:ss +07:00` (Asia/Saigon), người thực hiện, lý do, đường dẫn file và nội dung đổi, kiểm tra/kết quả, việc còn lại. Mốc quá khứ không rõ giờ phải ghi đúng mức độ biết được.
-- Khi đổi quyết định, thêm mục có mã `D-xxx` vào `spec/decisions.md`; chỉ rõ quyết định bị thay thế. Đề xuất của AI chưa được chốt phải mang nhãn đề xuất.
-- Khi đổi tính năng, cập nhật `spec/scope.md` và phần tương ứng của `hackathon/plan.md` trong cùng đợt. Khi đổi tiến độ/công việc tiếp theo, cập nhật `spec/progress.md`. Không tạo bản plan song song.
-- Chỉ đánh dấu hoàn thành khi có bằng chứng; phân biệt code có ở repo này, code được handoff nhắc đến ở repo khác, test local và kết quả Fuji. Không biến kết quả phiên trước thành kiểm thử vừa chạy.
-- Nhật ký giữ lịch sử theo thứ tự thời gian; sai sót được đính chính bằng mục mới. Không xóa dấu vết quyết định cũ. Không ghi secrets hay dữ liệu cá nhân của khách thuê vào hồ sơ làm việc.
-- Theo quy ước đã được Vy nêu trong handoff: sau đợt thay đổi hoàn tất, kiểm tra phù hợp, commit với danh tính Git `NhatVy177`, push đúng repo/nhánh đang làm và báo commit. Kiểm tra remote trước khi push; tôn trọng yêu cầu mới nếu Vy bảo chưa commit/push. Không gom thay đổi không liên quan của người khác vào commit.
-- Nếu dừng giữa chừng, để lại công việc đang làm, file đã chạm, kết quả kiểm tra và bước tiếp theo trong `spec/progress.md`/`spec/journal.md`.
+Nếu `luong-tong-hop.md` khác `decisions.md` thì `decisions.md` đúng; sửa lại `luong-tong-hop.md` trong cùng đợt.
 
-Đây là quy ước để AI chủ động tuân theo, không phải hệ thống tự động thu thập hội thoại. Mẫu ghi chép nằm trong `spec/README.md`.
+## Nhánh, commit, push
+
+- Mọi thay đổi (code lẫn tài liệu) làm trên **nhánh riêng** tạo từ `origin/main` mới nhất. **Không push `main`, không tự merge.** Vy xem rồi tự merge. Tôn trọng yêu cầu mới nếu Vy bảo chưa commit/push.
+- Commit bằng danh tính Git `NhatVy177`. **Không thêm dòng `Co-Authored-By` hay chú thích do AI tạo** vào commit và mô tả PR.
+- Push xong báo: tên nhánh, mã commit, danh sách file đã sửa, kết quả kiểm tra.
+- Không gom thay đổi không liên quan của người khác. Không commit `.env`, `web/backend/secrets/`, khóa bí mật.
+- Hai AI làm song song thì mỗi AI một nhánh và **một thư mục làm việc riêng** (`git worktree`), không dùng chung một checkout.
+
+## Ghi hồ sơ
+
+- **Quyết định (`D-xxx`)**: chỉ ghi khi Vy đã chốt, vào `spec/decisions.md`, nêu quyết định bị thay. Đề xuất của AI chưa chốt phải mang nhãn "đề xuất". Trước khi lấy số mới, chạy lệnh dưới để thấy số lớn nhất trên **mọi nhánh**, rồi push ngay sau khi ghi:
+  `git fetch -q; git grep -ohE "^\| D-[0-9]{3}" $(git branch -r --format="%(refname)") -- spec/decisions.md` (chạy được ở cả PowerShell và Bash; lấy số lớn nhất trong kết quả)
+- **Nhật ký (`spec/journal.md`)**: một mục cho mỗi đợt có đổi file hoặc có kết luận ảnh hưởng yêu cầu. Mã có chữ cái của AI để hai nhánh không trùng số: `J-C###` (Claude), `J-X###` (Codex), `J-A###` (AI khác); mỗi AI tự đếm tiếp số của mình. Các mã cũ không có chữ cái giữ nguyên. Ghi giờ thật `YYYY-MM-DD HH:mm:ss +07:00` lấy từ PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`, người làm, lý do, file, kiểm tra, việc còn lại. Mẫu ở [spec/README.md](spec/README.md).
+- **Không ghi nhật ký** cho thao tác không đổi file và không đổi yêu cầu: khởi động lại server, chạy lại test, trả lời câu hỏi, xem code.
+- Đổi tính năng → sửa `spec/scope.md` và mục tương ứng của `hackathon/plan.md` cùng đợt. Đổi tiến độ → sửa `spec/progress.md`. Không tạo bản kế hoạch song song.
+- `spec/progress.md` chỉ giữ **trạng thái hiện tại**: sửa tại chỗ, không chồng thêm mục "cập nhật lúc…". Lịch sử nằm ở journal và Git.
+- Nhật ký giữ thứ tự thời gian; sai thì đính chính bằng mục mới, không xóa quyết định cũ. Không ghi secrets hay dữ liệu cá nhân của khách thuê vào hồ sơ làm việc.
+
+## Chất lượng và bằng chứng
+
+- Chỉ đánh dấu hoàn thành khi có bằng chứng. Phân biệt bốn mức: **có code** → **test tự động qua** → **đã chạy thật qua giao diện với SQL Server** → **đã chạy trên Fuji**. Không biến kết quả phiên trước thành kiểm thử vừa chạy.
+- Thay đổi SQL: viết thành file trong `database/` chạy lại được, kèm lệnh `npm run …:db:migrate`. **Hỏi Vy trước khi chạy lên HOMEDORM4**; không sửa, xóa dữ liệu đang có khi chưa được đồng ý.
+- Trước khi báo xong phần code, chạy phần liên quan: `cd blockchain && npm test`; `cd web/backend && npm test`; `cd web/frontend && npm run build && npm run test:avalanche-ui`.
+- Sửa giao diện: theo skill [homestaydorm-ui](.agents/skills/homestaydorm-ui/SKILL.md).
+- Dừng giữa chừng: ghi việc dở, file đã chạm, kết quả kiểm tra và bước tiếp vào `spec/progress.md`.
+
+Đây là quy ước để AI chủ động tuân theo, không phải hệ thống tự động.

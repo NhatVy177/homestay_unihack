@@ -1,52 +1,52 @@
 # Blockchain — HomeStayDorm
 
-Module riêng trong cùng repository, dành cho xác nhận bàn giao và đối soát trên Avalanche. Web React/Express tiếp tục nằm trong `web/`; không cần một server blockchain hay repo thứ hai.
+Contract `DormSettlement.sol`, canonical evidence/hash và EIP-712 dùng chung với frontend/backend. Đã có compile, ABI, test và deploy local; **chưa có deployment hoặc giao dịch Fuji được nghiệm thu**. Không giữ/chuyển tiền cọc trên chuỗi.
 
-**Trạng thái:** khung thư mục, chưa có smart contract, ABI, công cụ compile/deploy hoặc tích hợp chạy thật. Các thư mục trống được giữ bằng `.gitkeep`. Nền ở `homedorm/feature/avalanche-settlement` trong handoff chưa được nhập về; kiểm tra lại trước khi tái sử dụng. Không có địa chỉ deployment Fuji ở đây.
+## Chuẩn bị ví Fuji (A1)
 
-## Cấu trúc và trách nhiệm
+Dùng Node 24, chạy từ `blockchain/`:
 
-```text
-blockchain/
-├─ contracts/       # Source Solidity (DormSettlement khi nhập/triển khai)
-├─ test/            # Test contract và mã thuần dùng chung
-├─ scripts/         # Compile, export ABI, chạy chain local, deploy, verify source
-├─ src/             # Mã JS thuần dùng chung: snapshot, hash, typed data, evidence
-│  └─ abi/          # ABI được xuất từ contract đã compile
-├─ deployments/     # Hồ sơ deployment công khai đã xác minh, phân theo mạng
-├─ package.json     # Package riêng; hiện chưa chọn/cài toolchain
-└─ .gitignore       # Bỏ qua output và dữ liệu local
+```powershell
+npm ci
+npm --prefix ../web/backend ci
+npm --prefix ../web/frontend ci
+npm test
+npm run fuji:keygen
 ```
 
-| Phần | Nơi đặt | Ranh giới |
-|---|---|---|
-| Contract, test, compile/deploy | `blockchain/` | Không phụ thuộc React, Express hoặc SQL Server; deploy không chạy khi bật web. |
-| ABI, canonical snapshot, hash/evidence và typed data | `blockchain/src/` | Browser và Node cùng dùng một định nghĩa; không import backend, SQL, khóa riêng, `process.env`, filesystem hay SDK ví UI. ABI được sinh từ build, không sửa tay. |
-| Ví nhúng, ký, tải file bằng chứng, đọc chain | [web/frontend/src/lib/avalanche/](../web/frontend/src/lib/avalanche/README.md) | Chạy trong browser; component/page gọi các hàm này. Trang Verify vẫn thuộc frontend. |
-| Adapter từ nghiệp vụ, relayer, đối chiếu receipt/event | [web/backend/integrations/avalanche/](../web/backend/integrations/avalanche/README.md) | Chạy ở server; dùng calculator/repository hiện có, quản lý khóa relayer và quyền gửi. |
-| Schema, dữ liệu, migration lưu liên kết giao dịch | `database/` | SQL vẫn ở đây; không đưa nghiệp vụ SQL vào contract/shared code. |
+Script tạo ba ví mới: deployer kiêm manager, accountant và relayer. Console chỉ hiện ba địa chỉ công khai. Khóa được lưu ở:
 
-Chiều phụ thuộc khi triển khai: **frontend → mã dùng chung**, **backend → mã dùng chung**; shared không import ngược web. Service nghiệp vụ gọi adapter backend, adapter không được import controller/router. Không có import runtime nào được nối trong đợt dựng khung.
+- `.env`: `FUJI_DEPLOYER_PRIVATE_KEY`, `FUJI_MANAGER_ADDRESS`, `FUJI_ACCOUNTANT_ADDRESS`, `FUJI_RPC_URL`.
+- `.fuji-backend-env.local`: `AVALANCHE_MANAGER_PRIVATE_KEY`, `AVALANCHE_ACCOUNTANT_PRIVATE_KEY`, `AVALANCHE_RELAYER_PRIVATE_KEY`. Vy tự chép các dòng này vào `web/backend/.env` khi chuyển cấu hình sang Fuji ở A2.
 
-`package.json` khai báo module private độc lập để bổ sung dependencies/toolchain sau. Chưa cấu hình npm workspaces, package exports hay dependency `file:` trong web. Chọn cách tiêu thụ shared package và kiểm tra build/deploy hai app khi thực sự thêm mã dùng chung; không import chéo bằng đường dẫn chưa tồn tại.
+Hai file đều bị Git bỏ qua. Không gửi nội dung qua chat, không chụp màn hình khóa, không đặt trong biến `VITE_*`. Cất bản sao an toàn của cả hai file trước khi chuyển worktree/máy. File local không tự đi theo nhánh khi checkout ở worktree khác.
 
-## Quy ước build và deployment khi triển khai
+Nếu `.env` đã có khóa hoặc `.fuji-backend-env.local` đã tồn tại, script từ chối ghi đè. Cấu hình không liên quan trong `.env` được giữ lại. Không xóa file ví cũ chỉ để chạy lại keygen.
 
-- Rà toolchain nhánh Avalanche cũ trước khi chọn tiếp; không mặc định chuyển sang Foundry chỉ vì Senpai dùng Foundry. Chưa có lệnh `npm test`, `compile` hay `deploy` ở package này.
-- Khi thêm toolchain, khóa dependencies bằng lockfile và thêm lệnh compile/test/export/deploy có kiểm tra lỗi. Compile → export ABI vào `src/abi/`; output đầy đủ/bytecode ở artifacts hoặc output toolchain, không đưa bộ deploy vào frontend.
-- Deployment public ghi chain ID, contract address, transaction hash, block, commit nguồn và phiên bản ABI/source verification; chỉ ghi sau khi đối chiếu receipt và mạng. Không tạo address/tx mẫu trông như deployment thật.
-- `deployments/local/` bị ignore; bản deployment Fuji đã xác minh có thể commit. Giữ bí mật deploy trong môi trường riêng của toolchain; runtime relayer dùng môi trường backend. Không biến private key thành biến `VITE_*` hoặc export qua shared.
-- Nghiệm thu MVP vẫn theo [scope](../spec/scope.md) và [plan](../hackathon/plan.md). Việc có folder/package không chứng minh F-01–F-09 đã hoàn thành.
+Lấy **địa chỉ deployer / manager** in trên console để xin AVAX thử tại [Avalanche Console](https://build.avax.network/console) hoặc [faucet Team1VN](https://team1vn.xyz/faucet.html). Không cần xin riêng cho hai ví còn lại.
 
-## Căn cứ từ Senpai
+Khi deployer đã có **hơn 0,6 AVAX thử và đủ phí gas**, chạy:
 
-Đọc bản local `D:\Nam4\Contest\senpai` tại commit `cde33571a348c26bae614f11aa31b32487cbc285` ngày 05/11/2026. Đây là nhận xét từ code, chưa chạy Senpai hoặc xác minh deployment của nó.
+```powershell
+npm run fuji:fund
+```
 
-- `web/contracts/src/MiuCoin.sol` và `foundry.toml`: contract/toolchain riêng; Foundry dùng OpenZeppelin trong `web/node_modules`.
-- `web/scripts/export-artifact.mjs`: xuất ABI + bytecode để script deploy/server sử dụng.
-- `web/lib/vault.ts`, `pay.ts`: tạo/mở ví và ký phía trình duyệt.
-- `web/lib/relayer.ts`, `app/api/session/route.ts`: phần server xác thực yêu cầu rồi gửi giao dịch trả gas; relayer có `server-only`.
+Script kiểm tra RPC đúng Fuji (chain ID `43113`), in số dư ba ví, kiểm tra tiền và phí ước tính trước khi gửi, chuyển **0,3 AVAX thử mỗi ví** cho accountant và relayer, đợi receipt thành công rồi in số dư mới. Deployer giữ phần còn lại cho deploy và thao tác manager. Nếu chưa có tiền hoặc không đủ, script dừng trước giao dịch đầu tiên và nhắc xin faucet. Có thể đặt `FUJI_RPC_URL` trong `.env` hoặc môi trường tiến trình.
 
-HomeStayDorm học cách phân chia các trách nhiệm trên. Senpai dùng token MIU/EIP-3009/x402 để trả tiền phiên; HomeStayDorm cần ký bàn giao/đối soát theo scope hiện tại. Chưa chọn mô hình ví tự tạo bằng mật khẩu của Senpai: README của nó nêu quên mật khẩu mất ví, còn kế hoạch của mình yêu cầu thử phương án khôi phục.
+**Mỗi lần chạy thành công chuyển thêm 0,3 AVAX cho mỗi ví**; không phải lệnh kiểm tra số dư thuần túy. Nếu RPC lỗi giữa chừng, kiểm tra số dư và transaction trên explorer trước khi chạy lại để tránh chuyển lặp. Lỗi thư viện được rút gọn, không in raw exception chứa khóa.
 
-Không sao chép mã Senpai trong đợt này. Nếu dùng mã của nó sau này, giữ thông báo MIT/bản quyền tương ứng. Xem quyết định D-008 và nhật ký J-004 trong `spec/`.
+A1 chỉ chuẩn bị ví và script chia tiền thử, **không deploy**, không đổi `.env` đang chạy của backend/frontend. Deploy và verify source thuộc A2; `deploy:fuji` hiện cần nạp biến môi trường theo hướng dẫn A2 trước khi chạy.
+
+## Code và kiểm tra
+
+| Thư mục | Nội dung |
+|---|---|
+| `contracts/` | Solidity; không đổi contract trong A1/C1 |
+| `src/` | Canonical snapshot, hash, typed data, evidence và ABI cho Node/browser |
+| `scripts/` | Compile, deploy, local chain, keygen/funding Fuji |
+| `test/` | Contract, workflow, HTTP và các hàm dùng chung; SQL là kiểm tra riêng |
+| `deployments/` | Manifest công khai; `local/` bị ignore, Fuji chỉ ghi khi deploy thật |
+
+`npm test` compile rồi chạy test tự động, gồm keygen trong thư mục tạm, từ chối ghi đè và funding dùng client giả (không chuyển AVAX thật). `npm run chain` chạy Hardhat local; `npm run deploy:local` deploy local. `artifacts/` và dependencies không commit. SQL không chạy trong A1; hỏi Vy trước khi dùng HOMEDORM4.
+
+Backend tích hợp ở `web/backend/integrations/avalanche/`, browser ở `web/frontend/src/lib/avalanche/`. Shared không import ngược web, filesystem hay khóa riêng. Theo dõi phạm vi tại [scope](../spec/scope.md), [tiến độ](../spec/progress.md) và [việc cho agent](../spec/viec-cho-agent.md).

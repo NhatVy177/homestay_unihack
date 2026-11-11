@@ -1,3 +1,4 @@
+import OverviewCards from '../../components/common/OverviewCards.jsx';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { datCocApi } from '../datCoc/datCoc.api.js';
@@ -605,40 +606,46 @@ export default function DatCocTab() {
 
 
       {activeSubTab === 'gui-yeu-cau' && (
-        <section>
-          {/* Thanh tìm kiếm — chỉ hiển thị yêu cầu TRONG NGÀY nên không cần lọc ngày/sắp xếp */}
-          <div style={{ backgroundColor: '#f4f7f7', padding: '16px', borderRadius: '8px', display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '20px' }}>
-            <div style={{ flex: '2 1 240px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#191c1d', marginBottom: '8px' }}>Tìm kiếm</label>
-              <input
+        <>
+<OverviewCards items={[{ key: 'all', label: 'Tất cả' }, ...STATUS_ORDER.map((s) => ({ key: s, label: STATUS_CONFIG[s].chip }))]} counts={counts} />
+<div className="ui-list-toolbar">
+            <label className="ui-list-search">
+              <span className="ui-search-label">Tìm kiếm</span>
+              <Icon name="search" />
+<input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Tên khách hàng, SĐT hoặc mã phiếu..."
                 className="ktp-input"
-                style={{ width: '100%', backgroundColor: '#fff' }}
+
               />
-            </div>
+            </label>
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch('')}
                 className="ktp-btn-action"
-                style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#3f494a', padding: '9px 16px', fontSize: '13px' }}
+
               >
                 Xóa lọc
               </button>
             )}
-          </div>
 
-          {/* Segmented control: lọc theo trạng thái, kèm số đếm (căn thẳng lề trái với ô tìm kiếm) */}
-          <StatusFilterTabs
+<StatusFilterTabs
             className="status-pill-tabs-offset"
             items={[{ key: 'all', label: 'Tất cả' }, ...STATUS_ORDER.map((s) => ({ key: s, label: STATUS_CONFIG[s].chip }))]}
             activeKey={statusFilter}
             counts={counts}
             onChange={chonChip}
           />
+</div>
+<section className="ui-list-table-card">
+          {/* Thanh tìm kiếm — chỉ hiển thị yêu cầu TRONG NGÀY nên không cần lọc ngày/sắp xếp */}
+
+
+          {/* Segmented control: lọc theo trạng thái, kèm số đếm (căn thẳng lề trái với ô tìm kiếm) */}
+
 
           <table className="ktp-table">
             <thead>
@@ -718,29 +725,36 @@ export default function DatCocTab() {
             )}
           </div>
         </section>
+</>
       )}
 
       {activeSubTab === 'ghi-nhan-chung-tu' && (
-        <section>
-          {/* Thanh tìm kiếm (đã bỏ bộ chọn sắp xếp — phiếu sắp hết hạn luôn lên đầu) */}
-          <div style={{ backgroundColor: '#f4f7f7', padding: '16px', borderRadius: '8px', display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '20px' }}>
-            <div style={{ flex: '2 1 260px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#191c1d', marginBottom: '8px' }}>Tìm kiếm</label>
-              <input type="text" value={ctSearch} onChange={(e) => setCtSearch(e.target.value)} placeholder="Tên khách hàng, SĐT hoặc mã phiếu cọc..." className="ktp-input" style={{ width: '100%', backgroundColor: '#fff' }} />
-            </div>
+        <>
+<OverviewCards items={[{ key: 'all', label: 'Tất cả' }, ...CT_STATUS_ORDER.map((s) => ({ key: s, label: CT_STATUS_CONFIG[s].chip }))]} counts={ctCounts} />
+<div className="ui-list-toolbar">
+            <label className="ui-list-search">
+              <span className="ui-search-label">Tìm kiếm</span>
+              <Icon name="search" />
+<input type="text" value={ctSearch} onChange={(e) => setCtSearch(e.target.value)} placeholder="Tên khách hàng, SĐT hoặc mã phiếu cọc..." className="ktp-input"  />
+            </label>
             {ctSearch && (
-              <button type="button" onClick={() => setCtSearch('')} className="ktp-btn-action" style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#3f494a', padding: '9px 16px', fontSize: '13px' }}>Xóa lọc</button>
+              <button type="button" onClick={() => setCtSearch('')} className="ktp-btn-action" >Xóa lọc</button>
             )}
-          </div>
 
-          {/* Segmented control theo trạng thái thanh toán */}
-          <StatusFilterTabs
+<StatusFilterTabs
             className="status-pill-tabs-offset"
             items={[{ key: 'all', label: 'Tất cả' }, ...CT_STATUS_ORDER.map((s) => ({ key: s, label: CT_STATUS_CONFIG[s].chip }))]}
             activeKey={ctStatus}
             counts={ctCounts}
             onChange={ctChonChip}
           />
+</div>
+<section className="ui-list-table-card">
+          {/* Thanh tìm kiếm (đã bỏ bộ chọn sắp xếp — phiếu sắp hết hạn luôn lên đầu) */}
+
+
+          {/* Segmented control theo trạng thái thanh toán */}
+
 
           <table className="ktp-table">
             <thead>
@@ -845,6 +859,7 @@ export default function DatCocTab() {
             )}
           </div>
         </section>
+</>
       )}
 
       {/* Modal xem chi tiết phiếu chứng từ (đã TT / hết hạn) */}

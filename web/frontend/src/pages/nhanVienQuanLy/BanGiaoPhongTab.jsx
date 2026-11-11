@@ -1,3 +1,4 @@
+import OverviewCards from '../../components/common/OverviewCards.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { banGiaoPhongApi } from './banGiaoPhong.api.js';
@@ -396,25 +397,45 @@ export default function BanGiaoPhongTab() {
       )}
 
       {!hopDong && (
-        <section className="ktp-table-section handover-queue-card">
-          <div style={{ padding: '20px 20px 0 20px' }}>
-            <div style={{ backgroundColor: '#f4f7f7', padding: '16px', borderRadius: '8px', display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '20px' }}>
-              <div style={{ flex: '2 1 240px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#191c1d', marginBottom: '8px' }}>Tìm kiếm</label>
-                <input
+        <>
+<OverviewCards items={[
+              { key: 'all', label: 'Tất cả' },
+              { key: 'cho-thu-tien', label: 'Chờ thanh toán' },
+              { key: 'da-thanh-toan', label: 'Chờ bàn giao' },
+              { key: 'da-ban-giao', label: 'Đã bàn giao' }
+            ]} counts={counts} />
+<div className="ui-list-toolbar">
+              <label className="ui-list-search">
+                <span className="ui-search-label">Tìm kiếm</span>
+                <Icon name="search" />
+<input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Mã hợp đồng, tên khách hàng, số điện thoại hoặc tên phòng..."
                   className="ktp-input"
-                  style={{ width: '100%', backgroundColor: '#fff' }}
+
                 />
-              </div>
+              </label>
               {searchQuery && (
-                <button type="button" onClick={() => setSearchQuery('')} className="ktp-btn-cancel" style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#3f494a', padding: '9px 16px', fontSize: '13px' }}>Xóa lọc</button>
+                <button type="button" onClick={() => setSearchQuery('')} className="ktp-btn-cancel" >Xóa lọc</button>
               )}
-            </div>
-          </div>
+
+<StatusFilterTabs
+            className="status-pill-tabs-offset"
+            items={[
+              { key: 'all', label: 'Tất cả' },
+              { key: 'cho-thu-tien', label: 'Chờ thanh toán' },
+              { key: 'da-thanh-toan', label: 'Chờ bàn giao' },
+              { key: 'da-ban-giao', label: 'Đã bàn giao' }
+            ]}
+            activeKey={filterState}
+            counts={counts}
+            onChange={setFilterState}
+          />
+</div>
+<section className="ktp-table-section handover-queue-card ui-list-table-card">
+
 
           <div className="handover-queue-head">
             <div>
@@ -432,18 +453,7 @@ export default function BanGiaoPhongTab() {
           </div>
 
           {/* Segmented control: lọc theo trạng thái + số đếm */}
-          <StatusFilterTabs
-            className="status-pill-tabs-offset"
-            items={[
-              { key: 'all', label: 'Tất cả' },
-              { key: 'cho-thu-tien', label: 'Chờ thanh toán' },
-              { key: 'da-thanh-toan', label: 'Chờ bàn giao' },
-              { key: 'da-ban-giao', label: 'Đã bàn giao' }
-            ]}
-            activeKey={filterState}
-            counts={counts}
-            onChange={setFilterState}
-          />
+
 
           <div className="handover-table-scroll">
             <table className="ktp-table">
@@ -561,6 +571,7 @@ export default function BanGiaoPhongTab() {
             </table>
           </div>
         </section>
+</>
       )}
 
       {/* POPUP XEM BIÊN BẢN (READ-ONLY) */}

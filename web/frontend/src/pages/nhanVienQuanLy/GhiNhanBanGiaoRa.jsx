@@ -1,3 +1,4 @@
+import OverviewCards from '../../components/common/OverviewCards.jsx';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { banGiaoRaApi } from './GhiNhanBanGiaoRa.api.js';
@@ -143,26 +144,31 @@ export default function GhiNhanBanGiaoRa() {
 
   return (
     <div>
-      <section className="ktp-table-section">
-        <div style={{ backgroundColor: '#f4f7f7', padding: '16px', borderRadius: '8px', display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '20px' }}>
-          <div style={{ flex: '2 1 240px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#191c1d', marginBottom: '8px' }}>Tìm kiếm</label>
-            <input
+      <>
+<OverviewCards items={[
+            { key: 'Tất cả', label: 'Tất cả' },
+            { key: 'Chờ bàn giao', label: 'Chờ bàn giao' },
+            { key: 'Đã bàn giao', label: 'Đã bàn giao' }
+          ]} counts={statusCounts} />
+<div className="ui-list-toolbar">
+          <label className="ui-list-search">
+            <span className="ui-search-label">Tìm kiếm</span>
+            <Icon name="search" />
+<input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tên khách hàng hoặc mã phiếu..."
               className="ktp-input"
-              style={{ width: '100%', backgroundColor: '#fff' }}
+
               spellCheck={false}
             />
-          </div>
+          </label>
           {searchQuery && (
-            <button type="button" onClick={() => setSearchQuery('')} className="ktp-btn-cancel" style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#3f494a', padding: '9px 16px', fontSize: '13px' }}>Xóa lọc</button>
+            <button type="button" onClick={() => setSearchQuery('')} className="ktp-btn-cancel" >Xóa lọc</button>
           )}
-        </div>
 
-        <StatusFilterTabs
+<StatusFilterTabs
           className="status-pill-tabs-offset"
           items={[
             { key: 'Tất cả', label: 'Tất cả' },
@@ -173,6 +179,11 @@ export default function GhiNhanBanGiaoRa() {
           counts={statusCounts}
           onChange={setFilterStatus}
         />
+</div>
+<section className="ktp-table-section ui-list-table-card">
+
+
+
 
         {loading ? (
           <div style={{ padding: '20px', textAlign: 'center' }}>Đang tải...</div>
@@ -243,6 +254,7 @@ export default function GhiNhanBanGiaoRa() {
           </table>
         )}
       </section>
+</>
 
       {/* Modal Overlay */}
       {modalOpen && (

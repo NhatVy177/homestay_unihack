@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:avalanche-ui": "node scripts/avalanche-smoke.mjs"
+    "test:avalanche-ui": "node scripts/avalanche-smoke.mjs",
+    "test:handover-ui": "node scripts/handover-bundle-ui.mjs"
   },
   "dependencies": {
     "@homestaydorm/settlement": "file:../../blockchain",

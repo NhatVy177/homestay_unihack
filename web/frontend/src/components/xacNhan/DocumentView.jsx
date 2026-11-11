@@ -9,8 +9,26 @@ function saveAttachment(file) {
 export function HandoverView({ policy, handover }) {
   if (!handover) return null;
   const p = handover.payload, files = p.attachments || [];
+  const terms = p.contractTerms;
   return <div className="xn-doc">
     <div className="xn-row"><span>Tiền cọc ghi nhận</span><strong>{money(p.depositHeldVnd)}</strong></div>
+    {p.schema === 'homestaydorm.handover.v2' && terms && <section className="ui-evidence-panel" aria-label="Điều khoản hợp đồng">
+      <h3>Điều khoản hợp đồng</h3>
+      <dl className="ui-evidence-terms">
+        <div><dt>Mã hợp đồng</dt><dd>{terms.contractId}</dd></div>
+        <div><dt>Giá thuê</dt><dd>{money(terms.rentVnd)}</dd></div>
+        <div><dt>Ngày bắt đầu</dt><dd>{terms.startDate}</dd></div>
+        <div><dt>Ngày kết thúc</dt><dd>{terms.endDate}</dd></div>
+        <div><dt>Kỳ thanh toán</dt><dd>{terms.paymentCycle}</dd></div>
+        <div><dt>Tiền cọc theo phiếu</dt><dd>{money(terms.depositVnd)}</dd></div>
+        <div><dt>Phiên bản chính sách</dt><dd>{p.policyVersion}</dd></div>
+      </dl>
+      {p.signedContract && <details><summary>Thông tin bản hợp đồng đã ký</summary>
+        <p>{p.signedContract.name}</p>
+        <p>Mã đối chiếu file: <code className="ui-evidence-hash">{p.signedContract.sha256}</code></p>
+        <p>Bản lưu chỉ chứa mã đối chiếu; hợp đồng gốc được lưu riêng.</p>
+      </details>}
+    </section>}
     <table className="xn-table"><thead><tr><th>Tài sản</th><th>SL</th><th>Tình trạng lúc nhận phòng</th></tr></thead>
       <tbody>{p.inventory.map((item, i) => <tr key={i}><td>{item.item}</td><td>{item.quantity}</td><td>{item.condition}</td></tr>)}</tbody></table>
     {p.notes && <p className="xn-note"><strong>Ghi chú chung:</strong> {p.notes}</p>}

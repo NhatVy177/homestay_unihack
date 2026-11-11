@@ -115,6 +115,8 @@ Trạng thái xác nhận: chờ xác nhận bàn giao → đã xác nhận bàn
 
 ### Luồng trước nhận phòng gọn hơn — D-026 (10/11/2026)
 
+**C1 / D-034 (11/11):** bàn giao v2 bổ sung điều khoản thực từ hợp đồng, cọc theo `PhieuDatCoc.SoTienCoc`, phiên bản SHA-256 ngắn của snapshot chính sách theo phiếu, tên/mã băm ảnh hợp đồng ký do Sale tải. Phiếu/email cọc dùng cùng chính sách; hồ sơ cũ phải bổ sung ảnh và khách xác nhận chính sách trước v2. Không nhúng file hợp đồng/PII, không sửa contract Solidity hoặc bằng chứng v1 đã khóa. Review v1 chưa lên chuỗi chuyển bằng bản sửa v2 giữ lịch sử; đọc/verify tiếp tục hỗ trợ v1. Migration mới cần Vy cho phép trước HOMEDORM4. Tiêu chí và mức bằng chứng tại `spec/scope.md`/`spec/progress.md`; không mở rộng sang hoàn một phần D-026.
+
 Vy bàn lại luồng theo D-022 (hợp lý ngoài thực tế), tham khảo dự án nhóm Hằng: khách tự làm nhiều hơn nhưng giữ quản lý duyệt. Đã chốt: một buổi xem nhiều phòng, chỉ ghi trạng thái buổi; khách tự gửi giữ chỗ trên web (Sale gửi thay khi cần), quản lý duyệt rồi hệ thống tự tạo phiếu như D-023; bị từ chối/hết hạn → hồ sơ về "Đã xem"; khách tự khai người ở, xem CCCD gốc lúc ký hợp đồng giấy; thành viên bị loại → nhả giường, hoàn 80% trừ vào kỳ đầu; đổi đại diện qua email mời tạo tài khoản (sau cùng). Chi tiết ở D-026/F-15. Danh sách đầy đủ các hướng còn chờ chốt (mốc chuỗi 3 "đóng hồ sơ" đã quyết **không làm trong bản thi** theo D-031, giữ ghi chú "không cần `Closed`" ở trên; thay bằng gói bằng chứng cuối trên Web2. Giai đoạn 5–9 chốt ở D-027 → D-031) và lịch đề xuất nằm ở `spec/progress.md` mục "Hướng luồng D-026". Đây không phải kế hoạch song song.
 
 ### Ví nhúng và app trả phí: mục tiêu của bản thi
@@ -254,6 +256,14 @@ Cổng thanh toán mô phỏng chỉ xuất hiện thêm nếu hoàn thiện s�
 
 ## 9. Thứ tự thực hiện và mốc nội bộ
 
+**Việc Vy giao ngày 11/11 (J-X058):** tạm dừng UI, làm lần lượt A1 (`chore/fuji-setup`) rồi C1 (`feat/t22-handover-bundle`), hai worktree/nhánh riêng từ `origin/chore/audit-cleanup`. A1 chuẩn bị ba ví vận hành và script chia AVAX thử; chưa deploy. Sau A1 báo địa chỉ deployer để Vy xin faucet; C1 không sửa contract và không tự chạy SQL trên HOMEDORM4. Yêu cầu này chỉ chốt hai việc đang làm, không mặc định phê duyệt toàn bộ lịch đề xuất dưới đây.
+
+> **Lịch hiện hành theo D-037 (Vy chốt 2026-11-11):** Fuji trước (11–12/11) → phần T-22 và giao diện nằm trên đường demo (13–15/11) → phần T-22 còn lại nếu kịp, dự phòng (16–17/11) → README, slide, video (18–19/11) → nộp 20/11, dự phòng 21/11. Bảng ngày, mức ưu tiên T-22 và trạng thái ở `spec/progress.md`; việc cho AI ở `spec/viec-cho-agent.md`. **Phần lịch của D-025 bên dưới là lịch sử**; các ràng buộc thiết kế của D-025 vẫn giữ. Bổ sung luồng theo D-038 (đường thoát khi khách im lặng, điều khoản xác nhận điện tử, ô đồng ý dữ liệu cá nhân): chi tiết ở `spec/luong-tong-hop.md`.
+
+**Điều chỉnh Sale D-036 (11/11, J-X065):** theo phản hồi Vy, nền xanh dùng chung sidebar/nội dung, Tra cứu chỉ tìm/xem khách; bỏ lối Trả phòng của Sale. Các việc bắt buộc theo D-023/D-026 giữ ở ngữ cảnh liên quan (tiếp nhận trong lịch/tổng quan, cọc trong tổng quan, nhập hộ trong hợp đồng). Làm lại danh sách đầu vào hợp đồng theo bố cục mẫu, giữ quy tắc và API; không tạo bản nháp giả, không chạy SQL. Thay cách tổ chức D-035, không thay nghiệp vụ đã chốt.
+
+**Đợt Sale D-035 (11/11, J-X063):** Vy cho sửa Sale trước theo bố cục mẫu Hằng: menu 5 mục, tổng quan, lịch tháng và form lập lịch; bỏ mục kiểm tra phòng/giường và tab cư trú riêng, giữ nhập hộ trong Tra cứu khách hàng. Nghiệp vụ hồ sơ/cọc/trả phòng vẫn có lối truy cập. Nhánh `feat/ui-sale-workspace` từ `origin/main` (`dcc1a59`), worktree riêng; không tự merge/push main. Phạm vi này không làm khách tự khai cư trú hoặc thay backend/SQL/quyền/luồng D-026; phần đó tiếp tục ở đợt nghiệp vụ tương ứng.
+
 **Lịch hiện hành theo D-025 (Vy chốt 2026-11-10 00:47 +07:00): làm giao diện trước Fuji.** Lịch này thay bảng mốc cũ tại mục này và phần lịch 15 ngày của D-019; không thay scope nghiệp vụ hoặc coi kiểm thử local là kết quả Fuji. Đây là lịch nội bộ của Vy, không phải xác minh lại hạn BTC.
 
 | Mốc | Đầu ra |
@@ -266,6 +276,8 @@ Cổng thanh toán mô phỏng chỉ xuất hiện thêm nếu hoàn thiện s�
 Kết quả T-21 và danh sách đợt 2 nằm ở `spec/progress.md` / J-045: ưu tiên trạng thái rỗng lặp ở Quản lý/Kế toán, màu inline trong modal/form/badge của các tab Sale/Quản lý/Kế toán/khách, bảng dài và form với dữ liệu demo; rà các tab Admin/khách chưa được chụp chi tiết. Ảnh khung dùng API giả không thay nghiệm thu tài khoản thật.
 
 **Bổ sung D-032 / J-054:** Vy chọn `D:\Nam4\Contest\Homestay-Dorm` làm mẫu cho quy tắc icon/form/modal. T-21 bổ sung lớp quy chuẩn CSS tự viết, icon SVG sẵn có, form khách vãng lai và đăng nhập/đăng ký, trình bày form Admin; kiểm ảnh và thao tác form ở 1440px/390px. Quy chuẩn cụ thể và mức áp dụng ở `spec/scope.md`; giữ native controls và handler/validation, không chép code/asset, không chuyển sang stack hoặc nghiệp vụ của dự án mẫu. Đợt 2 tiếp tục áp dụng vào các form chuyên biệt chưa rà; lịch D-025 giữ nguyên.
+
+**Bổ sung D-033 / J-056:** đồng bộ danh sách theo ảnh Vy gửi: thẻ tổng quan dùng số đếm sẵn có, thanh tìm kiếm dạng viên kèm bộ lọc, bảng riêng. Áp dụng qua `OverviewCards` và CSS chung cho Sale/Quản lý/Kế toán/Admin; giữ các bộ chọn ngày và toàn bộ tìm kiếm/lọc hiện hành. Kiểm tra 22 màn/tab ở 1440px/390px, có ca dữ liệu giả xác minh số đếm, tìm kiếm và lọc trạng thái. Phần này vẫn là T-21/UI, không thực hiện thay đổi nghiệp vụ T-22 hay đổi lịch.
 
 Nếu thử ví nhúng/relayer chưa đạt, ưu tiên sửa lát cắt nhỏ này và cắt simulator/point trước. Ví giao dịch trực tiếp trên Fuji có thể dùng kiểm thử nội bộ trong lúc phát triển, nhưng chưa đạt mục tiêu UX nộp bài. Không âm thầm coi fallback là chức năng đã hoàn thành.
 

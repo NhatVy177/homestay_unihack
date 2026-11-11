@@ -1,151 +1,52 @@
-import NavigationToggle from '../../components/common/NavigationToggle.jsx';
-import BranchChip from '../../components/common/BranchChip.jsx';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
-import '../khachHang/khachHangPortal.css';
-import '../nhanVienKeToan/nhanVienKeToanPortal.css'; // Use ke toan specific styles for content
-
-import HoSoDangKyTab from './HoSoDangKyTab.jsx';
-import LichXemPhongTab from './LichXemPhongTab.jsx';
-import DatCocTab from './DatCocTab.jsx';
-import LapHopDongTab from './LapHopDongTab.jsx';
-import TraCuuPhongTab from './TraCuuPhongTab.jsx';
-import DangKyTraPhongTab from './DangKyTraPhongTab.jsx';
-import NhanPhongTab from './NhanPhongTab.jsx';
+import NavigationToggle from '../../components/common/NavigationToggle.jsx';
+import BranchChip from '../../components/common/BranchChip.jsx';
 import { Icon } from '../../components/common/Icon.jsx';
+import '../khachHang/khachHangPortal.css';
+import '../nhanVienKeToan/nhanVienKeToanPortal.css';
+import '../../styles/saleWorkspace.css';
+import SaleOverview from './SaleOverview.jsx';
+import SaleCustomerWorkspace from './SaleCustomerWorkspace.jsx';
+import SaleProfile from './SaleProfile.jsx';
+import LichXemPhongTab from './LichXemPhongTab.jsx';
+import LapHopDongTab from './LapHopDongTab.jsx';
+import HoSoDangKyTab from './HoSoDangKyTab.jsx';
+import DatCocTab from './DatCocTab.jsx';
+import NhanPhongTab from './NhanPhongTab.jsx';
 
-function Brand() {
-  return (
-    <Link className="kp-brand" to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '16px 20px', textDecoration: 'none' }}>
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9.5L12 3l9 6.5V21H3V9.5z"/><path d="M9 21V12h6v9"/>
-      </svg>
-      <span style={{ fontSize: '19px', fontFamily: 'var(--font-heading)', fontWeight: '700', letterSpacing: '0' }}>
-        <span style={{ color: 'var(--color-primary)' }}>Homestay</span><span style={{ color: 'var(--color-accent)' }}>Dorm</span>
-      </span>
-    </Link>
-  );
-}
-
-function firstName(name = '') {
-  const parts = String(name).trim().split(/\s+/).filter(Boolean);
-  return parts[parts.length - 1] || 'bạn';
-}
-
+const navigation = [
+  ['tong-quan', 'Tổng quan', 'home'], ['lich-xem', 'Lịch hẹn xem phòng', 'event_note'],
+  ['hop-dong-thue', 'Lập hợp đồng thuê', 'description'], ['khach-hang', 'Tra cứu khách hàng', 'search'],
+  ['ho-so-ca-nhan', 'Hồ sơ cá nhân', 'person'],
+];
 export default function NhanVienSalePage() {
   const { user, dangXuat } = useAuth();
-  const [activeTab, setActiveTab] = useState('ho-so');
-  const [isScheduling, setIsScheduling] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const navItems = [
-    { id: 'ho-so', label: 'Hồ sơ đăng ký', icon: 'description' },
-    { id: 'tra-cuu', label: 'Kiểm tra phòng/giường', icon: 'meeting_room' },
-    { id: 'lich-xem', label: 'Lịch xem phòng', icon: 'pending_actions' },
-    { id: 'dat-coc', label: 'Đặt cọc', icon: 'account_balance_wallet' },
-    { id: 'nhan-phong', label: 'Ghi nhận cư trú', icon: 'badge' },
-    { id: 'hop-dong-thue', label: 'Hợp đồng thuê', icon: 'article' },
-    { id: 'tra-phong', label: 'Trả phòng', icon: 'logout' }
-  ];
-
-  function handleTabChange(tabId) {
-    if (isScheduling && tabId !== 'ho-so') return;
-    setActiveTab(tabId);
+  const [activeTab, setActiveTab] = useState('tong-quan'), [task, setTask] = useState(null);
+  const [scheduling, setScheduling] = useState(false);
+  function navigate(tab) {
+    if (scheduling && tab !== activeTab) return;
+    const taskParents = { 'ho-so': 'lich-xem', 'dat-coc': 'tong-quan', 'nhan-phong': 'hop-dong-thue' };
+    if (taskParents[tab]) { setTask(tab); setActiveTab(taskParents[tab]); }
+    else if (navigation.some(([id]) => id === tab)) { setTask(null); setActiveTab(tab); }
   }
-
-  return (
-    <div className="kp-page kh-page ui-employee-shell">
-      <aside className="kp-sidebar" style={{ borderRight: '1px solid var(--color-border)' }}>
-        <div className="kp-sidebar-brand">
-          <Brand />
-          <span className="ui-role-label">Nhân viên Sale</span>
-        </div>
-        <nav className="ktp-sidebar-nav" aria-label="Menu sale">
-          {navItems.map((item) => (
-            <button
-              className={`ktp-side-item ${activeTab === item.id ? 'is-active' : ''} ${isScheduling && item.id !== 'ho-so' ? 'is-disabled' : ''}`}
-              type="button"
-              key={item.id}
-              disabled={isScheduling && item.id !== 'ho-so'}
-              title={isScheduling && item.id !== 'ho-so' ? 'Hoàn tất lập lịch xem phòng trước khi chuyển mục' : ''}
-              onClick={() => handleTabChange(item.id)}
-            >
-              <Icon name={item.icon} />
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
-
-      <div className="kp-app">
-        <header className="kp-topbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <NavigationToggle />
-          <div>
-            <h1>Chào {firstName(user?.hoTen)},</h1>
-            <p>Đây là không gian làm việc của bạn hôm nay.</p>
-          </div>
-          
-          <div className="kp-top-actions">
-            <BranchChip user={user} />
-            <div ref={dropdownRef} className="kp-user-box" style={{ position: 'relative' }}>
-              <button
-                type="button"
-                className="kp-user-box-btn"
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 8px', borderRadius: '10px', transition: 'background 0.18s' }}
-                onClick={() => setShowDropdown((prev) => !prev)}
-                aria-expanded={showDropdown}
-                aria-haspopup="true"
-              >
-                <span className="kp-avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'var(--color-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px' }}>
-                  {firstName(user?.hoTen).charAt(0).toUpperCase()}
-                </span>
-                <div style={{ textAlign: 'left' }}>
-                  <strong style={{ display: 'block', fontSize: '14px', color: 'var(--color-text)' }}>{user?.hoTen || 'Nhân viên'}</strong>
-                  <small style={{ display: 'block', fontSize: '10px', fontWeight: '700', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    NHÂN VIÊN SALE
-                  </small>
-                </div>
-                <svg style={{ marginLeft: '2px', opacity: 0.5, transition: 'transform 0.2s', transform: showDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
-              </button>
-              {showDropdown && (
-                <>
-                  <div style={{ position: 'fixed', inset: 0, zIndex: 59 }} onClick={() => setShowDropdown(false)} aria-hidden="true" />
-                  <div className="kh-account-menu" style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 0, width: '220px', background: 'var(--color-surface)', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', padding: '8px', zIndex: 60, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <button type="button" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', border: 'none', background: 'none', width: '100%', textAlign: 'left', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', color: 'var(--color-text)' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--color-surface-alt)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'} onClick={(e) => { e.stopPropagation(); setShowDropdown(false); }}>
-                      <Icon name="account_circle" style={{ fontSize: '18px' }} /> Thông tin tài khoản
-                    </button>
-                    <button type="button" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', border: 'none', background: 'none', width: '100%', textAlign: 'left', borderRadius: '8px', cursor: 'pointer', fontSize: '14px', color: 'var(--color-danger)' }} onMouseOver={e => e.currentTarget.style.backgroundColor = 'var(--color-surface-alt)'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'} onClick={(e) => { e.stopPropagation(); setShowDropdown(false); dangXuat(); }}>
-                      <Icon name="logout" style={{ fontSize: '18px' }} /> Đăng xuất
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </header>
-
-        <main className="kp-main" style={{ padding: 0 }}>
-          {activeTab === 'ho-so' && <HoSoDangKyTab onNavigate={handleTabChange} onSchedulingChange={setIsScheduling} />}
-          {activeTab === 'tra-cuu' && <TraCuuPhongTab />}
-          {activeTab === 'lich-xem' && <LichXemPhongTab onNavigate={handleTabChange} />}
-          {activeTab === 'dat-coc' && <DatCocTab />}
-          {activeTab === 'nhan-phong' && <NhanPhongTab />}
-          {activeTab === 'hop-dong-thue' && <LapHopDongTab />}
-          {activeTab === 'tra-phong' && <DangKyTraPhongTab />}
-        </main>
-      </div>
+  return <div className="kp-page kh-page ui-employee-shell sale-workspace">
+    <aside className="kp-sidebar"><div className="kp-sidebar-brand"><Link className="kp-brand sale-brand" to="/"><Icon name="home" /><span>Homestay<span>Dorm</span></span></Link><span className="ui-role-label">Nhân viên Sale</span></div>
+      <nav className="ktp-sidebar-nav" aria-label="Menu sale">{navigation.map(([id, label, icon]) => <button className={`ktp-side-item ${activeTab === id ? 'is-active' : ''}`} type="button" key={id} disabled={scheduling && activeTab !== id} aria-current={activeTab === id ? 'page' : undefined} onClick={() => navigate(id)}><Icon name={icon} /><span>{label}</span></button>)}</nav>
+      <div className="sale-sidebar-footer"><span className="sale-sidebar-mark"><Icon name="verified_user" /></span><p>Không gian làm việc<br /><strong>Nhân viên Sale</strong></p></div>
+    </aside>
+    <div className="kp-app"><header className="kp-topbar sale-topbar"><NavigationToggle /><div><p className="sale-eyebrow">KHÔNG GIAN SALE</p><h1>{navigation.find(([id]) => id === activeTab)?.[1]}</h1></div>
+      <div className="kp-top-actions"><BranchChip user={user} /><button className="sale-account" onClick={() => navigate('ho-so-ca-nhan')} disabled={scheduling}><span className="kp-avatar">{(user?.hoTen || 'S').trim().charAt(0).toUpperCase()}</span><span><strong>{user?.hoTen || 'Nhân viên'}</strong><small>Nhân viên Sale</small></span></button><button className="ui-btn ui-btn--ghost" type="button" onClick={dangXuat} aria-label="Đăng xuất"><Icon name="logout" /></button></div>
+    </header>
+      <main className="kp-main" id="sale-main">
+        {task && <div className="sale-view"><div className="sale-section-heading"><p className="sale-eyebrow">{task === 'ho-so' ? 'TIẾP NHẬN HỒ SƠ' : task === 'dat-coc' ? 'XỬ LÝ ĐẶT CỌC' : 'HỖ TRỢ KHAI NGƯỜI Ở'}</p><button className="ui-btn ui-btn--secondary" disabled={scheduling} onClick={() => setTask(null)}><Icon name="arrow_back" /> Quay lại</button></div>{task === 'ho-so' && <HoSoDangKyTab onSchedulingChange={setScheduling} />}{task === 'dat-coc' && <DatCocTab />}{task === 'nhan-phong' && <NhanPhongTab />}</div>}
+        {!task && activeTab === 'tong-quan' && <SaleOverview user={user} onNavigate={navigate} />}
+        {!task && activeTab === 'lich-xem' && <LichXemPhongTab onNavigate={navigate} onSchedulingChange={setScheduling} />}
+        {!task && activeTab === 'hop-dong-thue' && <LapHopDongTab onResidence={() => navigate('nhan-phong')} />}
+        {activeTab === 'khach-hang' && <SaleCustomerWorkspace />}
+        {activeTab === 'ho-so-ca-nhan' && <SaleProfile user={user} />}
+      </main>
     </div>
-  );
+  </div>;
 }
