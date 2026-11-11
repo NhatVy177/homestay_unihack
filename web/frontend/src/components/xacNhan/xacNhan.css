@@ -48,3 +48,6 @@
 .xn-section-title { font-size: 15px; font-weight: 800; color: #191c1d; margin: 18px 0 8px; }
 @media (max-width: 640px) { .xn-card { padding: 14px; } .xn-table th, .xn-table td { padding: 6px; } }
 .xn-gate { border: 1px solid #86d3da; background: #f6feff; border-radius: 10px; padding: 14px; }
+
+/* B4: statement choice in the accountant tab */
+.xn-form label.xn-radio-option { flex-direction: row; align-items: center; font-weight: 400; }

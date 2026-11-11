@@ -1,0 +1,30 @@
+/* B4: settlement screen, replaces the old inline styles with tokens. */
+.qt-money { font-weight: 700; color: var(--color-text); font-variant-numeric: tabular-nums; }
+.qt-money--zero { color: var(--color-text-muted); font-weight: 600; }
+.qt-money--collect { color: var(--color-danger); }
+.qt-money--success { color: var(--color-success); }
+.qt-money--deduction { color: var(--color-warning); }
+.qt-money--primary { color: var(--color-primary); }
+.qt-info-strong { font-weight: 700; color: var(--color-primary); }
+
+.qt-source-title { margin: 0; font-weight: 500; color: var(--color-text); font-size: 13px; }
+.qt-source-meta { margin: 3px 0 0; color: var(--color-text-muted); font-size: 12px; line-height: 1.45; }
+.qt-source-amount { white-space: nowrap; font-size: 13px; font-weight: 700; color: var(--color-text); font-variant-numeric: tabular-nums; }
+.qt-source-amount.is-zero { color: var(--color-text-muted); font-weight: 600; }
+
+.qt-adjustment-request { background: var(--color-warning-soft); border: 1px solid var(--color-warning); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); }
+.qt-adjustment-title { color: var(--color-danger); margin-bottom: var(--space-3); }
+.qt-adjustment-text { margin: 0; font-size: 14px; color: var(--color-text); line-height: 1.7; white-space: pre-wrap; }
+
+.qt-alert { display: flex; align-items: center; gap: var(--space-2); }
+.qt-alert--success { background: var(--color-success-soft); color: var(--color-success); }
+
+.kp-page .ktp-modal-header.qt-modal-header { align-items: center; background: var(--color-surface); color: var(--color-text); border-bottom: 1px solid var(--color-border); }
+.kp-page .qt-modal-header h3 { color: var(--color-text); }
+.kp-page .qt-modal-header .ktp-modal-header-sub { color: var(--color-text-muted); }
+.kp-page .qt-modal-header .ktp-modal-close { color: var(--color-text-muted); }
+.qt-modal-code { color: var(--color-primary); font-weight: 600; }
+
+.qt-loading { padding: var(--space-6); }
+.qt-full-span { grid-column: 1 / -1; display: grid; gap: var(--space-3); }
+.qt-inspection-item { border-top: 1px solid var(--color-border); padding-top: 10px; margin-top: 10px; }
