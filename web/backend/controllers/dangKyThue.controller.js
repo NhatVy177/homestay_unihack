@@ -29,7 +29,8 @@ export async function createHoSoDangKy(req, res, next) {
 export async function getHoSoDangKy(req, res, next) {
   try {
     const query = { ...req.query };
-    if (req.user?.chucVu === 'Sale' && req.user?.maChiNhanh) {
+    // Sale, Quản lý and Kế toán share the customer lookup; each sees only their own branch.
+    if (['Sale', 'Quản lý', 'Kế toán'].includes(req.user?.chucVu) && req.user?.maChiNhanh) {
       query.maChiNhanh = req.user.maChiNhanh;
     } else if (req.user?.vaiTro === 'KhachHang') {
       query.khachHangId = req.user.maNguoiDung;

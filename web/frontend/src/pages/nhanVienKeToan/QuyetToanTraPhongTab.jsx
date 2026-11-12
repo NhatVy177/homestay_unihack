@@ -1,8 +1,13 @@
 import OverviewCards from '../../components/common/OverviewCards.jsx';
 import DoiChieuTraPhong from '../../components/traPhong/DoiChieuTraPhong.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
+
+const PAGE_SIZE = 10;
 import { Icon } from '../../components/common/Icon.jsx';
 import StatusBadge from '../../components/common/StatusBadge.jsx';
+import ListSearch from '../../components/common/ListSearch.jsx';
+import ListPagination from '../../components/common/ListPagination.jsx';
+import TableState from '../../components/common/TableState.jsx';
 import './quyetToanTraPhong.css';
 import { doiSoatApi } from './doiSoat.api.js';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
@@ -13,10 +18,10 @@ const LOAI_HO_SO = {
 };
 
 const QUYET_TOAN_TABS = [
-  { id: 'lap-doi-soat', label: 'Lập phiếu đối soát' },
-  { id: 'ghi-nhan-thu-them', label: 'Ghi nhận thu thêm' },
-  { id: 'ghi-nhan-hoan-coc', label: 'Ghi nhận hoàn cọc' },
-  { id: 'ket-qua-doi-soat', label: 'Kết quả đối soát' }
+  { id: 'lap-doi-soat', label: 'Lập phiếu đối soát', group: 'doi-soat' },
+  { id: 'ghi-nhan-thu-them', label: 'Ghi nhận thu thêm', group: 'chi-tien' },
+  { id: 'ghi-nhan-hoan-coc', label: 'Ghi nhận hoàn cọc', group: 'chi-tien' },
+  { id: 'ket-qua-doi-soat', label: 'Kết quả đối soát', group: 'doi-soat' }
 ];
 
 const THU_THEM_FILTERS = [
@@ -779,6 +784,9 @@ function GhiNhanThanhToanPanel({ type }) {
   const displayedRows = useMemo(() => {
     return filteredPendingRows.map((row) => ({ ...row, _settlementMode: 'pending' }));
   }, [filteredPendingRows]);
+
+  const [page, setPage] = useState(1);
+  useEffect(() => { setPage(1); }, [searchText, thuThemFilter, type]);
   const activeThuThemFilterMeta = THU_THEM_FILTER_META[thuThemFilter] || THU_THEM_FILTER_META.all;
   const currentProof = String(refundForm.chungTuThanhToan || refundDetail?.chungTuThanhToan || '').trim();
   const recordedThuThemPaymentMethod = isThuThem
@@ -983,9 +991,7 @@ function GhiNhanThanhToanPanel({ type }) {
           </thead>
           <tbody>
             {loadingRows ? (
-              <tr>
-                <td colSpan="6" className="text-center">Đang tải danh sách...</td>
-              </tr>
+              <TableState kind="loading" colSpan={6} />
             ) : tableRows.length === 0 ? (
               <tr>
                 <td colSpan="6" className="text-center">
@@ -996,7 +1002,7 @@ function GhiNhanThanhToanPanel({ type }) {
                   </div>
                 </td>
               </tr>
-            ) : tableRows.map((row) => {
+            ) : tableRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((row) => {
               const rowMode = row._settlementMode || 'pending';
               const waitingForCustomerProof = isThuThem && needsThuThemProof(row);
               const statusLabel = waitingForCustomerProof ? 'Cần bổ sung minh chứng' : row.trangThaiDoiSoat;
@@ -1040,6 +1046,7 @@ function GhiNhanThanhToanPanel({ type }) {
             })}
           </tbody>
         </table>
+        {!loadingRows && <ListPagination page={page} pageSize={PAGE_SIZE} total={tableRows.length} noun="phiếu" onChange={setPage} />}
       </section>
     );
   }
@@ -1050,21 +1057,7 @@ function GhiNhanThanhToanPanel({ type }) {
         <OverviewCards items={thuThemFilters} />
       )}
 <div className="ui-list-toolbar">
-        <label className="ui-list-search">
-          <span className="ui-search-label">Tìm kiếm</span>
-          <Icon name="search" />
-<input
-            type="text"
-            value={searchText}
-            onChange={(event) => setSearchText(event.target.value)}
-            placeholder="Tìm kiếm..."
-            className="ktp-input"
-
-          />
-        </label>
-        {searchText && (
-          <button type="button" onClick={() => setSearchText('')} className="ktp-btn-cancel" >Xóa lọc</button>
-        )}
+        <ListSearch value={searchText} onChange={setSearchText} placeholder="Tìm theo mã, tên hoặc số điện thoại" />
 
 {isThuThem && (
         <StatusFilterTabs
@@ -1337,6 +1330,10 @@ function KetQuaDoiSoatPanel() {
     return searchedRows.filter((row) => ketQuaFilterKey(row) === ketQuaFilter);
   }, [ketQuaFilter, searchedRows]);
 
+  const [page, setPage] = useState(1);
+  useEffect(() => { setPage(1); }, [searchText, ketQuaFilter]);
+  const pagedRows = useMemo(() => filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filteredRows, page]);
+
   async function openDetail(row) {
     setSelected(row);
     setDetail(null);
@@ -1373,21 +1370,7 @@ function KetQuaDoiSoatPanel() {
       <>
 <OverviewCards items={ketQuaFilterItems} />
 <div className="ui-list-toolbar">
-          <label className="ui-list-search">
-            <span className="ui-search-label">Tìm kiếm</span>
-            <Icon name="search" />
-<input
-              type="text"
-              value={searchText}
-              onChange={(event) => setSearchText(event.target.value)}
-              placeholder="Tìm kiếm..."
-              className="ktp-input"
-
-            />
-          </label>
-          {searchText && (
-            <button type="button" onClick={() => setSearchText('')} className="ktp-btn-cancel" >Xóa lọc</button>
-          )}
+          <ListSearch value={searchText} onChange={setSearchText} placeholder="Tìm theo mã, tên hoặc số điện thoại" />
 
 <StatusFilterTabs
           className="status-pill-tabs-offset"
@@ -1423,9 +1406,7 @@ function KetQuaDoiSoatPanel() {
           </thead>
           <tbody>
             {loading ? (
-              <tr>
-                <td colSpan="8" className="text-center">Đang tải danh sách...</td>
-              </tr>
+              <TableState kind="loading" colSpan={8} />
             ) : filteredRows.length === 0 ? (
               <tr>
                 <td colSpan="8" className="text-center">
@@ -1436,7 +1417,7 @@ function KetQuaDoiSoatPanel() {
                   </div>
                 </td>
               </tr>
-            ) : filteredRows.map((row) => {
+            ) : pagedRows.map((row) => {
               const meta = ketQuaMeta(row);
 
               return (
@@ -1469,6 +1450,7 @@ function KetQuaDoiSoatPanel() {
             })}
           </tbody>
         </table>
+        {!loading && <ListPagination page={page} pageSize={PAGE_SIZE} total={filteredRows.length} noun="phiếu" onChange={setPage} />}
       </section>
 </>
 
@@ -1534,8 +1516,10 @@ function KetQuaDoiSoatPanel() {
   );
 }
 
-export default function QuyetToanTraPhongTab() {
-  const [activeQuyetToanTab, setActiveQuyetToanTab] = useState('lap-doi-soat');
+// group 'doi-soat' = "Đối soát hoàn cọc", group 'chi-tien' = "Chi tiền thanh lý" (menu split as in Hang's layout).
+export default function QuyetToanTraPhongTab({ group = 'doi-soat' }) {
+  const visibleTabs = QUYET_TOAN_TABS.filter((tab) => tab.group === group);
+  const [activeQuyetToanTab, setActiveQuyetToanTab] = useState(visibleTabs[0].id);
   const [danhSach, setDanhSach] = useState([]);
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState('');
@@ -1620,6 +1604,10 @@ export default function QuyetToanTraPhongTab() {
     }
     return searchedDanhSach;
   }, [lapFilter, searchedDanhSach]);
+
+  const [page, setPage] = useState(1);
+  useEffect(() => { setPage(1); }, [search, lapFilter]);
+  const pagedDanhSach = useMemo(() => filteredDanhSach.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filteredDanhSach, page]);
 
   const lapSectionMeta = {
     all: {
@@ -1819,7 +1807,7 @@ export default function QuyetToanTraPhongTab() {
   return (
     <div className="ktp-container">
       <nav className="qt-subtab-bar" aria-label="Nghiệp vụ quyết toán trả phòng">
-        {QUYET_TOAN_TABS.map((tab) => (
+        {visibleTabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
@@ -1854,21 +1842,7 @@ export default function QuyetToanTraPhongTab() {
       <>
 <OverviewCards items={lapFilters} />
 <div className="ui-list-toolbar">
-          <label className="ui-list-search">
-            <span className="ui-search-label">Tìm kiếm</span>
-            <Icon name="search" />
-<input
-              type="text"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Tìm kiếm..."
-              className="ktp-input"
-
-            />
-          </label>
-          {search && (
-            <button type="button" onClick={() => setSearch('')} className="ktp-btn-cancel" >Xóa lọc</button>
-          )}
+          <ListSearch value={search} onChange={setSearch} placeholder="Tìm theo mã, tên hoặc số điện thoại" />
 
 <StatusFilterTabs
           className="status-pill-tabs-offset"
@@ -1902,9 +1876,7 @@ export default function QuyetToanTraPhongTab() {
           </thead>
           <tbody>
             {loading ? (
-              <tr>
-                <td colSpan="6" className="text-center">Đang tải danh sách...</td>
-              </tr>
+              <TableState kind="loading" colSpan={6} />
             ) : filteredDanhSach.length === 0 ? (
               <tr>
                 <td colSpan="6" className="text-center">
@@ -1915,7 +1887,7 @@ export default function QuyetToanTraPhongTab() {
                   </div>
                 </td>
               </tr>
-            ) : filteredDanhSach.map((row) => {
+            ) : pagedDanhSach.map((row) => {
               const lapState = getLapDoiSoatState(row);
               const hasDoiSoat = Boolean(row.maDoiSoat);
 
@@ -1975,6 +1947,7 @@ export default function QuyetToanTraPhongTab() {
             })}
           </tbody>
         </table>
+        {!loading && <ListPagination page={page} pageSize={PAGE_SIZE} total={filteredDanhSach.length} noun="phiếu" onChange={setPage} />}
       </section>
 </>
         </>

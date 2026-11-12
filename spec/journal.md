@@ -856,6 +856,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Lỗi: `migrate` lần 2 báo "There is already an object named 'SP_TraPhong_QuanLy_XacNhanThanhLy'" và rollback toàn bộ (không đổi gì). Nguyên nhân: SQL Server lưu `CREATE OR ALTER` thành `CREATE PROCEDURE`; nhánh "đã vá" của `patchLegacyProcedure` trả nguyên văn nên lệnh thành CREATE trùng. Sửa `web/backend/scripts/checkout-lifecycle-db.mjs` (nhánh đã vá cũng đổi đầu thành `CREATE OR ALTER`), thêm test chạy lại vào `test/checkout-closure.test.mjs`.
 - Kiểm tra: backend `npm test` 52 qua/2 bỏ qua; `migrate` chạy lại trên HOMEDORM4 thành công. Nhánh `fix/c4-migration-rerun`.
 - Còn: Vy merge nhánh sửa, restart backend nối HOMEDORM4 (để nạp route/job C4); nghiệm thu C4 cùng A3.
+## 2026-11-11 23:23:49 +07:00 — J-C068 — B4 (tiếp): tìm kiếm và phân trang màn Quyết toán
+
+- Người thực hiện: Claude, nhánh `feat/b4-settlement-ui`. `QuyetToanTraPhongTab.jsx`: 3 ô tìm kiếm viết tay đổi sang `ListSearch` (nút xóa từ khóa trong ô thay nút "Xóa lọc"); dòng "Đang tải danh sách..." đổi sang dòng khung xương `TableState`; 3 bảng (thu thêm/hoàn cọc, kết quả đối soát, lập đối soát) có `ListPagination` 10 dòng/trang, đổi bộ lọc hay từ khóa thì về trang 1. Không đổi logic nghiệp vụ.
+- `scripts/ui-settlement-c3.mjs` thêm 12 phiếu giả, kiểm tra "Hiển thị 1–10 / 12 phiếu".
+- Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả).
+- Còn: C4.
 
 ## 2026-11-12 22:21:08 +07:00 — J-X074 — C4: gỡ vòng chờ danh sách hoàn cọc trước thanh lý
 
@@ -864,3 +870,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - `web/backend/test/checkout-closure.test.mjs`: thêm kiểm tra patch giữ lọc và chạy lại được với header SQL Server chuẩn hóa. `web/backend/test/checkout-closure-sql.test.mjs`: kiểm thử tích hợp trong CSDL tạm `HOMEDORM_C4_TEST_*`, tạo/xóa xong; D-041 chặn đóng khi thiếu tiền, thu chìa khóa độc lập/đúng chi nhánh, không nhả giường khác, thao tác lặp không nhả giường thuê lại, đóng không nhả giường, snapshot/revision cũ bị chặn. Không fixture HOMEDORM4.
 - Kiểm tra mới: backend 53 pass/3 skip (ba test SQL opt-in); C4 SQL chạy riêng 1/1 pass trong CSDL tạm; blockchain 25 pass/1 skip. Frontend build trong đợt tiếp nối qua, cảnh báo thư viện/chunk; `test:avalanche-ui` qua. Không đổi frontend trong bản vá bổ sung này. `checkout-lifecycle:db:check` chỉ đọc HOMEDORM4, đủ 6 SP và patch không lệch; chưa chạy migrate bản bổ sung.
 - Còn lại: push nhánh riêng để Vy review; cần Vy cho phép trước khi áp dụng thay đổi SP danh sách lên HOMEDORM4. A3 vẫn chưa có 6 receipt/gas nghiệp vụ; không coi kiểm thử CSDL tạm là nghiệm thu thật. Không push/merge main; commit NhatVy177, không Co-Authored-By.
+
+## 2026-11-12 22:46:13 +07:00 — J-C072 — P1 theo bản đối chiếu Hằng: menu Quản lý và Kế toán; gộp lại phần B4 bị sót
+
+- Người thực hiện: Claude. Vy bảo Claude làm luôn phần việc của Codex (Codex làm lâu). Claude bắt đầu từ P1 trong `spec/doi-chieu-giao-dien-hang.md`; A3 cần Vy thao tác (tài khoản, OTP thật).
+- Phát hiện: PR #8 merge trước khi Claude push 2 commit cuối của `feat/b4-settlement-ui` (`03ffae5` tìm kiếm + phân trang, `52b17f9`), nên main thiếu phần này. Đã merge lại `origin/feat/b4-settlement-ui` vào nhánh `feat/ui-staff-tabs-hang` (xung đột chỉ ở journal/progress, giữ cả hai).
+- Menu Quản lý (`pages/nhanVienQuanLy/NhanVienQuanLyPage.jsx`): Kiểm duyệt đặt cọc, Kiểm tra lưu trú, Quản lý hợp đồng (màn xử lý trả phòng cũ), Bàn giao tài sản, Khách xác nhận biên bản, + Tra cứu khách hàng, + Hồ sơ cá nhân. Menu Kế toán (`pages/nhanVienKeToan/NhanVienKeToanPage.jsx`): Hóa đơn đặt cọc, Hóa đơn nhận phòng, Tiền mặt chờ nộp quỹ, Đối soát hoàn cọc (lập phiếu + kết quả), + Chi tiền thanh lý (ghi nhận thu thêm + hoàn cọc; `QuyetToanTraPhongTab` nhận `group`), Khách xác nhận đối soát, + Tra cứu khách hàng, + Hồ sơ cá nhân. Giữ nguyên mã tab trong URL. Tra cứu và hồ sơ dùng lại `SaleCustomerWorkspace` và `SaleProfile` (thêm `roleLabel`).
+- Bảo mật: `controllers/dangKyThue.controller.js` trước đây chỉ lọc theo chi nhánh khi người xem là Sale; nay Sale, Quản lý, Kế toán đều chỉ thấy hồ sơ chi nhánh mình, tránh lộ dữ liệu chi nhánh khác khi mở tra cứu cho hai vai trò mới.
+- Test: sửa nhãn trong `scripts/ui-settlement-c3.mjs` và `scripts/ui-lists.mjs` (bỏ 2 tab con đã xóa ở C4). Môi trường: `D:\HomeStayDorm-ui` bỏ liên kết `node_modules` sang `-audit` (bản cũ thiếu `@homestaydorm/settlement/closure`), cài riêng bằng `npm ci` cho frontend và backend; không xóa gì ở `-audit`.
+- Kiểm tra: backend `npm test` 52 qua/2 bỏ qua; build qua; `test:shell-ui` (mở mọi tab 5 vai trò), `test:list-kit`, `test:avalanche-ui`, `ui-settlement-c3.mjs`, `ui-checkout-closure.mjs`, `ui-checkout-compare.mjs` qua. Dữ liệu giả.
+- Còn: phần việc Codex còn lại (C5 giữ chỗ, C6, D-028, giao diện khách P2, B2/B5/B7, P3, E1–E3) Claude làm tiếp; A3 chờ Vy.
