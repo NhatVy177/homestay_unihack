@@ -1,5 +1,4 @@
 import { executeProcedure, executeQuery, sql } from '../database/connection.js';
-import { capNhatLichXemDenGioThanhDaXem } from './lichXemPhong.repository.js';
 
 export async function timLuongThueDangHoatDong(khachHangId) {
   const result = await executeQuery(`
@@ -250,7 +249,6 @@ export async function traCuuPhong(filter = {}) {
 
 export async function kiemTraDieuKienThue(hoSoId) {
   const maDangKy = String(hoSoId || '').trim();
-  await capNhatLichXemDenGioThanhDaXem({ maDangKy });
 
   const result = await executeProcedure('dbo.SP_KiemTraDieuKienThue', [
     { name: 'HoSoId', type: sql.NVarChar(30), value: maDangKy }
@@ -261,7 +259,6 @@ export async function kiemTraDieuKienThue(hoSoId) {
 
 export async function capNhatKetQuaXuLy(hoSoId, data = {}) {
   const maDangKy = String(hoSoId || '').trim();
-  await capNhatLichXemDenGioThanhDaXem({ maDangKy });
 
   const result = await executeProcedure('dbo.SP_CapNhatKetQuaXuLyHoSo', [
     { name: 'HoSoId', type: sql.NVarChar(30), value: maDangKy },

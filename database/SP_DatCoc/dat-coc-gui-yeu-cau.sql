@@ -123,11 +123,6 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    UPDATE dbo.LichXemPhong
-    SET TrangThai = N'Đã xem'
-    WHERE MaDangKy = @MaDangKy
-      AND TrangThai IN (N'Chờ xem', N'Yêu cầu đổi lịch', N'Yêu cầu hủy')
-      AND ThoiGianHen <= GETDATE();
 
     -- CỐ Ý KHÔNG ĐỌC TÌNH TRẠNG PHÒNG/GIƯỜNG Ở ĐÂY.
     -- Sale chốt phòng dựa trên những gì khách ĐÃ ĐI XEM, tại thời điểm đó phòng còn trống;
@@ -184,11 +179,6 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    UPDATE dbo.LichXemPhong
-    SET TrangThai = N'Đã xem'
-    WHERE MaDangKy = @MaDangKy
-      AND TrangThai IN (N'Chờ xem', N'Yêu cầu đổi lịch', N'Yêu cầu hủy')
-      AND ThoiGianHen <= GETDATE();
 
     IF NOT EXISTS (SELECT 1 FROM dbo.PhieuDangKy WHERE MaDangKy = @MaDangKy)
         THROW 50201, N'Không tìm thấy phiếu đăng ký.', 1;
@@ -337,11 +327,6 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    UPDATE dbo.LichXemPhong
-    SET TrangThai = N'Đã xem'
-    WHERE MaDangKy = @MaDangKy
-      AND TrangThai IN (N'Chờ xem', N'Yêu cầu đổi lịch', N'Yêu cầu hủy')
-      AND ThoiGianHen <= GETDATE();
 
     IF NOT EXISTS (SELECT 1 FROM dbo.PhieuDangKy WHERE MaDangKy = @MaDangKy)
         THROW 50201, N'Không tìm thấy phiếu đăng ký.', 1;
