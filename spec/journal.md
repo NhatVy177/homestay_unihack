@@ -856,3 +856,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Lỗi: `migrate` lần 2 báo "There is already an object named 'SP_TraPhong_QuanLy_XacNhanThanhLy'" và rollback toàn bộ (không đổi gì). Nguyên nhân: SQL Server lưu `CREATE OR ALTER` thành `CREATE PROCEDURE`; nhánh "đã vá" của `patchLegacyProcedure` trả nguyên văn nên lệnh thành CREATE trùng. Sửa `web/backend/scripts/checkout-lifecycle-db.mjs` (nhánh đã vá cũng đổi đầu thành `CREATE OR ALTER`), thêm test chạy lại vào `test/checkout-closure.test.mjs`.
 - Kiểm tra: backend `npm test` 52 qua/2 bỏ qua; `migrate` chạy lại trên HOMEDORM4 thành công. Nhánh `fix/c4-migration-rerun`.
 - Còn: Vy merge nhánh sửa, restart backend nối HOMEDORM4 (để nạp route/job C4); nghiệm thu C4 cùng A3.
+
+## 2026-11-12 14:55:36 +07:00 — J-C071 — Bản đối chiếu tab giao diện với repo của Hằng
+
+- Người thực hiện: Claude. Vy yêu cầu đối chiếu toàn bộ giao diện từng vai trò với repo của Hằng (`D:\Nam4\Contest\Homestay-Dorm`, `6e3fa9b`); tên tab, cách chia và bố cục làm theo Hằng, chức năng và luồng được khác. Ghi nhận: Vy cho phép bắt chước giao diện Hằng (thay cho giới hạn trước đây là chỉ học bố cục); vẫn tự viết lại, không chép code.
+- Việc khởi động app: backend (cổng 5011, HOMEDORM4, Fuji, `SCHEDULERS_ENABLED=false`) và frontend (cổng 5199) chạy từ `origin/main` `ab5bcae` ở `D:\HomeStayDorm-c4` (detached); `.env` chép từ thư mục A3, nằm ngoài Git.
+- File mới `spec/doi-chieu-giao-dien-hang.md`: bảng đối chiếu Sale (đã khớp), Quản lý, Kế toán, Khách (Hằng có 3 menu theo tình trạng khách), Admin, trang công khai; đề xuất thứ tự P1–P3. Mọi mục là đề xuất, chưa phải quyết định.
+- Kiểm tra: chỉ đọc hai repo, không chạy test. Còn: Vy chọn mục nào làm và giao người làm; mục "Hóa đơn định kỳ" cần Vy quyết phạm vi.
