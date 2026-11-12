@@ -1425,10 +1425,10 @@
 }
 
 .kh-toast {
-  background: var(--kp-text);
+  background: var(--color-text);
   border-radius: 999px;
-  bottom: 24px;
-  box-shadow: var(--kp-shadow-strong);
+  top: 24px;
+  box-shadow: var(--shadow-md);
   color: var(--color-surface);
   font-size: 13px;
   font-weight: 750;
@@ -1438,9 +1438,14 @@
   padding: 12px 18px;
   pointer-events: none;
   position: fixed;
-  transform: translate(-50%, 18px);
+  transform: translate(-50%, -18px);
   transition: opacity 0.2s ease, transform 0.2s ease;
-  z-index: 120;
+  z-index: 1200;
+}
+
+.kh-register-modal.kh-form-validated input:invalid,
+.kh-register-modal.kh-form-validated select:invalid {
+  border-color: var(--color-danger);
 }
 
 .kh-toast.show {

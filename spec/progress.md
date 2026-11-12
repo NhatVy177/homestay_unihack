@@ -1,8 +1,10 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-12 22:21:42 +07:00** (J-X074, bản vá danh sách hoàn cọc C4 chờ duyệt/migration). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-13 01:05:52 +07:00** (J-X075, lỗi form đăng ký thuê). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
+
+Form đăng ký thuê: lỗi nhập/gửi dùng hộp thông báo, ngày dọn vào nhắc dưới ô theo giới hạn ngày mai có sẵn, giữ dữ liệu để sửa/gửi lại; toast ngoài modal đã có nền. Nhánh `feat/ui-customer-form-feedback` từ main `16a4945`, đang phục vụ frontend 5199. Build + avalanche UI qua, backend 53/3 skip, blockchain 25/1 skip; kiểm tra fixture 1440/390 qua và có ảnh `.ui-screens/customer-form-feedback/`. Chưa gửi hồ sơ SQL thật; chưa hoàn tất các phần B5 khác. Chờ Vy review/merge nhánh riêng.
 
 C4 đã merge PR #10/#11 và migrate HOMEDORM4 (J-C069/J-C070). Bản vá bổ sung `fix/c4-refund-before-close` gỡ điều kiện danh sách hoàn cọc đòi hợp đồng đã thanh lý (D-041); backend 53 pass/3 skip, SQL C4 riêng 1/1 trên CSDL tạm, blockchain 25 pass/1 skip, build và avalanche UI qua. Chưa áp dụng phần SP bổ sung lên HOMEDORM4; chờ Vy duyệt và cho phép. Chưa nghiệm thu C4 bằng hồ sơ thật.
 

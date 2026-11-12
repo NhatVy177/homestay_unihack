@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { khachMoiApi } from '../khachMoi/khachMoi.api.js';
@@ -864,6 +864,13 @@ export default function KhachHangPortalPage() {
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [rentModal, setRentModal] = useState(false);
   const [rentForm, setRentForm] = useState(rentInitial);
+  const [rentValidationVisible, setRentValidationVisible] = useState(false);
+  const rentErrorField = useRef(null);
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const minMoveInDate = toLocalDateInputValue(tomorrow);
+  const moveInDateError = rentForm.ngayDuKienVaoO && rentForm.ngayDuKienVaoO < minMoveInDate
+    ? 'Ngày dự kiến dọn vào phải từ ngày mai trở đi.' : '';
   const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -950,6 +957,13 @@ export default function KhachHangPortalPage() {
     const timeout = setTimeout(() => setToast(''), 3200);
     return () => clearTimeout(timeout);
   }, [toast]);
+
+  useEffect(() => {
+    if (!rentModal) {
+      setRentValidationVisible(false);
+      rentErrorField.current = null;
+    }
+  }, [rentModal]);
 
   useEffect(() => {
     if (!registrationNoticeOpen) return undefined;
@@ -1173,12 +1187,32 @@ export default function KhachHangPortalPage() {
     setRentModal(true);
   }
 
+  function showRentError(message, field = null) {
+    rentErrorField.current = field;
+    setResultModal({ type: 'error', title: 'Chưa gửi được đăng ký thuê', message, confirmText: 'Kiểm tra lại thông tin' });
+  }
+
+  function handleRentInvalid(event) {
+    event.preventDefault();
+    setRentValidationVisible(true);
+    const field = event.currentTarget.querySelector('input:invalid, select:invalid, textarea:invalid');
+    if (!field) return;
+    const label = (field.closest('label')?.querySelector('span')?.textContent || 'thông tin').replace(/\*$/, '').trim();
+    let message = `Vui lòng kiểm tra ${label.toLocaleLowerCase('vi-VN')}.`;
+    if (field.validity.valueMissing) message = `Vui lòng điền ${label.toLocaleLowerCase('vi-VN')} trước khi gửi đăng ký.`;
+    else if (field.name === 'ngayDuKienVaoO' && field.validity.rangeUnderflow) message = moveInDateError;
+    else if (field.type === 'email' && field.validity.typeMismatch) message = 'Email chưa đúng định dạng. Ví dụ: ten@example.com.';
+    else if (field.validity.rangeOverflow) message = `${label} không được vượt quá ${field.max}.`;
+    else if (field.validity.rangeUnderflow) message = `${label} phải từ ${field.min} trở lên.`;
+    showRentError(message, field);
+  }
+
   async function submitRent(event) {
     event.preventDefault();
 
     const validationError = validateContactAndArea(rentForm);
     if (validationError) {
-      setToast(validationError);
+      showRentError(validationError);
       return;
     }
 
@@ -1187,7 +1221,7 @@ export default function KhachHangPortalPage() {
       const soNam = Number(rentForm.soNam) || 0;
       const soNu = Number(rentForm.soNu) || 0;
       if (soNam + soNu !== soNguoiO) {
-        setToast('Tổng số lượng nam và nữ không khớp với số người dự kiến ở.');
+        showRentError('Tổng số lượng nam và nữ không khớp với số người dự kiến ở.');
         return;
       }
     }
@@ -1218,7 +1252,7 @@ export default function KhachHangPortalPage() {
         confirmText: 'Xem hồ sơ'
       });
     } catch (requestError) {
-      setToast(requestError.response?.data?.message || requestError.message || 'Không thể gửi hồ sơ lúc này.');
+      showRentError(requestError.response?.data?.message || requestError.message || 'Không thể gửi hồ sơ lúc này. Vui lòng thử lại.');
     } finally {
       setSubmitting(false);
     }
@@ -3852,7 +3886,7 @@ export default function KhachHangPortalPage() {
 
       {rentModal && (
         <div className="kp-modal-backdrop" onMouseDown={() => setRentModal(false)}>
-          <form className="kp-modal kh-rent-modal kh-register-modal" onMouseDown={(event) => event.stopPropagation()} onSubmit={submitRent}>
+          <form className={`kp-modal kh-rent-modal kh-register-modal${rentValidationVisible ? ' kh-form-validated' : ''}`} onMouseDown={(event) => event.stopPropagation()} onSubmit={submitRent} onInvalidCapture={handleRentInvalid}>
             <div className="kp-modal-head kh-register-head">
               <div>
                 <h2>Đăng ký thuê phòng</h2>
@@ -3960,7 +3994,7 @@ export default function KhachHangPortalPage() {
                     )}
                   </label>
                   <label><span>Mức giá tối đa (đ/tháng)*</span><input type="number" min="0" value={rentForm.mucGiaToiDa} onChange={(event) => setRentForm({ ...rentForm, mucGiaToiDa: event.target.value })} placeholder="VD: 3.000.000" required /></label>
-                  <label className="is-half"><span>Thời gian dự kiến dọn vào*</span><input type="date" value={rentForm.ngayDuKienVaoO} onChange={(event) => setRentForm({ ...rentForm, ngayDuKienVaoO: event.target.value })} required /></label>
+                  <label className="is-half"><span>Thời gian dự kiến dọn vào*</span><input name="ngayDuKienVaoO" type="date" min={minMoveInDate} value={rentForm.ngayDuKienVaoO} onChange={(event) => setRentForm({ ...rentForm, ngayDuKienVaoO: event.target.value })} aria-invalid={rentValidationVisible && Boolean(moveInDateError) || undefined} aria-describedby={rentValidationVisible && moveInDateError ? 'kh-move-in-error' : 'kh-move-in-hint'} required />{rentValidationVisible && moveInDateError ? <small className="kh-field-error" id="kh-move-in-error">{moveInDateError}</small> : <small className="kh-field-hint" id="kh-move-in-hint">Chọn ngày bạn dự định bắt đầu ở, từ ngày mai trở đi.</small>}</label>
                   <label className="is-half"><span>Thời hạn thuê (tháng)*</span><input type="number" min="1" value={rentForm.thoiHanThue} onChange={(event) => setRentForm({ ...rentForm, thoiHanThue: event.target.value })} placeholder="Ví dụ: 6" required /></label>
                   <div className="is-wide" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <span className="kh-register-field-title">Yêu cầu khác</span>
@@ -3980,14 +4014,19 @@ export default function KhachHangPortalPage() {
         </div>
       )}
 
-      <div className={`kh-toast ${toast ? 'show' : ''}`}>{toast}</div>
+      <div className={`kh-toast ${toast ? 'show' : ''}`} role="status" aria-live="polite" aria-atomic="true">{toast}</div>
       <ResultModal
         open={Boolean(resultModal)}
         type={resultModal?.type || 'success'}
         title={resultModal?.title}
         message={resultModal?.message}
         confirmText={resultModal?.confirmText}
-        onClose={() => setResultModal(null)}
+        onClose={() => {
+          setResultModal(null);
+          const field = rentErrorField.current;
+          rentErrorField.current = null;
+          if (field?.isConnected) requestAnimationFrame(() => { field.focus(); field.scrollIntoView({ block: 'center', behavior: 'smooth' }); });
+        }}
       />
 
       {profileDetailModal && (

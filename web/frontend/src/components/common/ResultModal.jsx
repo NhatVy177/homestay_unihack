@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 import './resultModal.css';
 
 // Máy bay giấy đang bay - dùng cho thông báo thành công.
@@ -44,12 +44,30 @@ function CrashedPlane() {
  * @param {() => void} onClose
  */
 export default function ResultModal({ open, type = 'success', title, message, confirmText, onClose }) {
+  const card = useRef(null);
+  const close = useRef(onClose);
+  close.current = onClose;
+  const titleId = useId();
+  const messageId = useId();
   useEffect(() => {
     if (!open) return undefined;
-    const onKey = (e) => { if (e.key === 'Escape') onClose?.(); };
+    const previousFocus = document.activeElement;
+    card.current?.querySelector('.rm-btn')?.focus();
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); close.current?.(); }
+      if (e.key === 'Tab') {
+        const buttons = [...(card.current?.querySelectorAll('button:not(:disabled)') || [])];
+        const first = buttons[0], last = buttons.at(-1);
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
+    };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      if (previousFocus?.isConnected) previousFocus.focus();
+    };
+  }, [open]);
 
   if (!open) return null;
 
@@ -59,19 +77,19 @@ export default function ResultModal({ open, type = 'success', title, message, co
 
   return (
     <div className="rm-overlay" onClick={onClose}>
-      <div className="rm-card ui-card" onClick={(e) => e.stopPropagation()} role="alertdialog" aria-modal="true">
+      <div ref={card} className="rm-card ui-card" onClick={(e) => e.stopPropagation()} role="alertdialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={message ? messageId : undefined}>
         <div className={`rm-art rm-art--${isSuccess ? 'success' : 'error'}`}>
           <div className="rm-hill" />
           {isSuccess ? <PaperPlane /> : <CrashedPlane />}
         </div>
 
-        <button className="rm-close" onClick={onClose} aria-label="Đóng">×</button>
+        <button type="button" className="rm-close" onClick={onClose} aria-label="Đóng">×</button>
 
         <div className="rm-body">
-          <h3 className="rm-title">{heading}</h3>
+          <h3 id={titleId} className="rm-title">{heading}</h3>
           {/* Không có message thì bỏ luôn thẻ <p>, tránh để lại khoảng trống thừa */}
-          {message ? <p className="rm-msg">{message}</p> : null}
-          <button className={`rm-btn ui-btn rm-btn--${isSuccess ? 'success' : 'error'}`} onClick={onClose}>
+          {message ? <p id={messageId} className="rm-msg">{message}</p> : null}
+          <button type="button" className={`rm-btn ui-btn rm-btn--${isSuccess ? 'success' : 'error'}`} onClick={onClose}>
             {btnText}
           </button>
         </div>
