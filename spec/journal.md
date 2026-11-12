@@ -880,3 +880,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Test: sửa nhãn trong `scripts/ui-settlement-c3.mjs` và `scripts/ui-lists.mjs` (bỏ 2 tab con đã xóa ở C4). Môi trường: `D:\HomeStayDorm-ui` bỏ liên kết `node_modules` sang `-audit` (bản cũ thiếu `@homestaydorm/settlement/closure`), cài riêng bằng `npm ci` cho frontend và backend; không xóa gì ở `-audit`.
 - Kiểm tra: backend `npm test` 52 qua/2 bỏ qua; build qua; `test:shell-ui` (mở mọi tab 5 vai trò), `test:list-kit`, `test:avalanche-ui`, `ui-settlement-c3.mjs`, `ui-checkout-closure.mjs`, `ui-checkout-compare.mjs` qua. Dữ liệu giả.
 - Còn: phần việc Codex còn lại (C5 giữ chỗ, C6, D-028, giao diện khách P2, B2/B5/B7, P3, E1–E3) Claude làm tiếp; A3 chờ Vy.
+
+## 2026-11-13 00:15:40 +07:00 — J-C073 — Sửa form "Đăng ký thuê phòng" của khách bị trong suốt, nút gửi trắng
+
+- Người thực hiện: Claude, nhánh `fix/customer-modal-tokens` từ origin/main `3b70290`. Vy gửi ảnh: form đăng ký thuê phòng không có nền (thấy thẻ phòng phía sau), nút "Gửi yêu cầu đăng ký" trắng trơn, nút "Hủy" viền mặc định của trình duyệt.
+- Nguyên nhân: từ `6ead67e` (khung chung D-039, J-C061) các modal của cổng khách nằm cạnh `WorkspaceShell`, không còn bên trong `.kp-page`, nên mất biến màu `--kp-*` và các reset nút/ô nhập chỉ khai báo cho `.kp-page`. Lỗi áp dụng cho mọi modal của cổng khách (đăng ký, sửa hồ sơ, chi tiết hồ sơ/lịch xem, hỗ trợ, thông báo).
+- Sửa: `pages/khamPhaPhong/khamPhaPhong.css` khai báo biến `--kp-*` và reset (box-sizing, font, viền nút, link) cho cả `.kp-modal-backdrop`; bố cục của `.kp-page` giữ nguyên. `pages/khachHang/khachHangPortal.css`: nền mờ của modal khách áp dụng cả khi modal nằm cạnh `.kh-page`. Không đổi JSX hay logic.
+- Thêm `web/frontend/scripts/ui-customer-register-modal.mjs` (dữ liệu giả): mở form ở 1440/390, kiểm tra modal có nền và nút gửi có màu nền khác màu chữ. Chạy trên code cũ: FAIL (nền `rgba(0,0,0,0)`); sau khi sửa: PASS.
+- Kiểm tra: build qua; `ui-settlement-c3.mjs`, `ui-checkout-closure.mjs` qua. `ui-lists.mjs` lỗi sẵn từ trước (không do đợt này): các ca Sale còn dùng nhãn cũ "Lịch xem phòng", "Đặt cọc", "Ghi nhận cư trú", "Hợp đồng thuê" trong khi menu Sale đã đổi ở `6ead67e`.
+- Còn: sửa nhãn ca Sale trong `ui-lists.mjs`; tiếp tục việc C6.
