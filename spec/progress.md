@@ -28,7 +28,7 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy loc
 | `feat/ui-list-b1` (Claude) | Tạo từ `feat/ui-shared-shell` (nên chứa luôn B0). Bộ danh sách chung theo mẫu bên Hằng (J-C062); bản nháp hồ sơ nộp D1–D3 (J-C063) | Đã vào main qua PR #5 |
 | `feat/t22-checkout` (Claude) | B0, bộ danh sách chung, D1–D3 bản nháp, C2 + B3, A2 | **Đã merge vào main (PR #5)** |
 | `feat/t22-settlement` (Claude) | Từ main sau PR #5. C3: tỷ lệ hoàn theo chính sách đã khóa (D-040), khách trả thu thêm qua ví mô phỏng, kế toán xem đối chiếu và ảnh trả phòng (J-C066); tiếp theo B4, C4 | Đã merge PR #7; migration thu thêm HOMEDORM4 ở J-C066; chưa nghiệm thu A3 |
-| `feat/b4-settlement-ui` (Claude) | Từ `feat/t22-settlement`. B4: màn Quyết toán bỏ 46 style viết tay, dùng StatusBadge/ô bảng/hộp thoại chung (J-C067). Còn: tìm kiếm + phân trang bảng, C4 | Đã merge PR #8; phần tìm kiếm/phân trang và C4 chưa hoàn tất |
+| `feat/b4-settlement-ui` (Claude) | B4: màn Quyết toán bỏ 46 style viết tay, dùng StatusBadge/ô bảng/hộp thoại chung (J-C067); tìm kiếm + phân trang (J-C068) | PR #8 đã merge nhưng thiếu 2 commit cuối (`03ffae5`, `52b17f9`); gộp lại ở `feat/ui-staff-tabs-hang` (J-C072) |
 | `fix/c5a-viewing-status` (Codex) | C5-a lịch xem (A3-01), từ main `0b42fb2`, worktree `D:\HomeStayDorm-c5a` | Code + test J-X070 và migration HOMEDORM4 J-X071 qua; chờ Vy merge PR #9/restart; chưa nghiệm thu hồ sơ thật |
 | `feat/t22-backend` (Claude) | Khách tự giữ chỗ, từ chối → "Đã xem", "Không thuê nữa", "Khách không đến" | Có code + test đầu vào; SQL chưa chạy lên HOMEDORM4; chưa nối giao diện; chưa gộp vào nhánh tích hợp (việc C5) |
 | `docs/review-branch-workflow` | Quy tắc "không push main" | Nội dung đã có trong AGENTS.md; xóa được |

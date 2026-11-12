@@ -9,7 +9,7 @@ await mkdir('.ui-screens/settlement-c3', { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
 const accountant = { maNguoiDung: 'UI-DEMO', maNhanVien: 'UI-DEMO', hoTen: 'Kế toán demo', tenDangNhap: 'ui-demo', maChiNhanh: 'CN-DEMO', tenChiNhanh: 'Chi nhánh demo', vaiTro: 'NhanVien', chucVu: 'Kế toán' };
-const pending = [{ maPhieuTra: 'PT-DEMO', hoTenKhachHang: 'Khách Demo A', sdtKhachHang: '0900000001', maHopDong: 'HD-DEMO', ngayTraThucTe: '2026-03-15', daDoiSoat: false }];
+const pending = Array.from({ length: 12 }, (_, i) => ({ maPhieuTra: i ? `PT-DEMO${i}` : 'PT-DEMO', hoTenKhachHang: `Khách Demo ${i}`, sdtKhachHang: '0900000001', maHopDong: 'HD-DEMO', ngayTraThucTe: '2026-03-15', daDoiSoat: false }));
 const detail = {
   phieuTraPhong: { maPhieuTra: 'PT-DEMO', maHopDong: 'HD-DEMO', ngayTraThucTe: '2026-03-15', trangThai: 'Chờ đối soát' },
   loaiHoSo: 'HOP_DONG_THUE',
@@ -50,10 +50,12 @@ try {
     await page.goto(`${base}/nhan-vien-ke-toan`, { waitUntil: 'domcontentloaded' });
     if (width < 800) await page.locator('.ui-navigation-toggle').click();
     await page.locator('aside nav button', { hasText: 'Quyết toán trả phòng' }).click();
-    await page.locator('tbody tr', { hasText: 'PT-DEMO' }).locator('button').first().click();
+    const paging = (await page.locator('.ui-pagination-summary').innerText()).trim();
+    await page.locator('tbody tr', { hasText: 'PT-DEMO' }).first().locator('button').first().click();
     const compare = page.getByLabel('Đối chiếu lúc nhận phòng và lúc trả phòng');
     await compare.getByText('Khách đã xác nhận').waitFor({ timeout: 8000 });
     const check = {
+      paging,
       rate: (await page.locator('.qt-summary-panel').getByText('40%').count()) > 0,
       rateSource: (await page.locator('.qt-rate-source').innerText()).trim(),
       moveInDefect: (await compare.locator('.is-defect').first().innerText()).trim(),
@@ -61,7 +63,7 @@ try {
       scrollWidth: await page.evaluate(() => document.documentElement.scrollWidth),
     };
     await page.screenshot({ path: `.ui-screens/settlement-c3/ke-toan-${width}.png`, fullPage: true });
-    const ok = !errors.length && check.rate && /phiên bản abcd1234/.test(check.rateSource) && check.moveInDefect === 'Rách góc 5 cm'
+    const ok = !errors.length && check.paging.includes("1–10 / 12") && check.rate && /phiên bản abcd1234/.test(check.rateSource) && check.moveInDefect === 'Rách góc 5 cm'
       && check.checkoutPhoto === 1 && check.scrollWidth <= width;
     failed ||= !ok;
     results.push({ width, ok, ...check, errors });

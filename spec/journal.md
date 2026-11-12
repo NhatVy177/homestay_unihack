@@ -856,3 +856,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Lỗi: `migrate` lần 2 báo "There is already an object named 'SP_TraPhong_QuanLy_XacNhanThanhLy'" và rollback toàn bộ (không đổi gì). Nguyên nhân: SQL Server lưu `CREATE OR ALTER` thành `CREATE PROCEDURE`; nhánh "đã vá" của `patchLegacyProcedure` trả nguyên văn nên lệnh thành CREATE trùng. Sửa `web/backend/scripts/checkout-lifecycle-db.mjs` (nhánh đã vá cũng đổi đầu thành `CREATE OR ALTER`), thêm test chạy lại vào `test/checkout-closure.test.mjs`.
 - Kiểm tra: backend `npm test` 52 qua/2 bỏ qua; `migrate` chạy lại trên HOMEDORM4 thành công. Nhánh `fix/c4-migration-rerun`.
 - Còn: Vy merge nhánh sửa, restart backend nối HOMEDORM4 (để nạp route/job C4); nghiệm thu C4 cùng A3.
+## 2026-11-11 23:23:49 +07:00 — J-C068 — B4 (tiếp): tìm kiếm và phân trang màn Quyết toán
+
+- Người thực hiện: Claude, nhánh `feat/b4-settlement-ui`. `QuyetToanTraPhongTab.jsx`: 3 ô tìm kiếm viết tay đổi sang `ListSearch` (nút xóa từ khóa trong ô thay nút "Xóa lọc"); dòng "Đang tải danh sách..." đổi sang dòng khung xương `TableState`; 3 bảng (thu thêm/hoàn cọc, kết quả đối soát, lập đối soát) có `ListPagination` 10 dòng/trang, đổi bộ lọc hay từ khóa thì về trang 1. Không đổi logic nghiệp vụ.
+- `scripts/ui-settlement-c3.mjs` thêm 12 phiếu giả, kiểm tra "Hiển thị 1–10 / 12 phiếu".
+- Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả).
+- Còn: C4.
