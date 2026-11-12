@@ -23,7 +23,7 @@ export default function SaleScheduleModal({ children, onClose }) {
   }, []);
   return createPortal(<div className="sale-scheduling-overlay" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
     <section ref={card} className="ui-card sale-scheduling-dialog" role="dialog" aria-modal="true" aria-labelledby={titleId}>
-      <header className="sale-scheduling-header"><div><h2 id={titleId}>Lập lịch hẹn xem phòng</h2><p>Chọn hồ sơ đã tiếp nhận, phòng phù hợp và thời gian hẹn.</p></div><button type="button" className="ui-btn ui-btn--ghost" aria-label="Đóng form lập lịch" onClick={onClose}><Icon name="close" /></button></header>
+      <header className="sale-scheduling-header"><div><h2 id={titleId}>Tạo lịch xem phòng</h2><p>Chọn phiếu nhu cầu, đối chiếu phòng phù hợp rồi mới lập lịch cho khách.</p></div><button type="button" className="ui-btn ui-btn--ghost" aria-label="Đóng form lập lịch" onClick={onClose}><Icon name="close" /></button></header>
       <div className="sale-scheduling-body">{children}</div>
     </section>
   </div>, document.body);

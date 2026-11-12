@@ -106,7 +106,7 @@ try {
       await page.getByRole('button', { name: /Khách thử An/ }).click();
       await page.getByRole('checkbox', { name: 'Chọn Phòng 101' }).waitFor();
       assert.equal(await page.locator('aside nav button:disabled').count(), 0, 'schedule modal does not disable workspace tabs');
-      assert.equal(await page.getByRole('dialog', { name: 'Lập lịch hẹn xem phòng', exact: true }).count(), 1);
+      assert.equal(await page.getByRole('dialog', { name: 'Tạo lịch xem phòng', exact: true }).count(), 1);
       await page.getByRole('button', { name: 'Quay lại', exact: true }).click();
       await nav('Tra cứu khách hàng'); await page.getByText('Khách thử An', { exact: true }).first().waitFor(); await shot('customers');
       assert.equal(await page.locator('.sale-work-tabs').count(), 0);

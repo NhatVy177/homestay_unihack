@@ -12,7 +12,7 @@ const rooms=[{maPhong:'P-UI1',tenPhong:'Phòng kiểm thử 1',sucChua:2,soGiuon
 const report=[];
 try {
   for(const width of [1440,390]){
-    let profiles=[pending],schedules=[],writes=[];
+    let profiles=[],schedules=[],writes=[];
     const context=await browser.newContext({viewport:{width,height:1000},reducedMotion:'reduce'});
     await context.addInitScript(user=>localStorage.setItem('happyroom_session',JSON.stringify({_v:2,token:'fixture-only',user})),user);
     await context.route('**/api/**',route=>{
@@ -30,11 +30,16 @@ try {
     });
     const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
     const nav=async label=>{if(width===390)await page.getByRole('button',{name:'Mở menu',exact:true}).click();await page.locator('aside nav').getByRole('button',{name:label,exact:true}).click();};
-    const shot=async name=>{await page.evaluate(()=>document.fonts.ready);assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),width);await page.screenshot({path:resolve(folder,`${name}-${width}.png`),fullPage:true});};
+    const shot=async name=>{await page.evaluate(()=>document.fonts.ready);assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),width);assert.equal(await page.locator('.sale-scheduling-dialog h2:visible').count(),1,'only one visible modal title at every step');assert.equal(await page.locator('.sale-scheduling-body').evaluate(el=>el.scrollWidth<=el.clientWidth),true,'modal body does not overflow horizontally');await page.screenshot({path:resolve(folder,`${name}-${width}.png`),fullPage:true});};
     await page.goto(base+'/nhan-vien-sale');await nav('Lịch hẹn xem phòng');
     const launch=page.getByRole('button',{name:'Lập lịch hẹn',exact:true});
-    await launch.click();let modal=page.getByRole('dialog',{name:'Lập lịch hẹn xem phòng',exact:true});await modal.waitFor();
-    await modal.getByText('Chưa có hồ sơ đã tiếp nhận', {exact:false}).waitFor();
+    await launch.click();let modal=page.getByRole('dialog',{name:'Tạo lịch xem phòng',exact:true});await modal.waitFor();
+    await modal.getByText('Không còn phiếu nào cần xếp lịch.', {exact:true}).waitFor();
+    await modal.getByText('0 phiếu chưa có lịch xem phòng',{exact:true}).waitFor();
+    assert.equal(await modal.getByRole('textbox').count(),0,'empty picker has no unnecessary search field');
+    assert.equal(await modal.getByRole('button',{name:'Tiếp nhận hồ sơ đăng ký',exact:true}).count(),0);
+    await shot('empty-reference');await modal.getByRole('button',{name:'Đóng form lập lịch',exact:true}).click();
+    profiles=[pending];await launch.click();await modal.getByText('Hồ sơ mới cần được tiếp nhận trước khi lập lịch.',{exact:true}).waitFor();
     assert.equal(await page.locator('aside nav button:disabled').count(),0);
     assert.equal(await launch.count(),1,'calendar page remains mounted behind dialog');
     await shot('pending-needs-receiving');
@@ -42,6 +47,8 @@ try {
     assert.equal(await modal.count(),0);await page.getByText('Hồ sơ chờ tiếp nhận',{exact:true}).waitFor();
     assert.equal(writes.length,0,'opening reception does not mutate a real registration');
     await nav('Lịch hẹn xem phòng');profiles=[accepted,pending];await launch.click();await modal.getByRole('button',{name:/Khách kiểm thử/}).waitFor();
+    await modal.getByText('1 phiếu chưa có lịch xem phòng',{exact:true}).waitFor();
+    const search=modal.getByRole('textbox',{name:'Tìm hồ sơ để lập lịch'});await search.fill('không khớp');await modal.getByText('Không có hồ sơ khớp từ khóa.',{exact:true}).waitFor();await search.fill('');
     await shot('choose-profile');await modal.getByRole('button',{name:/Khách kiểm thử/}).click();
     await modal.getByRole('checkbox',{name:'Chọn Phòng kiểm thử 1',exact:true}).check();
     await modal.getByRole('checkbox',{name:'Chọn Phòng kiểm thử 2',exact:true}).check();
@@ -59,7 +66,7 @@ try {
     await launch.click();await modal.getByRole('button',{name:'Đóng form lập lịch',exact:true}).click();await modal.waitFor({state:'detached'});
     await nav('Hồ sơ cá nhân');await page.getByRole('heading',{name:'Hồ sơ cá nhân',exact:true}).first().waitFor();
     assert.equal(await page.locator('aside nav button:disabled').count(),0);assert.deepEqual(errors,[]);
-    report.push({width,emptyState:true,receptionLink:true,calendarPreserved:true,tabsDisabled:0,multipleRooms:true,writes:1,closeAndEscape:true,fixtures:true,errors});
+    report.push({width,emptyState:true,singleHeader:true,searchAndCount:true,receptionLink:true,calendarPreserved:true,tabsDisabled:0,multipleRooms:true,writes:1,closeAndEscape:true,fixtures:true,errors});
     await context.close();
   }
   await writeFile(resolve(folder,'report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));console.log('PASS Sale schedule modal at 1440/390: reception path, unchanged booking payload, closing and enabled tabs; fixture APIs only.');
