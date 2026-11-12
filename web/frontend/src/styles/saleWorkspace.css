@@ -1,4 +1,12 @@
 /* Sale workspace content. The frame itself lives in shell.css (.ui-workspace). */
+.sale-scheduling-overlay { --sale-wood: var(--color-primary); --sale-paper: var(--color-primary-soft); position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: var(--space-6); background: rgba(25,28,26,.4); }
+.sale-scheduling-dialog.ui-card { display: flex; flex-direction: column; width: min(1040px, 100%); max-height: calc(100dvh - 48px); padding: 0; overflow: hidden; background: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-md); border-radius: var(--radius-lg); }
+.sale-scheduling-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); padding: var(--space-6); border-bottom: 1px solid var(--color-border); background: var(--color-surface); }
+.sale-scheduling-header h2 { margin: 0 0 var(--space-2); font-size: 22px; }
+.sale-scheduling-header p { margin: 0; color: var(--color-text-muted); font-size: 14px; }
+.sale-scheduling-body { padding: var(--space-6); overflow-y: auto; min-height: 0; }
+.sale-scheduling-body .sale-section-heading h2 { font-size: 18px; }
+@media (max-width: 600px) { .sale-scheduling-overlay { padding: var(--space-3); } .sale-scheduling-dialog.ui-card { max-height: calc(100dvh - 24px); } .sale-scheduling-header, .sale-scheduling-body { padding: var(--space-4); } }
 .sale-workspace { --sale-wood: var(--color-primary); --sale-paper: var(--color-primary-soft); }
 .sale-workspace .ui-btn--secondary { border: 1px solid var(--color-border); }
 .sale-eyebrow { color: var(--sale-wood, var(--color-accent)); font-size: 10px; font-weight: 600; letter-spacing: .1em; margin: 0 0 var(--space-2); }

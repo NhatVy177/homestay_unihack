@@ -5,6 +5,7 @@ import EmptyState from '../../components/common/EmptyState.jsx';
 import { lichXemPhongApi } from '../lichXemPhong/lichXemPhong.api.js';
 import SaleCalendar from './SaleCalendar.jsx';
 import SaleScheduleCreate from './SaleScheduleCreate.jsx';
+import SaleScheduleModal from './SaleScheduleModal.jsx';
 import { dateKey as toDateInput, dateLabel, timeLabel } from './salePresentation.js';
 
 function toTimeInput(value) {
@@ -14,7 +15,7 @@ function toTimeInput(value) {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
-export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
+export default function LichXemPhongTab({ onNavigate }) {
   const [schedules, setSchedules] = useState([]), [loading, setLoading] = useState(false), [error, setError] = useState('');
   const [selectedSchedule, setSelectedSchedule] = useState(null), [modalType, setModalType] = useState(null);
   const [outcomeError, setOutcomeError] = useState(''), [success, setSuccess] = useState('');
@@ -78,9 +79,9 @@ export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
   const detail = visible.find(s => s.id === detailId) || visible[0];
   const recordingOutcome = ['da-xem', 'khach-khong-den'].includes(modalType);
   const outcomeLabel = modalType === 'da-xem' ? 'Đã xem' : 'Khách không đến';
-  if (creating) return <SaleScheduleCreate schedules={schedules} onBack={() => setCreating(false)} onCreated={fetchSchedules} onSchedulingChange={onSchedulingChange} />;
 
   return <div className="sale-view">
+    {creating && <SaleScheduleModal onClose={() => setCreating(false)}><SaleScheduleCreate schedules={schedules} onBack={() => setCreating(false)} onCreated={fetchSchedules} onReceive={() => { setCreating(false); onNavigate?.('ho-so'); }} /></SaleScheduleModal>}
     <button className="sale-context-link" onClick={() => onNavigate?.('ho-so')}><Icon name="description" /> Tiếp nhận hồ sơ đăng ký <Icon name="chevron_right" /></button>
     <div className="sale-section-heading"><div><p className="sale-eyebrow">LỊCH TRÌNH CỦA BẠN</p><h2>Lịch hẹn xem phòng</h2><p>Theo dõi buổi xem, thông tin khách và các phòng trong lịch hẹn.</p></div><div className="sale-actions"><button className="ui-btn ui-btn--secondary" onClick={fetchSchedules} disabled={loading}><Icon name="refresh" /> Làm mới</button><button className="ui-btn ui-btn--primary" onClick={() => setCreating(true)}><Icon name="add_circle" /> Lập lịch hẹn</button></div></div>
     <section className="ui-card sale-schedule-toolbar" aria-label="Bộ lọc lịch xem phòng">

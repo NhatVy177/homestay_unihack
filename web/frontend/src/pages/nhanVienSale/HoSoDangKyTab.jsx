@@ -4,6 +4,7 @@ import { Icon } from '../../components/common/Icon.jsx';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { dangKyThueApi } from '../dangKyThue/dangKyThue.api.js';
 import LapLichChoHoSo from './LapLichChoHoSo.jsx';
+import SaleScheduleModal from './SaleScheduleModal.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 
 function parseMoney(value) {
@@ -282,7 +283,7 @@ function getRegistrationDisplayStatus(reg = {}) {
   return reg?.trangThaiHienThi || reg?.trangThai || '';
 }
 
-export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
+export default function HoSoDangKyTab({ onNavigate }) {
   const { user } = useAuth();
   const [filterStatus, setFilterStatus] = useState('Chờ tiếp nhận');
   const [list, setList] = useState([]);
@@ -310,11 +311,6 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
   const [createErrors, setCreateErrors] = useState({});
   const [createDuplicateErrors, setCreateDuplicateErrors] = useState({});
   const [createDuplicateChecking, setCreateDuplicateChecking] = useState({ sdt: false, cccd: false });
-
-  useEffect(() => {
-    onSchedulingChange?.(Boolean(schedulingProfile));
-    return () => onSchedulingChange?.(false);
-  }, [schedulingProfile, onSchedulingChange]);
 
   useEffect(() => {
     if (!showCreateModal) return;
@@ -638,22 +634,6 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
     }
   };
 
-  if (schedulingProfile) {
-    return (
-      <LapLichChoHoSo
-        profile={schedulingProfile}
-        onBack={() => {
-          setSchedulingProfile(null);
-          fetchData();
-        }}
-        onCreated={() => {
-          onSchedulingChange?.(false);
-          fetchData();
-        }}
-      />
-    );
-  }
-
   const doiChieuRows = roomResults
     ? buildDoiChieuRows(selectedReg, roomResults, isRegionValid, user?.maChiNhanh)
     : [];
@@ -665,6 +645,7 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
 
   return (
     <div className="ktp-container">
+      {schedulingProfile && <SaleScheduleModal onClose={() => { setSchedulingProfile(null); fetchData(); }}><LapLichChoHoSo profile={schedulingProfile} onBack={() => { setSchedulingProfile(null); fetchData(); }} onCreated={fetchData} /></SaleScheduleModal>}
       {/* HEADER TABS & STATS */}
       <OverviewCards items={[
         { key: 'Tất cả', label: 'Tất cả', count: branchFilteredList.length },
