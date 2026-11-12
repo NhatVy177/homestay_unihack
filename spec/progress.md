@@ -1,12 +1,12 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-11 23:53:30 +07:00** (J-X070, C5-a gỡ điểm lịch xem của A3). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-12 13:04:57 +07:00** (J-X071, migration C5-a HOMEDORM4 đã kiểm tra). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
 
 Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy local. **Contract đã deploy và verify source thật trên Fuji (A2/J-X068)**: `0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C`, block 60882820; Sourcify creation/runtime exact match. Hai ví phụ đã nạp 0,1 AVAX mỗi ví. **Luồng xác nhận của khách mới thử local**, chưa chạy trọn A3 với SQL/SMTP/OTP Privy thật; ba giao dịch hạ tầng A2 không thay kết quả nghiệm thu nghiệp vụ.
 
-**Bước kế:** C5-a (A3-01) có code + test trên `fix/c5a-viewing-status`, chưa chạy migration HOMEDORM4, chờ Vy cho phép rồi merge/restart backend cũ. Sau đó tiếp A3 ở `fix/fuji-e2e` (checkpoint `b892b5b`, J-X069, chưa merge main): Vy đã cho đọc DB và chạy đúng một bộ demo mới qua Web2, chọn alias email, đăng nhập Sale CN0001 thật; chưa tạo bộ demo/OTP hoặc sáu receipt/gas nghiệp vụ. Không hỏi lại quyền đọc/chạy một bộ Web2 đã được cấp; quyền đó không thay chấp thuận migration C5-a. Giữ thẻ thu thêm và chữ thanh toán C3 khi làm B1/B5.
+**Bước kế:** C5-a (A3-01) có code + test trên `fix/c5a-viewing-status`, đã chạy migration HOMEDORM4 sau khi Vy cho phép (J-X071); chờ Vy merge PR #9 rồi restart backend cũ. Sau đó tiếp A3 ở `fix/fuji-e2e` (checkpoint `b892b5b`, J-X069, chưa merge main): Vy đã cho đọc DB và chạy đúng một bộ demo mới qua Web2, chọn alias email, đăng nhập Sale CN0001 thật; chưa tạo bộ demo/OTP hoặc sáu receipt/gas nghiệp vụ. Không hỏi lại quyền đọc/chạy một bộ Web2 đã được cấp; migration C5-a cũng đã được Vy cho phép và chạy xong. Giữ thẻ thu thêm và chữ thanh toán C3 khi làm B1/B5.
 
 ## Mức sẵn sàng theo tiêu chí chấm
 
@@ -29,7 +29,7 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy loc
 | `feat/t22-checkout` (Claude) | B0, bộ danh sách chung, D1–D3 bản nháp, C2 + B3, A2 | **Đã merge vào main (PR #5)** |
 | `feat/t22-settlement` (Claude) | Từ main sau PR #5. C3: tỷ lệ hoàn theo chính sách đã khóa (D-040), khách trả thu thêm qua ví mô phỏng, kế toán xem đối chiếu và ảnh trả phòng (J-C066); tiếp theo B4, C4 | Đã merge PR #7; migration thu thêm HOMEDORM4 ở J-C066; chưa nghiệm thu A3 |
 | `feat/b4-settlement-ui` (Claude) | Từ `feat/t22-settlement`. B4: màn Quyết toán bỏ 46 style viết tay, dùng StatusBadge/ô bảng/hộp thoại chung (J-C067). Còn: tìm kiếm + phân trang bảng, C4 | Đã merge PR #8; phần tìm kiếm/phân trang và C4 chưa hoàn tất |
-| `fix/c5a-viewing-status` (Codex) | C5-a lịch xem (A3-01), từ main `0b42fb2`, worktree `D:\HomeStayDorm-c5a` | Code + test qua (J-X070); chờ cho phép migration HOMEDORM4 và merge/restart; chưa nghiệm thu thật |
+| `fix/c5a-viewing-status` (Codex) | C5-a lịch xem (A3-01), từ main `0b42fb2`, worktree `D:\HomeStayDorm-c5a` | Code + test J-X070 và migration HOMEDORM4 J-X071 qua; chờ Vy merge PR #9/restart; chưa nghiệm thu hồ sơ thật |
 | `feat/t22-backend` (Claude) | Khách tự giữ chỗ, từ chối → "Đã xem", "Không thuê nữa", "Khách không đến" | Có code + test đầu vào; SQL chưa chạy lên HOMEDORM4; chưa nối giao diện; chưa gộp vào nhánh tích hợp (việc C5) |
 | `docs/review-branch-workflow` | Quy tắc "không push main" | Nội dung đã có trong AGENTS.md; xóa được |
 
@@ -49,7 +49,7 @@ Nhánh tích hợp đã vào main; các nhánh cũ đã gộp có thể được
 
 | Mã | Việc | Trạng thái | Bước kế |
 |---|---|---|---|
-| T-08 | Deploy, verify source, nghiệm thu Fuji | A2/J-X068 deploy+source thật; A3/J-X069 đang chuẩn bị, chờ C5-a/J-X070; [manifest](../blockchain/deployments/fuji.json), [explorer](https://testnet.snowtrace.io/address/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C), [source](https://repo.sourcify.dev/43113/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C) | Cho phép migration C5-a → merge/restart → tiếp một bộ demo Web2 và 6 receipt/gas; T-08 chưa nghiệm thu toàn luồng |
+| T-08 | Deploy, verify source, nghiệm thu Fuji | A2/J-X068 deploy+source thật; A3/J-X069 đang chuẩn bị, chờ C5-a/J-X070; [manifest](../blockchain/deployments/fuji.json), [explorer](https://testnet.snowtrace.io/address/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C), [source](https://repo.sourcify.dev/43113/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C) | Migration C5-a xong → Vy merge PR #9/restart → tiếp một bộ demo Web2 và 6 receipt/gas; T-08 chưa nghiệm thu toàn luồng |
 | T-11 / T-14 | Bàn giao Web2 → email → OTP → ký | Có code, test tự động qua, **chưa chạy thật** | Chạy thật trong A3 |
 | T-22 | Luồng D-026 → D-038 | C1 xong code + test + migration HOMEDORM4 (J-X061, J-X062); 4 mục giữ chỗ có code backend ở `feat/t22-backend`; còn lại chưa làm | Bảng mức ưu tiên bên dưới |
 | T-21 | Giao diện | Khung, token, form, danh sách (D-032, D-033); không gian Sale (D-035, D-036); **B0 xong (J-C061)**: cả 5 vai trò dùng chung một khung `WorkspaceShell`; **bộ danh sách chung (J-C062)**: ô tìm kiếm có nút xóa, thẻ tổng quan bấm để lọc, nhãn trạng thái có icon, hàng đang tải/lỗi/rỗng, phân trang; đã áp vào 5 màn danh sách không thuộc việc của Codex | Claude: B1, B5, B2. Codex: B7, và B3/B4 gộp vào C2/C3 |
@@ -67,7 +67,7 @@ Nhánh tích hợp đã vào main; các nhánh cũ đã gộp có thể được
 | | Tự thanh lý 3 trường hợp + gói bằng chứng cuối + "Thanh lý không có xác nhận của khách" | D-030, D-031, D-038 | Chưa làm (C4) |
 | | Điều khoản xác nhận điện tử trong mẫu hợp đồng; ô đồng ý dữ liệu cá nhân | D-038 | Chưa làm (C6) |
 | | Danh sách "Chờ khách xác nhận", nhắc 24/72 giờ | D-028 | Có nút nhắc tay; chưa tự nhắc (trong C4) |
-| **Nên có** | Khách tự giữ chỗ; từ chối → "Đã xem"; "Không thuê nữa"; "Khách không đến" | D-026 | C5-a có code + test nút Sale và bỏ tự đánh dấu, chờ migrate/merge; các phần giữ chỗ/Không thuê nữa/chặn lịch thứ hai vẫn chưa hoàn tất |
+| **Nên có** | Khách tự giữ chỗ; từ chối → "Đã xem"; "Không thuê nữa"; "Khách không đến" | D-026 | C5-a có code + test nút Sale và bỏ tự đánh dấu, đã migrate, chờ merge/restart; các phần giữ chỗ/Không thuê nữa/chặn lịch thứ hai vẫn chưa hoàn tất |
 | | Chính sách hoàn cọc trên phiếu và email cọc | D-031, D-034 | **Xong code + test (C1)**; chưa thử SMTP thật |
 | | Thẻ "Kích hoạt xác nhận điện tử" sau khi trả cọc | D-028 | Chưa làm |
 | **Để sau nếu trễ** | Khách tự khai người ở; thành viên bị loại hoàn 80%; hợp đồng "Chờ ký" | D-026, D-027 | Chưa làm |
@@ -95,12 +95,12 @@ Nguyên tắc: mỗi file chỉ một người sửa. Chi tiết và prompt: [vi
 - Bản A2 `fuji:fund` nạp đủ 0,1 mỗi ví, bỏ qua ví đủ và hỗ trợ `--check`; bản A1 cũ ở worktree chứa khóa vẫn là 0,3. Chạy **script A2 với cwd thư mục khóa A1** theo `blockchain/README.md`, không chạy nhầm npm script A1. Nếu RPC lỗi sau broadcast, kiểm hash/receipt trước khi thử lại.
 - Bản ứng dụng đang chạy trước A2 chưa được restart/chuyển cấu hình. Env Fuji đã chuẩn bị riêng ở `D:\HomeStayDorm-fuji-deploy\web\{backend,frontend}\.env`, kèm `.env.local-chain` sao lưu; đều ignore. Config route thật với env A2 trả enabled/43113/address đúng trong tiến trình chỉ đọc, không nối DB hay khởi động scheduler. Không coi đây là ứng dụng đầy đủ đã chạy A3.
 
-## Kiểm tra gần nhất (2026-11-11, J-X070)
+## Kiểm tra gần nhất (J-X071: migration 12/11; code/test J-X070 ngày 11/11)
 
 - `blockchain npm test`: 25 qua/1 bỏ qua (SQL). Không sửa contract hoặc ABI.
 - `web/backend npm test`: 45 qua/2 bỏ qua (SQL tích hợp cần bật riêng). 3 test mới kiểm quyền nhân viên, không tin actor trong body, input/HTTP lỗi, patch giữ nguyên phần SP khác và chạy lại được.
 - `C5A_SQL_TEST=true node --test test/viewing-status-sql.test.mjs`: 1 qua riêng, tạo/xóa CSDL `HOMEDORM_C5A_TEST_*`; migration chạy hai lần, đọc không đổi trạng thái, chặn sai vai trò/chủ hồ sơ/chi nhánh/giờ và hồ sơ đã cọc, hai yêu cầu đồng thời chỉ một thành công, không tự đóng hồ sơ khi khách không đến. Không seed/update HOMEDORM4.
-- HOMEDORM4 chỉ đọc: `viewing-status:db:check` thấy 4 khối tự đánh dấu còn trong 8 SP; 4 SP cọc đã không có khối này. Câu SELECT danh sách của repository mới chạy được, không xuất PII. Chưa chạy migrate C5-a.
+- HOMEDORM4/J-X071: trước migration còn 4 khối tự đánh dấu trong 8 SP; sau migration check cả 8 đều 0. Ràng buộc CHK_LXP_TrangThai đang enabled/trusted, cho Khách không đến; định nghĩa SP_GhiNhanKetQuaBuoiXem khớp nguồn sau chuẩn hóa header CREATE/ALTER do SQL Server lưu lại. Số dòng và checksum LichXemPhong/PhieuDangKy/PhieuDatCoc trước–sau khớp (mỗi bảng 2 dòng). Không gọi SP để ghi kết quả lên lịch cũ; không chạy lại test code ở J-X071 vì chỉ cập nhật hồ sơ sau SQL.
 - Frontend build qua (cảnh báo chunk/directives), `test:avalanche-ui` qua; `scripts/ui-viewing-outcomes.mjs` qua ở 1440/390 với API giả: nút mở/khóa theo quyền, ghi Đã xem/Khách không đến, lỗi xung đột giữ hộp thoại và thử lại, lọc kết quả, không lỗi JS/tràn ngang. 6 ảnh/report tại `web/frontend/.ui-screens/c5a-viewing-status/` (ignore); đã xem ảnh desktop/mobile. `LichXemPhongTab.jsx` style viết tay 0 → 0.
 - Ban đầu test/build thiếu dependency của gói blockchain trong worktree mới; cài `blockchain npm ci` rồi chạy lại các check trên đều qua. Lỗi locator nhãn trong script ảnh đã sửa bằng id `schedule-status`, không đổi id ứng dụng.
 - Chưa chạy lại handover/shell UI; chưa thử nút kết quả với hồ sơ thật, OTP/SMTP hoặc sáu giao dịch nghiệp vụ Fuji trong đợt này. Bằng chứng deploy/source trước ở J-X068; C3 migration trước ở J-C066; không đổi chúng thành kiểm thử vừa chạy.
