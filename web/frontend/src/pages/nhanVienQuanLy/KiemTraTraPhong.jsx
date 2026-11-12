@@ -6,6 +6,7 @@ import StatusBadge from '../../components/common/StatusBadge.jsx';
 import ListSearch from '../../components/common/ListSearch.jsx';
 import TableState from '../../components/common/TableState.jsx';
 import { kiemTraTraPhongApi } from './kiemTraTraPhong.api.js';
+import { MoveInCard } from '../../components/traPhong/DoiChieuTraPhong.jsx';
 import './kiemTraTraPhong.css';
 
 const MAX_ANH = 10;
@@ -17,7 +18,6 @@ function fmtDate(d) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   return `${day}/${month}/${date.getFullYear()}`;
 }
-const fmtDateTime = (d) => (d ? new Date(d).toLocaleString('vi-VN') : '');
 const fmtTien = (v) => `${v != null ? Number(v).toLocaleString() : 0}đ`;
 
 // C2: tìm dòng biên bản lúc nhận phòng tương ứng một tài sản đang kiểm tra.
@@ -160,33 +160,6 @@ const AssetRow = ({ asset, onChange, readOnly, lucVao, coBienBanVao }) => {
   );
 };
 
-function MoveInCard({ moveIn, loading, error }) {
-  let status;
-  if (loading) status = <span>Đang tải biên bản lúc nhận phòng...</span>;
-  else if (error) status = <span>{error}</span>;
-  else if (!moveIn || moveIn.nguon === 'khong-co') status = <span>Không tìm thấy biên bản lúc nhận phòng của hợp đồng này.</span>;
-  else if (moveIn.nguon === 'web2') status = <><StatusBadge status="Chỉ có biên bản Web2" tone="neutral" /><span>Khách chưa xác nhận điện tử biên bản này.</span></>;
-  else if (moveIn.khachDaXacNhan) status = <><StatusBadge status="Khách đã xác nhận" tone="success" /><span>Bản {moveIn.phienBan}{moveIn.xacNhanLuc ? `, xác nhận lúc ${fmtDateTime(moveIn.xacNhanLuc)}` : ''}</span></>;
-  else status = <><StatusBadge status="Khách chưa xác nhận" tone="warning" /><span>Đang dùng bản {moveIn.phienBan} mới nhất đã phát hành.</span></>;
-
-  return (
-    <section className="kttp-card" aria-label="Biên bản lúc nhận phòng">
-      <h4 className="kttp-card-title"><Icon name="verified_user" /> Biên bản lúc nhận phòng</h4>
-      <div className="kttp-movein-status">{status}</div>
-      {moveIn?.ghiChu && <p className="kttp-movein-note">Ghi chú lúc nhận phòng: {moveIn.ghiChu}</p>}
-      {moveIn?.anh?.length > 0 && (
-        <div className="kttp-photos">
-          {moveIn.anh.map((a, i) => (
-            <figure className="kttp-photo" key={`${a.ten}-${i}`}>
-              <img src={`data:${a.mediaType};base64,${a.dataBase64}`} alt={`Ảnh lúc nhận phòng: ${a.ten}`} />
-              <figcaption>{a.ten}</figcaption>
-            </figure>
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
 
 function CheckoutPhotos({ maPhieuTra, taiSan, readOnly, onToast }) {
   const [photos, setPhotos] = useState([]);

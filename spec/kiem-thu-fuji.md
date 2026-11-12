@@ -1,6 +1,6 @@
 # A3 — Kiểm thử luồng thật trên Fuji
 
-Trạng thái: **chuẩn bị, chưa chạy trọn luồng**. Nhánh `fix/fuji-e2e` cập nhật từ main `6467b77` sau khi Vy merge PR #5. Contract đã deploy ở A2 không phải kết quả A3.
+Trạng thái: **chuẩn bị, chưa chạy trọn luồng**. Nhánh `fix/fuji-e2e` đã ghép main `649781f` (C3/B4/C5-a) để xử lý xung đột theo yêu cầu Vy (J-X072); chờ Vy merge nhánh A3. Contract đã deploy ở A2 không phải kết quả A3.
 
 ## Điều kiện trước khi bắt đầu
 
@@ -32,7 +32,7 @@ Không bỏ qua bước bị chặn bởi ngày/giờ, sức chứa, giới tín
 - Preflight chỉ đọc đã chạy sau khi Vy cho phép: đủ nhân viên Sale/quản lý/kế toán CN0001, có phòng trống; 2 đăng ký, 2 phiếu cọc, 0 hợp đồng, 0 trả phòng, 0 AvalancheCase. Báo cáo chi tiết ở `web/backend/secrets/fuji-e2e/` (ignore).
 - Email ban đầu trùng ba khách cũ. Vy chọn alias Gmail riêng cho A3; alias chưa có trong DB. Giá trị email chỉ lưu local, không đưa vào hồ sơ Git.
 - Vy đăng nhập Sale thật `NV0001`/`CN0001` trong Chrome riêng, API `/auth/toi` trả 200. Form tài khoản khách demo mới đã chuẩn bị, chưa gửi; chưa tạo/reserve bộ demo.
-- Vy chốt **Claude sửa lịch xem trong C5 theo D-026; A3 chờ ở bước lịch xem**. Chưa tới OTP, hợp đồng, màn kiểm tra trả phòng hoặc giao dịch nghiệp vụ Fuji. Việc cần sửa/kiểm lại đã ghi ở mục C5 của `viec-cho-agent.md`.
+- C5-a do Codex làm theo bàn giao J-C067: đã vào main qua PR #9, SQL đã migrate/kiểm tra J-X071. Nhánh A3 đang cập nhật cùng main và bỏ 5 xung đột J-X072; sau Vy merge sẽ restart phiên riêng rồi tiếp chuẩn bị hồ sơ. P1 chưa được gửi; không coi hai hồ sơ cũ là bộ demo mới hoặc ghi P2 đã chạy. Chưa tới OTP, hợp đồng, màn trả phòng hoặc giao dịch nghiệp vụ Fuji. C4 được Vy giao Codex làm trong lúc chờ lịch.
 
 ### Lệnh hỗ trợ
 

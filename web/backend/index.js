@@ -29,7 +29,6 @@ import { startHoaDonQuaHanScheduler } from './services/hoaDonQuaHan.service.js';
 import { startDatCocHetHanScheduler } from './services/datCocHetHan.service.js';
 import { startYeuCauCocQuaHanScheduler } from './services/yeuCauCocQuaHan.service.js';
 import { startNhacThuDauKyScheduler } from './services/nhacThuDauKy.service.js';
-import { startLichXemPhongDenGioScheduler } from './services/lichXemPhongDenGio.service.js';
 import hopDongRoutes from './routes/hopDong.routes.js';
 import avalancheRoutes from './routes/avalanche.routes.js';
 import thanhToanMoPhongRoutes from './routes/thanhToanMoPhong.routes.js';
@@ -105,7 +104,6 @@ async function start() {
       startDatCocHetHanScheduler();
       startYeuCauCocQuaHanScheduler();
       startNhacThuDauKyScheduler();
-      startLichXemPhongDenGioScheduler();
     } else {
       console.log('Background schedulers disabled for this isolated session.');
     }

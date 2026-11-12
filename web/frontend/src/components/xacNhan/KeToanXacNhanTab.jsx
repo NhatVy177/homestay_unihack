@@ -48,7 +48,7 @@ function SettlementCase({ c, busy, run }) {
       <strong>{c.state === 'disputed' ? 'Gửi phiên bản mới sau khi điều chỉnh' : 'Chọn bảng đối soát để gửi khách'}</strong>
       {error && <div className="xn-alert error">{error}</div>}
       {statements && !statements.length && <p className="xn-muted">Chưa có bảng đối soát nào cho hợp đồng này trong Web2.</p>}
-      {statements?.map(s => <label key={s.sourceId} style={{ flexDirection: 'row', alignItems: 'center', fontWeight: 400 }}>
+      {statements?.map(s => <label key={s.sourceId} className="xn-radio-option">
         <input type="radio" name={'ds-' + c.id} value={s.sourceId} checked={choice === s.sourceId} onChange={() => setChoice(s.sourceId)} />
         {s.sourceId} · lập {dateTime(s.createdAt)} · khấu trừ {money(s.deductionsVnd)} · hoàn {money(s.refundDueVnd)}{Number(s.topUpDueVnd) > 0 ? ` · thu thêm ${money(s.topUpDueVnd)}` : ''}{s.published ? ' (đã gửi trước đó)' : ''}
       </label>)}

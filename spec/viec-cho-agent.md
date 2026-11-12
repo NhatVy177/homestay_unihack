@@ -5,8 +5,8 @@ Lập 2026-11-11 (J-C059), cập nhật 09:40 cùng ngày (J-C060), kèm [audit-
 **Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036), B0 khung chung (J-C061), C2 + B3 (J-C064); **A2 funding/deploy/source verification thật (J-X068)**, config riêng tại worktree A2 và kiểm route config/read roles khớp. **Tiếp A3:** đưa cấu hình vào phiên ứng dụng đầy đủ, chuẩn bị hợp đồng demo và chạy trọn luồng SQL/SMTP/OTP Privy; chưa chạy các bước đó. Song song B1, C6.
 
 **Ai làm việc nào:** mỗi file chỉ một người sửa. **Chia lại 2026-11-11 15:3x (Vy chọn, J-C064)** vì Codex đang chờ AVAX cho A2 nên chuỗi trả phòng đứng yên; thay bảng chia lúc 10:11 (J-C061).
-- **Claude:** chuỗi trả phòng C2 (gộp B3, **xong**), C3 (gộp B4), C4; D1–D3 (bản nháp xong). C5: Vy giao Claude sửa lỗi lịch xem A3-01 theo D-026 trước khi A3 đi tiếp (J-X069); phần còn lại vẫn theo bảng ưu tiên, backend có ở `feat/t22-backend`. Codex **không** sửa: `pages/nhanVienQuanLy/{KiemTraTraPhong,XuLyTraPhongTab,thanhlytraphong,GhiNhanBanGiaoRa,XacNhanPhanHoi}.jsx`, `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx`, `web/backend/services/{doiSoat*,khauTruDoiSoat,thuThemDoiSoat,hoanCocDoiSoat,kiemTraTraPhong,traPhongSoSanh,thanhlytraphong}*.js`, `styles/lists.css` (chỉ thêm ở cuối nếu cần).
-- **Codex:** A2, A3 (Fuji, làm trước); sau đó B1, B2, B5, B7, C6; E1–E3. Được sửa `components/common/WorkspaceShell.jsx`, `styles/shell.css`, `KhachHangPortalPage.jsx`, các file còn lại trong `components/xacNhan/`, `pages/avalanche/*`, `pages/thanhToanMoPhong/*`, `BanGiaoPhongTab.jsx` khi làm B1/B2/B5.
+- **Claude:** chuỗi trả phòng C2 (gộp B3, **xong**), C3 (gộp B4); C4 Vy giao lại Codex ngày 12/11; D1–D3 (bản nháp xong). C5: chưa đổi người, đề xuất Claude làm sau C4 vì backend đã viết ở `feat/t22-backend`. Ngoài phần C4 Vy giao lại, Codex **không** sửa: `pages/nhanVienQuanLy/{KiemTraTraPhong,XuLyTraPhongTab,thanhlytraphong,GhiNhanBanGiaoRa,XacNhanPhanHoi}.jsx`, `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx`, `web/backend/services/{doiSoat*,khauTruDoiSoat,thuThemDoiSoat,hoanCocDoiSoat,kiemTraTraPhong,traPhongSoSanh,thanhlytraphong}*.js`, `styles/lists.css` (chỉ thêm ở cuối nếu cần).
+- **Codex:** A2, A3 (Fuji, làm trước); C4 theo yêu cầu Vy ngày 12/11 trong lúc chờ lịch xem; **C5-a lịch xem để gỡ A3-01 (Vy giao tại J-C067)**; sau đó B1, B2, B5, B7, C6; E1–E3. Được sửa `components/common/WorkspaceShell.jsx`, `styles/shell.css`, `KhachHangPortalPage.jsx`, các file còn lại trong `components/xacNhan/`, `pages/avalanche/*`, `pages/thanhToanMoPhong/*`, `BanGiaoPhongTab.jsx` khi làm B1/B2/B5.
 
 **Bộ danh sách chung (J-C062, Claude):** `ListSearch`, `TableState`, `ListPagination`, `OverviewCards` lọc được, `StatusBadge` có icon; CSS ở `styles/lists.css` (Claude giữ file này, Codex chỉ thêm quy tắc ở cuối file nếu cần). Codex dùng chúng khi làm B3, B4, B7, C4.
 
@@ -153,7 +153,10 @@ Việc: trên màn Kiểm tra trả phòng của quản lý, hiện cạnh nhau 
 3. Làm sau hoặc cùng B3 để tránh hai nhánh cùng sửa KiemTraTraPhong.jsx.
 ```
 
-### C3 — Bản nháp đối soát tự soạn (D-030 mục 2, 3) (Claude)
+### C3 — Bản nháp đối soát tự soạn (D-030 mục 2, 3) (Claude, ĐÃ XONG CODE J-C066; còn chạy migration và B4)
+
+Ghi chú cho Codex: C3 đã thêm `pages/khachHang/ThuThemDoiSoatWalletCard.jsx` và **một dòng** gắn thẻ này ngay dưới `ThuNhanPhongWalletCard` trong `KhachHangPortalPage.jsx` (tab Hợp đồng), và sửa 2 chỗ chữ trong `pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx` cho loại đơn `thu-them-doi-soat`. Khi làm B1/B5 giữ nguyên hai thay đổi này.
+
 
 ```
 Việc: khảo sát rồi bổ sung. Nhánh: feat/t22-settlement-draft.
@@ -163,7 +166,9 @@ Việc: khảo sát rồi bổ sung. Nhánh: feat/t22-settlement-draft.
 4. Test SQL chạy trong transaction rồi rollback, theo mẫu scripts/deposit-flow-verify.mjs.
 ```
 
-### C4 — Tự thanh lý và gói bằng chứng cuối (D-030 mục 5, D-031 mục 1) (Claude)
+### C4 — Tự thanh lý và gói bằng chứng cuối (D-030 mục 5, D-031 mục 1) (Vy giao lại Codex 12/11)
+
+Vy yêu cầu tiếp A3 sau khi merge hai nhánh và restart; trong lúc chờ lịch xem, Codex làm C4 trên `feat/t22-auto-liquidation`/`D:\HomeStayDorm-c4`. Quyền giữ file của Claude trước đây được chuyển cho Codex trong phạm vi C4; giữ nguyên C3/B4 đã merge. Không chạy migration C4 lên HOMEDORM4 theo quyền của C5-a; phải xin riêng khi có kết quả review được.
 
 ```
 Việc: tự thanh lý hợp đồng khi tiền đã xong. Nhánh: feat/t22-auto-liquidation. KHÔNG sửa contract.
@@ -177,7 +182,11 @@ Việc: tự thanh lý hợp đồng khi tiền đã xong. Nhánh: feat/t22-auto
 
 ### C5 — Hoàn tất phần giữ chỗ đã có code (D-026)
 
-**Vy chốt khi chạy A3 (11/11, J-X069): Claude sửa điểm lịch xem trong C5 theo D-026; A3 chờ tại bước lịch xem.** Cần bỏ việc tự chuyển Đã xem khi đến giờ; Sale ghi nhận sau buổi xem, có thao tác Khách không đến theo D-026. `layDanhSachLichXemPhong` hiện UPDATE lịch trước khi lọc theo chi nhánh/khách: tải danh sách không được sửa lịch của hồ sơ khác. Rà cả scheduler và các nguồn gọi tương tự, không chỉ ẩn nút trên UI. Điều kiện hiện tại chỉ cho lịch từ ngày mai, 07:00–17:00; không sửa đồng hồ/ngày SQL hay tự nới điều kiện này để A3 đi tắt. Chi tiết code và tình trạng chuẩn bị ở [kiem-thu-fuji.md — A3-01](kiem-thu-fuji.md). Kiểm lại sau sửa: đọc danh sách không đổi trạng thái; Sale đúng chi nhánh ghi được Đã xem/Khách không đến theo quy tắc đã chốt, người khác không được; A3 chỉ đụng bộ demo. Không chạy SQL lên HOMEDORM4 khi chưa được Vy cho phép riêng cho migration C5.
+**C5-a / A3-01 — Codex, J-X070:** code ở `fix/c5a-viewing-status` từ main `0b42fb2`, worktree `D:\HomeStayDorm-c5a`. Bỏ hàm tự chuyển Đã xem, các lời gọi JS và scheduler; bỏ 8 khối tự UPDATE trong SQL nguồn. Thêm hai thao tác Sale **Đã xem / Khách không đến** qua route cập nhật lịch đang có; SP `SP_GhiNhanKetQuaBuoiXem` kiểm nhân viên đang hoạt động, phụ trách hồ sơ, cùng chi nhánh, đã đến giờ, chưa có kết quả/chuyển bước cọc; khóa để hai yêu cầu đồng thời không ghi đè nhau. Khách không đến không tự đóng hồ sơ. Không nới điều kiện đặt lịch từ ngày mai 07:00–17:00.
+
+Migration `viewing-status:db:migrate` giữ nguyên phần khác của SP đã triển khai, chỉ gỡ khối tự đánh dấu, mở rộng ràng buộc cho Khách không đến và cài SP mới; tất cả trong một transaction, chạy lại được, không UPDATE dữ liệu cũ. **J-X071 (12/11): Vy cho tiếp tục sau câu hỏi SQL, đã migrate HOMEDORM4.** Trước còn 4 khối trong 8 SP, sau check cả 8 đều 0; SP mới khớp nguồn, ràng buộc trạng thái enabled/trusted, số dòng/checksum ba bảng lịch/đăng ký/cọc khớp trước–sau. Không ghi kết quả trên lịch cũ. Sau migration/merge phải restart các backend đang dùng code cũ trước khi A3 tiếp tục; SQL migration không thể đổi hàm JS đã nạp trong tiến trình cũ. Phần giữ chỗ/Không thuê nữa/chặn lịch thứ hai của C5 vẫn chưa làm trong C5-a.
+
+Kiểm tra mới: backend 45 pass/2 skip; blockchain 25 pass/1 skip; SQL tích hợp 1 pass riêng trên CSDL tạm `HOMEDORM_C5A_TEST_*` (đã xóa sau test, không seed HOMEDORM4); build + avalanche smoke qua; `node scripts/ui-viewing-outcomes.mjs` qua ở 1440/390 (API giả, 6 ảnh tại `.ui-screens/c5a-viewing-status/`, không commit). Chưa nghiệm thu thao tác thật với hồ sơ demo A3/Fuji. Các thay đổi C3 ghi chú cho B1/B5 phía trên được giữ nguyên.
 
 ```
 Việc: tiếp nhánh feat/t22-backend (đã có SP_KhachGiuCho, SP_KhachKhongThueNua, SP_GhiNhanKhachKhongDen, sửa nhánh từ chối của SP_XacNhanKhaNangNhanCoc).

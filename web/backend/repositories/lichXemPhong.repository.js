@@ -9,22 +9,6 @@ function normalizeStatus(value) {
   return normalizeText(value);
 }
 
-export async function capNhatLichXemDenGioThanhDaXem({ maDangKy = null } = {}) {
-  const result = await executeQuery(`
-    UPDATE dbo.LichXemPhong
-    SET TrangThai = N'Đã xem'
-    WHERE (@MaDangKy IS NULL OR MaDangKy = @MaDangKy)
-      AND TrangThai IN (N'Chờ xem', N'Yêu cầu đổi lịch', N'Yêu cầu hủy')
-      AND ThoiGianHen <= GETDATE();
-
-    SELECT @@ROWCOUNT AS soLichCapNhat;
-  `, [
-    { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy || null }
-  ]);
-
-  return Number(result.recordset?.[0]?.soLichCapNhat || 0);
-}
-
 export async function tuChoiHoSoNeuTatCaLichBiHuy(maDangKy) {
   await executeQuery(`
     UPDATE dbo.PhieuDangKy
@@ -161,7 +145,6 @@ export async function taoLichXemPhong({
 }
 
 export async function layDanhSachLichXemPhong(filter = {}) {
-  await capNhatLichXemDenGioThanhDaXem({ maDangKy: filter.maDangKy || null });
 
   const result = await executeQuery(`
     SELECT
@@ -192,7 +175,7 @@ export async function layDanhSachLichXemPhong(filter = {}) {
         THEN 1 ELSE 0
       END AS BIT) AS daGuiYeuCauDatCoc,
       CAST(CASE
-        WHEN lxp.TrangThai <> N'Đã hủy'
+        WHEN lxp.TrangThai IN (N'Chờ xem', N'Yêu cầu đổi lịch', N'Yêu cầu hủy')
           AND GETDATE() < DATEADD(MINUTE, 30, lxp.ThoiGianHen)
           AND pdk.TrangThai NOT IN (N'Chờ xác nhận cọc', N'Xác nhận cọc')
           AND NOT EXISTS (
@@ -202,7 +185,19 @@ export async function layDanhSachLichXemPhong(filter = {}) {
               AND pdc.TrangThaiCoc <> N'Đã hủy'
           )
         THEN 1 ELSE 0
-      END AS BIT) AS coTheHuy
+      END AS BIT) AS coTheHuy,
+      CAST(CASE
+        WHEN lxp.TrangThai IN (N'Chờ xem', N'Yêu cầu đổi lịch', N'Yêu cầu hủy')
+          AND lxp.ThoiGianHen <= GETDATE()
+          AND pdk.TrangThai = N'Đã tiếp nhận'
+          AND pdk.MaNhanVienSale = @NhanVienSaleId
+          AND MIN(p.MaChiNhanh) = @MaChiNhanh AND MAX(p.MaChiNhanh) = @MaChiNhanh
+          AND NOT EXISTS (
+            SELECT 1 FROM dbo.PhieuDatCoc pdc
+            WHERE pdc.MaPhieuYeuCauDangKy = lxp.MaDangKy AND pdc.TrangThaiCoc <> N'Đã hủy'
+          )
+        THEN 1 ELSE 0
+      END AS BIT) AS coTheGhiNhanKetQua
     FROM dbo.LichXemPhong AS lxp
     INNER JOIN dbo.PhieuDangKy AS pdk ON pdk.MaDangKy = lxp.MaDangKy
     INNER JOIN dbo.NguoiDung AS nd ON nd.MaNguoiDung = pdk.MaKhachHang
@@ -242,16 +237,19 @@ export async function layDanhSachLichXemPhong(filter = {}) {
 }
 
 export async function ghiNhanYeuCauDieuChinhLich({ maDangKy, sttLich, lyDo } = {}) {
-  await executeQuery(`
+  const result = await executeQuery(`
     UPDATE dbo.LichXemPhong
     SET TrangThai = N'Yêu cầu đổi lịch',
         GhiChu = COALESCE(@LyDo, GhiChu)
     WHERE MaDangKy = @MaDangKy AND STTLich = @STTLich
+      AND TrangThai IN (N'Chờ xem', N'Yêu cầu đổi lịch', N'Yêu cầu hủy');
+    SELECT @@ROWCOUNT AS changed;
   `, [
     { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
     { name: 'STTLich', type: sql.Int, value: sttLich },
     { name: 'LyDo', type: sql.NVarChar(500), value: lyDo }
   ]);
+  if (!result.recordset?.[0]?.changed) throw createServiceError('Buổi xem đã kết thúc, không thể yêu cầu đổi lịch.', 409);
 }
 
 export async function huyLichXemPhong({ maDangKy, sttLich, ghiChuXuLy } = {}) {
@@ -262,7 +260,7 @@ export async function huyLichXemPhong({ maDangKy, sttLich, ghiChuXuLy } = {}) {
     FROM dbo.LichXemPhong AS lxp
     INNER JOIN dbo.PhieuDangKy AS pdk ON pdk.MaDangKy = lxp.MaDangKy
     WHERE lxp.MaDangKy = @MaDangKy AND lxp.STTLich = @STTLich
-      AND lxp.TrangThai <> N'Đã hủy'
+      AND lxp.TrangThai IN (N'Chờ xem', N'Yêu cầu đổi lịch', N'Yêu cầu hủy')
       AND GETDATE() < DATEADD(MINUTE, 30, lxp.ThoiGianHen)
       AND pdk.TrangThai NOT IN (N'Chờ xác nhận cọc', N'Xác nhận cọc')
       AND NOT EXISTS (
@@ -283,18 +281,21 @@ export async function huyLichXemPhong({ maDangKy, sttLich, ghiChuXuLy } = {}) {
 }
 
 export async function capNhatThoiGianLichXemPhong({ maDangKy, sttLich, thoiGianHen, ghiChuXuLy } = {}) {
-  await executeQuery(`
+  const result = await executeQuery(`
     UPDATE dbo.LichXemPhong
     SET ThoiGianHen = @ThoiGianHen,
         TrangThai = N'Chờ xem',
         GhiChu = NULLIF(@GhiChuXuLy, N'')
     WHERE MaDangKy = @MaDangKy AND STTLich = @STTLich
+      AND TrangThai IN (N'Chờ xem', N'Yêu cầu đổi lịch', N'Yêu cầu hủy');
+    SELECT @@ROWCOUNT AS changed;
   `, [
     { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
     { name: 'STTLich', type: sql.Int, value: sttLich },
     { name: 'ThoiGianHen', type: sql.DateTime, value: thoiGianHen },
     { name: 'GhiChuXuLy', type: sql.NVarChar(500), value: ghiChuXuLy || null }
   ]);
+  if (!result.recordset?.[0]?.changed) throw createServiceError('Buổi xem đã kết thúc, không thể đổi lịch.', 409);
 }
 
 export async function layHoSoDangKyChoPhongPhuHop(hoSoId) {

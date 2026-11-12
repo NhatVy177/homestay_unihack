@@ -1,6 +1,9 @@
 import OverviewCards from '../../components/common/OverviewCards.jsx';
+import DoiChieuTraPhong from '../../components/traPhong/DoiChieuTraPhong.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
+import StatusBadge from '../../components/common/StatusBadge.jsx';
+import './quyetToanTraPhong.css';
 import { doiSoatApi } from './doiSoat.api.js';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 
@@ -97,18 +100,18 @@ function getLapDoiSoatStatusLabel(row) {
   return 'Đã đối soát';
 }
 
-function getLapDoiSoatStatusStyle(row) {
+function getLapDoiSoatStatusTone(row) {
   const state = getLapDoiSoatState(row);
-  if (state === 'needs-adjustment') return { background: '#e8f1ff', color: '#1d4ed8' };
-  if (state === 'pending') return { background: '#fff4e5', color: '#b45309' };
-  return { background: '#e6f6ec', color: '#15803d' };
+  if (state === 'needs-adjustment') return 'info';
+  if (state === 'pending') return 'warning';
+  return 'success';
 }
 
-function getDoiSoatStatusStyle(status) {
+function getDoiSoatStatusTone(status) {
   const normalized = String(status || '').trim();
-  if (normalized === 'Cần điều chỉnh') return { background: '#e8f1ff', color: '#1d4ed8' };
-  if (normalized.startsWith('Đã') || normalized === 'Hoàn tất') return { background: '#e6f6ec', color: '#15803d' };
-  return { background: '#fff4e5', color: '#b45309' };
+  if (normalized === 'Cần điều chỉnh') return 'info';
+  if (normalized.startsWith('Đã') || normalized === 'Hoàn tất') return 'success';
+  return 'warning';
 }
 
 function safeNumber(value) {
@@ -138,14 +141,13 @@ function isZeroMoneyText(value) {
   return String(value ?? '').trim() === '0đ';
 }
 
-function moneyToneColor(tone, value) {
-  if (isZeroMoneyText(value)) return '#9aa3a4';
-  if (tone === 'collect') return '#ba1a1a';
-  if (tone === 'success') return '#137333';
-  if (tone === 'deduction') return '#a94b00';
-  if (tone === 'primary') return '#00666d';
-  if (tone === 'group') return '#00666d';
-  return '#263238';
+function moneyToneClass(tone, value) {
+  if (isZeroMoneyText(value)) return 'qt-money qt-money--zero';
+  if (tone === 'collect') return 'qt-money qt-money--collect';
+  if (tone === 'success') return 'qt-money qt-money--success';
+  if (tone === 'deduction') return 'qt-money qt-money--deduction';
+  if (tone === 'primary' || tone === 'group') return 'qt-money qt-money--primary';
+  return 'qt-money';
 }
 
 function evidenceHref(value) {
@@ -361,7 +363,11 @@ function calculatePreview(detail, form) {
     ? safeNumber(doiSoat.tyLeHoanCocHienTai)
     : 80;
 
-  if (!detail.doiSoat) {
+  if (!detail.doiSoat && Number.isFinite(Number(detail.tinhToanTam?.tyLeHoanCocHienTai))) {
+    // D-040: the backend reads the rate from the policy locked on the deposit slip; show the same number.
+    tyLeHoanCocHienTai = safeNumber(detail.tinhToanTam.tyLeHoanCocHienTai);
+    soThangLuuTru = safeNumber(detail.tinhToanTam.soThangLuuTru);
+  } else if (!detail.doiSoat) {
     if (detail.loaiHoSo === LOAI_HO_SO.HOP_DONG_THUE) {
       soThangLuuTru = calculateStayMonths(
         detail.hopDong?.ngayBatDau,
@@ -412,7 +418,7 @@ function InfoRow({ label, value, strong = false }) {
   return (
     <div className="ktp-info-row">
       <span className="ktp-info-label">{label}</span>
-      <span className="ktp-info-value" style={strong ? { fontWeight: 800, color: '#00666d' } : undefined}>
+      <span className={`ktp-info-value${strong ? ' qt-info-strong' : ''}`}>
         {value ?? '--'}
       </span>
     </div>
@@ -422,14 +428,12 @@ function InfoRow({ label, value, strong = false }) {
 function SourceLine({ title, meta, amount, editing = false, editValue, onAmountChange, autoFocus = false }) {
   const canEdit = editing && typeof onAmountChange === 'function';
   const amountText = formatMoney(amount);
-  const amountColor = isZeroMoneyText(amountText) ? '#9aa3a4' : '#263238';
-  const amountWeight = isZeroMoneyText(amountText) ? 600 : 750;
 
   return (
     <div className={`qt-source-line${canEdit ? ' is-editing' : ''}`}>
       <div>
-        <p style={{ margin: 0, fontWeight: 500, color: '#526061', fontSize: '13px' }}>{title}</p>
-        {meta && <p style={{ margin: '3px 0 0', color: '#6f797a', fontSize: '12px', lineHeight: 1.45 }}>{meta}</p>}
+        <p className="qt-source-title">{title}</p>
+        {meta && <p className="qt-source-meta">{meta}</p>}
       </div>
       {canEdit ? (
         <input
@@ -442,7 +446,7 @@ function SourceLine({ title, meta, amount, editing = false, editValue, onAmountC
           autoFocus={autoFocus}
         />
       ) : (
-        <strong style={{ color: amountColor, whiteSpace: 'nowrap', fontSize: '13px', fontWeight: amountWeight }}>
+        <strong className={`qt-source-amount${isZeroMoneyText(amountText) ? ' is-zero' : ''}`}>
           {amountText}
         </strong>
       )}
@@ -455,30 +459,21 @@ function EmptySource({ children }) {
 }
 
 function SummaryLine({ label, value, tone = 'normal' }) {
-  const color = moneyToneColor(tone, value);
   return (
     <div className="qt-summary-line">
       <span>{label}</span>
-      <strong style={{ color }}>{value}</strong>
+      <strong className={moneyToneClass(tone, value)}>{value}</strong>
     </div>
   );
 }
 
 function AdjustmentRequestBox({ value }) {
   return (
-    <section
-      className="ktp-section qt-adjustment-request"
-      style={{
-        backgroundColor: '#fff8f0',
-        border: '1px solid #fdba74',
-        borderRadius: 8,
-        padding: '14px 16px'
-      }}
-    >
-      <h4 className="ktp-section-title" style={{ color: '#ba1a1a', marginBottom: 12 }}>
+    <section className="ktp-section qt-adjustment-request">
+      <h4 className="ktp-section-title qt-adjustment-title">
         <Icon name="feedback" /> Yêu cầu điều chỉnh của khách hàng
       </h4>
-      <p style={{ margin: 0, fontSize: 14, color: '#3f494a', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+      <p className="qt-adjustment-text">
         {value || '(Khách hàng chưa nhập nội dung phản hồi)'}
       </p>
     </section>
@@ -492,7 +487,7 @@ function KhauTruPanel({ title, value, children, editing, onEdit, onDone, readOnl
       <div className="qt-deduction-head">
         <div>
           <h5>{title}</h5>
-          <strong style={{ color: moneyToneColor('group', totalText) }}>{totalText}</strong>
+          <strong className={moneyToneClass('group', totalText)}>{totalText}</strong>
         </div>
         {!readOnly && (
           <button
@@ -590,7 +585,7 @@ function ketQuaMeta(row) {
       label: 'Hoàn cọc',
       badgeClass: 'is-refund',
       amount: row.soTienHoanThucTe,
-      amountTone: '#137333'
+      amountTone: 'qt-money qt-money--success'
     };
   }
 
@@ -599,7 +594,7 @@ function ketQuaMeta(row) {
       label: 'Thu thêm',
       badgeClass: 'is-collect',
       amount: row.soTienKhachPhaiTT,
-      amountTone: '#ba1a1a'
+      amountTone: 'qt-money qt-money--collect'
     };
   }
 
@@ -607,7 +602,7 @@ function ketQuaMeta(row) {
     label: 'Không phát sinh',
     badgeClass: 'is-neutral',
     amount: 0,
-    amountTone: '#3f494a'
+    amountTone: 'qt-money'
   };
 }
 
@@ -1008,25 +1003,23 @@ function GhiNhanThanhToanPanel({ type }) {
 
               return (
                 <tr key={`${rowMode}-${row.maDoiSoat}`}>
-                  <td style={{ fontWeight: 700, color: '#00666d' }}>{row.maDoiSoat}</td>
+                  <td className="ui-cell-code">{row.maDoiSoat}</td>
                   <td>
-                    <p style={{ margin: 0, fontWeight: 600 }}>{row.hoTenKhachHang || '--'}</p>
-                    <p style={{ margin: 0, fontSize: '12px', color: '#414753' }}>{row.sdtKhachHang || '--'}</p>
+                    <p className="ui-cell-main">{row.hoTenKhachHang || '--'}</p>
+                    <p className="ui-cell-sub">{row.sdtKhachHang || '--'}</p>
                   </td>
                   <td>
                     <span className="ktp-badge ktp-badge-outline">{row.maHoSo || '--'}</span>
-                    <p style={{ margin: '4px 0 0', color: '#6f797a', fontSize: '12px' }}>
+                    <p className="ui-cell-sub">
                       {row.tenPhong || '--'}{row.maGiuong ? ` - ${row.maGiuong}` : ''}
                       {safeNumber(row.soLuongPhongGiuong) > 1 ? ` và ${safeNumber(row.soLuongPhongGiuong) - 1} mục khác` : ''}
                     </p>
                   </td>
-                  <td style={{ color: isThuThem ? '#ba1a1a' : '#137333', fontWeight: 800 }}>
+                  <td className={`ui-num qt-money ${isThuThem ? 'qt-money--collect' : 'qt-money--success'}`}>
                     {formatMoney(row[amountField])}
                   </td>
                   <td>
-                    <span className="ktp-badge ktp-badge-secondary" style={getDoiSoatStatusStyle(statusLabel)}>
-                      {statusLabel}
-                    </span>
+                    <StatusBadge status={statusLabel} tone={getDoiSoatStatusTone(statusLabel)} />
                   </td>
                   <td className="text-center">
                     <button
@@ -1093,14 +1086,14 @@ function GhiNhanThanhToanPanel({ type }) {
   return (
     <>
       {localMessage && (
-        <div className="ktp-warning-box" style={{ backgroundColor: '#dbe4e5', color: '#004f55', marginBottom: '16px' }}>
+        <div className="ui-list-alert qt-alert qt-alert--success" role="status">
           <Icon name="check_circle" />
           <span>{localMessage}</span>
         </div>
       )}
 
       {localError && (
-        <div className="ktp-warning-box" style={{ backgroundColor: '#ffdad6', color: '#410002', marginBottom: '16px' }}>
+        <div className="ui-list-alert qt-alert" role="alert">
           <Icon name="error_outline" />
           <span>{localError}</span>
         </div>
@@ -1111,14 +1104,14 @@ function GhiNhanThanhToanPanel({ type }) {
       {selectedRefund && (
         <div className="ktp-modal-overlay" onClick={() => setSelectedRefund(null)}>
           <div className="ktp-modal qt-refund-modal" onClick={(event) => event.stopPropagation()}>
-            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#3b8280', color: '#ffffff' }}>
+            <div className="ktp-modal-header qt-modal-header">
               <div>
-                <h3 style={{ color: '#ffffff' }}>{selectedRefund._viewMode === 'completed' ? `Chi tiết ${isThuThem ? 'thu thêm' : 'hoàn cọc'}` : actionTitle}</h3>
-                <p className="ktp-modal-header-sub" style={{ color: 'rgba(255,255,255,0.85)' }}>
-                  Mã đối soát: <span style={{ color: '#ffffff' }}>{selectedRefund.maDoiSoat}</span>
+                <h3>{selectedRefund._viewMode === 'completed' ? `Chi tiết ${isThuThem ? 'thu thêm' : 'hoàn cọc'}` : actionTitle}</h3>
+                <p className="ktp-modal-header-sub">
+                  Mã đối soát: <span className="qt-modal-code">{selectedRefund.maDoiSoat}</span>
                 </p>
               </div>
-              <button className="ktp-modal-close" type="button" onClick={() => setSelectedRefund(null)} style={{ color: '#ffffff' }}>
+              <button className="ktp-modal-close" type="button" onClick={() => setSelectedRefund(null)} aria-label="Đóng hộp thoại">
                 <Icon name="close" />
               </button>
             </div>
@@ -1371,7 +1364,7 @@ function KetQuaDoiSoatPanel() {
   return (
     <>
       {error && (
-        <div className="ktp-warning-box" style={{ backgroundColor: '#ffdad6', color: '#410002', marginBottom: '16px' }}>
+        <div className="ui-list-alert qt-alert" role="alert">
           <Icon name="error_outline" />
           <span>{error}</span>
         </div>
@@ -1448,24 +1441,22 @@ function KetQuaDoiSoatPanel() {
 
               return (
                 <tr key={row.maDoiSoat}>
-                  <td style={{ fontWeight: 700, color: '#00666d' }}>{row.maDoiSoat}</td>
+                  <td className="ui-cell-code">{row.maDoiSoat}</td>
                   <td>
-                    <p style={{ margin: 0, fontWeight: 600 }}>{row.hoTenKhachHang || '--'}</p>
-                    <p style={{ margin: 0, fontSize: '12px', color: '#414753' }}>{row.sdtKhachHang || '--'}</p>
+                    <p className="ui-cell-main">{row.hoTenKhachHang || '--'}</p>
+                    <p className="ui-cell-sub">{row.sdtKhachHang || '--'}</p>
                   </td>
                   <td>
                     <span className="ktp-badge ktp-badge-outline">{row.maHoSo || '--'}</span>
-                    <p style={{ margin: '4px 0 0', color: '#6f797a', fontSize: '12px' }}>
+                    <p className="ui-cell-sub">
                       {row.tenPhong || '--'}{row.maGiuong ? ` - ${row.maGiuong}` : ''}
                       {safeNumber(row.soLuongPhongGiuong) > 1 ? ` và ${safeNumber(row.soLuongPhongGiuong) - 1} mục khác` : ''}
                     </p>
                   </td>
                   <td><span className={`ktp-badge qt-result-badge ${meta.badgeClass}`}>{meta.label}</span></td>
-                  <td style={{ color: meta.amountTone, fontWeight: 800 }}>{formatMoney(meta.amount)}</td>
+                  <td className={`ui-num ${meta.amountTone}`}>{formatMoney(meta.amount)}</td>
                   <td>
-                    <span className="ktp-badge ktp-badge-secondary" style={getDoiSoatStatusStyle(row.trangThaiDoiSoat)}>
-                      {row.trangThaiDoiSoat}
-                    </span>
+                    <StatusBadge status={row.trangThaiDoiSoat} tone={getDoiSoatStatusTone(row.trangThaiDoiSoat)} />
                   </td>
                   <td>{formatDate(row.ngayThanhToan || row.ngayLap)}</td>
                   <td className="text-center">
@@ -1484,21 +1475,21 @@ function KetQuaDoiSoatPanel() {
       {selected && (
         <div className="ktp-modal-overlay" onClick={() => setSelected(null)}>
           <div className="ktp-modal qt-refund-modal" onClick={(event) => event.stopPropagation()}>
-            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#3b8280', color: '#ffffff' }}>
+            <div className="ktp-modal-header qt-modal-header">
               <div>
-                <h3 style={{ color: '#ffffff' }}>Chi tiết kết quả đối soát</h3>
-                <p className="ktp-modal-header-sub" style={{ color: 'rgba(255,255,255,0.85)' }}>
-                  Mã đối soát: <span style={{ color: '#ffffff' }}>{selected.maDoiSoat}</span>
+                <h3>Chi tiết kết quả đối soát</h3>
+                <p className="ktp-modal-header-sub">
+                  Mã đối soát: <span className="qt-modal-code">{selected.maDoiSoat}</span>
                 </p>
               </div>
-              <button className="ktp-modal-close" type="button" onClick={() => setSelected(null)} style={{ color: '#ffffff' }}>
+              <button className="ktp-modal-close" type="button" onClick={() => setSelected(null)} aria-label="Đóng hộp thoại">
                 <Icon name="close" />
               </button>
             </div>
 
             <div className="ktp-modal-body qt-refund-body">
               {loadingDetail ? (
-                <div className="text-center" style={{ padding: '28px' }}>Đang tải chi tiết...</div>
+                <div className="text-center qt-loading">Đang tải chi tiết...</div>
               ) : detail ? (
                 <>
                   <section className="ktp-section ktp-info-box-outline">
@@ -1847,14 +1838,14 @@ export default function QuyetToanTraPhongTab() {
       {activeQuyetToanTab === 'lap-doi-soat' && (
         <>
       {message && (
-        <div className="ktp-warning-box" style={{ backgroundColor: '#dbe4e5', color: '#004f55', marginBottom: '16px' }}>
+        <div className="ui-list-alert qt-alert qt-alert--success" role="status">
           <Icon name="check_circle" />
           <span>{message}</span>
         </div>
       )}
 
       {error && (
-        <div className="ktp-warning-box" style={{ backgroundColor: '#ffdad6', color: '#410002', marginBottom: '16px' }}>
+        <div className="ui-list-alert qt-alert" role="alert">
           <Icon name="error_outline" />
           <span>{error}</span>
         </div>
@@ -1930,10 +1921,10 @@ export default function QuyetToanTraPhongTab() {
 
               return (
                 <tr key={row.maPhieuTra}>
-                  <td style={{ fontWeight: 700, color: '#00666d' }}>{row.maPhieuTra}</td>
+                  <td className="ui-cell-code">{row.maPhieuTra}</td>
                   <td>
-                    <p style={{ margin: 0, fontWeight: 600 }}>{row.hoTenKhachHang || '--'}</p>
-                    <p style={{ margin: 0, fontSize: '12px', color: '#414753' }}>{row.sdtKhachHang || row.emailKhachHang || '--'}</p>
+                    <p className="ui-cell-main">{row.hoTenKhachHang || '--'}</p>
+                    <p className="ui-cell-sub">{row.sdtKhachHang || row.emailKhachHang || '--'}</p>
                   </td>
                   <td>
                     <span className="ktp-badge ktp-badge-outline">
@@ -1942,11 +1933,9 @@ export default function QuyetToanTraPhongTab() {
                   </td>
                   <td>{formatDate(row.ngayTraThucTe)}</td>
                   <td>
-                    <span className="ktp-badge ktp-badge-secondary" style={getLapDoiSoatStatusStyle(row)}>
-                      {getLapDoiSoatStatusLabel(row)}
-                    </span>
+                    <StatusBadge status={getLapDoiSoatStatusLabel(row)} tone={getLapDoiSoatStatusTone(row)} />
                     {hasDoiSoat && (
-                      <p style={{ margin: '4px 0 0', color: '#6f797a', fontSize: '12px' }}>
+                      <p className="ui-cell-sub">
                         {row.maDoiSoat} · {row.loaiQuyetToan || '--'}
                       </p>
                     )}
@@ -2006,30 +1995,30 @@ export default function QuyetToanTraPhongTab() {
       {activeQuyetToanTab === 'lap-doi-soat' && selected && (
         <div className="ktp-modal-overlay" onClick={() => setSelected(null)}>
           <div className={`ktp-modal qt-modal ${laPhieuDatCoc ? 'qt-modal-sm' : ''}`} onClick={(event) => event.stopPropagation()}>
-            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#3b8280', color: '#ffffff' }}>
+            <div className="ktp-modal-header qt-modal-header">
               <div>
-                <h3 style={{ color: '#ffffff' }}>
+                <h3>
                   {isAdjustmentDoiSoat
                     ? 'Điều chỉnh phiếu đối soát trả phòng'
                     : isReadonlyDoiSoat
                       ? 'Chi tiết phiếu đối soát trả phòng'
                       : 'Lập phiếu đối soát trả phòng'}
                 </h3>
-                <p className="ktp-modal-header-sub" style={{ color: 'rgba(255,255,255,0.85)' }}>
-                  Mã phiếu trả: <span style={{ color: '#ffffff' }}>{selected.phieuTraPhong.maPhieuTra}</span>
+                <p className="ktp-modal-header-sub">
+                  Mã phiếu trả: <span className="qt-modal-code">{selected.phieuTraPhong.maPhieuTra}</span>
                   {selected.doiSoat?.maDoiSoat ? (
-                    <> · Mã đối soát: <span style={{ color: '#ffffff' }}>{selected.doiSoat.maDoiSoat}</span></>
+                    <> · Mã đối soát: <span className="qt-modal-code">{selected.doiSoat.maDoiSoat}</span></>
                   ) : null}
                 </p>
               </div>
-              <button className="ktp-modal-close" type="button" onClick={() => setSelected(null)} style={{ color: '#ffffff' }}>
+              <button className="ktp-modal-close" type="button" onClick={() => setSelected(null)} aria-label="Đóng hộp thoại">
                 <Icon name="close" />
               </button>
             </div>
 
             <div className="ktp-modal-body qt-modal-body">
               {laPhieuDatCoc ? (
-                <div style={{ gridColumn: '1 / -1', display: 'grid', gap: '12px' }}>
+                <div className="qt-full-span">
                   <div className="ktp-grid-2">
                     <section className="ktp-section ktp-info-box-outline">
                       <h4 className="ktp-section-title">
@@ -2123,6 +2112,13 @@ export default function QuyetToanTraPhongTab() {
                 <AdjustmentRequestBox value={adjustmentRequestText} />
               )}
 
+              {selected?.loaiHoSo === LOAI_HO_SO.HOP_DONG_THUE && selected?.phieuTraPhong?.maPhieuTra && (
+                <section className="ktp-section ktp-info-box-outline">
+                  <h4 className="ktp-section-title"><Icon name="fact_check" /> Đối chiếu lúc nhận phòng và lúc trả phòng</h4>
+                  <DoiChieuTraPhong maPhieuTra={selected.phieuTraPhong.maPhieuTra} />
+                </section>
+              )}
+
               <section className="ktp-section ktp-info-box-outline">
                 <h4 className="ktp-section-title"><Icon name="money_off" /> 3. Các khoản khấu trừ</h4>
                 <div className="qt-deduction-grid">
@@ -2204,7 +2200,7 @@ export default function QuyetToanTraPhongTab() {
                           }, 0);
 
                       return (
-                        <div key={bienBan.maBienBanKT} style={{ borderTop: '1px solid #e1e3e4', paddingTop: '10px', marginTop: '10px' }}>
+                        <div key={bienBan.maBienBanKT} className="qt-inspection-item">
                           <SourceLine
                             title={`Biên bản ${bienBan.maBienBanKT}`}
                             meta={`Ngày kiểm tra: ${formatDate(bienBan.ngayKiemTra)}${bienBan.tinhTrangPhong ? ` · ${bienBan.tinhTrangPhong}` : ''}`}
@@ -2279,6 +2275,13 @@ export default function QuyetToanTraPhongTab() {
                   <SummaryLine label="Tiền cọc ban đầu" value={formatMoney(preview?.tienCocBanDau)} tone="primary" />
                   <SummaryLine label="Số tháng lưu trú" value={preview?.soThangLuuTru ?? 0} />
                   <SummaryLine label="Tỷ lệ hoàn cọc" value={`${preview?.tyLeHoanCocHienTai ?? 0}%`} />
+                  {!selected?.doiSoat && selected?.chinhSachHoanCoc && (
+                    <p className="qt-rate-source">
+                      {selected.chinhSachHoanCoc.nguon === 'chinh-sach'
+                        ? `Theo chính sách hoàn cọc khách đã nhận lúc cọc, phiên bản ${selected.chinhSachHoanCoc.phienBan}.`
+                        : selected.chinhSachHoanCoc.lyDo}
+                    </p>
+                  )}
                   <SummaryLine label="Cọc được hoàn" value={formatMoney(preview?.tienCocDuocHoan)} tone="primary" />
                   <SummaryLine label="Tổng khấu trừ" value={formatMoney(preview?.tongKhauTru)} tone="deduction" />
                   <SummaryLine label="Số tiền hoàn thực tế" value={formatMoney(preview?.soTienHoanThucTe)} tone={preview?.soTienHoanThucTe > 0 ? 'success' : 'normal'} />

@@ -18,8 +18,10 @@ export default function ThanhToanMoPhongPage() {
     }
     finally { setBusy(false); }
   };
-  const firstCharge = order?.purpose === 'thu-nhan-phong';
-  const description = firstCharge ? `Khoản thu kỳ đầu – hợp đồng ${order.refId}` : `Tiền cọc – phiếu ${order?.refId || ''}`;
+  const topUp = order?.purpose === 'thu-them-doi-soat';
+  const firstCharge = order?.purpose === 'thu-nhan-phong' || topUp; // both return to the contract tab
+  const description = topUp ? `Khoản thu thêm khi trả phòng – đối soát ${order.refId}`
+    : firstCharge ? `Khoản thu kỳ đầu – hợp đồng ${order.refId}` : `Tiền cọc – phiếu ${order?.refId || ''}`;
   return <main className="tm-page">
     <div className="tm-sim-banner">MÔI TRƯỜNG MÔ PHỎNG — dùng để demo, không có tiền thật được chuyển.</div>
     <section className="tm-card">
@@ -40,7 +42,7 @@ export default function ThanhToanMoPhongPage() {
             <button type="button" className="tm-btn secondary" disabled={busy} onClick={() => act('huy')}>Hủy</button>
           </div>
         </>}
-        {order.status === 'Paid' && <div className="tm-result ok"><strong>Thanh toán thành công (mô phỏng)</strong><p>{firstCharge ? `Khoản thu kỳ đầu của hợp đồng ${order.refId}` : `Phiếu cọc ${order.refId}`} đã được ghi nhận thanh toán. Mã giao dịch mô phỏng: {order.transId}</p></div>}
+        {order.status === 'Paid' && <div className="tm-result ok"><strong>Thanh toán thành công (mô phỏng)</strong><p>{topUp ? `Khoản thu thêm của đối soát ${order.refId}` : firstCharge ? `Khoản thu kỳ đầu của hợp đồng ${order.refId}` : `Phiếu cọc ${order.refId}`} đã được ghi nhận thanh toán. Mã giao dịch mô phỏng: {order.transId}</p></div>}
         {order.status === 'Cancelled' && <div className="tm-result"><strong>Đã hủy thanh toán</strong><p>Bạn có thể mở lại khoản thanh toán trong tài khoản.</p></div>}
         {['Failed', 'Processing'].includes(order.status) && <div className="tm-result"><strong>{order.status === 'Failed' ? 'Thanh toán không thành công' : 'Đang xử lý'}</strong><p>{order.lastError || 'Vui lòng kiểm tra lại khoản thanh toán.'}</p></div>}
       </>}

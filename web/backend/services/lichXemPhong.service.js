@@ -1,5 +1,6 @@
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as lichXemPhongRepository from '../repositories/lichXemPhong.repository.js';
+import { ghiNhanKetQuaBuoiXem } from './ketQuaBuoiXem.service.js';
 
 function handleDatabaseError(error) {
   mapDatabaseError(error, {
@@ -267,6 +268,9 @@ export async function yeuCauDieuChinhLich(id, data = {}, user = null) {
 
 export async function capNhatLichXemPhong(id, data = {}, user = null) {
   requireSaleUser(user);
+  if (['da-xem', 'khach-khong-den'].includes(data.thaoTac)) {
+    return ghiNhanKetQuaBuoiXem(id, data, user);
+  }
   try {
     const { maDangKy, sttLich } = parseScheduleId(id);
     const thaoTac = String(data.thaoTac || '').trim().toLowerCase();
@@ -275,7 +279,7 @@ export async function capNhatLichXemPhong(id, data = {}, user = null) {
     const currentStatus = normalizeStatus(current.trangThai);
     const isCancelAction = ['huy', 'hủy', 'cancel'].includes(thaoTac);
 
-    if (currentStatus === 'đã hủy') {
+    if (['đã hủy', 'đã xem', 'khách không đến'].includes(currentStatus)) {
       throw createServiceError('Lịch xem phòng đã kết thúc, không thể cập nhật.');
     }
 

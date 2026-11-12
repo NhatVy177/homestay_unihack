@@ -6,9 +6,9 @@ const fail = (message, statusCode = 400) => { throw Object.assign(new Error(mess
 const FIELDS = ['orderId', 'amountVnd', 'resultCode', 'transId', 'responseTime'];
 export const ipnString = body => FIELDS.map(key => `${key}=${body[key]}`).join('&');
 export class PaymentSimulator {
-  constructor({ store, deposits, firstCharges, secret, clock = () => Date.now(), notifyDepositPaid = async () => {}, notifyFirstChargePaid = async () => {} }) {
+  constructor({ store, deposits, firstCharges, topUps, secret, clock = () => Date.now(), notifyDepositPaid = async () => {}, notifyFirstChargePaid = async () => {} }) {
     if (!secret || secret.length < 16) throw new Error('PAYMENT_SIM_SECRET must be at least 16 characters.');
-    Object.assign(this, { store, deposits, firstCharges, secret, clock, notifyDepositPaid, notifyFirstChargePaid });
+    Object.assign(this, { store, deposits, firstCharges, topUps, secret, clock, notifyDepositPaid, notifyFirstChargePaid });
   }
   sign(body) { return createHmac('sha256', this.secret).update(ipnString(body)).digest('hex'); }
   verify(body) {
@@ -69,6 +69,29 @@ export class PaymentSimulator {
     await this.store.create(order);
     return order;
   }
+  // C3 / D-030 (3): the tenant pays the agreed settlement top-up. refId is the settlement (DoiSoat) id,
+  // so the unique "one Paid order per purpose/refId" index blocks paying the same settlement twice.
+  async topUpQuote(user, maHopDong) {
+    this.customer(user);
+    const id = String(maHopDong || '').trim();
+    const row = this.topUps && await this.topUps.get(id);
+    if (!row || row.customerId !== user.maNguoiDung) fail('Không tìm thấy hợp đồng của bạn.', 404);
+    const base = { purpose: 'thu-them-doi-soat', refId: row.settlementId || null, contractId: id };
+    if (row.status === 'Đã quyết toán' && row.amountVnd > 0) return { ...base, status: 'Paid', amountVnd: row.amountVnd };
+    if (row.status !== 'Chờ thanh toán thêm' || row.returnStatus !== 'Chờ ký biên bản' || !(row.amountVnd > 0)) return { ...base, status: 'Unavailable' };
+    if (Math.round(row.amountVnd * 100) / 100 !== row.amountVnd) fail('Số tiền thu thêm không hợp lệ, vui lòng liên hệ kế toán.', 409);
+    return { ...base, status: 'Pending', amountVnd: row.amountVnd };
+  }
+  async createTopUpOrder(user, maHopDong) {
+    const { contractId, ...quote } = await this.topUpQuote(user, maHopDong);
+    if (quote.status === 'Paid') fail('Khoản thu thêm đã được thanh toán.', 409);
+    if (quote.status !== 'Pending') fail('Đối soát chưa ở bước chờ thanh toán thêm.', 409);
+    const existing = await this.store.findPending(quote.purpose, quote.refId, user.maNguoiDung);
+    if (existing && existing.amountVnd === quote.amountVnd) return existing;
+    const order = { id: 'SIM' + randomBytes(12).toString('hex').toUpperCase(), ...quote, customerId: user.maNguoiDung };
+    await this.store.create(order);
+    return order;
+  }
   async getOrder(user, id) { return this.owned(user, id); }
   async cancel(user, id) {
     const order = await this.owned(user, id);
@@ -109,6 +132,10 @@ export class PaymentSimulator {
         await this.firstCharges.markPaid(order, receipt, String(body.transId));
         try { await this.notifyFirstChargePaid(order.refId); }
         catch (error) { console.warn('[checkin-mail] first-charge-paid:', error.message); }
+      }
+      else if (order.purpose === 'thu-them-doi-soat') {
+        // The SQL adapter runs the top-up procedure and marks the order Paid in one transaction.
+        await this.topUps.markPaid(order, receipt, String(body.transId));
       }
       else fail('Loại đơn thanh toán không hợp lệ.', 409);
     } catch (error) {

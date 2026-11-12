@@ -70,3 +70,8 @@ tr[data-status="Hư hỏng nặng"] .kttp-control--status, tr[data-status="Mất
   .kttp-actions { width: 100%; }
   .kttp-actions .ui-btn { flex: 1; }
 }
+
+/* C3: read-only comparison inside the accountant's settlement dialog (DoiChieuTraPhong). */
+.kttp-compare { display: flex; flex-direction: column; gap: var(--space-3); }
+.kttp-compare .kttp-footer-note { margin: var(--space-3) 0 0; }
+.qt-rate-source { margin: calc(var(--space-1) * -1) 0 var(--space-2); color: var(--color-text-muted); font-size: 12px; line-height: 1.45; }

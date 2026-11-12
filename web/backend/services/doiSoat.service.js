@@ -9,6 +9,7 @@ import {
 import * as phieuTraPhongService from './phieuTraPhong.service.js';
 import * as hoSoThueService from './hoSoThue.service.js';
 import * as khauTruDoiSoatService from './khauTruDoiSoat.service.js';
+import { layChinhSachDaKhoa, moTaNguonTyLe } from './chinhSachHoanCoc.service.js';
 import * as doiSoatRepository from '../repositories/doiSoat.repository.js';
 import * as khauTruDoiSoatRepository from '../repositories/khauTruDoiSoat.repository.js';
 import * as quyDinhHoanCocRepository from '../repositories/quyDinhHoanCoc.repository.js';
@@ -132,9 +133,10 @@ function sumRepairCostAdjustments(items) {
   ), 0);
 }
 
-function buildDoiSoatContext(hoSoContext, khauTruContext) {
+function buildDoiSoatContext(hoSoContext, khauTruContext, chinhSach = null) {
   return {
     ...hoSoContext,
+    chinhSach,
     defaults: {
       ...hoSoContext.defaults,
       ...khauTruContext.defaults
@@ -157,8 +159,14 @@ function buildPreview(phieuTraPhong, context, overrides = {}) {
     tienThueConNo,
     tienDichVuConNo,
     tongChiPhiSuaChua,
-    tienPhat
+    tienPhat,
+    tyLeTheoChinhSach: context.chinhSach?.tyLe
   });
+}
+
+// D-040: policy locked on the deposit slip of this contract (or of the deposit-only return).
+async function chinhSachCuaHoSo(hoSoContext, db) {
+  return layChinhSachDaKhoa(hoSoContext.hopDong?.maPhieuCoc || hoSoContext.phieuDatCoc?.maPhieuDatCoc, db);
 }
 
 export async function getDanhSachChoDoiSoat(maNhanVienKeToan) {
@@ -183,7 +191,7 @@ export async function getChiTietPhieuTraPhong(maPhieuTraInput, maNhanVienKeToan)
     phieuTraPhong.maHopDong,
     pool
   );
-  const context = buildDoiSoatContext(hoSoContext, khauTruContext);
+  const context = buildDoiSoatContext(hoSoContext, khauTruContext, await chinhSachCuaHoSo(hoSoContext, pool));
   const chiTietKhauTru = khauTruContext.chiTietKhauTru;
   let tinhToanTam = null;
 
@@ -209,7 +217,8 @@ export async function getChiTietPhieuTraPhong(maPhieuTraInput, maNhanVienKeToan)
     danhSachPhong: context.danhSachPhong,
     macDinhKhauTru: context.defaults,
     chiTietKhauTru,
-    tinhToanTam
+    tinhToanTam,
+    chinhSachHoanCoc: moTaNguonTyLe(context.chinhSach, tinhToanTam)
   };
 }
 
@@ -266,8 +275,9 @@ export async function taoDoiSoat(data, maNhanVienKeToan) {
       khauTruDoiSoatService.kiemTraDaCoBienBanKiemTra(khauTruContext);
     }
 
-    const context = buildDoiSoatContext(hoSoContext, khauTruContext);
+    const context = buildDoiSoatContext(hoSoContext, khauTruContext, await chinhSachCuaHoSo(hoSoContext, transaction));
     const result = buildPreview(phieuTraPhong, context, data);
+    const chinhSachHoanCoc = moTaNguonTyLe(context.chinhSach, result);
     const maQuyDinhHoanCoc = await quyDinhHoanCocRepository.getMaQuyDinhHoanCoc(
       transaction,
       result.tyLeHoanCocHienTai
@@ -308,6 +318,7 @@ export async function taoDoiSoat(data, maNhanVienKeToan) {
         trangThai: updated.trangThai || 'Chờ xác nhận',
         maQuyDinhHoanCoc,
         tienCocBanDau: context.tienCocBanDau,
+        chinhSachHoanCoc,
         ...result
       };
     }
@@ -341,6 +352,7 @@ export async function taoDoiSoat(data, maNhanVienKeToan) {
       trangThai: 'Chờ xác nhận',
       maQuyDinhHoanCoc,
       tienCocBanDau: context.tienCocBanDau,
+      chinhSachHoanCoc,
       ...result
     };
   } catch (error) {
