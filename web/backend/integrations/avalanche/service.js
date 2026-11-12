@@ -23,8 +23,8 @@ export const currentDraft = c => c.drafts[c.drafts.length - 1];
  * D-012: emails only notify; they never change state or stand in for the tenant's signature.
  */
 export class AvalancheService {
-  constructor({ store, sources, chain, origin, notify = async () => ({ status: 'skipped' }), clock = () => Date.now() }) {
-    Object.assign(this, { store, sources, chain, origin, notify, clock });
+  constructor({ store, sources, chain, origin, notify = async () => ({ status: 'skipped' }), clock = () => Date.now(), isClosed=async()=>false, afterConfirmed=async()=>{} }) {
+    Object.assign(this, { store, sources, chain, origin, notify, clock, isClosed, afterConfirmed });
     this.tail = Promise.resolve();
   }
   // One worker per deployment: serializes operator nonces and case writes.
@@ -34,6 +34,11 @@ export class AvalancheService {
     return next;
   }
   now() { return new Date(this.clock()).toISOString(); }
+  async assertOpen(c) {if(await this.isClosed(c.contractId))fail('Hồ sơ đã đóng; không được phát hành hoặc xác nhận thêm.',409);}
+  async finishLifecycle(c) {
+    try {await this.afterConfirmed(c);return c;}
+    catch {return {...c,lifecycleWarning:'Xác nhận đã được ghi nhận; phần xử lý kết thúc chưa đồng bộ. Vui lòng đồng bộ lại hồ sơ.'};}
+  }
   staff(user, role) {
     if (user.vaiTro !== 'NhanVien' || user.chucVu !== role || !user.maChiNhanh) fail('Bạn không có quyền thực hiện thao tác này.', 403);
   }
@@ -118,6 +123,7 @@ export class AvalancheService {
   async requestChange(user, id, reason) {
     return this.exclusive(async () => {
       const c = await this.accessible(user, id);
+      await this.assertOpen(c);
       this.owner(user, c);
       if (c.state !== 'review') fail('Biên bản không còn ở bước chờ bạn xem.', 409);
       reason = text(reason, 2000, 'Nội dung cần chỉnh sửa');
@@ -130,6 +136,7 @@ export class AvalancheService {
     return this.exclusive(async () => {
       this.staff(user, 'Quản lý');
       let c = await this.accessible(user, id);
+      await this.assertOpen(c);
       if (!['review', 'change-requested'].includes(c.state) || c.pending || c.handover) fail('Biên bản đã được khách xác nhận hoặc đang ghi nhận; không sửa được.', 409);
       const previous = currentDraft(c), payload = previous.handover.payload;
       // Upgrade an unbound v1 review only after D-034 prerequisites are met; never rewrite locked v1 evidence.
@@ -173,6 +180,7 @@ export class AvalancheService {
     return this.exclusive(async () => {
       this.staff(user, 'Kế toán');
       let c = await this.accessible(user, id);
+      await this.assertOpen(c);
       c = await this.syncRecord(c);
       const a = await this.chain.read('getAgreement', [id]);
       if (![2, 4].includes(a.status)) fail('Cần bàn giao đã xác nhận hoặc đối soát bị phản đối.', 409);
@@ -204,6 +212,7 @@ export class AvalancheService {
   async prepare(user, id, action, reason, revision) {
     return this.exclusive(async () => {
       let c = await this.accessible(user, id);
+      await this.assertOpen(c);
       this.owner(user, c);
       if (c.pending) c = await this.syncRecord(c);
       if (action === 1 && c.state === 'change-requested') fail('Bạn đã yêu cầu chỉnh sửa. Vui lòng chờ quản lý phát hành bản mới.', 409);
@@ -233,6 +242,7 @@ export class AvalancheService {
   async confirm(user, id, request) {
     return this.exclusive(async () => {
       let c = await this.accessible(user, id);
+      await this.assertOpen(c);
       this.owner(user, c);
       if (c.pending) fail('Đang có giao dịch chờ. Hãy đồng bộ lại.', 409);
       const m = request.message;
@@ -245,7 +255,8 @@ export class AvalancheService {
         { version: m.version, ...(m.action === 2 ? { commitment: m.commitment } : { reasonHash: m.reasonHash }) }) };
       c = await this.submit(c, 'relayer', 'confirm', [m, request.signature], names[m.action], eventArgs,
         { type: 'confirmation', action: m.action, version: m.version, dispute: request.dispute || null });
-      return publicCase(await this.notified(c, { 1: 'handover-confirmed', 2: 'settlement-confirmed', 3: 'settlement-disputed' }[m.action]));
+      c=await this.notified(c, { 1: 'handover-confirmed', 2: 'settlement-confirmed', 3: 'settlement-disputed' }[m.action]);
+      return publicCase(await this.finishLifecycle(c));
     });
   }
   async submit(c, role, name, args, event, eventArgs, effect) {
@@ -257,7 +268,7 @@ export class AvalancheService {
     return this.syncRecord(c);
   }
   async sync(user, id) {
-    return this.exclusive(async () => publicCase(await this.syncRecord(await this.accessible(user, id))));
+    return this.exclusive(async () => publicCase(await this.finishLifecycle(await this.syncRecord(await this.accessible(user, id)))));
   }
   async syncRecord(c) {
     if (!c.pending) return c;

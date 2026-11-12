@@ -18,8 +18,8 @@ import dangKyTraPhongRoutes from './routes/dangKyTraPhong.routes.js';
 import kiemTraTraPhongRoutes from './routes/kiemTraTraPhong.routes.js';
 import xacNhanKetQuaRoutes from './routes/xacNhanKetQua.routes.js';
 import xacNhanPhanHoiRoutes from './routes/xacNhanPhanHoi.routes.js';
-import thanhLyTraPhongRoutes from './routes/thanhlytraphong.routes.js';
-import banGiaoRaRoutes from './routes/GhiNhanBanGiaoRa.routes.js';
+import checkoutClosureRoutes from './routes/checkoutClosure.routes.js';
+import { startCheckoutLifecycleScheduler } from './services/checkoutLifecycleScheduler.service.js';
 import suaChuaBaoTriRoutes from './routes/suaChuaBaoTri.routes.js';
 import khachMoiRoutes from './routes/khachMoi.routes.js';
 import trangChuRoutes from './routes/trangChu.routes.js';
@@ -82,8 +82,7 @@ app.use('/api/dang-ky-tra-phong', requireAuth, auditMutations({ chucNang: 'Đăn
 app.use('/api/kiem-tra-tra-phong', requireAuth, auditMutations({ chucNang: 'Kiểm tra trả phòng', doiTuong: 'BienBanKiemTra' }), kiemTraTraPhongRoutes);
 app.use('/api/xac-nhan-ket-qua', requireAuth, auditMutations({ chucNang: 'Xác nhận kết quả trả phòng', doiTuong: 'KetQuaDoiSoat' }), xacNhanKetQuaRoutes);
 app.use('/api/xac-nhan-phan-hoi', requireAuth, auditMutations({ chucNang: 'Xác nhận phản hồi trả phòng', doiTuong: 'PhanHoiDoiSoat' }), xacNhanPhanHoiRoutes);
-app.use('/api/thanh-ly-tra-phong', requireAuth, auditMutations({ chucNang: 'Thanh lý hợp đồng', doiTuong: 'HopDongThue' }), thanhLyTraPhongRoutes);
-app.use('/api/ban-giao-ra', requireAuth, auditMutations({ chucNang: 'Bàn giao trả phòng', doiTuong: 'BienBanBanGiao' }), banGiaoRaRoutes);
+app.use('/api/checkout-lifecycle', requireAuth, auditMutations({ chucNang: 'Kết thúc hợp đồng và thu chìa khóa', doiTuong: 'HopDongThue' }), checkoutClosureRoutes);
 app.use('/api/sua-chua-bao-tri', requireAuth, auditMutations({ chucNang: 'Sửa chữa bảo trì', doiTuong: 'YeuCauSuaChua' }), suaChuaBaoTriRoutes);
 app.use('/api/khach-moi', requireAuth, auditMutations({ chucNang: 'Portal khách hàng', doiTuong: 'KhachHang' }), khachMoiRoutes);
 app.use('/api/admin', requireAuth, adminRoutes);
@@ -99,10 +98,13 @@ async function start() {
   const server = app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
     console.log(`Connected to SQL Server database: ${process.env.DB_NAME || 'not configured'}`);
-    startHoaDonQuaHanScheduler();
-    startDatCocHetHanScheduler();
-    startYeuCauCocQuaHanScheduler();
-    startNhacThuDauKyScheduler();
+    if (process.env.SCHEDULERS_ENABLED !== 'false') {
+      startHoaDonQuaHanScheduler();
+      startDatCocHetHanScheduler();
+      startYeuCauCocQuaHanScheduler();
+      startNhacThuDauKyScheduler();
+      startCheckoutLifecycleScheduler();
+    }
   });
 
   server.on('error', (error) => {

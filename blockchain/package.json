@@ -6,6 +6,7 @@
   "description": "Versioned handover and deposit settlement confirmations without custody.",
   "exports": {
     "./evidence": "./src/evidence.js",
+    "./closure": "./src/closure.js",
     "./confirmation": "./src/confirmation.js",
     "./abi": "./src/abi.js"
   },

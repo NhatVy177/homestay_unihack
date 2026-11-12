@@ -1,6 +1,7 @@
 import { getPool } from '../database/connection.js';
 import * as thuThemDoiSoatRepository from '../repositories/thuThemDoiSoat.repository.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
+import { getCheckoutClosure, reconcileCheckoutBySettlement } from '../integrations/checkoutClosure/index.js';
 
 const THU_THEM_FILTERS = new Set(['all', 'can-ghi-nhan', 'cho-xac-nhan']);
 
@@ -81,16 +82,19 @@ export async function xacNhanThuThem(data, maNhanVienKeToan) {
   const phuongThucThanhToan = normalizePaymentMethod(data?.phuongThucThanhToan);
   const ngayThanhToan = normalizePaymentDate(data?.ngayThanhToan);
   const chungTuThanhToan = String(data?.chungTuThanhToan || '').trim() || null;
+  await getCheckoutClosure().assertFinancialAction(maDoiSoat,maNhanVienKeToan,chungTuThanhToan,ngayThanhToan);
   const pool = await getPool();
 
   try {
-    return await thuThemDoiSoatRepository.xacNhanThuThem(pool, {
+    const result=await thuThemDoiSoatRepository.xacNhanThuThem(pool, {
       maDoiSoat,
       maNhanVienKeToan,
       phuongThucThanhToan,
       ngayThanhToan,
       chungTuThanhToan
     });
+    await reconcileCheckoutBySettlement(maDoiSoat);
+    return result;
   } catch (error) {
     mapThuThemDatabaseError(error);
   }

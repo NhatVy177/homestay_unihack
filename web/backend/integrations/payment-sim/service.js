@@ -6,9 +6,9 @@ const fail = (message, statusCode = 400) => { throw Object.assign(new Error(mess
 const FIELDS = ['orderId', 'amountVnd', 'resultCode', 'transId', 'responseTime'];
 export const ipnString = body => FIELDS.map(key => `${key}=${body[key]}`).join('&');
 export class PaymentSimulator {
-  constructor({ store, deposits, firstCharges, topUps, secret, clock = () => Date.now(), notifyDepositPaid = async () => {}, notifyFirstChargePaid = async () => {} }) {
+  constructor({ store, deposits, firstCharges, topUps, secret, clock = () => Date.now(), notifyDepositPaid = async () => {}, notifyFirstChargePaid = async () => {}, beforeTopUpPaid=async()=>{}, afterTopUpPaid=async()=>{} }) {
     if (!secret || secret.length < 16) throw new Error('PAYMENT_SIM_SECRET must be at least 16 characters.');
-    Object.assign(this, { store, deposits, firstCharges, topUps, secret, clock, notifyDepositPaid, notifyFirstChargePaid });
+    Object.assign(this, { store, deposits, firstCharges, topUps, secret, clock, notifyDepositPaid, notifyFirstChargePaid, beforeTopUpPaid, afterTopUpPaid });
   }
   sign(body) { return createHmac('sha256', this.secret).update(ipnString(body)).digest('hex'); }
   verify(body) {
@@ -135,7 +135,9 @@ export class PaymentSimulator {
       }
       else if (order.purpose === 'thu-them-doi-soat') {
         // The SQL adapter runs the top-up procedure and marks the order Paid in one transaction.
+        await this.beforeTopUpPaid(order.refId);
         await this.topUps.markPaid(order, receipt, String(body.transId));
+        try {await this.afterTopUpPaid(order.refId);} catch { /* receipt is committed; reconciliation can retry */ }
       }
       else fail('Loại đơn thanh toán không hợp lệ.', 409);
     } catch (error) {
