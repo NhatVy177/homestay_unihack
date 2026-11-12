@@ -46,6 +46,15 @@ try {
     await modal.getByRole('button',{name:'Tiếp nhận hồ sơ đăng ký',exact:true}).click();
     assert.equal(await modal.count(),0);await page.getByText('Hồ sơ chờ tiếp nhận',{exact:true}).waitFor();
     assert.equal(writes.length,0,'opening reception does not mutate a real registration');
+    const filters=page.getByRole('group',{name:'Bộ lọc trạng thái',exact:true});
+    const pendingFilter=filters.getByRole('button',{name:/Chờ tiếp nhận/});
+    assert.equal(await pendingFilter.getAttribute('aria-pressed'),'true');
+    const colors=await pendingFilter.evaluate(el=>{const s=getComputedStyle(el),count=getComputedStyle(el.querySelector('.status-pill-count'));return{background:s.backgroundColor,border:s.borderTopColor,text:s.color,count:count.color,countBackground:count.backgroundColor};});
+    assert.deepEqual(colors,{background:'rgb(232, 237, 231)',border:'rgb(74, 101, 73)',text:'rgb(74, 101, 73)',count:'rgb(74, 101, 73)',countBackground:'rgba(0, 0, 0, 0)'},'sage theme and transparent count in reception filters');
+    await filters.getByRole('button',{name:/Đã tiếp nhận/}).click();await page.getByRole('heading',{name:'Không có phiếu đăng ký',exact:true}).waitFor();
+    await pendingFilter.click();await page.getByText('Hồ sơ chờ tiếp nhận',{exact:true}).waitFor();assert.equal(writes.length,0);
+    await page.evaluate(()=>document.fonts.ready);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),width);assert.deepEqual(errors,[]);
+    await page.screenshot({path:resolve(folder,`reception-sage-filters-${width}.png`),fullPage:true});
     await nav('Lịch hẹn xem phòng');profiles=[accepted,pending];await launch.click();await modal.getByRole('button',{name:/Khách kiểm thử/}).waitFor();
     await modal.getByText('1 phiếu chưa có lịch xem phòng',{exact:true}).waitFor();
     const search=modal.getByRole('textbox',{name:'Tìm hồ sơ để lập lịch'});await search.fill('không khớp');await modal.getByText('Không có hồ sơ khớp từ khóa.',{exact:true}).waitFor();await search.fill('');
@@ -66,7 +75,7 @@ try {
     await launch.click();await modal.getByRole('button',{name:'Đóng form lập lịch',exact:true}).click();await modal.waitFor({state:'detached'});
     await nav('Hồ sơ cá nhân');await page.getByRole('heading',{name:'Hồ sơ cá nhân',exact:true}).first().waitFor();
     assert.equal(await page.locator('aside nav button:disabled').count(),0);assert.deepEqual(errors,[]);
-    report.push({width,emptyState:true,singleHeader:true,searchAndCount:true,receptionLink:true,calendarPreserved:true,tabsDisabled:0,multipleRooms:true,writes:1,closeAndEscape:true,fixtures:true,errors});
+    report.push({width,emptyState:true,singleHeader:true,searchAndCount:true,receptionLink:true,sageReceptionFilters:true,calendarPreserved:true,tabsDisabled:0,multipleRooms:true,writes:1,closeAndEscape:true,fixtures:true,errors});
     await context.close();
   }
   await writeFile(resolve(folder,'report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));console.log('PASS Sale schedule modal at 1440/390: reception path, unchanged booking payload, closing and enabled tabs; fixture APIs only.');

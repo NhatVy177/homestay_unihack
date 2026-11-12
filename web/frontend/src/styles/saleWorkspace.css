@@ -19,6 +19,10 @@
 @media (max-width: 600px) { .sale-scheduling-overlay { padding: var(--space-3); } .sale-scheduling-dialog.ui-card { max-height: calc(100dvh - 24px); border-radius: var(--radius-lg); } .sale-scheduling-header, .sale-scheduling-body { padding: var(--space-4); } .sale-scheduling-header h2 { font-size: 20px; } .sale-scheduling-count { gap: var(--space-3); } }
 .sale-workspace { --sale-wood: var(--color-primary); --sale-paper: var(--color-primary-soft); }
 .sale-workspace .ui-btn--secondary { border: 1px solid var(--color-border); }
+.sale-workspace .ui-list-toolbar .status-pill-tab { color: var(--color-primary); }
+.sale-workspace .ui-list-toolbar .status-pill-tab:hover { background: var(--color-primary-soft); border-color: var(--color-primary); }
+.sale-workspace .ui-list-toolbar .status-pill-tab:is(.is-active, [aria-pressed="true"]) { background: var(--color-primary-soft); border-color: var(--color-primary); color: var(--color-primary); }
+.sale-workspace .ui-list-toolbar .status-pill-tab .status-pill-count { background: transparent; color: inherit; }
 .sale-eyebrow { color: var(--sale-wood, var(--color-accent)); font-size: 10px; font-weight: 600; letter-spacing: .1em; margin: 0 0 var(--space-2); }
 .sale-view { display: flex; flex-direction: column; gap: var(--space-6); min-width: 0; }
 .sale-workspace .lhd-container { min-width: 0; padding: 0; background: var(--color-bg); --lhd-bg: var(--color-bg); --lhd-white: var(--color-surface); }
