@@ -64,7 +64,7 @@ Nhánh tích hợp đã vào main; các nhánh cũ đã gộp có thể được
 | **Phải có** (trên đường demo) | Điều khoản hợp đồng + phiên bản chính sách + mã băm ảnh hợp đồng vào gói bàn giao | D-027, D-031, D-034 | **Xong code + test (C1)**; migration đã chạy; chưa chạy thật qua giao diện |
 | | Màn kiểm tra trả phòng so trước/sau | D-030 | **Xong code + test (C2, J-C064)**; bảng ảnh đã tạo; HOMEDORM4 chưa có phiếu trả phòng của hợp đồng nên chưa thử dữ liệu thật |
 | | Bản nháp đối soát tự soạn; thu thêm qua ví | D-030, D-040 | **Xong code + test (C3, J-C066)**: phần tự điền đã có sẵn; thêm tỷ lệ theo chính sách đã khóa, thu thêm qua ví, kế toán xem đối chiếu. Migration `settlement-topup:db:migrate` đã chạy trên HOMEDORM4; giao diện màn Quyết toán (B4) chưa làm lại |
-| | Tự thanh lý 3 trường hợp + gói bằng chứng cuối + "Thanh lý không có xác nhận của khách" | D-030, D-031, D-038 | Chưa làm (C4) |
+| | Tự thanh lý 3 trường hợp + gói bằng chứng cuối + "Thanh lý không có xác nhận của khách" | D-030, D-031, D-038 | Đang khảo sát/triển khai C4 ở feat/t22-auto-liquidation (Codex, Vy giao lại 12/11); D-041 đã chốt, chưa code/test/migration |
 | | Điều khoản xác nhận điện tử trong mẫu hợp đồng; ô đồng ý dữ liệu cá nhân | D-038 | Chưa làm (C6) |
 | | Danh sách "Chờ khách xác nhận", nhắc 24/72 giờ | D-028 | Có nút nhắc tay; chưa tự nhắc (trong C4) |
 | **Nên có** | Khách tự giữ chỗ; từ chối → "Đã xem"; "Không thuê nữa"; "Khách không đến" | D-026 | C5-a có code + test nút Sale và bỏ tự đánh dấu, đã migrate, chờ merge/restart; các phần giữ chỗ/Không thuê nữa/chặn lịch thứ hai vẫn chưa hoàn tất |
@@ -82,7 +82,7 @@ Nguyên tắc: mỗi file chỉ một người sửa. Chi tiết và prompt: [vi
 | Người | Việc |
 |---|---|
 | **Claude** | Chuỗi trả phòng: C2 + B3 (xong), C3 + B4, C4; hồ sơ nộp D1–D3 (bản nháp xong, điền số liệu Fuji sau); C5 đề xuất làm sau C4 |
-| **Codex** | C5-a gỡ A3-01 (J-C067/J-X070), Fuji A2, A3 trước; sau đó giao diện B1, B2, B5, B7 và C6; dọn dẹp E1–E3 |
+| **Codex** | C4 theo yêu cầu Vy ngày 12/11 và D-041; C5-a gỡ A3-01 (J-C067/J-X070), Fuji A2, A3 trước; sau đó giao diện B1, B2, B5, B7 và C6; dọn dẹp E1–E3 |
 | **Vy** | Faucet; merge PR; chạy luồng thật cùng A3 (OTP, các vai trò); trả lời Q-07; dựng slide, quay video |
 
 ## Lưu ý khi chạy thật (từ đợt xem code J-C060)

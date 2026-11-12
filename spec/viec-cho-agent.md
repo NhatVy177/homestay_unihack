@@ -166,7 +166,9 @@ Việc: khảo sát rồi bổ sung. Nhánh: feat/t22-settlement-draft.
 4. Test SQL chạy trong transaction rồi rollback, theo mẫu scripts/deposit-flow-verify.mjs.
 ```
 
-### C4 — Tự thanh lý và gói bằng chứng cuối (D-030 mục 5, D-031 mục 1) (Claude)
+### C4 — Tự thanh lý và gói bằng chứng cuối (D-030 mục 5, D-031 mục 1, D-041) (Vy giao lại Codex 12/11)
+
+D-041: thanh lý không có xác nhận vẫn phải đủ thu/hoàn/chứng từ; nút đóng khóa và báo khoản thiếu. Thu chìa khóa/nhả phòng không phụ thuộc đóng hợp đồng. C4 làm ở nhánh/worktree riêng `feat/t22-auto-liquidation`/`D:\HomeStayDorm-c4`, không sửa Solidity. Quyền giữ file của Claude trước đây được chuyển cho Codex trong phạm vi C4 theo yêu cầu mới của Vy; giữ C3/B4 và ghi chú B1/B5. Migration C4 cần xin riêng.
 
 ```
 Việc: tự thanh lý hợp đồng khi tiền đã xong. Nhánh: feat/t22-auto-liquidation. KHÔNG sửa contract.

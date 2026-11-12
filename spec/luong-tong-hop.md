@@ -169,11 +169,11 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
 | Khách **trả thêm** | Khách đồng ý đối soát **và** đã trả xong |
 | Khách **được hoàn** | Khách đồng ý đối soát **và** kế toán đã chi, **có chứng từ** |
 | **Bằng 0** | Khách đồng ý đối soát (vẫn phải đóng được hồ sơ) |
-| **Không có xác nhận** *(D-038)* | Quản lý bấm "Thanh lý không có xác nhận của khách", có lý do và bằng chứng |
+| **Không có xác nhận** *(D-038, D-041)* | Đủ điều kiện quá hạn/phản đối, lý do và bằng chứng liên hệ; vẫn phải xử lý đủ thu/hoàn và chứng từ. Thiếu thì khóa nút và báo khoản thiếu |
 
 Đủ điều kiện → **hệ thống tự thanh lý hợp đồng và đóng hồ sơ**. **Bỏ** bước thanh lý tay và biên bản trả phòng giấy (chữ ký điện tử ở mốc 2 thay thế).
 
-Quản lý chỉ còn bấm **"Đã thu chìa khóa"** để phòng/giường về trống (khách trả chìa sau khi nhận đủ tiền, nên "hoàn xong mới trả chìa" là chủ ý).
+**D-041 (thay điều kiện cũ của D-030):** quản lý bấm **"Đã thu chìa khóa"** để phòng/giường về trống; thao tác này không phụ thuộc hợp đồng đã đóng. Không tự nhả phòng/giường chỉ vì hợp đồng thanh lý hoặc tiền đã xong.
 
 **Gói bằng chứng cuối (D-031):** khi tự thanh lý, hệ thống thêm **chứng từ chi/thu** (mã băm chứng từ, số tiền, thời điểm) vào gói bằng chứng trên **Web2** và **email cho khách**. Trang Verify hiển thị phần này, **đánh dấu rõ là dữ liệu Web2, không phải trên chuỗi.**
 
