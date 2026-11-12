@@ -5,6 +5,7 @@ import { AvalancheService } from './service.js';
 import { chainConfig, configuredChain } from './chain.js';
 import { createNotifier } from './notifications.js';
 import { createMailer } from '../mail/mailer.js';
+import { getCheckoutClosure } from '../checkoutClosure/index.js';
 export function avalancheEnabled() {
   try { return process.env.AVALANCHE_ENABLED === 'true' && isAddress(chainConfig().address); } catch { return false; }
 }
@@ -14,6 +15,8 @@ export function getAvalancheService() {
   return service ||= new AvalancheService({
     store: new SqlStore(), sources: sqlSources, chain: configuredChain(), origin: appOrigin(),
     notify: createNotifier({ mailer: createMailer(), contact: sqlSources.contact, origin: appOrigin() }),
+    isClosed:async id=>!!(await getCheckoutClosure().repository.context(id))?.closedAt,
+    afterConfirmed: c=>getCheckoutClosure().reconcile(c.contractId),
   });
 }
 /** D-012: the Web2 handover publishes the tenant review automatically; failures never block Web2. */

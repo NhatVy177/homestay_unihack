@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { getCheckoutClosure, reconcileCheckoutBySettlement } from '../integrations/checkoutClosure/index.js';
 import { randomBytes } from 'node:crypto';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { PaymentSimulator } from '../integrations/payment-sim/service.js';
@@ -14,7 +15,8 @@ const getSimulator = () => {
   if (!process.env.PAYMENT_SIM_SECRET) console.warn('[payment-sim] PAYMENT_SIM_SECRET chưa đặt; dùng khóa tạm thời cho phiên chạy này.');
   return (simulator = new PaymentSimulator({ store: sqlPaymentStore, deposits: sqlDeposits, firstCharges: sqlFirstCharges, topUps: sqlTopUps,
     secret, notifyDepositPaid: id => notifyDeposit('paid', id),
-    notifyFirstChargePaid: id => notifyNhanPhong('first-charge-paid', id) }));
+    notifyFirstChargePaid: id => notifyNhanPhong('first-charge-paid', id),
+    beforeTopUpPaid:id=>getCheckoutClosure().assertFinancialAction(id),afterTopUpPaid:reconcileCheckoutBySettlement }));
 };
 const enabled = () => process.env.PAYMENT_SIM_ENABLED !== 'false';
 router.use((req, res, next) => enabled() ? next() : res.status(503).json({ message: 'Cổng thanh toán mô phỏng đang tắt.' }));

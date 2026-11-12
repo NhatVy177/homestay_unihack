@@ -40,7 +40,7 @@ const templates = {
 export function createNotifier({ mailer, contact, origin }) {
   const link = `${origin.replace(/\/$/, '')}/khach-hang?tab=hop-dong`;
   return async (kind, c) => {
-    const template = templates[kind];
+    const template = templates[kind] || (kind.startsWith('reminder:') ? templates.reminder : null);
     if (!template) return { status: 'skipped' };
     const person = await contact(c.customerId);
     const { subject, text, attachments } = template(c, link);

@@ -1,6 +1,7 @@
 import { getPool } from '../database/connection.js';
 import * as hoanCocDoiSoatRepository from '../repositories/hoanCocDoiSoat.repository.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
+import { getCheckoutClosure, reconcileCheckoutBySettlement } from '../integrations/checkoutClosure/index.js';
 
 function requireMaDoiSoat(maDoiSoat) {
   if (!maDoiSoat || String(maDoiSoat).trim().length > 6) {
@@ -69,16 +70,19 @@ export async function xacNhanHoanCoc(data, maNhanVienKeToan) {
   const phuongThucThanhToan = normalizePaymentMethod(data?.phuongThucThanhToan);
   const ngayThanhToan = normalizePaymentDate(data?.ngayThanhToan);
   const chungTuThanhToan = String(data?.chungTuThanhToan || '').trim() || null;
+  await getCheckoutClosure().assertFinancialAction(maDoiSoat,maNhanVienKeToan,chungTuThanhToan,ngayThanhToan);
   const pool = await getPool();
 
   try {
-    return await hoanCocDoiSoatRepository.xacNhanHoanCoc(pool, {
+    const result=await hoanCocDoiSoatRepository.xacNhanHoanCoc(pool, {
       maDoiSoat,
       maNhanVienKeToan,
       phuongThucThanhToan,
       ngayThanhToan,
       chungTuThanhToan
     });
+    await reconcileCheckoutBySettlement(maDoiSoat);
+    return result;
   } catch (error) {
     mapHoanCocDatabaseError(error);
   }

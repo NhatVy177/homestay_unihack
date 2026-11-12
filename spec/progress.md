@@ -64,9 +64,9 @@ Nhánh tích hợp đã vào main; các nhánh cũ đã gộp có thể được
 | **Phải có** (trên đường demo) | Điều khoản hợp đồng + phiên bản chính sách + mã băm ảnh hợp đồng vào gói bàn giao | D-027, D-031, D-034 | **Xong code + test (C1)**; migration đã chạy; chưa chạy thật qua giao diện |
 | | Màn kiểm tra trả phòng so trước/sau | D-030 | **Xong code + test (C2, J-C064)**; bảng ảnh đã tạo; HOMEDORM4 chưa có phiếu trả phòng của hợp đồng nên chưa thử dữ liệu thật |
 | | Bản nháp đối soát tự soạn; thu thêm qua ví | D-030, D-040 | **Xong code + test (C3, J-C066)**: phần tự điền đã có sẵn; thêm tỷ lệ theo chính sách đã khóa, thu thêm qua ví, kế toán xem đối chiếu. Migration `settlement-topup:db:migrate` đã chạy trên HOMEDORM4; giao diện màn Quyết toán (B4) chưa làm lại |
-| | Tự thanh lý 3 trường hợp + gói bằng chứng cuối + "Thanh lý không có xác nhận của khách" | D-030, D-031, D-038 | Chưa làm (C4) |
+| | Tự thanh lý 3 trường hợp + gói bằng chứng cuối + "Thanh lý không có xác nhận của khách" | D-030, D-031, D-038 | **Xong code + test (C4, J-X073, J-C069)** ở `feat/t22-auto-liquidation`: tự thanh lý 3 trường hợp, thanh lý không có xác nhận (D-038/D-041), "Đã thu chìa khóa" riêng, gói bằng chứng cuối; bỏ tab thanh lý tay/bàn giao ra. **Migration `checkout-lifecycle:db:migrate` chưa chạy lên HOMEDORM4 (chờ Vy)**; chưa thử dữ liệu thật |
 | | Điều khoản xác nhận điện tử trong mẫu hợp đồng; ô đồng ý dữ liệu cá nhân | D-038 | Chưa làm (C6) |
-| | Danh sách "Chờ khách xác nhận", nhắc 24/72 giờ | D-028 | Có nút nhắc tay; chưa tự nhắc (trong C4) |
+| | Danh sách "Chờ khách xác nhận", nhắc 24/72 giờ | D-028 | Có nút nhắc tay; C4 thêm tự nhắc 24/72 giờ và "Quá hạn phản hồi" sau 7 ngày (job nền, tôn trọng `SCHEDULERS_ENABLED`); chờ migration C4 |
 | **Nên có** | Khách tự giữ chỗ; từ chối → "Đã xem"; "Không thuê nữa"; "Khách không đến" | D-026 | C5-a có code + test nút Sale và bỏ tự đánh dấu, đã migrate, chờ merge/restart; các phần giữ chỗ/Không thuê nữa/chặn lịch thứ hai vẫn chưa hoàn tất |
 | | Chính sách hoàn cọc trên phiếu và email cọc | D-031, D-034 | **Xong code + test (C1)**; chưa thử SMTP thật |
 | | Thẻ "Kích hoạt xác nhận điện tử" sau khi trả cọc | D-028 | Chưa làm |
@@ -82,7 +82,7 @@ Nguyên tắc: mỗi file chỉ một người sửa. Chi tiết và prompt: [vi
 | Người | Việc |
 |---|---|
 | **Claude** | Chuỗi trả phòng: C2 + B3 (xong), C3 + B4, C4; hồ sơ nộp D1–D3 (bản nháp xong, điền số liệu Fuji sau); C5 đề xuất làm sau C4 |
-| **Codex** | C5-a gỡ A3-01 (J-C067/J-X070), Fuji A2, A3 trước; sau đó giao diện B1, B2, B5, B7 và C6; dọn dẹp E1–E3 |
+| **Codex** | C4 theo yêu cầu Vy ngày 12/11 và D-041; C5-a gỡ A3-01 (J-C067/J-X070), Fuji A2, A3 trước; sau đó giao diện B1, B2, B5, B7 và C6; dọn dẹp E1–E3 |
 | **Vy** | Faucet; merge PR; chạy luồng thật cùng A3 (OTP, các vai trò); trả lời Q-07; dựng slide, quay video |
 
 ## Lưu ý khi chạy thật (từ đợt xem code J-C060)
@@ -91,7 +91,7 @@ Nguyên tắc: mỗi file chỉ một người sửa. Chi tiết và prompt: [vi
 - **Sale không còn lối đăng ký trả phòng** (D-036): khách tự gửi yêu cầu trả phòng trên cổng khách.
 - J-X069 đã đăng nhập Sale NV0001/CN0001 thật ở phiên A3, chưa nghiệm thu toàn luồng. J-X070 kiểm hai nút kết quả lịch bằng API giả, SQL tích hợp ở DB tạm; chưa ghi trạng thái lịch thật HOMEDORM4.
 - **Đã sửa lỗi có sẵn trên `main`** (J-C061): tab "Tiền mặt chờ nộp quỹ" của kế toán bị trắng trang khi mở do thiếu `import React`. Cổng khách trên điện thoại trước đây không có menu; nay có.
-- Đã bỏ trang `/dashboard` của ứng dụng cũ (HappyRoom) và 3 tab giữ chỗ trống của khách ("Phòng/Giường của tôi", "Hóa đơn", "Bảo trì"). Tab "Thanh lý trả phòng" của quản lý còn giữ cho tới khi C4 làm xong tự thanh lý (D-039).
+- Đã bỏ trang `/dashboard` của ứng dụng cũ (HappyRoom) và 3 tab giữ chỗ trống của khách ("Phòng/Giường của tôi", "Hóa đơn", "Bảo trì"). Tab "Thanh lý trả phòng" và "Ghi nhận bàn giao ra" của quản lý được thay bằng mục "Kết thúc hợp đồng" ở nhánh C4 (D-039; có hiệu lực khi merge + migration).
 - Bản A2 `fuji:fund` nạp đủ 0,1 mỗi ví, bỏ qua ví đủ và hỗ trợ `--check`; bản A1 cũ ở worktree chứa khóa vẫn là 0,3. Chạy **script A2 với cwd thư mục khóa A1** theo `blockchain/README.md`, không chạy nhầm npm script A1. Nếu RPC lỗi sau broadcast, kiểm hash/receipt trước khi thử lại.
 - Bản ứng dụng đang chạy trước A2 chưa được restart/chuyển cấu hình. Env Fuji đã chuẩn bị riêng ở `D:\HomeStayDorm-fuji-deploy\web\{backend,frontend}\.env`, kèm `.env.local-chain` sao lưu; đều ignore. Config route thật với env A2 trả enabled/43113/address đúng trong tiến trình chỉ đọc, không nối DB hay khởi động scheduler. Không coi đây là ứng dụng đầy đủ đã chạy A3.
 
