@@ -22,6 +22,7 @@
     "verify:fuji": "node scripts/verify-fuji.mjs",
     "fuji:keygen": "node scripts/fuji-keygen.mjs",
     "fuji:fund": "node scripts/fuji-fund.mjs",
+    "fuji:e2e:receipts": "node scripts/fuji-e2e-receipts.mjs",
     "local:ensure": "node scripts/ensure-local.mjs"
   },
   "dependencies": {

@@ -96,16 +96,18 @@ Trang [`/kiem-chung-avalanche`](web/frontend/src/pages/avalanche/AvalancheVerify
 | Manifest | [blockchain/deployments/fuji.json](blockchain/deployments/fuji.json) (compiler, constructor, source commit, receipt) |
 | Phí gas các giao dịch nghiệp vụ | chưa đo (sau A3) |
 
-Giao dịch mẫu của một luồng đầy đủ (điền sau việc A3):
+Giao dịch mẫu của một luồng đầy đủ (điền sau việc A3). **Chưa nghiệm thu A3**: phiên ứng dụng Fuji đã chạy, Sale thật đã đăng nhập; Vy chốt A3 chờ Claude sửa lịch xem trong C5 theo D-026 trước khi chuẩn bị tiếp hợp đồng demo. Bảng kiểm và lỗi A3-01: [spec/kiem-thu-fuji.md](spec/kiem-thu-fuji.md).
 
-| # | Bước | Link explorer |
-|---|---|---|
-| 1 | Quản lý ghi biên bản bàn giao (`proposeHandover`) | chưa có |
-| 2 | Khách xác nhận biên bản (`confirm`, hành động 1) | chưa có |
-| 3 | Kế toán lập đối soát v1 (`proposeSettlement`) | chưa có |
-| 4 | Khách phản đối v1 (`confirm`, hành động 3) | chưa có |
-| 5 | Kế toán lập đối soát v2 (`proposeSettlement`) | chưa có |
-| 6 | Khách đồng ý v2 (`confirm`, hành động 2) | chưa có |
+| # | Bước | Link explorer | Gas used | Phí AVAX |
+|---|---|---|---|---|
+| 1 | Quản lý ghi biên bản bàn giao (`proposeHandover`) | chưa có | chưa đo | chưa đo |
+| 2 | Khách xác nhận biên bản (`confirm`, hành động 1) | chưa có | chưa đo | chưa đo |
+| 3 | Kế toán lập đối soát v1 (`proposeSettlement`) | chưa có | chưa đo | chưa đo |
+| 4 | Khách phản đối v1 (`confirm`, hành động 3) | chưa có | chưa đo | chưa đo |
+| 5 | Kế toán lập đối soát v2 (`proposeSettlement`) | chưa có | chưa đo | chưa đo |
+| 6 | Khách đồng ý v2 (`confirm`, hành động 2) | chưa có | chưa đo | chưa đo |
+
+Phí đo từ receipt: `gasUsed × effectiveGasPrice / 10^18` AVAX. Script `npm run fuji:e2e:receipts` trong `blockchain` kiểm đủ sáu receipt đúng thứ tự/hồ sơ/vai trò rồi xuất bảng; chưa có báo cáo receipt thật. Giao dịch deploy/nạp ví không nằm trong bảng này.
 
 ## 4. Chạy thử từ đầu
 
@@ -130,8 +132,8 @@ Cấu hình đầy đủ (Privy, email, chu kỳ quét, cổng mô phỏng): [do
 
 | Phần | Lệnh | Kết quả gần nhất (11/11/2026) |
 |---|---|---|
-| Contract + luồng tích hợp trên chain local | `cd blockchain && npm test` | 18 qua, 1 bỏ qua (SQL) |
-| Backend | `cd web/backend && npm test` | 31 qua, 1 bỏ qua |
+| Contract + luồng tích hợp trên chain local + collector receipt | `cd blockchain && npm test` | 28 qua, 1 bỏ qua (SQL), J-X069 |
+| Backend | `cd web/backend && npm test` | 36 qua, 1 bỏ qua, J-X069 |
 | Build frontend | `cd web/frontend && npm run build` | Qua |
 | Màn xác nhận, kiểm chứng, cổng mô phỏng (API giả) | `npm run test:avalanche-ui` | Qua |
 | Gói bàn giao v2, khung trang, danh sách (API giả) | `npm run test:handover-ui`, `test:shell-ui`, `test:list-kit` | Qua |

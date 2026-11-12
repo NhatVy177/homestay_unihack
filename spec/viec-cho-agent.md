@@ -5,8 +5,8 @@ Lập 2026-11-11 (J-C059), cập nhật 09:40 cùng ngày (J-C060), kèm [audit-
 **Đã xong:** A1 (J-X058), C1 (J-X061, J-X062), không gian Sale (D-035, D-036), B0 khung chung (J-C061), C2 + B3 (J-C064); **A2 funding/deploy/source verification thật (J-X068)**, config riêng tại worktree A2 và kiểm route config/read roles khớp. **Tiếp A3:** đưa cấu hình vào phiên ứng dụng đầy đủ, chuẩn bị hợp đồng demo và chạy trọn luồng SQL/SMTP/OTP Privy; chưa chạy các bước đó. Song song B1, C6.
 
 **Ai làm việc nào:** mỗi file chỉ một người sửa. **Chia lại 2026-11-11 15:3x (Vy chọn, J-C064)** vì Codex đang chờ AVAX cho A2 nên chuỗi trả phòng đứng yên; thay bảng chia lúc 10:11 (J-C061).
-- **Claude:** chuỗi trả phòng C2 (gộp B3, **xong**), C3 (gộp B4), C4; D1–D3 (bản nháp xong). C5: chưa đổi người, đề xuất Claude làm sau C4 vì backend đã viết ở `feat/t22-backend`. Codex **không** sửa: `pages/nhanVienQuanLy/{KiemTraTraPhong,XuLyTraPhongTab,thanhlytraphong,GhiNhanBanGiaoRa,XacNhanPhanHoi}.jsx`, `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx`, `web/backend/services/{doiSoat*,khauTruDoiSoat,thuThemDoiSoat,hoanCocDoiSoat,kiemTraTraPhong,traPhongSoSanh,thanhlytraphong}*.js`, `styles/lists.css` (chỉ thêm ở cuối nếu cần).
-- **Codex:** A2, A3 (Fuji, làm trước); **C5-a lịch xem để gỡ A3-01 (Vy giao tại J-C067)**; sau đó B1, B2, B5, B7, C6; E1–E3. Được sửa `components/common/WorkspaceShell.jsx`, `styles/shell.css`, `KhachHangPortalPage.jsx`, các file còn lại trong `components/xacNhan/`, `pages/avalanche/*`, `pages/thanhToanMoPhong/*`, `BanGiaoPhongTab.jsx` khi làm B1/B2/B5.
+- **Claude:** chuỗi trả phòng C2 (gộp B3, **xong**), C3 (gộp B4); C4 Vy giao lại Codex ngày 12/11; D1–D3 (bản nháp xong). C5: chưa đổi người, đề xuất Claude làm sau C4 vì backend đã viết ở `feat/t22-backend`. Ngoài phần C4 Vy giao lại, Codex **không** sửa: `pages/nhanVienQuanLy/{KiemTraTraPhong,XuLyTraPhongTab,thanhlytraphong,GhiNhanBanGiaoRa,XacNhanPhanHoi}.jsx`, `pages/nhanVienKeToan/QuyetToanTraPhongTab.jsx`, `components/xacNhan/KeToanXacNhanTab.jsx`, `web/backend/services/{doiSoat*,khauTruDoiSoat,thuThemDoiSoat,hoanCocDoiSoat,kiemTraTraPhong,traPhongSoSanh,thanhlytraphong}*.js`, `styles/lists.css` (chỉ thêm ở cuối nếu cần).
+- **Codex:** A2, A3 (Fuji, làm trước); C4 theo yêu cầu Vy ngày 12/11 trong lúc chờ lịch xem; **C5-a lịch xem để gỡ A3-01 (Vy giao tại J-C067)**; sau đó B1, B2, B5, B7, C6; E1–E3. Được sửa `components/common/WorkspaceShell.jsx`, `styles/shell.css`, `KhachHangPortalPage.jsx`, các file còn lại trong `components/xacNhan/`, `pages/avalanche/*`, `pages/thanhToanMoPhong/*`, `BanGiaoPhongTab.jsx` khi làm B1/B2/B5.
 
 **Bộ danh sách chung (J-C062, Claude):** `ListSearch`, `TableState`, `ListPagination`, `OverviewCards` lọc được, `StatusBadge` có icon; CSS ở `styles/lists.css` (Claude giữ file này, Codex chỉ thêm quy tắc ở cuối file nếu cần). Codex dùng chúng khi làm B3, B4, B7, C4.
 
@@ -166,7 +166,9 @@ Việc: khảo sát rồi bổ sung. Nhánh: feat/t22-settlement-draft.
 4. Test SQL chạy trong transaction rồi rollback, theo mẫu scripts/deposit-flow-verify.mjs.
 ```
 
-### C4 — Tự thanh lý và gói bằng chứng cuối (D-030 mục 5, D-031 mục 1) (Claude)
+### C4 — Tự thanh lý và gói bằng chứng cuối (D-030 mục 5, D-031 mục 1) (Vy giao lại Codex 12/11)
+
+Vy yêu cầu tiếp A3 sau khi merge hai nhánh và restart; trong lúc chờ lịch xem, Codex làm C4 trên `feat/t22-auto-liquidation`/`D:\HomeStayDorm-c4`. Quyền giữ file của Claude trước đây được chuyển cho Codex trong phạm vi C4; giữ nguyên C3/B4 đã merge. Không chạy migration C4 lên HOMEDORM4 theo quyền của C5-a; phải xin riêng khi có kết quả review được.
 
 ```
 Việc: tự thanh lý hợp đồng khi tiền đã xong. Nhánh: feat/t22-auto-liquidation. KHÔNG sửa contract.
