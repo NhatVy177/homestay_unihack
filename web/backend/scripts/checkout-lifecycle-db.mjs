@@ -4,9 +4,12 @@ import { resolve } from 'node:path';
 
 export const financialProcedures=['dbo.SP_TraPhong_KeToan_XacNhanHoanCoc','dbo.SP_TraPhong_KeToan_XacNhanThuThem','dbo.SP_TraPhong_ThuThemQuaViMoPhong'];
 export const legacyProcedures=['dbo.SP_TraPhong_QuanLy_XacNhanThanhLy','dbo.SP_TraPhong_QuanLy_GhiNhanBanGiaoRa'];
+// SQL Server stores CREATE OR ALTER as "CREATE PROCEDURE", so a re-run must rewrite the header
+// even when the body is already patched; otherwise the second migrate fails with "already an object".
+const asCreateOrAlter=source=>source.replace(/^[ \t]*(?:CREATE(?:\s+OR\s+ALTER)?|ALTER)\s+PROC(?:EDURE)?\b/gmi,"CREATE OR ALTER PROCEDURE");
 export function patchLegacyProcedure(name,source) {
   if(!legacyProcedures.includes(name))throw new Error('Unexpected legacy procedure.');
-  if(source.includes('C4_LEGACY_CONTRACT_BLOCK'))return source;
+  if(source.includes('C4_LEGACY_CONTRACT_BLOCK'))return asCreateOrAlter(source);
   const marker=/SET NOCOUNT ON\s*;/i;
   if(!marker.test(source))throw new Error('Legacy procedure drifted.');
   return source.replace(marker,match=>match+`\n    -- C4_LEGACY_CONTRACT_BLOCK: leave deposit-only cancellations unchanged.\n    IF EXISTS(SELECT 1 FROM dbo.PhieuTraPhong WHERE MaPhieuTra=@MaPhieuTra AND MaHopDong IS NOT NULL)\n      THROW 50909,N'Hợp đồng dùng tự thanh lý và thao tác Đã thu chìa khóa.',1;`)

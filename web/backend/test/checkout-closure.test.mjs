@@ -7,7 +7,7 @@ import { CheckoutClosure } from '../services/checkoutClosure.service.js';
 import { ClosureProofs } from '../services/checkoutClosure.proofs.js';
 import { DAY, moneyState, exceptionEligibility, responseState, assertAccess } from '../services/checkoutClosure.rules.js';
 import { remindPendingCases } from '../services/checkoutLifecycleScheduler.service.js';
-import { patchFinancialProcedure } from '../scripts/checkout-lifecycle-db.mjs';
+import { patchFinancialProcedure, patchLegacyProcedure } from '../scripts/checkout-lifecycle-db.mjs';
 
 const manager={vaiTro:'NhanVien',chucVu:'Quản lý',maNguoiDung:'NV0001',maChiNhanh:'CN0001'};
 const now=Date.parse('2026-11-12T08:00:00Z');
@@ -95,4 +95,13 @@ test('C4: migration patches payment time once, preserves procedure and refuses d
   assert.match(patched,/ThoiDiemThanhToan = SYSUTCDATETIME\(\)/);
   assert.equal(patchFinancialProcedure('dbo.SP_TraPhong_KeToan_XacNhanThuThem',patched),patched);
   assert.throws(()=>patchFinancialProcedure('dbo.SP_TraPhong_KeToan_XacNhanThuThem','CREATE PROCEDURE x AS SELECT 1'),/drifted/);
+});
+
+test('C4: re-running the migration on an already patched legacy procedure keeps CREATE OR ALTER',()=>{
+  const stored="CREATE   PROCEDURE dbo.SP_TraPhong_QuanLy_XacNhanThanhLy @MaPhieuTra varchar(6) AS BEGIN SET NOCOUNT ON; SELECT 1; END";
+  const once=patchLegacyProcedure('dbo.SP_TraPhong_QuanLy_XacNhanThanhLy',stored);
+  const deployed=once.replace('CREATE OR ALTER PROCEDURE','CREATE   PROCEDURE');
+  const twice=patchLegacyProcedure('dbo.SP_TraPhong_QuanLy_XacNhanThanhLy',deployed);
+  assert.match(twice,/^CREATE OR ALTER PROCEDURE/);
+  assert.equal(twice.split('C4_LEGACY_CONTRACT_BLOCK').length,2,'the guard is inserted once');
 });
