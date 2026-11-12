@@ -848,3 +848,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Claude thêm `web/frontend/scripts/ui-checkout-closure.mjs` (API giả): hợp đồng chưa chi hoàn vẫn mở và liệt kê khoản thiếu dù đã thu chìa khóa; nút "Thanh lý không có xác nhận của khách" bị khóa; hợp đồng đã đóng có nút tải gói bằng chứng và nhãn "Đóng không có xác nhận của khách".
 - Kiểm tra (chạy trong đợt này, thư mục C4): backend `npm test` 51 qua/2 bỏ qua (gồm 6 test C4); blockchain 25 qua/1 bỏ qua; frontend build qua; `ui-checkout-closure.mjs` qua 1440/390 (đã xem ảnh); `test:avalanche-ui`, `test:list-kit`, `test:handover-ui`, `ui-settlement-c3.mjs`, `ui-checkout-compare.mjs` qua. `test:handover-ui` lần đầu lỗi do thư mục chưa biên dịch contract, chạy `npm run compile` rồi qua. Dữ liệu giả, chưa có dữ liệu thật.
 - Chưa làm: migration C4 lên HOMEDORM4 (chờ Vy cho phép; chạy `npm run checkout-lifecycle:db:check` trước rồi `:migrate`), restart backend; nghiệm thu cùng A3.
+
+## 2026-11-12 13:58:57 +07:00 — J-C070 — Chạy migration C4 lên HOMEDORM4; sửa lỗi chạy lại của script
+
+- Người thực hiện: Claude. Vy cho phép chạy migration C4 và đã merge PR #10 (`2f5de74`).
+- HOMEDORM4: `checkout-lifecycle-db.mjs check` (chỉ đọc) tìm đủ 5 thủ tục, không lệch; `migrate` lần 1 thành công. Kiểm tra chỉ đọc sau đó: bảng `CheckoutLifecycle` có (0 dòng), cột `DoiSoat.ThoiDiemThanhToan` có, đủ 5 đối tượng mới (`SP_C4_AssertMoney/AdvanceMoney/Close/ReturnKeys`, `C4_ExceptionAllowed`), 2 thủ tục thanh lý/bàn giao ra cũ có khối chặn hợp đồng, 3 thủ tục tiền có `SP_C4_AssertMoney`. Không đổi dòng hợp đồng/chứng từ/phòng nào.
+- Lỗi: `migrate` lần 2 báo "There is already an object named 'SP_TraPhong_QuanLy_XacNhanThanhLy'" và rollback toàn bộ (không đổi gì). Nguyên nhân: SQL Server lưu `CREATE OR ALTER` thành `CREATE PROCEDURE`; nhánh "đã vá" của `patchLegacyProcedure` trả nguyên văn nên lệnh thành CREATE trùng. Sửa `web/backend/scripts/checkout-lifecycle-db.mjs` (nhánh đã vá cũng đổi đầu thành `CREATE OR ALTER`), thêm test chạy lại vào `test/checkout-closure.test.mjs`.
+- Kiểm tra: backend `npm test` 52 qua/2 bỏ qua; `migrate` chạy lại trên HOMEDORM4 thành công. Nhánh `fix/c4-migration-rerun`.
+- Còn: Vy merge nhánh sửa, restart backend nối HOMEDORM4 (để nạp route/job C4); nghiệm thu C4 cùng A3.
