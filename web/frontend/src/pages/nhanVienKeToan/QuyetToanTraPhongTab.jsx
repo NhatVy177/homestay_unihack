@@ -18,10 +18,10 @@ const LOAI_HO_SO = {
 };
 
 const QUYET_TOAN_TABS = [
-  { id: 'lap-doi-soat', label: 'Lập phiếu đối soát' },
-  { id: 'ghi-nhan-thu-them', label: 'Ghi nhận thu thêm' },
-  { id: 'ghi-nhan-hoan-coc', label: 'Ghi nhận hoàn cọc' },
-  { id: 'ket-qua-doi-soat', label: 'Kết quả đối soát' }
+  { id: 'lap-doi-soat', label: 'Lập phiếu đối soát', group: 'doi-soat' },
+  { id: 'ghi-nhan-thu-them', label: 'Ghi nhận thu thêm', group: 'chi-tien' },
+  { id: 'ghi-nhan-hoan-coc', label: 'Ghi nhận hoàn cọc', group: 'chi-tien' },
+  { id: 'ket-qua-doi-soat', label: 'Kết quả đối soát', group: 'doi-soat' }
 ];
 
 const THU_THEM_FILTERS = [
@@ -1516,8 +1516,10 @@ function KetQuaDoiSoatPanel() {
   );
 }
 
-export default function QuyetToanTraPhongTab() {
-  const [activeQuyetToanTab, setActiveQuyetToanTab] = useState('lap-doi-soat');
+// group 'doi-soat' = "Đối soát hoàn cọc", group 'chi-tien' = "Chi tiền thanh lý" (menu split as in Hang's layout).
+export default function QuyetToanTraPhongTab({ group = 'doi-soat' }) {
+  const visibleTabs = QUYET_TOAN_TABS.filter((tab) => tab.group === group);
+  const [activeQuyetToanTab, setActiveQuyetToanTab] = useState(visibleTabs[0].id);
   const [danhSach, setDanhSach] = useState([]);
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState('');
@@ -1805,7 +1807,7 @@ export default function QuyetToanTraPhongTab() {
   return (
     <div className="ktp-container">
       <nav className="qt-subtab-bar" aria-label="Nghiệp vụ quyết toán trả phòng">
-        {QUYET_TOAN_TABS.map((tab) => (
+        {visibleTabs.map((tab) => (
           <button
             key={tab.id}
             type="button"

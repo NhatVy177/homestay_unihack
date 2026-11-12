@@ -862,3 +862,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - `scripts/ui-settlement-c3.mjs` thêm 12 phiếu giả, kiểm tra "Hiển thị 1–10 / 12 phiếu".
 - Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả).
 - Còn: C4.
+
+## 2026-11-12 22:46:13 +07:00 — J-C072 — P1 theo bản đối chiếu Hằng: menu Quản lý và Kế toán; gộp lại phần B4 bị sót
+
+- Người thực hiện: Claude. Vy bảo Claude làm luôn phần việc của Codex (Codex làm lâu). Claude bắt đầu từ P1 trong `spec/doi-chieu-giao-dien-hang.md`; A3 cần Vy thao tác (tài khoản, OTP thật).
+- Phát hiện: PR #8 merge trước khi Claude push 2 commit cuối của `feat/b4-settlement-ui` (`03ffae5` tìm kiếm + phân trang, `52b17f9`), nên main thiếu phần này. Đã merge lại `origin/feat/b4-settlement-ui` vào nhánh `feat/ui-staff-tabs-hang` (xung đột chỉ ở journal/progress, giữ cả hai).
+- Menu Quản lý (`pages/nhanVienQuanLy/NhanVienQuanLyPage.jsx`): Kiểm duyệt đặt cọc, Kiểm tra lưu trú, Quản lý hợp đồng (màn xử lý trả phòng cũ), Bàn giao tài sản, Khách xác nhận biên bản, + Tra cứu khách hàng, + Hồ sơ cá nhân. Menu Kế toán (`pages/nhanVienKeToan/NhanVienKeToanPage.jsx`): Hóa đơn đặt cọc, Hóa đơn nhận phòng, Tiền mặt chờ nộp quỹ, Đối soát hoàn cọc (lập phiếu + kết quả), + Chi tiền thanh lý (ghi nhận thu thêm + hoàn cọc; `QuyetToanTraPhongTab` nhận `group`), Khách xác nhận đối soát, + Tra cứu khách hàng, + Hồ sơ cá nhân. Giữ nguyên mã tab trong URL. Tra cứu và hồ sơ dùng lại `SaleCustomerWorkspace` và `SaleProfile` (thêm `roleLabel`).
+- Bảo mật: `controllers/dangKyThue.controller.js` trước đây chỉ lọc theo chi nhánh khi người xem là Sale; nay Sale, Quản lý, Kế toán đều chỉ thấy hồ sơ chi nhánh mình, tránh lộ dữ liệu chi nhánh khác khi mở tra cứu cho hai vai trò mới.
+- Test: sửa nhãn trong `scripts/ui-settlement-c3.mjs` và `scripts/ui-lists.mjs` (bỏ 2 tab con đã xóa ở C4). Môi trường: `D:\HomeStayDorm-ui` bỏ liên kết `node_modules` sang `-audit` (bản cũ thiếu `@homestaydorm/settlement/closure`), cài riêng bằng `npm ci` cho frontend và backend; không xóa gì ở `-audit`.
+- Kiểm tra: backend `npm test` 52 qua/2 bỏ qua; build qua; `test:shell-ui` (mở mọi tab 5 vai trò), `test:list-kit`, `test:avalanche-ui`, `ui-settlement-c3.mjs`, `ui-checkout-closure.mjs`, `ui-checkout-compare.mjs` qua. Dữ liệu giả.
+- Còn: phần việc Codex còn lại (C5 giữ chỗ, C6, D-028, giao diện khách P2, B2/B5/B7, P3, E1–E3) Claude làm tiếp; A3 chờ Vy.

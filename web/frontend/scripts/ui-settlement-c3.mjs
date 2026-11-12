@@ -49,7 +49,7 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`${base}/nhan-vien-ke-toan`, { waitUntil: 'domcontentloaded' });
     if (width < 800) await page.locator('.ui-navigation-toggle').click();
-    await page.locator('aside nav button', { hasText: 'Quyết toán trả phòng' }).click();
+    await page.locator('aside nav button', { hasText: 'Đối soát hoàn cọc' }).click();
     const paging = (await page.locator('.ui-pagination-summary').innerText()).trim();
     await page.locator('tbody tr', { hasText: 'PT-DEMO' }).first().locator('button').first().click();
     const compare = page.getByLabel('Đối chiếu lúc nhận phòng và lúc trả phòng');
