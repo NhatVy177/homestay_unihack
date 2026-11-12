@@ -863,6 +863,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả).
 - Còn: C4.
 
+## 2026-11-12 22:21:08 +07:00 — J-X074 — C4: gỡ vòng chờ danh sách hoàn cọc trước thanh lý
+
+- Người thực hiện: Codex. Khi tiếp nối đã kiểm tra lại Git: Claude hoàn tất C4 ở J-C069, Vy merge PR #10/#11 và cho chạy migration ở J-C070. Không chạy lại migration đó. Worktree C4 đang detached origin/main; tạo nhánh `fix/c4-refund-before-close` từ origin/main `ab5bcae`, giữ các phần Claude đã hoàn tất.
+- Lỗi còn lại theo D-041: thủ tục danh sách chờ hoàn cọc vẫn lọc hợp đồng Đã thanh lý, trong khi C4 cần chi hoàn trước khi đóng hợp đồng. `web/backend/scripts/checkout-lifecycle-db.mjs` bổ sung vá đúng một điều kiện này của `SP_TraPhong_KeToan_DanhSachChoHoanCoc`; giữ lọc trạng thái đối soát/phiếu trả, số tiền và chi nhánh. Chặn ghi tiền theo xác nhận/hồ sơ ngoại lệ và chứng từ của C4 giữ nguyên. Không đổi quyết định, contract, giao diện hoặc dữ liệu.
+- `web/backend/test/checkout-closure.test.mjs`: thêm kiểm tra patch giữ lọc và chạy lại được với header SQL Server chuẩn hóa. `web/backend/test/checkout-closure-sql.test.mjs`: kiểm thử tích hợp trong CSDL tạm `HOMEDORM_C4_TEST_*`, tạo/xóa xong; D-041 chặn đóng khi thiếu tiền, thu chìa khóa độc lập/đúng chi nhánh, không nhả giường khác, thao tác lặp không nhả giường thuê lại, đóng không nhả giường, snapshot/revision cũ bị chặn. Không fixture HOMEDORM4.
+- Kiểm tra mới: backend 53 pass/3 skip (ba test SQL opt-in); C4 SQL chạy riêng 1/1 pass trong CSDL tạm; blockchain 25 pass/1 skip. Frontend build trong đợt tiếp nối qua, cảnh báo thư viện/chunk; `test:avalanche-ui` qua. Không đổi frontend trong bản vá bổ sung này. `checkout-lifecycle:db:check` chỉ đọc HOMEDORM4, đủ 6 SP và patch không lệch; chưa chạy migrate bản bổ sung.
+- Còn lại: push nhánh riêng để Vy review; cần Vy cho phép trước khi áp dụng thay đổi SP danh sách lên HOMEDORM4. A3 vẫn chưa có 6 receipt/gas nghiệp vụ; không coi kiểm thử CSDL tạm là nghiệm thu thật. Không push/merge main; commit NhatVy177, không Co-Authored-By.
+
 ## 2026-11-12 22:46:13 +07:00 — J-C072 — P1 theo bản đối chiếu Hằng: menu Quản lý và Kế toán; gộp lại phần B4 bị sót
 
 - Người thực hiện: Claude. Vy bảo Claude làm luôn phần việc của Codex (Codex làm lâu). Claude bắt đầu từ P1 trong `spec/doi-chieu-giao-dien-hang.md`; A3 cần Vy thao tác (tài khoản, OTP thật).

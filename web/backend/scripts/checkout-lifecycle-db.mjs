@@ -4,6 +4,13 @@ import { resolve } from 'node:path';
 
 export const financialProcedures=['dbo.SP_TraPhong_KeToan_XacNhanHoanCoc','dbo.SP_TraPhong_KeToan_XacNhanThuThem','dbo.SP_TraPhong_ThuThemQuaViMoPhong'];
 export const legacyProcedures=['dbo.SP_TraPhong_QuanLy_XacNhanThanhLy','dbo.SP_TraPhong_QuanLy_GhiNhanBanGiaoRa'];
+export const refundListProcedure='dbo.SP_TraPhong_KeToan_DanhSachChoHoanCoc';
+export function patchRefundList(source) {
+  const old=/AND \(pt\.MaHopDong IS NULL OR hd\.TrangThai = N'Đã thanh lý'\)/;
+  const replacement='-- C4_REFUND_BEFORE_CLOSE: money must finish before contract closure.';
+  if(!old.test(source)&&!source.includes('C4_REFUND_BEFORE_CLOSE'))throw new Error('Refund list drifted.');
+  return source.replace(old,replacement).replace(/^[ \t]*(?:CREATE(?:\s+OR\s+ALTER)?|ALTER)\s+PROC(?:EDURE)?\b/gmi,'CREATE OR ALTER PROCEDURE');
+}
 // SQL Server stores CREATE OR ALTER as "CREATE PROCEDURE", so a re-run must rewrite the header
 // even when the body is already patched; otherwise the second migrate fails with "already an object".
 const asCreateOrAlter=source=>source.replace(/^[ \t]*(?:CREATE(?:\s+OR\s+ALTER)?|ALTER)\s+PROC(?:EDURE)?\b/gmi,"CREATE OR ALTER PROCEDURE");
@@ -47,10 +54,10 @@ async function main() {
   const pool=await getPool();let transaction;
   try {
     const plan=[];
-    for(const name of [...financialProcedures,...legacyProcedures]){
+    for(const name of [...financialProcedures,...legacyProcedures,refundListProcedure]){
       const r=await pool.request().input('name',sql.NVarChar(128),name).query('SELECT OBJECT_DEFINITION(OBJECT_ID(@name)) AS definition');
       const old=r.recordset[0]?.definition;if(!old)throw new Error('Missing financial procedure: '+name);
-      plan.push({name,definition:financialProcedures.includes(name)?patchFinancialProcedure(name,old):patchLegacyProcedure(name,old)});
+      plan.push({name,definition:financialProcedures.includes(name)?patchFinancialProcedure(name,old):name===refundListProcedure?patchRefundList(old):patchLegacyProcedure(name,old)});
     }
     console.log(JSON.stringify({mode,financialProcedures:plan.map(r=>r.name),businessRowsChanged:false}));
     if(mode==='check')return;

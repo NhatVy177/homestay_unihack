@@ -7,9 +7,18 @@ import { CheckoutClosure } from '../services/checkoutClosure.service.js';
 import { ClosureProofs } from '../services/checkoutClosure.proofs.js';
 import { DAY, moneyState, exceptionEligibility, responseState, assertAccess } from '../services/checkoutClosure.rules.js';
 import { remindPendingCases } from '../services/checkoutLifecycleScheduler.service.js';
-import { patchFinancialProcedure, patchLegacyProcedure } from '../scripts/checkout-lifecycle-db.mjs';
+import { patchFinancialProcedure, patchLegacyProcedure, patchRefundList } from '../scripts/checkout-lifecycle-db.mjs';
 
 const manager={vaiTro:'NhanVien',chucVu:'Quản lý',maNguoiDung:'NV0001',maChiNhanh:'CN0001'};
+test('C4/D-041: refund list permits payment before closure, preserving return/status/branch filters',()=>{
+  const source="CREATE PROCEDURE dbo.SP_TraPhong_KeToan_DanhSachChoHoanCoc AS SELECT ds.* FROM dbo.DoiSoat ds JOIN dbo.PhieuTraPhong pt ON pt.MaPhieuTra=ds.MaPhieuTra LEFT JOIN dbo.HopDongThue hd ON hd.MaHopDong=pt.MaHopDong WHERE ds.TrangThai = N'Chờ hoàn cọc' AND pt.TrangThai = N'Chờ hoàn cọc' AND (pt.MaHopDong IS NULL OR hd.TrangThai = N'Đã thanh lý')\n AND (@MaChiNhanh IS NULL OR p.MaChiNhanh = @MaChiNhanh);";
+  const patched=patchRefundList(source);
+  assert.ok(!patched.includes("hd.TrangThai = N'Đã thanh lý'"));
+  for(const predicate of ["ds.TrangThai = N'Chờ hoàn cọc'","pt.TrangThai = N'Chờ hoàn cọc'",'(@MaChiNhanh IS NULL OR p.MaChiNhanh = @MaChiNhanh)']) assert.ok(patched.includes(predicate));
+  assert.equal(patchRefundList(patched),patched);
+  assert.equal(patchRefundList(patched.replace('CREATE OR ALTER PROCEDURE','CREATE PROCEDURE')),patched);
+  assert.throws(()=>patchRefundList('CREATE PROCEDURE dbo.X AS SELECT 1'),/drifted/);
+});
 const now=Date.parse('2026-11-12T08:00:00Z');
 const waiting={state:'review',drafts:[{revision:1,publishedAt:new Date(now-8*DAY).toISOString()}],versions:[]};
 const contact={id:'proof',sha256:'a'.repeat(64)};
