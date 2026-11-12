@@ -1,4 +1,7 @@
-.kp-page {
+/* Modals of the customer portal render next to the shell, not inside .kp-page,
+   so they need the same tokens and resets. */
+.kp-page,
+.kp-modal-backdrop {
   --kp-primary: var(--color-primary);
   --kp-primary-dark: var(--color-primary-hover);
   --kp-primary-soft: var(--color-primary-soft);
@@ -19,7 +22,9 @@
   --kp-radius: var(--radius-sm);
   --kp-radius-lg: var(--radius-lg);
   --kp-sidebar-width: 256px;
+}
 
+.kp-page {
   background: var(--kp-bg);
   color: var(--kp-text);
   display: flex;
@@ -29,21 +34,28 @@
 
 .kp-page *,
 .kp-page *::before,
-.kp-page *::after {
+.kp-page *::after,
+.kp-modal-backdrop *,
+.kp-modal-backdrop *::before,
+.kp-modal-backdrop *::after {
   box-sizing: border-box;
 }
 
 .kp-page button,
-.kp-page input {
+.kp-page input,
+.kp-modal-backdrop button,
+.kp-modal-backdrop input {
   font: inherit;
 }
 
-.kp-page button {
+.kp-page button,
+.kp-modal-backdrop button {
   border: 0;
   cursor: pointer;
 }
 
-.kp-page a {
+.kp-page a,
+.kp-modal-backdrop a {
   color: inherit;
   text-decoration: none;
 }
