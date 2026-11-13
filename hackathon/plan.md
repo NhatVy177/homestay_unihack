@@ -119,6 +119,8 @@ Trạng thái xác nhận: chờ xác nhận bàn giao → đã xác nhận bàn
 
 Vy bàn lại luồng theo D-022 (hợp lý ngoài thực tế), tham khảo dự án nhóm Hằng: khách tự làm nhiều hơn nhưng giữ quản lý duyệt. Đã chốt: một buổi xem nhiều phòng, chỉ ghi trạng thái buổi; khách tự gửi giữ chỗ trên web (Sale gửi thay khi cần), quản lý duyệt rồi hệ thống tự tạo phiếu như D-023; bị từ chối/hết hạn → hồ sơ về "Đã xem"; khách tự khai người ở, xem CCCD gốc lúc ký hợp đồng giấy; thành viên bị loại → nhả giường, hoàn 80% trừ vào kỳ đầu; đổi đại diện qua email mời tạo tài khoản (sau cùng). Chi tiết ở D-026/F-15. Danh sách đầy đủ các hướng còn chờ chốt (mốc chuỗi 3 "đóng hồ sơ" đã quyết **không làm trong bản thi** theo D-031, giữ ghi chú "không cần `Closed`" ở trên; thay bằng gói bằng chứng cuối trên Web2. Giai đoạn 5–9 chốt ở D-027 → D-031) và lịch đề xuất nằm ở `spec/progress.md` mục "Hướng luồng D-026". Đây không phải kế hoạch song song.
 
+**D-042 (13/11, J-C074):** khách chọn phòng quan tâm trên cổng khách (phòng còn trống hoặc đang chờ cọc; phòng hết hẳn không chọn được) rồi gửi hồ sơ; Sale chỉ tiếp nhận hồ sơ đó và lập lịch xem ngay bằng nút "Tiếp nhận & lập lịch xem phòng" đã có. Bỏ form "Tạo phiếu mới cho khách vãng lai" của Sale. Đã làm ngày 13/11 theo yêu cầu Vy (J-C075): thẻ phòng và chi tiết phòng có nhãn Còn trống / Đang chờ cọc / Hết chỗ (đếm giường ở backend, không đổi SP), nút mờ khi hết chỗ và backend chặn phòng hết chỗ, form khách chặn dưới 18 tuổi, bỏ form khách vãng lai ở Sale. Chưa nghiệm thu với dữ liệu thật.
+
 ### Ví nhúng và app trả phí: mục tiêu của bản thi
 
 - Ví nhúng giải quyết việc cài ví; relayer giải quyết việc khách phải có AVAX. Đây là hai phần khác nhau và đều cần thử trên Fuji.

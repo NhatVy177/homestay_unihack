@@ -71,7 +71,7 @@ Trạng thái hồ sơ (`PhieuDangKy`): Chờ tiếp nhận → **Đã tiếp nh
 
 ## 3. Các giai đoạn chi tiết
 
-### 3.1 Giai đoạn 1: Đăng ký và xem phòng (D-026)
+### 3.1 Giai đoạn 1: Đăng ký và xem phòng (D-026, D-042)
 
 1. Khách tạo tài khoản (email bắt buộc, đúng định dạng, không trùng — D-016), gửi hồ sơ đăng ký: số người, giới tính, giá tối đa, khu vực, ngày vào ở, thời hạn thuê.
 2. Sale tiếp nhận hồ sơ và **hẹn một buổi xem**. Mỗi hồ sơ **chỉ một buổi xem**, gồm **một hoặc nhiều phòng cùng chi nhánh**. Dời giờ vẫn là buổi đó.
@@ -79,6 +79,7 @@ Trạng thái hồ sơ (`PhieuDangKy`): Chờ tiếp nhận → **Đã tiếp nh
 4. Sale **chỉ ghi trạng thái của buổi**. Không ghi kết quả từng phòng, không bắt khách chọn phòng ngay, không có hạn chờ, không tự đóng hồ sơ. Khách có thể về nghĩ 2 ngày rồi quay lại.
 5. Khách (hoặc Sale) có nút **"Không thuê nữa"** — là cách duy nhất đóng hồ sơ sau buổi xem. Nút này không bắt buộc bấm.
 6. *(Mục 11, D-031, giao diện đợt 2)* Thẻ lịch xem của khách có thanh tiến trình: Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ.
+7. *(D-042, có code + test local, J-C075)* Khách chọn phòng quan tâm khi gửi hồ sơ: phòng còn trống hoặc đang chờ cọc thì chọn được, phòng hết hẳn thì không. Sale chỉ tiếp nhận hồ sơ khách gửi rồi lập lịch xem luôn; Sale không tạo hồ sơ thay khách (bỏ form khách vãng lai). "Phòng quan tâm" chỉ là gợi ý, không giữ chỗ.
 
 ### 3.2 Giai đoạn 2: Giữ chỗ (D-026, D-023, D-031)
 
@@ -261,7 +262,7 @@ Email có chống trùng theo từng lần gửi; lỗi gửi không làm hỏng
 |---|---|
 | Nền, mục tiêu | D-001 (bài thi), D-005 (demo: cọc giả 3 triệu, v2 hoàn 2,5 triệu), D-006/D-007/D-008 (repo, spec, module blockchain), D-018 (pitch mở bằng nỗi đau từ đề) |
 | Nguyên tắc | D-021 (người/máy), **D-022 (hợp lý ngoài thực tế)** |
-| 1 Xem phòng | **D-026** (1), D-031 (thanh tiến trình) |
+| 1 Xem phòng | **D-026** (1), D-031 (thanh tiến trình), D-042 (quan tâm phòng, bỏ phiếu khách vãng lai) |
 | 2 Giữ chỗ | **D-026** (2, 3), D-020 (quản lý luôn duyệt), D-023 (duyệt, 12 giờ, tự chốt), D-031 (chính sách trên phiếu) |
 | 3 Cọc | D-023 (tiền mặt, CK tay), D-013 (ví mô phỏng) |
 | 4 Khai người ở | D-024 (duyệt cư trú theo ngoại lệ), **D-026** (4, 5, 6) |

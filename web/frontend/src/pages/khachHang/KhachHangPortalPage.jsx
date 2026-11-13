@@ -164,13 +164,42 @@ function getMaxBirthDate() {
   return toLocalDateInputValue(yesterday);
 }
 
+function isUnderAdultAge(value) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(value || ''));
+  if (!match) return false;
+  const today = new Date();
+  let age = today.getFullYear() - Number(match[1]);
+  const month = today.getMonth() + 1;
+  if (month < Number(match[2]) || (month === Number(match[2]) && today.getDate() < Number(match[3]))) age -= 1;
+  return age < 18;
+}
+
 function getBirthDateError(value) {
   if (!value) return '';
-  return value <= getMaxBirthDate() ? '' : 'Ngày sinh phải trước ngày hiện tại.';
+  if (value > getMaxBirthDate()) return 'Ngày sinh phải trước ngày hiện tại.';
+  return isUnderAdultAge(value) ? 'Bạn cần từ đủ 18 tuổi để đăng ký thuê phòng.' : '';
+}
+
+// D-042: phòng hết hẳn không cho quan tâm; còn trống và đang chờ cọc thì cho.
+const ROOM_FULL_LABEL = 'Hết chỗ';
+
+function getRoomStatusTone(status = '') {
+  if (status === 'Còn trống') return 'is-open';
+  if (status === 'Đang chờ cọc') return 'is-waiting';
+  if (status === ROOM_FULL_LABEL) return 'is-full';
+  return '';
+}
+
+function isForeignNationality(value = '') {
+  const normalized = String(value).toLocaleLowerCase('vi-VN').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/\s+/g, ' ').trim();
+  if (!normalized) return false;
+  return !['viet nam', 'vietnam', 'vn', 'nguoi viet nam'].includes(normalized);
 }
 
 function validateContactAndArea(form) {
-  if (!form.ngaySinh || getBirthDateError(form.ngaySinh)) return 'Ngày sinh phải trước ngày hiện tại.';
+  if (!form.ngaySinh) return 'Ngày sinh phải trước ngày hiện tại.';
+  const birthDateError = getBirthDateError(form.ngaySinh);
+  if (birthDateError) return birthDateError;
   if (!/^\d{10}$/.test(form.soDienThoai || '')) return 'Số điện thoại phải có đúng 10 chữ số.';
   if (!/^\d{12}$/.test(form.cccd || '')) return 'CCCD phải có đúng 12 chữ số.';
   if (!resolveAllowedArea(form.khuVucMongMuon)) return 'Khu vực mong muốn không hợp lệ.';
@@ -804,12 +833,26 @@ function ChiTietPhongView({ phong, onBack, onRent }) {
                 ))}
               </div>
             )}
-            <button className="kp-btn kp-btn-primary kp-full kh-detail-cta kh-detail-register" type="button" onClick={() => onRent(phong)}>
-              Đăng ký thuê ngay
+            {phong.trangThaiQuanTam && (
+              <p className="kh-detail-room-status"><span className={`kh-room-status ${getRoomStatusTone(phong.trangThaiQuanTam)}`}>{phong.trangThaiQuanTam}</span></p>
+            )}
+            <button
+              className="kp-btn kp-btn-primary kp-full kh-detail-cta kh-detail-register"
+              type="button"
+              disabled={phong.trangThaiQuanTam === ROOM_FULL_LABEL}
+              onClick={() => onRent(phong)}
+            >
+              {phong.trangThaiQuanTam === ROOM_FULL_LABEL ? ROOM_FULL_LABEL : 'Đăng ký thuê ngay'}
             </button>
             <div className="kh-detail-note">
               <Icon name="info" />
-              <span>Có thể dọn vào ngày sau khi ký hợp đồng và đóng cọc.</span>
+              <span>
+                {phong.trangThaiQuanTam === ROOM_FULL_LABEL
+                  ? 'Phòng này đã hết chỗ. Vui lòng chọn phòng khác.'
+                  : phong.trangThaiQuanTam === 'Đang chờ cọc'
+                    ? 'Phòng đang có người giữ chỗ. Bạn vẫn có thể gửi nhu cầu; nếu phòng không còn, nhân viên Sale sẽ tư vấn phòng khác.'
+                    : 'Có thể dọn vào ngày sau khi ký hợp đồng và đóng cọc.'}
+              </span>
             </div>
           </div>
 
@@ -1113,6 +1156,11 @@ export default function KhachHangPortalPage() {
       setToast('Chọn ít nhất một phòng trước khi gửi nhu cầu thuê.');
       return;
     }
+    const fullRooms = selected.filter((item) => item.trangThaiQuanTam === ROOM_FULL_LABEL);
+    if (fullRooms.length) {
+      setToast(`Phòng ${fullRooms.map((item) => item.tenPhong).join(', ')} đã hết chỗ, vui lòng chọn phòng khác.`);
+      return;
+    }
     const selectedRoomTypes = [...new Set(selected.map((item) => item.loaiPhong).filter(Boolean))];
     if (selectedRoomTypes.length > 1) {
       setToast('Phiếu đăng ký chỉ được chọn một loại phòng mong muốn. Vui lòng chọn các phòng cùng loại.');
@@ -1198,6 +1246,7 @@ export default function KhachHangPortalPage() {
         ...rentForm,
         khuVucMongMuon: resolveAllowedArea(rentForm.khuVucMongMuon),
         phongQuanTam: selectedRooms.map((room) => room.tenPhong).join(', '),
+        phongQuanTamIds: selectedRooms.map((room) => room.maPhong || room.id).filter(Boolean),
         mucGiaToiDa: normalizeMoneyVnd(rentForm.mucGiaToiDa) || '',
         gioiTinhThue: rentForm.gioiTinhThue,
         soNam: rentForm.soNam || 0,
@@ -1374,6 +1423,7 @@ export default function KhachHangPortalPage() {
                       <p className="kh-room-location"><Icon name="explore" />{getArea(room)}</p>
                       <p>{room.moTa || 'Chưa có mô tả chi tiết.'}</p>
                       <div className="kh-pills">
+                        {room.trangThaiQuanTam && <span className={`kh-room-status ${getRoomStatusTone(room.trangThaiQuanTam)}`}>{room.trangThaiQuanTam}</span>}
                         {room.loaiPhong && <span>{room.loaiPhong}</span>}
                         {room.hinhThucThue && <span>{room.hinhThucThue}</span>}
                       </div>
@@ -3894,7 +3944,13 @@ export default function KhachHangPortalPage() {
                     {getPhoneError(rentForm.soDienThoai) && <small className="kh-field-error">{getPhoneError(rentForm.soDienThoai)}</small>}
                   </label>
                   <label className="is-half"><span>Email</span><input type="email" value={rentForm.email} onChange={(event) => setRentForm({ ...rentForm, email: event.target.value })} placeholder="example@gmail.com" /></label>
-                  <label className="is-half"><span>Quốc tịch*</span><input value={rentForm.quocTich} onChange={(event) => setRentForm({ ...rentForm, quocTich: event.target.value })} placeholder="Ví dụ: Việt Nam" required /></label>
+                  <label className="is-half">
+                    <span>Quốc tịch*</span>
+                    <input value={rentForm.quocTich} onChange={(event) => setRentForm({ ...rentForm, quocTich: event.target.value })} placeholder="Ví dụ: Việt Nam" required />
+                    {isForeignNationality(rentForm.quocTich) && (
+                      <small className="kh-field-hint">Bạn vẫn gửi được hồ sơ; quản lý chi nhánh sẽ xem xét thêm khi duyệt cư trú.</small>
+                    )}
+                  </label>
                   <label className="is-half">
                     <span>CCCD*</span>
                     <input

@@ -889,3 +889,20 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Thêm `web/frontend/scripts/ui-customer-register-modal.mjs` (dữ liệu giả): mở form ở 1440/390, kiểm tra modal có nền và nút gửi có màu nền khác màu chữ. Chạy trên code cũ: FAIL (nền `rgba(0,0,0,0)`); sau khi sửa: PASS.
 - Kiểm tra: build qua; `ui-settlement-c3.mjs`, `ui-checkout-closure.mjs` qua. `ui-lists.mjs` lỗi sẵn từ trước (không do đợt này): các ca Sale còn dùng nhãn cũ "Lịch xem phòng", "Đặt cọc", "Ghi nhận cư trú", "Hợp đồng thuê" trong khi menu Sale đã đổi ở `6ead67e`.
 - Còn: sửa nhãn ca Sale trong `ui-lists.mjs`; tiếp tục việc C6.
+
+## 2026-11-13 03:14:42 +07:00 — J-C074 — Chốt D-042: khách quan tâm phòng, Sale tiếp nhận rồi hẹn lịch, bỏ phiếu khách vãng lai
+
+- Người thực hiện: Claude cùng Vy (thảo luận); nhánh `docs/d042-quan-tam-tiep-nhan` từ origin/main `16a4945`, worktree `D:\HomeStayDorm-docs-d042`. Giờ lấy bằng PowerShell.
+- Bối cảnh: Vy so với luồng bên Hằng (khách thấy trạng thái phòng, bấm quan tâm là đề xuất tới lịch xem). Claude đối chiếu code: cổng khách (`KhachHangPortalPage`) đã có chọn phòng và `phongQuanTam`, Sale (`HoSoDangKyTab`) đã có "Tiếp nhận & lập lịch xem phòng" và "Từ chối phiếu"; `KhachMoiPage` không còn được dùng (route chuyển sang `/khach-hang`). Trang không có nút tên "Quan tâm". Claude đã nói sai hai lần trong phiên (dùng checkout local cũ, rồi dẫn nhầm trang), đã đính chính với Vy.
+- Vy chốt: phòng còn trống và đang chờ cọc cho quan tâm, phòng hết hẳn không cho; Sale chỉ tiếp nhận hồ sơ khách gửi rồi lập lịch luôn; bỏ nút và form "Tạo phiếu mới cho khách vãng lai". Kiểm tra tuổi 18 trên form, khách nước ngoài chuyển quản lý và lịch xếp "Nên có" ghi là đề xuất.
+- File: `spec/decisions.md` (D-042), `spec/scope.md` (F-15), `hackathon/plan.md` (đoạn D-026), `spec/progress.md` (một dòng T-22 "Nên có"), `spec/luong-tong-hop.md` (mục 3.1 và bảng mục 8), `spec/journal.md`. Không sửa code, không chạy test.
+- Việc còn lại: Vy xem và merge; Vy trả lời hai đề xuất (tuổi 18, khách nước ngoài) và lịch; sau đó viết prompt cho AI code (mở rộng truy vấn phòng, nhãn trạng thái, gỡ form khách vãng lai).
+
+## 2026-11-13 13:19:20 +07:00 — J-C075 — Làm D-042: nhãn trạng thái phòng, chặn dưới 18 tuổi, gỡ form khách vãng lai
+
+- Người thực hiện: Claude theo yêu cầu Vy ("đúng rồi, thực hiện đi"); nhánh `feat/d042-interested-rooms` từ `docs/d042-quan-tam-tiep-nhan` (chứa D-042, chưa merge), worktree `D:\HomeStayDorm-d042-code`. Nên merge nhánh docs trước.
+- Backend: `repositories/phongKhamPha.repository.js` thêm đếm giường Trống/Giữ chỗ theo phòng (query thường, không đổi SP, không migration); `services/phongKhamPha.service.js` gắn `trangThaiQuanTam` (Còn trống / Đang chờ cọc / Hết chỗ) cho danh sách và chi tiết phòng; `services/khachMoi.service.js` gắn nhãn cho danh sách phòng của khách, chặn dưới 18 tuổi, chặn gửi hồ sơ kèm phòng hết chỗ (nhận `phongQuanTamIds`); file mới `services/customerAgeRules.js`, `test/interested-rooms.test.mjs`.
+- Frontend: `KhachHangPortalPage.jsx` + `khachHangPortal.css` thêm nhãn trạng thái trên thẻ và trang chi tiết, nút "Hết chỗ" bị khóa, ghi chú theo trạng thái, báo lỗi dưới 18 tuổi, gợi ý khi quốc tịch khác Việt Nam, gửi kèm `phongQuanTamIds`. `nhanVienSale/HoSoDangKyTab.jsx` gỡ nút, form hai bước, hộp thoại, kiểm tra trùng và các hàm chỉ phục vụ form khách vãng lai (còn 788 dòng); `dangKyThue.api.js` bỏ `taoHoSoKhachVangLai`; `scripts/ui-forms.mjs` bỏ phần Sale; thêm `scripts/ui-interested-rooms.mjs`.
+- Kiểm tra: backend `npm test` 57 pass/3 skip/0 fail (thêm 4 ca); frontend `npm run build` qua; `test:avalanche-ui`, `ui-shell`, `ui-list-kit`, `ui-customer-register-modal`, `ui-sale-workspace`, `ui-viewing-outcomes` và `ui-interested-rooms` đều PASS ở 1440/390px với dữ liệu giả, không có lỗi trình duyệt hay thao tác ghi. Không chạy SQL, không đụng HOMEDORM4.
+- Giới hạn: chưa thử với SQL/giao diện thật; route backend `POST /dang-ky-thue/khach-vang-lai` và service vẫn còn (không còn nơi nào gọi), chờ Vy quyết có gỡ; chặn phòng hết chỗ ở backend chỉ chạy khi frontend gửi `phongQuanTamIds`.
+- Việc còn lại: Vy xem và merge; chạy thử qua giao diện với SQL thật ở đợt A3.

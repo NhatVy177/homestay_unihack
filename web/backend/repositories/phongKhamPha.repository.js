@@ -33,3 +33,18 @@ export async function layBoLocPhongKhamPha() {
 
   return result.recordsets || [];
 }
+
+// D-042: đếm giường trống / đang giữ chỗ chờ cọc theo phòng để gắn nhãn "quan tâm".
+export async function layDemGiuongTheoPhong() {
+  const pool = await getPool();
+  const result = await pool.request().query(`
+    SELECT
+      MaPhong AS maPhong,
+      SUM(CASE WHEN TinhTrang = N'Trống' THEN 1 ELSE 0 END) AS soGiuongTrong,
+      SUM(CASE WHEN TinhTrang = N'Giữ chỗ' THEN 1 ELSE 0 END) AS soGiuongChoCoc
+    FROM dbo.Giuong
+    GROUP BY MaPhong;
+  `);
+
+  return result.recordset || [];
+}

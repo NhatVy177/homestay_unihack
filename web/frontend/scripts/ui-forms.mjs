@@ -11,7 +11,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 const report = [];
 try {
   for (const width of [1440, 390]) {
-    for (const role of ['Sale', 'Admin', 'public']) {
+    for (const role of ['Admin', 'public']) {
       const context = await browser.newContext({ viewport: { width, height: width === 390 ? 844 : 1000 }, reducedMotion: 'reduce' });
       const user = { maNguoiDung: 'UI-DEMO', vaiTro: 'NhanVien', chucVu: role, hoTen: 'Giao diện thử', maChiNhanh: 'CN-UI' };
       if (role !== 'public') await context.addInitScript(value => localStorage.setItem('happyroom_session', JSON.stringify({ _v: 2, token: 'ui-only', user: value })), user);
@@ -50,27 +50,9 @@ try {
         }
         console.log(JSON.stringify(report.at(-1)));
       };
-      await page.goto(base + (role === 'Sale' ? '/nhan-vien-sale' : role === 'Admin' ? '/nhan-vien-admin' : '/'), { waitUntil: 'domcontentloaded' });
+      await page.goto(base + (role === 'Admin' ? '/nhan-vien-admin' : '/'), { waitUntil: 'domcontentloaded' });
       await page.locator('h1').first().waitFor();
-      if (role === 'Sale') {
-        if (width === 390) await page.getByRole('button', { name: 'Mở menu', exact: true }).click();
-        await page.locator('aside nav').getByRole('button', { name: 'Lịch hẹn xem phòng', exact: true }).click();
-        await page.getByRole('button', { name: 'Tiếp nhận hồ sơ đăng ký', exact: false }).click();
-        await page.getByRole('button', { name: 'Tạo phiếu mới cho khách vãng lai' }).click();
-        await capture('sale-form');
-        await page.getByRole('button', { name: 'Tiếp tục', exact: true }).click();
-        assert.ok(await page.locator('.ktp-modal .is-invalid').count() > 0, 'Existing field validation must remain');
-        await capture('sale-errors');
-        const fields = page.locator('.ktp-modal input');
-        await fields.nth(0).fill('Khách giao diện');
-        await fields.nth(1).fill('0901234567');
-        await fields.nth(2).fill('012345678901');
-        await page.locator('.ktp-modal input[type="date"]').fill('2000-01-01');
-        await page.waitForTimeout(600);
-        await page.getByRole('button', { name: 'Tiếp tục', exact: true }).click();
-        await page.getByRole('button', { name: 'Lưu đơn đăng ký', exact: true }).waitFor();
-        await capture('sale-step-2');
-      } else if (role === 'Admin') {
+      if (role === 'Admin') {
         await page.getByRole('button', { name: 'Tạo nhân viên', exact: true }).click();
         await page.getByRole('button', { name: 'Tạo tài khoản', exact: true }).click();
         await page.getByRole('heading', { name: 'Tạo tài khoản mới', exact: true }).waitFor();
