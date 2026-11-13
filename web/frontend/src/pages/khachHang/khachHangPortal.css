@@ -1425,10 +1425,11 @@
 }
 
 .kh-toast {
-  background: var(--kp-text);
+  /* Thông báo nằm ngoài khung .kp-page nên không có biến --kp-*; dùng token chung. */
+  background: var(--color-text);
   border-radius: 999px;
   bottom: 24px;
-  box-shadow: var(--kp-shadow-strong);
+  box-shadow: var(--shadow-md);
   color: var(--color-surface);
   font-size: 13px;
   font-weight: 750;

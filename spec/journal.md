@@ -914,3 +914,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Giữ nguyên: mọi trường, state, validation, `submitRent`, API; ngày sinh/quốc tịch/CCCD/thời hạn thuê vẫn bắt buộc vì backend và kiểm tra 18 tuổi (D-042) cần. Không làm nút "Đăng ký thuê theo nhóm" của ảnh mẫu (nhóm đã có qua số người ở và giới tính Khác).
 - Kiểm tra: frontend build qua; `ui-interested-rooms`, `ui-customer-register-modal`, `ui-shell`, `ui-list-kit`, `test:avalanche-ui` PASS; backend 57 pass/3 skip/0 fail. Xem ảnh form 1440/390px: không tràn ngang. Dữ liệu giả; chưa thử đăng nhập thật.
 - Việc còn lại: Vy xem; quyết có thêm nút "Đăng ký thuê theo nhóm" không.
+
+## 2026-11-13 14:35:00 +07:00 — J-C077 — Sửa thông báo nổi của cổng khách bị chữ trắng trên nền trắng; thêm bộ quét tương phản
+
+- Người thực hiện: Claude theo phản ánh của Vy ("cứ có thông báo lỗi là màu trắng trùng với nền"); nhánh `feat/d042-interested-rooms`.
+- Nguyên nhân: `.kh-toast` (thông báo nổi của cổng khách, nơi hiện mọi `setToast` như lỗi kiểm tra form) dùng `var(--kp-text)` và `var(--kp-shadow-strong)`; hai biến này chỉ khai báo trong `.kp-page`/`.kp-modal-backdrop`, còn toast nằm cạnh `WorkspaceShell` nên không có biến → nền trong suốt, chữ vẫn trắng. Cùng loại lỗi với J-C073. Đo bằng trình duyệt trước khi sửa: nền `rgba(0,0,0,0)`, chữ `rgb(255,255,255)`.
+- Sửa: `web/frontend/src/pages/khachHang/khachHangPortal.css` đổi sang `var(--color-text)` và `var(--shadow-md)`. Thêm `web/frontend/scripts/ui-contrast-scan.mjs` (lệnh `npm run test:contrast-ui`, thêm vào `package.json`): mở mọi tab của khách, Sale, quản lý, kế toán ở hai chế độ (dữ liệu rỗng, mọi API lỗi 500), tính tỉ lệ tương phản chữ/nền, báo chữ dưới 2:1; hiện luôn toast để kiểm.
+- Kiểm tra: bỏ bản sửa thì bộ quét báo đúng `div.kh-toast.show` (tương phản 1,05); có bản sửa thì 0 lỗi ở cả hai chế độ. Build qua; `ui-interested-rooms`, `ui-customer-register-modal`, `ui-shell`, `ui-list-kit`, `ui-sale-workspace`, `ui-viewing-outcomes`, `test:avalanche-ui` PASS; backend 57 pass/3 skip/0 fail. Dữ liệu giả, chưa đăng nhập thật.
+- Giới hạn: bộ quét chỉ thấy chữ nằm trong DOM lúc quét với dữ liệu giả; thông báo lỗi chỉ hiện sau thao tác riêng (gửi form thật, v.v.) chưa được kích hoạt hết. Màu thông báo vẫn một kiểu (nền tối) cho cả lỗi lẫn thành công; chưa tách màu lỗi.
