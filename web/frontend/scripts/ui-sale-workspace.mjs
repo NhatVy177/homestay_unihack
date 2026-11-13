@@ -41,7 +41,7 @@ try {
       if (path.endsWith('/avalanche/config')) json = { enabled: false };
       if (path === '/api/dang-ky-thue') json = registrations;
       if (path === '/api/lich-xem-phong') json = schedules;
-      if (path.endsWith('/phong-phu-hop')) json = { rooms, isRegionValid: true };
+      if (path.endsWith('/phong-phu-hop')) json = { rooms, isRegionValid: true, phongQuanTamIds: ['P101', 'P999'], phongQuanTam: [{ maPhong: 'P101', tenPhong: 'Phòng 101', chiNhanh: 'Chi nhánh thử' }, { maPhong: 'P999', tenPhong: 'Phòng 999', chiNhanh: 'Chi nhánh thử' }] };
       if (req.method() !== 'GET') {
         writes.push({ path, body: req.postDataJSON() });
         json = { id: 'LXNEW1' };
@@ -105,6 +105,11 @@ try {
       await shot('create-profile-picker');
       await page.getByRole('button', { name: /Khách thử An/ }).click();
       await page.getByRole('checkbox', { name: 'Chọn Phòng 101' }).waitFor();
+      // D-043: phòng khách quan tâm được chọn sẵn; phòng không đủ điều kiện được báo là đã bỏ ra.
+      assert.equal(await page.getByRole('checkbox', { name: 'Chọn Phòng 101' }).isChecked(), true, 'phòng khách quan tâm được chọn sẵn');
+      assert.equal(await page.getByRole('checkbox', { name: 'Chọn Phòng 103' }).isChecked(), false);
+      assert.match(await page.locator('.sale-alert--danger').first().innerText(), /Phòng 999/);
+      assert.equal(await page.locator('.sale-room-card .ui-badge', { hasText: 'Khách quan tâm' }).count(), 1);
       assert.equal(await page.locator('aside nav button:disabled').count(), 4, 'other tabs stay locked while scheduling');
       await page.getByRole('button', { name: 'Quay lại', exact: true }).click();
       await nav('Tra cứu khách hàng'); await page.getByText('Khách thử An', { exact: true }).first().waitFor(); await shot('customers');

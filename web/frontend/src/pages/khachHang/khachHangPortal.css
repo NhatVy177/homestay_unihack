@@ -4873,3 +4873,13 @@
     justify-content: flex-start;
   }
 }
+
+.kh-profile-banner--scheduled {
+  background: var(--color-warning-soft);
+  border-color: var(--color-warning);
+  grid-template-columns: 1fr;
+}
+
+.kh-profile-banner--scheduled strong {
+  color: var(--color-warning);
+}

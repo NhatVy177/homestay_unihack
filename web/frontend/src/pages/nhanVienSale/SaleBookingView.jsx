@@ -3,7 +3,7 @@ import { Icon } from '../../components/common/Icon.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
 
 // Presentation of the existing booking controller; does not create or validate a schedule itself.
-export default function SaleBookingView({ profile, onBack, rooms, selectedRoomIds, selectedRooms, loadingRooms, regionValid, roomError,
+export default function SaleBookingView({ unfitInterested = [], profile, onBack, rooms, selectedRoomIds, selectedRooms, loadingRooms, regionValid, roomError,
   step, setStep, formDate, setFormDate, formTime, setFormTime, formNote, setFormNote, saving, createdSchedule,
   selectionPlan, minScheduleDate, toggleRoom, handleCreateSchedule, formatMoney, formatGender, getAvailableSlots, isWholeRoomOption }) {
   return <div className="sale-view sale-booking">
@@ -17,6 +17,7 @@ export default function SaleBookingView({ profile, onBack, rooms, selectedRoomId
     </section>
     {step === 'rooms' && <>
       {!regionValid && <div className="sale-alert" role="status"><Icon name="warning" /> Khu vực mong muốn chưa khớp chi nhánh đang hoạt động. Cần liên hệ lại khách trước khi lập lịch.</div>}
+      {!loadingRooms && unfitInterested.length > 0 && <div className="sale-alert sale-alert--danger" role="status"><Icon name="warning" /> Khách đã chọn nhưng không đủ điều kiện nên đã được bỏ ra: {unfitInterested.map((room) => `${room.tenPhong} (${room.chiNhanh})`).join(', ')}. Lý do có thể là hết giường, không hợp giới tính/số người, vượt mức giá hoặc khác chi nhánh của bạn; báo khách khi gọi xác nhận lịch.</div>}
       {loadingRooms && <p role="status">Đang tải danh sách phòng phù hợp...</p>}
       {!loadingRooms && roomError && <p className="sale-alert sale-alert--danger" role="alert">{roomError}</p>}
       {!loadingRooms && !roomError && rooms.length === 0 && <EmptyState message="Không có phòng/giường phù hợp để lập lịch cho phiếu này." />}

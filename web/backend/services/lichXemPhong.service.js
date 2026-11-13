@@ -369,6 +369,7 @@ export async function getPhongPhuHop(maDangKy, user = null) {
     return {
       rooms,
       phongQuanTamIds: phongQuanTam.map((room) => room.maPhong),
+      phongQuanTam,
       isRegionValid: !khongCoChiNhanhPhuHop,
       khongCoChiNhanhPhuHop
     };

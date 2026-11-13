@@ -734,7 +734,7 @@ function GalleryPhoto({ urlAnh, fallbackUrl, moTa, index }) {
   return <img src={src} alt={moTa || `Ảnh ${index + 1}`} onError={() => setFailed(true)} loading="lazy" />;
 }
 
-function ChiTietPhongView({ phong, onBack, onRent, profile = null, isInProfile = false, profileBusy = false, onAddToProfile, onRemoveFromProfile }) {
+function ChiTietPhongView({ phong, onBack, onRent, scheduledMessage = '', profile = null, isInProfile = false, profileBusy = false, onAddToProfile, onRemoveFromProfile }) {
   const [lightbox, setLightbox] = useState(null);
   const anh = phong.hinhAnh || [];
   const tienNghi = phong.tienNghi || [];
@@ -858,7 +858,15 @@ function ChiTietPhongView({ phong, onBack, onRent, profile = null, isInProfile =
                 ))}
               </div>
             )}
-            {profile ? (
+            {scheduledMessage ? (
+              <>
+                <button className="kp-btn kp-btn-primary kp-full kh-detail-cta kh-detail-register" type="button" disabled>
+                  <Icon name="calendar" />
+                  Đang có lịch xem phòng
+                </button>
+                <p className="kh-detail-flow-note">{scheduledMessage}</p>
+              </>
+            ) : profile ? (
               <>
                 <button
                   className="kp-btn kp-btn-primary kp-full kh-detail-cta kh-detail-register"
@@ -1000,6 +1008,16 @@ export default function KhachHangPortalPage() {
     && !item.biHuyDoTatCaLich
     && !(item.sttLich != null && item.trangThaiLich !== 'Đã hủy')
   )) || null;
+  // Hồ sơ đã có lịch xem còn hiệu lực: chưa xem xong thì không thêm phòng hay gửi phiếu mới.
+  const scheduledProfile = openProfile ? null : (overview?.hoSo || []).find((item) => (
+    ['Chờ tiếp nhận', 'Đã tiếp nhận'].includes(item.trangThai)
+    && item.sttLich != null && item.trangThaiLich !== 'Đã hủy'
+  )) || null;
+  const scheduledMessage = scheduledProfile
+    ? (scheduledProfile.trangThaiLich === 'Đã xem'
+      ? `Hồ sơ ${scheduledProfile.maDangKy} đã xem phòng xong. Bạn chọn phòng giữ chỗ ở mục Lịch xem phòng; muốn xem thêm phòng khác thì nhắn nhân viên Sale.`
+      : `Bạn đang có lịch xem phòng (hồ sơ ${scheduledProfile.maDangKy}${scheduledProfile.thoiGianHen ? `, ${formatDate(scheduledProfile.thoiGianHen, true)}` : ''}). Xem xong rồi mới thêm phòng khác được.`)
+    : '';
   const interestedRooms = openProfile?.danhSachPhongQuanTam || [];
   const interestedIds = new Set(interestedRooms.map((room) => room.maPhong));
   const registrationLockedMessage = overview?.trangThai?.thongBaoKhoaDangKy
@@ -1478,6 +1496,14 @@ export default function KhachHangPortalPage() {
       <section className="kh-explore-view">
         <div className="kh-shell-grid">
           <div className="kh-left-content">
+            {scheduledProfile && (
+              <div className="kh-profile-banner kh-profile-banner--scheduled" role="status">
+                <div>
+                  <strong>Đang có lịch xem phòng</strong>
+                  <p>{scheduledMessage}</p>
+                </div>
+              </div>
+            )}
             {openProfile && (
               <div className="kh-profile-banner" role="status">
                 <div>
@@ -1545,7 +1571,7 @@ export default function KhachHangPortalPage() {
           </div>
 
           <aside className="kh-rightbar">
-            {!openProfile && (
+            {!openProfile && !scheduledProfile && (
             <article className="kh-rent-help">
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', marginBottom: '16px' }}>
                 <Icon name="support" />Bạn muốn thuê phòng?
@@ -4073,6 +4099,7 @@ export default function KhachHangPortalPage() {
           onBack={() => setDetailPhong(null)}
           onRent={(room) => { setDetailPhong(null); openRentForm(room); }}
           profile={openProfile}
+          scheduledMessage={scheduledMessage}
           isInProfile={interestedIds.has(detailPhong.maPhong || detailPhong.id)}
           profileBusy={profileBusy}
           onAddToProfile={addRoomToProfile}

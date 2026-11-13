@@ -155,6 +155,7 @@ export default function LapLichChoHoSo({ profile, onBack, onCreated }) {
   const [loadingRooms, setLoadingRooms] = useState(false);
   const [regionValid, setRegionValid] = useState(true);
   const [roomError, setRoomError] = useState('');
+  const [unfitInterested, setUnfitInterested] = useState([]);
   const [step, setStep] = useState('rooms');
   const [formDate, setFormDate] = useState('');
   const [formTime, setFormTime] = useState('');
@@ -169,6 +170,7 @@ export default function LapLichChoHoSo({ profile, onBack, onCreated }) {
     setRoomError('');
     setRooms([]);
     setSelectedRoomIds([]);
+    setUnfitInterested([]);
     setStep('rooms');
 
     lichXemPhongApi.getPhongPhuHop(profile.maDangKy)
@@ -179,6 +181,8 @@ export default function LapLichChoHoSo({ profile, onBack, onCreated }) {
         setRooms(list);
         // D-043: phòng khách đã quan tâm được chọn sẵn, Sale chỉ xem lại và bỏ/thêm nếu cần.
         setSelectedRoomIds(list.filter((room) => room.khachQuanTam).map((room) => room.maPhong));
+        // Phòng khách đã chọn nhưng không qua kiểm tra (hết giường, sai giới tính/sức chứa, giá, khác chi nhánh).
+        setUnfitInterested((payload?.phongQuanTam || []).filter((room) => !list.some((item) => item.maPhong === room.maPhong)));
         setRegionValid(payload?.isRegionValid ?? !payload?.khongCoChiNhanhPhuHop);
       })
       .catch((err) => {
@@ -234,5 +238,5 @@ export default function LapLichChoHoSo({ profile, onBack, onCreated }) {
     }
   };
 
-  return <SaleBookingView {...{profile,onBack,rooms,selectedRoomIds,selectedRooms,loadingRooms,regionValid,roomError,step,setStep,formDate,setFormDate,formTime,setFormTime,formNote,setFormNote,saving,createdSchedule,selectionPlan,minScheduleDate,toggleRoom,handleCreateSchedule,formatMoney,formatGender,getAvailableSlots,isWholeRoomOption}} />;
+  return <SaleBookingView {...{unfitInterested,profile,onBack,rooms,selectedRoomIds,selectedRooms,loadingRooms,regionValid,roomError,step,setStep,formDate,setFormDate,formTime,setFormTime,formNote,setFormNote,saving,createdSchedule,selectionPlan,minScheduleDate,toggleRoom,handleCreateSchedule,formatMoney,formatGender,getAvailableSlots,isWholeRoomOption}} />;
 }

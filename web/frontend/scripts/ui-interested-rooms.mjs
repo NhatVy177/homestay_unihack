@@ -124,6 +124,23 @@ try {
     results.push({ width, role: 'khách có hồ sơ mở', ok: true });
     await second.context.close();
 
+    // --- Hồ sơ đã có lịch xem: báo rõ, không cho thêm phòng
+    const scheduled = { trangThai: { coQuyTrinhThueDangHoatDong: true }, hoSo: [{ maDangKy: 'DK0002', trangThai: 'Đã tiếp nhận', sttLich: 1, trangThaiLich: 'Chờ xem', thoiGianHen: '2026-11-20T09:00:00' }], lichXem: [], phongGoiY: [] };
+    const third = await newPage(width, customer, scheduled);
+    await third.page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await third.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
+    assert.match(await third.page.locator('.kh-profile-banner--scheduled').innerText(), /Xem xong rồi mới thêm phòng khác/);
+    assert.equal(await third.page.getByRole('button', { name: /Thêm vào hồ sơ/ }).count(), 0);
+    await third.page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết' }).click();
+    const busy = third.page.locator('.kh-detail-register');
+    await busy.waitFor();
+    assert.equal(await busy.isDisabled(), true);
+    assert.match(await busy.innerText(), /Đang có lịch xem phòng/);
+    await third.page.screenshot({ path: `.ui-screens/interested-rooms/da-co-lich-${width}.png` });
+    assert.equal(third.errors.length, 0, `browser errors: ${third.errors.join('; ')}`);
+    results.push({ width, role: 'khách đã có lịch', ok: true });
+    await third.context.close();
+
     // --- Sale: không còn nút tạo phiếu khách vãng lai
     const saleCtx = await newPage(width, sale);
     await saleCtx.page.goto(`${base}/nhan-vien-sale`, { waitUntil: 'domcontentloaded' });
