@@ -4409,3 +4409,393 @@
   cursor: not-allowed;
   opacity: 0.55;
 }
+
+/* D-042: thẻ chi tiết phòng theo mẫu "Tôi quan tâm phòng này" */
+.kh-detail-availability {
+  display: grid;
+  gap: 6px;
+}
+
+.kh-detail-availability span {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.kh-detail-availability strong {
+  align-items: center;
+  display: flex;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  gap: 8px;
+  line-height: 1.3;
+}
+
+.kh-detail-availability strong .kp-line-icon {
+  height: 20px;
+  width: 20px;
+}
+
+.kh-detail-availability strong.is-open { color: var(--color-success); }
+.kh-detail-availability strong.is-waiting { color: var(--color-warning); }
+.kh-detail-availability strong.is-full { color: var(--color-danger); }
+
+.kh-detail-bed-note {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.kh-detail-bed-note h3 {
+  color: var(--color-primary);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+
+.kh-detail-bed-note p {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.kh-detail-register {
+  align-items: center;
+  display: flex;
+  font-size: 14px;
+  gap: 8px;
+  justify-content: center;
+  line-height: 1.25;
+  padding-left: 12px;
+  padding-right: 12px;
+  text-align: center;
+  text-transform: none;
+  white-space: normal;
+}
+
+.kh-detail-register .kp-line-icon {
+  flex: 0 0 auto;
+  height: 20px;
+  width: 20px;
+}
+
+.kh-detail-flow-note {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+  text-align: center;
+}
+
+.kh-detail-flow-badge {
+  align-items: center;
+  color: var(--color-primary);
+  display: flex;
+  font-size: 13px;
+  font-weight: 650;
+  gap: 8px;
+  justify-content: center;
+}
+
+.kh-detail-flow-badge .kp-line-icon {
+  height: 20px;
+  width: 20px;
+}
+
+/* D-042: phiếu nhu cầu thuê là một trang trong cổng khách, không còn là hộp thoại */
+.kh-rent-page {
+  align-items: start;
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: minmax(0, 1fr) 320px;
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: var(--space-6);
+}
+
+.kh-rent-card.kh-register-modal {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  gap: var(--space-6);
+  max-height: none;
+  max-width: none;
+  overflow: visible;
+  padding: var(--space-8);
+}
+
+.kh-rent-header {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.kh-rent-tag {
+  align-items: center;
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-pill);
+  color: var(--color-primary);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 8px;
+  justify-self: start;
+  letter-spacing: 0.05em;
+  padding: 6px 14px;
+  text-transform: uppercase;
+}
+
+.kh-rent-tag .kp-line-icon {
+  height: 16px;
+  width: 16px;
+}
+
+.kh-rent-header h1 {
+  font-family: var(--font-heading);
+  font-size: 34px;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.kh-rent-header p {
+  color: var(--color-text-muted);
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.kh-rent-interest {
+  align-items: center;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+  padding: var(--space-4) var(--space-6);
+}
+
+.kh-rent-interest-icon {
+  align-items: center;
+  background: var(--color-surface);
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.kh-rent-interest-icon .kp-line-icon {
+  color: var(--color-primary);
+  height: 22px;
+  width: 22px;
+}
+
+.kh-rent-interest-body {
+  display: grid;
+  gap: 2px;
+}
+
+.kh-rent-interest-body small {
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.kh-rent-interest-body strong {
+  font-family: var(--font-heading);
+  font-size: 20px;
+}
+
+.kh-rent-interest-body span {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.kh-rent-interest-body em {
+  background: var(--color-success-soft);
+  border-radius: var(--radius-pill);
+  color: var(--color-success);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+  justify-self: start;
+  margin-top: 6px;
+  padding: 4px 10px;
+}
+
+.kh-rent-interest > p {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.kh-rent-card .kh-register-scroll {
+  gap: var(--space-6);
+  overflow: visible;
+  padding: 0;
+}
+
+.kh-rent-card .kh-register-section {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+.kh-rent-card .kh-register-section h3 {
+  font-family: var(--font-heading);
+  font-size: 17px;
+}
+
+.kh-rent-card .kh-register-grid {
+  white-space: normal;
+}
+
+.kh-rent-card.kh-register-modal .kh-register-grid input,
+.kh-rent-card.kh-register-modal .kh-register-grid select {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding: 10px 18px;
+}
+
+.kh-rent-card.kh-register-modal .kh-register-grid textarea {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.kh-register-pair {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.kh-register-pair label {
+  flex: 1;
+  margin: 0;
+}
+
+.kh-register-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.kh-register-stack label {
+  margin: 0;
+}
+
+.kh-rent-card .kh-register-actions {
+  border-top: 0;
+  justify-content: flex-end;
+  padding: 0;
+}
+
+.kh-rent-aside {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  position: sticky;
+  top: var(--space-6);
+}
+
+.kh-rent-aside-icon {
+  align-items: center;
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+  color: var(--color-surface);
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+.kh-rent-aside-icon .kp-line-icon {
+  height: 22px;
+  width: 22px;
+}
+
+.kh-rent-aside h2 {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  margin: 0;
+}
+
+.kh-rent-aside p {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.kh-rent-aside ol {
+  display: grid;
+  gap: var(--space-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.kh-rent-aside li {
+  align-items: center;
+  display: flex;
+  font-size: 14px;
+  gap: var(--space-3);
+}
+
+.kh-rent-aside li span {
+  align-items: center;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  flex: 0 0 28px;
+  font-size: 12px;
+  font-weight: 800;
+  height: 28px;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .kh-rent-page {
+    grid-template-columns: 1fr;
+    padding: var(--space-4);
+  }
+
+  .kh-rent-card.kh-register-modal {
+    padding: var(--space-4);
+  }
+
+  .kh-rent-header h1 {
+    font-size: 26px;
+  }
+
+  .kh-rent-interest {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .kh-rent-interest > p {
+    grid-column: 1 / -1;
+  }
+
+  .kh-register-pair {
+    flex-direction: column;
+  }
+
+  .kh-rent-aside {
+    position: static;
+  }
+}

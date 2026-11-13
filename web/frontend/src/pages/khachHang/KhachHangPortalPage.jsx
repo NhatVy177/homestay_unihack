@@ -190,6 +190,14 @@ function getRoomStatusTone(status = '') {
   return '';
 }
 
+function getRoomAvailabilityText(room = {}) {
+  const free = Number(room.soGiuongTrong ?? room.soChoTrong ?? 0);
+  const waiting = Number(room.soGiuongChoCoc ?? 0);
+  if (room.trangThaiQuanTam === ROOM_FULL_LABEL) return 'Đã hết chỗ';
+  if (room.trangThaiQuanTam === 'Đang chờ cọc') return waiting > 0 ? `Có ${waiting} giường đang chờ cọc` : 'Đang có người giữ chỗ';
+  return free > 0 ? `Còn ${free} giường trống` : 'Còn chỗ trống';
+}
+
 function isForeignNationality(value = '') {
   const normalized = String(value).toLocaleLowerCase('vi-VN').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/\s+/g, ' ').trim();
   if (!normalized) return false;
@@ -273,6 +281,8 @@ function Icon({ name, className = '' }) {
         <circle cx="12" cy="10" r="2.2" />
       </>
     ),
+    bed: <path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9" />,
+    shield: <><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6l-7-3Z" /><path d="m9 12 2 2 4-4" /></>,
     bell: <><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" /><path d="M10 20a2 2 0 0 0 4 0" /></>
   };
 
@@ -818,6 +828,21 @@ function ChiTietPhongView({ phong, onBack, onRent }) {
         {/* Sidebar */}
         <aside className="kh-detail-sidebar">
           <div className="kh-detail-price-card">
+            {phong.trangThaiQuanTam && (
+              <div className="kh-detail-availability">
+                <span>Tình trạng phòng</span>
+                <strong className={getRoomStatusTone(phong.trangThaiQuanTam)}>
+                  <Icon name="bed" />
+                  {getRoomAvailabilityText(phong)}
+                </strong>
+              </div>
+            )}
+            {phong.trangThaiQuanTam && phong.trangThaiQuanTam !== ROOM_FULL_LABEL && (
+              <div className="kh-detail-bed-note">
+                <h3>Giường lựa chọn</h3>
+                <p>Nhân viên Sale sẽ xếp giường cụ thể sau khi tiếp nhận phiếu đăng ký của bạn.</p>
+              </div>
+            )}
             <div className="kh-detail-price-top">
               <span>Giá thuê hàng tháng</span>
               <strong>{formatMoney(phong.giaThue)}</strong>
@@ -833,26 +858,25 @@ function ChiTietPhongView({ phong, onBack, onRent }) {
                 ))}
               </div>
             )}
-            {phong.trangThaiQuanTam && (
-              <p className="kh-detail-room-status"><span className={`kh-room-status ${getRoomStatusTone(phong.trangThaiQuanTam)}`}>{phong.trangThaiQuanTam}</span></p>
-            )}
             <button
               className="kp-btn kp-btn-primary kp-full kh-detail-cta kh-detail-register"
               type="button"
               disabled={phong.trangThaiQuanTam === ROOM_FULL_LABEL}
               onClick={() => onRent(phong)}
             >
-              {phong.trangThaiQuanTam === ROOM_FULL_LABEL ? ROOM_FULL_LABEL : 'Đăng ký thuê ngay'}
+              <Icon name="profile" />
+              {phong.trangThaiQuanTam === ROOM_FULL_LABEL ? ROOM_FULL_LABEL : 'Tôi quan tâm phòng này'}
             </button>
-            <div className="kh-detail-note">
-              <Icon name="info" />
-              <span>
-                {phong.trangThaiQuanTam === ROOM_FULL_LABEL
-                  ? 'Phòng này đã hết chỗ. Vui lòng chọn phòng khác.'
-                  : phong.trangThaiQuanTam === 'Đang chờ cọc'
-                    ? 'Phòng đang có người giữ chỗ. Bạn vẫn có thể gửi nhu cầu; nếu phòng không còn, nhân viên Sale sẽ tư vấn phòng khác.'
-                    : 'Có thể dọn vào ngày sau khi ký hợp đồng và đóng cọc.'}
-              </span>
+            <p className="kh-detail-flow-note">
+              {phong.trangThaiQuanTam === ROOM_FULL_LABEL
+                ? 'Phòng này đã hết chỗ. Vui lòng chọn phòng khác.'
+                : phong.trangThaiQuanTam === 'Đang chờ cọc'
+                  ? 'Phòng đang có người giữ chỗ. Bạn vẫn có thể gửi phiếu; nếu phòng không còn, nhân viên Sale sẽ tư vấn phòng khác. Khách chỉ đặt cọc sau khi đã xem phòng.'
+                  : 'Nhân viên Sale sẽ kiểm tra tình trạng thực tế và sắp xếp lịch xem phòng phù hợp. Khách chỉ đặt cọc sau khi đã xem phòng.'}
+            </p>
+            <div className="kh-detail-flow-badge">
+              <Icon name="shield" />
+              <span>Gửi phiếu nhu cầu trước, Sale xếp phòng sau</span>
             </div>
           </div>
 
@@ -3800,7 +3824,170 @@ export default function KhachHangPortalPage() {
     return renderDatCocList();
   }
 
+  function renderRentRequestPage() {
+    const interested = selectedRooms[0];
+    return (
+      <section className="kh-rent-page">
+        <form className="kh-rent-card kh-register-modal kh-register-page" onSubmit={submitRent}>
+          <header className="kh-rent-header">
+            <span className="kh-rent-tag"><Icon name="profile" />Phiếu nhu cầu thuê</span>
+            <h1>Đăng ký thuê phòng</h1>
+            <p>Bạn gửi nhu cầu thuê và thời gian có thể đến xem. Nhân viên Sale sẽ kiểm tra điều kiện, tìm phòng/giường phù hợp rồi lập lịch xem phòng cho bạn.</p>
+          </header>
+
+          {interested && (
+            <div className="kh-rent-interest">
+              <span className="kh-rent-interest-icon"><Icon name="home" /></span>
+              <div className="kh-rent-interest-body">
+                <small>Phòng bạn đang quan tâm</small>
+                <strong>{selectedRooms.map((room) => room.tenPhong).join(', ')}</strong>
+                <span>{[...new Set([interested.chiNhanh, getArea(interested)].filter(Boolean))].join(' · ')}</span>
+                {selectedRooms.length === 1 && interested.giaThue ? <em>{formatMoney(interested.giaThue)}</em> : null}
+              </div>
+              <p>Phòng này sẽ được ghi nhận như một ưu tiên. Sale vẫn kiểm tra tình trạng thực tế trước khi sắp lịch xem phòng.</p>
+            </div>
+          )}
+
+          <div className="kh-register-scroll">
+              <section className="kh-register-section">
+                <h3><Icon name="profile" />Thông tin liên hệ</h3>
+                <div className="kh-register-grid kh-balanced-grid">
+                  <label className="is-half"><span>Họ và tên*</span><input value={rentForm.hoTen} onChange={(event) => setRentForm({ ...rentForm, hoTen: event.target.value })} placeholder="Nguyễn Văn A" required /></label>
+                  <label>
+                    <span>Ngày sinh*</span>
+                    <input
+                      className={getBirthDateError(rentForm.ngaySinh) ? 'is-invalid' : ''}
+                      type="date"
+                      max={getMaxBirthDate()}
+                      value={rentForm.ngaySinh}
+                      onChange={(event) => setRentForm({ ...rentForm, ngaySinh: event.target.value })}
+                      required
+                    />
+                    {getBirthDateError(rentForm.ngaySinh) && <small className="kh-field-error">{getBirthDateError(rentForm.ngaySinh)}</small>}
+                  </label>
+                  <label><span>Giới tính*</span><select value={rentForm.gioiTinh} onChange={(event) => setRentForm({ ...rentForm, gioiTinh: event.target.value })} required><option value="">Chọn giới tính</option><option value="Nam">Nam</option><option value="Nữ">Nữ</option></select></label>
+                  <label className="is-half">
+                    <span>Số điện thoại*</span>
+                    <input
+                      className={getPhoneError(rentForm.soDienThoai) ? 'is-invalid' : ''}
+                      inputMode="numeric"
+                      maxLength={10}
+                      pattern="[0-9]{10}"
+                      value={rentForm.soDienThoai}
+                      onChange={(event) => setRentForm({ ...rentForm, soDienThoai: event.target.value.replace(/\D/g, '').slice(0, 10) })}
+                      placeholder="Nhập 10 chữ số"
+                      required
+                    />
+                    {getPhoneError(rentForm.soDienThoai) && <small className="kh-field-error">{getPhoneError(rentForm.soDienThoai)}</small>}
+                  </label>
+                  <label className="is-half"><span>Email</span><input type="email" value={rentForm.email} onChange={(event) => setRentForm({ ...rentForm, email: event.target.value })} placeholder="example@gmail.com" /></label>
+                  <label className="is-half">
+                    <span>Quốc tịch*</span>
+                    <input value={rentForm.quocTich} onChange={(event) => setRentForm({ ...rentForm, quocTich: event.target.value })} placeholder="Ví dụ: Việt Nam" required />
+                    {isForeignNationality(rentForm.quocTich) && (
+                      <small className="kh-field-hint">Bạn vẫn gửi được hồ sơ; quản lý chi nhánh sẽ xem xét thêm khi duyệt cư trú.</small>
+                    )}
+                  </label>
+                  <label className="is-half">
+                    <span>CCCD*</span>
+                    <input
+                      className={getCccdError(rentForm.cccd) ? 'is-invalid' : ''}
+                      inputMode="numeric"
+                      maxLength={12}
+                      pattern="[0-9]{12}"
+                      value={rentForm.cccd}
+                      onChange={(event) => setRentForm({ ...rentForm, cccd: event.target.value.replace(/\D/g, '').slice(0, 12) })}
+                      placeholder="Nhập 12 chữ số"
+                      required
+                    />
+                    {getCccdError(rentForm.cccd) && <small className="kh-field-error">{getCccdError(rentForm.cccd)}</small>}
+                  </label>
+                </div>
+              </section>
+
+              <section className="kh-register-section">
+                <h3><Icon name="home" />Nhu cầu thuê</h3>
+                <div className="kh-register-grid kh-balanced-grid">
+                  <label><span>Số lượng người ở*</span><input type="number" min="1" max={getRoomTypeCapacity(rentForm.loaiPhongYeuCau) || undefined} value={rentForm.soNguoiO} onChange={(event) => setRentForm({ ...rentForm, soNguoiO: event.target.value })} required /></label>
+                  <label><span>Giới tính thuê*</span><select value={rentForm.gioiTinhThue} onChange={(event) => setRentForm({ ...rentForm, gioiTinhThue: event.target.value })} required><option value="Nam">Nam</option><option value="Nữ">Nữ</option><option value="Khác">Khác</option></select></label>
+                  {rentForm.gioiTinhThue === 'Khác' && (
+                    <div className="is-half kh-register-pair">
+                      <label><span>Số lượng nam*</span><input type="number" min="0" value={rentForm.soNam ?? ''} onChange={(event) => setRentForm({ ...rentForm, soNam: event.target.value })} required /></label>
+                      <label><span>Số lượng nữ*</span><input type="number" min="0" value={rentForm.soNu ?? ''} onChange={(event) => setRentForm({ ...rentForm, soNu: event.target.value })} required /></label>
+                    </div>
+                  )}
+                  <label className="is-half">
+                    <span>Khu vực mong muốn*</span>
+                    <input
+                      className={getAreaError(rentForm.khuVucMongMuon) ? 'is-invalid' : ''}
+                      type="text"
+                      list="kh-rent-area-options"
+                      value={rentForm.khuVucMongMuon}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        event.target.setCustomValidity(getAreaError(value));
+                        setRentForm({ ...rentForm, khuVucMongMuon: value });
+                      }}
+                      placeholder="VD: Quận 1, quan 3, Thu Duc..."
+                      required
+                    />
+                    <datalist id="kh-rent-area-options">
+                      {ALLOWED_RENT_AREAS.map((area) => <option key={area} value={area} />)}
+                    </datalist>
+                    {getAreaError(rentForm.khuVucMongMuon) && <small className="kh-field-error">{getAreaError(rentForm.khuVucMongMuon)}</small>}
+                  </label>
+                  <label className="is-half kh-room-type-field">
+                    <span>Loại phòng mong muốn*</span>
+                    <select
+                      value={rentForm.loaiPhongYeuCau}
+                      onChange={(event) => setRentForm({ ...rentForm, loaiPhongYeuCau: event.target.value })}
+                      required
+                    >
+                      <option value="">Chọn một loại phòng</option>
+                      {filterOptions.loaiPhong.filter(Boolean).map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                    {getRoomTypeCapacity(rentForm.loaiPhongYeuCau) && (
+                      <small className="kh-field-hint">Tối đa {getRoomTypeCapacity(rentForm.loaiPhongYeuCau)} người.</small>
+                    )}
+                  </label>
+                  <label><span>Mức giá tối đa (đ/tháng)*</span><input type="number" min="0" value={rentForm.mucGiaToiDa} onChange={(event) => setRentForm({ ...rentForm, mucGiaToiDa: event.target.value })} placeholder="VD: 3.000.000" required /></label>
+                  <label className="is-half"><span>Thời gian dự kiến dọn vào*</span><input type="date" value={rentForm.ngayDuKienVaoO} onChange={(event) => setRentForm({ ...rentForm, ngayDuKienVaoO: event.target.value })} required /></label>
+                  <label className="is-half"><span>Thời hạn thuê (tháng)*</span><input type="number" min="1" value={rentForm.thoiHanThue} onChange={(event) => setRentForm({ ...rentForm, thoiHanThue: event.target.value })} placeholder="Ví dụ: 6" required /></label>
+                  <div className="is-wide kh-register-stack">
+                    <span className="kh-register-field-title">Yêu cầu khác</span>
+                    <label>
+                      <textarea value={rentForm.ghiChu} onChange={(event) => setRentForm({ ...rentForm, ghiChu: event.target.value })} placeholder="Giờ giấc sinh hoạt, yêu cầu yên tĩnh, gửi xe..." />
+                    </label>
+                  </div>
+                </div>
+              </section>
+          </div>
+
+          <div className="kp-modal-actions kh-register-actions">
+            <button className="kp-btn kp-btn-soft" type="button" onClick={() => setRentModal(false)}>Hủy</button>
+            <button className="kp-btn kp-btn-primary" type="submit" disabled={submitting}>{submitting ? 'Đang gửi...' : 'Gửi yêu cầu đăng ký'}</button>
+          </div>
+        </form>
+
+        <aside className="kh-rent-aside">
+          <span className="kh-rent-aside-icon"><Icon name="info" /></span>
+          <h2>Quy trình sau khi gửi phiếu</h2>
+          <p>Sale sẽ kiểm tra nhu cầu, tìm phòng/giường phù hợp, đối chiếu thời gian rảnh của bạn rồi lập lịch xem phòng. Bạn chỉ gửi yêu cầu giữ chỗ sau khi đã xem phòng và quyết định thuê.</p>
+          <ol>
+            <li><span>1</span>Gửi phiếu nhu cầu thuê</li>
+            <li><span>2</span>Sale sắp xếp phòng và lịch xem</li>
+            <li><span>3</span>Khách xem phòng thực tế</li>
+            <li><span>4</span>Gửi yêu cầu giữ chỗ nếu ưng ý</li>
+          </ol>
+        </aside>
+      </section>
+    );
+  }
+
   function renderCurrentTab() {
+    if (rentModal) return renderRentRequestPage();
     if (detailPhong && activeTab === 'kham-pha') {
       return (
         <ChiTietPhongView
@@ -3897,142 +4084,6 @@ export default function KhachHangPortalPage() {
               ))}
             </div>
           </section>
-        </div>
-      )}
-
-      {rentModal && (
-        <div className="kp-modal-backdrop" onMouseDown={() => setRentModal(false)}>
-          <form className="kp-modal kh-rent-modal kh-register-modal" onMouseDown={(event) => event.stopPropagation()} onSubmit={submitRent}>
-            <div className="kp-modal-head kh-register-head">
-              <div>
-                <h2>Đăng ký thuê phòng</h2>
-                <p>Vui lòng cung cấp thông tin cá nhân và nhu cầu thuê phòng để nhân viên Sale hỗ trợ kiểm tra và sắp lịch xem phòng.</p>
-              </div>
-              <button type="button" onClick={() => setRentModal(false)}>×</button>
-            </div>
-
-            <div className="kh-register-scroll">
-              <section className="kh-register-section">
-                <h3><Icon name="profile" />Thông tin cá nhân</h3>
-                <div className="kh-register-grid kh-balanced-grid">
-                  <label className="is-half"><span>Họ và tên*</span><input value={rentForm.hoTen} onChange={(event) => setRentForm({ ...rentForm, hoTen: event.target.value })} placeholder="Nguyễn Văn A" required /></label>
-                  <label>
-                    <span>Ngày sinh*</span>
-                    <input
-                      className={getBirthDateError(rentForm.ngaySinh) ? 'is-invalid' : ''}
-                      type="date"
-                      max={getMaxBirthDate()}
-                      value={rentForm.ngaySinh}
-                      onChange={(event) => setRentForm({ ...rentForm, ngaySinh: event.target.value })}
-                      required
-                    />
-                    {getBirthDateError(rentForm.ngaySinh) && <small className="kh-field-error">{getBirthDateError(rentForm.ngaySinh)}</small>}
-                  </label>
-                  <label><span>Giới tính*</span><select value={rentForm.gioiTinh} onChange={(event) => setRentForm({ ...rentForm, gioiTinh: event.target.value })} required><option value="">Chọn giới tính</option><option value="Nam">Nam</option><option value="Nữ">Nữ</option></select></label>
-                  <label className="is-half">
-                    <span>Số điện thoại*</span>
-                    <input
-                      className={getPhoneError(rentForm.soDienThoai) ? 'is-invalid' : ''}
-                      inputMode="numeric"
-                      maxLength={10}
-                      pattern="[0-9]{10}"
-                      value={rentForm.soDienThoai}
-                      onChange={(event) => setRentForm({ ...rentForm, soDienThoai: event.target.value.replace(/\D/g, '').slice(0, 10) })}
-                      placeholder="Nhập 10 chữ số"
-                      required
-                    />
-                    {getPhoneError(rentForm.soDienThoai) && <small className="kh-field-error">{getPhoneError(rentForm.soDienThoai)}</small>}
-                  </label>
-                  <label className="is-half"><span>Email</span><input type="email" value={rentForm.email} onChange={(event) => setRentForm({ ...rentForm, email: event.target.value })} placeholder="example@gmail.com" /></label>
-                  <label className="is-half">
-                    <span>Quốc tịch*</span>
-                    <input value={rentForm.quocTich} onChange={(event) => setRentForm({ ...rentForm, quocTich: event.target.value })} placeholder="Ví dụ: Việt Nam" required />
-                    {isForeignNationality(rentForm.quocTich) && (
-                      <small className="kh-field-hint">Bạn vẫn gửi được hồ sơ; quản lý chi nhánh sẽ xem xét thêm khi duyệt cư trú.</small>
-                    )}
-                  </label>
-                  <label className="is-half">
-                    <span>CCCD*</span>
-                    <input
-                      className={getCccdError(rentForm.cccd) ? 'is-invalid' : ''}
-                      inputMode="numeric"
-                      maxLength={12}
-                      pattern="[0-9]{12}"
-                      value={rentForm.cccd}
-                      onChange={(event) => setRentForm({ ...rentForm, cccd: event.target.value.replace(/\D/g, '').slice(0, 12) })}
-                      placeholder="Nhập 12 chữ số"
-                      required
-                    />
-                    {getCccdError(rentForm.cccd) && <small className="kh-field-error">{getCccdError(rentForm.cccd)}</small>}
-                  </label>
-                </div>
-              </section>
-
-              <section className="kh-register-section">
-                <h3><Icon name="home" />Nhu cầu thuê phòng</h3>
-                <div className="kh-register-grid kh-balanced-grid">
-                  <label><span>Số lượng người ở*</span><input type="number" min="1" max={getRoomTypeCapacity(rentForm.loaiPhongYeuCau) || undefined} value={rentForm.soNguoiO} onChange={(event) => setRentForm({ ...rentForm, soNguoiO: event.target.value })} required /></label>
-                  <label><span>Giới tính thuê*</span><select value={rentForm.gioiTinhThue} onChange={(event) => setRentForm({ ...rentForm, gioiTinhThue: event.target.value })} required><option value="Nam">Nam</option><option value="Nữ">Nữ</option><option value="Khác">Khác</option></select></label>
-                  {rentForm.gioiTinhThue === 'Khác' && (
-                    <div className="is-half" style={{ display: 'flex', gap: '16px' }}>
-                      <label style={{ margin: 0, flex: 1 }}><span>Số lượng nam*</span><input type="number" min="0" value={rentForm.soNam ?? ''} onChange={(event) => setRentForm({ ...rentForm, soNam: event.target.value })} required /></label>
-                      <label style={{ margin: 0, flex: 1 }}><span>Số lượng nữ*</span><input type="number" min="0" value={rentForm.soNu ?? ''} onChange={(event) => setRentForm({ ...rentForm, soNu: event.target.value })} required /></label>
-                    </div>
-                  )}
-                  <label className="is-half">
-                    <span>Khu vực mong muốn*</span>
-                    <input
-                      className={getAreaError(rentForm.khuVucMongMuon) ? 'is-invalid' : ''}
-                      type="text"
-                      list="kh-rent-area-options"
-                      value={rentForm.khuVucMongMuon}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        event.target.setCustomValidity(getAreaError(value));
-                        setRentForm({ ...rentForm, khuVucMongMuon: value });
-                      }}
-                      placeholder="VD: Quận 1, quan 3, Thu Duc..."
-                      required
-                    />
-                    <datalist id="kh-rent-area-options">
-                      {ALLOWED_RENT_AREAS.map((area) => <option key={area} value={area} />)}
-                    </datalist>
-                    {getAreaError(rentForm.khuVucMongMuon) && <small className="kh-field-error">{getAreaError(rentForm.khuVucMongMuon)}</small>}
-                  </label>
-                  <label className="is-half kh-room-type-field">
-                    <span>Loại phòng mong muốn*</span>
-                    <select
-                      value={rentForm.loaiPhongYeuCau}
-                      onChange={(event) => setRentForm({ ...rentForm, loaiPhongYeuCau: event.target.value })}
-                      required
-                    >
-                      <option value="">Chọn một loại phòng</option>
-                      {filterOptions.loaiPhong.filter(Boolean).map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                    {getRoomTypeCapacity(rentForm.loaiPhongYeuCau) && (
-                      <small className="kh-field-hint">Tối đa {getRoomTypeCapacity(rentForm.loaiPhongYeuCau)} người.</small>
-                    )}
-                  </label>
-                  <label><span>Mức giá tối đa (đ/tháng)*</span><input type="number" min="0" value={rentForm.mucGiaToiDa} onChange={(event) => setRentForm({ ...rentForm, mucGiaToiDa: event.target.value })} placeholder="VD: 3.000.000" required /></label>
-                  <label className="is-half"><span>Thời gian dự kiến dọn vào*</span><input type="date" value={rentForm.ngayDuKienVaoO} onChange={(event) => setRentForm({ ...rentForm, ngayDuKienVaoO: event.target.value })} required /></label>
-                  <label className="is-half"><span>Thời hạn thuê (tháng)*</span><input type="number" min="1" value={rentForm.thoiHanThue} onChange={(event) => setRentForm({ ...rentForm, thoiHanThue: event.target.value })} placeholder="Ví dụ: 6" required /></label>
-                  <div className="is-wide" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <span className="kh-register-field-title">Yêu cầu khác</span>
-                    <label style={{ margin: 0 }}>
-                      <textarea value={rentForm.ghiChu} onChange={(event) => setRentForm({ ...rentForm, ghiChu: event.target.value })} placeholder="Giờ giấc sinh hoạt, yêu cầu yên tĩnh, gửi xe..." style={{ width: '100%', minHeight: '46px' }} />
-                    </label>
-                  </div>
-                </div>
-              </section>
-            </div>
-
-            <div className="kp-modal-actions kh-register-actions">
-              <button className="kp-btn kp-btn-soft" type="button" onClick={() => setRentModal(false)}>Hủy</button>
-              <button className="kp-btn kp-btn-primary" type="submit" disabled={submitting}>{submitting ? 'Đang gửi...' : 'Gửi yêu cầu đăng ký'}</button>
-            </div>
-          </form>
         </div>
       )}
 

@@ -10,9 +10,9 @@ await mkdir('.ui-screens/interested-rooms', { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
 
 const rooms = [
-  { id: 'P901', maPhong: 'P901', tenPhong: 'Phòng P901', loaiPhong: 'Phòng 4 người', giaThue: 1400000, chiNhanh: 'Chi nhánh giao diện', diaChi: 'Quận 1', trangThaiQuanTam: 'Còn trống' },
-  { id: 'P902', maPhong: 'P902', tenPhong: 'Phòng P902', loaiPhong: 'Phòng 4 người', giaThue: 1500000, chiNhanh: 'Chi nhánh giao diện', diaChi: 'Quận 1', trangThaiQuanTam: 'Đang chờ cọc' },
-  { id: 'P903', maPhong: 'P903', tenPhong: 'Phòng P903', loaiPhong: 'Phòng 4 người', giaThue: 1600000, chiNhanh: 'Chi nhánh giao diện', diaChi: 'Quận 1', trangThaiQuanTam: 'Hết chỗ' }
+  { id: 'P901', maPhong: 'P901', tenPhong: 'Phòng P901', loaiPhong: 'Phòng 4 người', giaThue: 1400000, chiNhanh: 'Chi nhánh giao diện', diaChi: 'Quận 1', trangThaiQuanTam: 'Còn trống', soGiuongTrong: 4, soGiuongChoCoc: 0 },
+  { id: 'P902', maPhong: 'P902', tenPhong: 'Phòng P902', loaiPhong: 'Phòng 4 người', giaThue: 1500000, chiNhanh: 'Chi nhánh giao diện', diaChi: 'Quận 1', trangThaiQuanTam: 'Đang chờ cọc', soGiuongTrong: 0, soGiuongChoCoc: 2 },
+  { id: 'P903', maPhong: 'P903', tenPhong: 'Phòng P903', loaiPhong: 'Phòng 4 người', giaThue: 1600000, chiNhanh: 'Chi nhánh giao diện', diaChi: 'Quận 1', trangThaiQuanTam: 'Hết chỗ', soGiuongTrong: 0, soGiuongChoCoc: 0 }
 ];
 const customer = { maNguoiDung: 'KH-DEMO', maKhachHang: 'KH-DEMO', hoTen: 'Khách demo', tenDangNhap: 'kh-demo', vaiTro: 'KhachHang' };
 const sale = { maNguoiDung: 'UI-SALE', vaiTro: 'NhanVien', chucVu: 'Sale', hoTen: 'Sale giao diện', maChiNhanh: 'CN-UI' };
@@ -55,6 +55,7 @@ try {
     await page.locator('.kh-room-card').nth(2).getByRole('button', { name: 'Xem chi tiết' }).click();
     const full = page.locator('.kh-detail-register');
     await full.waitFor();
+    assert.match(await page.locator('.kh-detail-availability').innerText(), /Đã hết chỗ/);
     assert.equal(await full.isDisabled(), true, 'phòng hết chỗ: nút bị khóa');
     assert.match(await full.innerText(), /Hết chỗ/i);
     await page.screenshot({ path: `.ui-screens/interested-rooms/chi-tiet-het-cho-${width}.png` });
@@ -65,12 +66,29 @@ try {
     const waiting = page.locator('.kh-detail-register');
     await waiting.waitFor();
     assert.equal(await waiting.isDisabled(), false, 'phòng chờ cọc: vẫn cho quan tâm');
-    assert.match(await page.locator('.kh-detail-note').innerText(), /đang có người giữ chỗ/);
-    await waiting.click();
+    assert.match(await page.locator('.kh-detail-flow-note').innerText(), /đang có người giữ chỗ/);
+    assert.match(await page.locator('.kh-detail-availability').innerText(), /2 giường đang chờ cọc/);
 
-    // Form đăng ký: dưới 18 tuổi bị báo lỗi, quốc tịch khác chỉ cảnh báo
+    // Phòng còn trống: hiện số giường trống và nút "Tôi quan tâm phòng này"
+    await page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
+    await page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết' }).click();
+    const open = page.getByRole('button', { name: 'Tôi quan tâm phòng này' });
+    await open.waitFor();
+    assert.match(await page.locator('.kh-detail-availability').innerText(), /Còn 4 giường trống/);
+    assert.match(await page.locator('.kh-detail-bed-note').innerText(), /Sale sẽ xếp giường cụ thể/);
+    await page.screenshot({ path: `.ui-screens/interested-rooms/chi-tiet-con-trong-${width}.png` });
+    await open.click();
+
+    // Form đăng ký là một trang (không phải hộp thoại), có thẻ phòng quan tâm và cột quy trình
     const modal = page.locator('.kh-register-modal').first();
     await modal.waitFor({ timeout: 8000 });
+    assert.equal(await page.locator('.kp-modal-backdrop').count(), 0, 'form là trang, không phải overlay');
+    assert.match(await page.locator('.kh-rent-interest').innerText(), /Phòng P901/);
+    assert.match(await page.locator('.kh-rent-aside').innerText(), /Quy trình sau khi gửi phiếu/);
+    const metrics = await page.evaluate(() => ({ pageWidth: document.documentElement.scrollWidth, viewport: innerWidth }));
+    assert.ok(metrics.pageWidth <= metrics.viewport, `form tràn ngang: ${metrics.pageWidth} > ${metrics.viewport}`);
+    await page.screenshot({ path: `.ui-screens/interested-rooms/form-phieu-nhu-cau-${width}.png`, fullPage: true });
     const birth = modal.locator('input[type="date"]').first();
     await birth.fill('2015-01-01');
     await page.screenshot({ path: `.ui-screens/interested-rooms/form-duoi-18-${width}.png` });
