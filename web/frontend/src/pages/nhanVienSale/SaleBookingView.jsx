@@ -7,28 +7,32 @@ import EmptyState from '../../components/common/EmptyState.jsx';
 export default function SaleBookingView({ unfitInterested = [], viewingPreference = null, profile, onBack, rooms, selectedRoomIds, selectedRooms, loadingRooms, regionValid, roomError,
   formDate, setFormDate, formTime, setFormTime, formNote, setFormNote, saving, createdSchedule,
   selectionPlan, minScheduleDate, toggleRoom, handleCreateSchedule, formatMoney, formatGender, getAvailableSlots, isWholeRoomOption }) {
-  const otherRooms = rooms.filter((room) => !selectedRoomIds.includes(room.maPhong));
+  // Phòng đã chọn lên đầu danh sách; còn lại giữ thứ tự hệ thống gợi ý.
+  const sortedRooms = [...rooms].sort((x, y) => Number(selectedRoomIds.includes(y.maPhong)) - Number(selectedRoomIds.includes(x.maPhong)));
   const canSubmit = selectionPlan.valid && formDate && formTime && !saving;
 
   const renderRoom = (room) => {
     const selected = selectedRoomIds.includes(room.maPhong);
-    return <article className={`ktp-detail-card ui-card sale-room-card ${selected ? 'is-selected' : ''}`} key={room.maPhong} onClick={() => toggleRoom(room.maPhong)}>
-      <div className="sale-room-image">{room.urlImg ? <img src={room.urlImg} alt={room.tenPhong} /> : <Icon name="meeting_room" />}</div>
-      <div className="sale-room-body">
-        <div className="sale-section-heading">
-          <div><h3>{room.tenPhong}</h3>{room.khachQuanTam && <span className="ui-badge ui-badge--success">Khách quan tâm</span>}<p>{room.loaiPhong}</p></div>
-          <input type="checkbox" aria-label={`Chọn ${room.tenPhong}`} checked={selected} onChange={() => toggleRoom(room.maPhong)} onClick={(e) => e.stopPropagation()} />
+    const freeBeds = room.soGiuongTrong ?? room.soGiuongDuKienXep ?? 0;
+    return <article className={`sale-room-card sale-room-row ${selected ? 'is-selected' : ''}`} key={room.maPhong} onClick={() => toggleRoom(room.maPhong)}>
+      <div className="sale-room-thumb">{room.urlImg ? <img src={room.urlImg} alt={room.tenPhong} /> : <Icon name="meeting_room" />}</div>
+      <div className="sale-room-info">
+        <div className="sale-room-title">
+          <h3>{room.tenPhong}</h3>
+          {selected && <Icon name="check_circle" />}
+          {room.khachQuanTam && <span className="ui-badge ui-badge--success">Khách quan tâm</span>}
         </div>
-        <p>{isWholeRoomOption(room) ? 'Nguyên phòng' : 'Ghép giường'}</p>
-        <dl className="sale-definition">
-          <div><dt>Chi nhánh</dt><dd>{room.tenChiNhanh || room.diaChi || '—'}</dd></div>
-          <div><dt>Giới tính</dt><dd>{room.gioiTinhChoPhep || 'Không phân biệt'}</dd></div>
-          <div><dt>Giường trống</dt><dd>{room.soGiuongTrong ?? room.soGiuongDuKienXep ?? 0}</dd></div>
-          <div><dt>Số chỗ có thể xếp</dt><dd>{getAvailableSlots(room)} chỗ</dd></div>
-        </dl>
-        {room.danhSachGiuong?.length > 0 && <p>Giường: {room.danhSachGiuong.join(', ')}</p>}
-        <div className="sale-room-footer"><span className="ui-badge ui-badge--success">{room.tinhTrang || 'Khả dụng'}</span><strong>{formatMoney(room.giaThue)}</strong></div>
+        <div className="sale-room-chips">
+          <span>{room.tenChiNhanh || room.diaChi || '—'}</span>
+          {room.loaiPhong && <span>{room.loaiPhong}</span>}
+          <span>{isWholeRoomOption(room) ? 'Nguyên phòng' : 'Ghép giường'}</span>
+          <span>{room.gioiTinhChoPhep || 'Không phân biệt'}</span>
+          <span>{formatMoney(room.giaThue)}</span>
+          {room.sucChua ? <span>Tối đa {room.sucChua} người</span> : null}
+          <span className="sale-room-free">{freeBeds > 0 ? `Còn ${freeBeds} giường` : (room.tinhTrang || 'Khả dụng')}</span>
+        </div>
       </div>
+      <input type="checkbox" aria-label={`Chọn ${room.tenPhong}`} checked={selected} onChange={() => toggleRoom(room.maPhong)} onClick={(e) => e.stopPropagation()} />
     </article>;
   };
 
@@ -57,20 +61,13 @@ export default function SaleBookingView({ unfitInterested = [], viewingPreferenc
         {!loadingRooms && roomError && <p className="sale-alert sale-alert--danger" role="alert">{roomError}</p>}
 
         {!loadingRooms && !roomError && <section className="ui-card sale-panel">
-          <h3>Phòng sẽ dẫn khách xem ({selectedRooms.length})</h3>
-          <p className="sale-panel-hint">Phòng khách đã quan tâm được chọn sẵn. Bỏ chọn phòng không còn phù hợp; có thể thêm phòng ở danh sách bên dưới.</p>
+          <div className="sale-section-heading"><h3>Chọn phòng dẫn khách xem</h3><span className="ui-badge ui-badge--neutral">Đã chọn {selectedRooms.length} / {rooms.length}</span></div>
+          <p className="sale-panel-hint">Phòng khách đã quan tâm được chọn sẵn và nằm trên cùng. Bỏ chọn phòng không còn phù hợp, hoặc tích thêm phòng khác trong danh sách.</p>
           {unfitInterested.length > 0 && <div className="sale-alert sale-alert--danger" role="status"><Icon name="warning" /> Đã bỏ ra vì không đủ điều kiện: {unfitInterested.map((room) => `${room.tenPhong} (${room.chiNhanh})`).join(', ')}. Lý do có thể là hết giường, không hợp giới tính/số người, vượt mức giá hoặc khác chi nhánh của bạn; báo khách khi gọi xác nhận lịch.</div>}
-          {selectedRooms.length === 0
-            ? <p className="sale-panel-hint">Chưa chọn phòng nào.</p>
-            : <div className="sale-room-grid">{selectedRooms.map(renderRoom)}</div>}
+          {rooms.length === 0
+            ? <EmptyState message="Không có phòng/giường phù hợp để lập lịch cho phiếu này." />
+            : <div className="sale-room-list">{sortedRooms.map(renderRoom)}</div>}
           {selectedRooms.length > 0 && <div className={`sale-alert ${selectionPlan.valid ? 'sale-selection-valid' : 'sale-alert--danger'}`} role="status"><Icon name={selectionPlan.valid ? 'check_circle' : 'warning'} /><span>{selectionPlan.message}</span></div>}
-        </section>}
-
-        {!loadingRooms && !roomError && <section className="ui-card sale-panel">
-          <h3>Phòng phù hợp khác ({otherRooms.length})</h3>
-          {rooms.length === 0 && <EmptyState message="Không có phòng/giường phù hợp để lập lịch cho phiếu này." />}
-          {rooms.length > 0 && otherRooms.length === 0 && <p className="sale-panel-hint">Không còn phòng phù hợp nào khác.</p>}
-          {otherRooms.length > 0 && <div className="sale-room-grid">{otherRooms.map(renderRoom)}</div>}
         </section>}
       </div>
 

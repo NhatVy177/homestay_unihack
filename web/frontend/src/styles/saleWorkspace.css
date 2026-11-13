@@ -204,3 +204,20 @@
 .sale-pending-name { font-family: var(--font-heading); font-size: 18px; }
 .sale-pending-meta { color: var(--color-text-muted); font-size: 14px; }
 .sale-pending-reject { position: absolute; top: var(--space-4); right: var(--space-4); }
+
+/* D-043: danh sách phòng gọn — mỗi phòng một dòng, phòng đã chọn lên đầu */
+.sale-room-list { display: grid; gap: var(--space-2); }
+.sale-room-row { display: grid; grid-template-columns: 88px minmax(0, 1fr) auto; align-items: center; gap: var(--space-4); padding: var(--space-3) var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); cursor: pointer; }
+.sale-room-row:hover { border-color: var(--color-primary); }
+.sale-room-row.is-selected { background: var(--color-primary-soft); border: 2px solid var(--color-primary); padding: calc(var(--space-3) - 1px) calc(var(--space-4) - 1px); }
+.sale-room-thumb { width: 88px; height: 64px; border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface-alt); display: grid; place-items: center; color: var(--color-text-muted); }
+.sale-room-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.sale-room-info { display: grid; gap: var(--space-2); min-width: 0; }
+.sale-room-title { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); }
+.sale-room-title h3 { margin: 0; font-size: 16px; }
+.sale-room-title .ui-icon, .sale-room-title svg { width: 18px; height: 18px; color: var(--color-primary); }
+.sale-room-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.sale-room-chips span { padding: 3px 10px; border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-surface); color: var(--color-text-muted); font-size: 12px; font-weight: 600; }
+.sale-room-chips .sale-room-free { background: var(--color-success-soft); border-color: transparent; color: var(--color-success); }
+.sale-room-row input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--color-primary); }
+@media (max-width: 600px) { .sale-room-row { grid-template-columns: 64px minmax(0, 1fr) auto; } .sale-room-thumb { width: 64px; height: 52px; } }
