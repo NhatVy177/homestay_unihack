@@ -1,8 +1,10 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-12 22:21:42 +07:00** (J-X074, bản vá danh sách hoàn cọc C4 chờ duyệt/migration). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-14 02:34:05 +07:00** (J-X079, nới khung chi tiết phòng). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
+
+Sửa nhỏ UI: nhánh `fix/ui-room-detail-width` từ `origin/main` `45c63f7`, worktree `D:\HomeStayDorm-ui-small-fixes`. CSS riêng nới cột thông tin/đăng ký ở chi tiết phòng từ 244 lên 320px trên desktop; mobile giữ một cột. Không sửa JSX/CSS nghiệp vụ của Claude hoặc ghép nhánh. Build + avalanche UI qua, backend 57/3 skip, blockchain local 25/1 skip; kiểm giao diện 1440/1024/390 qua, nút một dòng và không tràn ngang. Đã kiểm CSS mới trên giao diện D-044 của Claude bằng cách chèn CSS trong trang Playwright riêng với API giả (không đổi runtime/code của Claude). Ảnh/report bị ignore tại `web/frontend/.ui-screens/room-detail-width/`. Chờ Vy review/merge để áp dụng vào giao diện mới đang chạy 5173; bản riêng từ main phục vụ ở 5199.
 
 C4 đã merge PR #10/#11 và migrate HOMEDORM4 (J-C069/J-C070). Bản vá bổ sung `fix/c4-refund-before-close` gỡ điều kiện danh sách hoàn cọc đòi hợp đồng đã thanh lý (D-041); backend 53 pass/3 skip, SQL C4 riêng 1/1 trên CSDL tạm, blockchain 25 pass/1 skip, build và avalanche UI qua. Chưa áp dụng phần SP bổ sung lên HOMEDORM4; chờ Vy duyệt và cho phép. Chưa nghiệm thu C4 bằng hồ sơ thật.
 
