@@ -23,7 +23,7 @@ export async function layHoSoCuaKhach(maDangKy, khachHangId) {
 export async function layPhongQuanTam(maDangKy) {
   const result = await executeQuery(`
     SELECT q.MaPhong AS maPhong, p.TenPhong AS tenPhong, p.MaChiNhanh AS maChiNhanh,
-           cn.TenChiNhanh AS chiNhanh, q.ThoiGianThem AS thoiGianThem
+           p.MaLoaiPhong AS maLoaiPhong, cn.TenChiNhanh AS chiNhanh, q.ThoiGianThem AS thoiGianThem
     FROM dbo.PhieuDangKyPhongQuanTam q
     JOIN dbo.Phong p ON p.MaPhong = q.MaPhong
     JOIN dbo.ChiNhanh cn ON cn.MaChiNhanh = p.MaChiNhanh
@@ -52,7 +52,10 @@ export async function layThongTinPhong(maPhongs = []) {
   const rows = [];
   for (const maPhong of ids) {
     const result = await executeQuery(
-      'SELECT MaPhong AS maPhong, TenPhong AS tenPhong, MaChiNhanh AS maChiNhanh FROM dbo.Phong WHERE MaPhong = @MaPhong;',
+      `SELECT p.MaPhong AS maPhong, p.TenPhong AS tenPhong, p.MaChiNhanh AS maChiNhanh,
+              p.MaLoaiPhong AS maLoaiPhong, lp.TenLoaiPhong AS tenLoaiPhong
+       FROM dbo.Phong p JOIN dbo.LoaiPhong lp ON lp.MaLoaiPhong = p.MaLoaiPhong
+       WHERE p.MaPhong = @MaPhong;`,
       [{ name: 'MaPhong', type: sql.VarChar(4), value: maPhong }]
     );
     if (result.recordset[0]) rows.push(result.recordset[0]);
@@ -78,4 +81,12 @@ export async function goPhongQuanTam(maDangKy, maPhong) {
       { name: 'MaPhong', type: sql.VarChar(4), value: maPhong }
     ]
   );
+}
+
+export async function layLoaiPhongHoSo(maDangKy) {
+  const result = await executeQuery(
+    'SELECT MaLoaiPhong AS maLoaiPhong FROM dbo.PDK_LoaiPhong WHERE MaDangKy = @MaDangKy;',
+    [{ name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy }]
+  );
+  return result.recordset.map((row) => row.maLoaiPhong);
 }

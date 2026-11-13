@@ -25,3 +25,11 @@ test('D-043: trùng phòng, khác chi nhánh, quá giới hạn đều bị từ
   const full = Array.from({ length: MAX_INTERESTED_ROOMS }, (_, i) => ({ maPhong: `P10${i}`, maChiNhanh: 'CN0001' }));
   assert.match(checkRoomCanJoin(full, { maPhong: 'P199', maChiNhanh: 'CN0001' }), /tối đa/);
 });
+
+test('D-043: chỉ thêm phòng cùng loại với hồ sơ', () => {
+  const current = [{ maPhong: 'P101', maChiNhanh: 'CN0001', maLoaiPhong: 'LP0001' }];
+  assert.equal(checkRoomCanJoin(current, { maPhong: 'P102', maChiNhanh: 'CN0001', maLoaiPhong: 'LP0001' }), '');
+  assert.match(checkRoomCanJoin(current, { maPhong: 'P103', maChiNhanh: 'CN0001', maLoaiPhong: 'LP0002' }), /cùng loại/);
+  assert.match(checkRoomCanJoin([], { maPhong: 'P103', maChiNhanh: 'CN0001', maLoaiPhong: 'LP0002' }, ['LP0001']), /cùng loại/);
+  assert.equal(checkRoomCanJoin([], { maPhong: 'P101', maChiNhanh: 'CN0001', maLoaiPhong: 'LP0001' }, ['LP0001']), '');
+});

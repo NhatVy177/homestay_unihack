@@ -13,9 +13,14 @@ export function checkProfileEditable({ trangThai, coLichXemConHieuLuc }) {
   return '';
 }
 
-// currentRooms: [{ maPhong, maChiNhanh }]; newRoom: { maPhong, maChiNhanh }.
-export function checkRoomCanJoin(currentRooms, newRoom) {
+// currentRooms: [{ maPhong, maChiNhanh, maLoaiPhong }]; newRoom: { maPhong, maChiNhanh, maLoaiPhong, tenLoaiPhong }.
+// profileRoomTypes: mã loại phòng hồ sơ đã chọn (PDK_LoaiPhong); rỗng thì lấy theo phòng đã có trong hồ sơ.
+export function checkRoomCanJoin(currentRooms, newRoom, profileRoomTypes = []) {
   if (currentRooms.some((room) => room.maPhong === newRoom.maPhong)) return 'Phòng này đã có trong hồ sơ của bạn.';
+  const allowedTypes = profileRoomTypes.length ? profileRoomTypes : [...new Set(currentRooms.map((room) => room.maLoaiPhong).filter(Boolean))];
+  if (allowedTypes.length && newRoom.maLoaiPhong && !allowedTypes.includes(newRoom.maLoaiPhong)) {
+    return 'Chỉ thêm được phòng cùng loại với hồ sơ của bạn.';
+  }
   if (currentRooms.length >= MAX_INTERESTED_ROOMS) return `Mỗi hồ sơ chỉ quan tâm tối đa ${MAX_INTERESTED_ROOMS} phòng.`;
   if (currentRooms.length && currentRooms.some((room) => room.maChiNhanh !== newRoom.maChiNhanh)) {
     return 'Hồ sơ của bạn đang ở chi nhánh khác. Hãy gửi hồ sơ riêng cho chi nhánh này sau khi xem phòng.';

@@ -414,7 +414,8 @@ export async function themPhongQuanTam(user, maDangKy, maPhong) {
     throw createServiceError(`Phòng ${room.tenPhong} đã hết chỗ, vui lòng chọn phòng khác.`, 409);
   }
   const current = await phongQuanTamRepository.layPhongQuanTam(profile.maDangKy);
-  const reason = checkRoomCanJoin(current, room);
+  const profileRoomTypes = await phongQuanTamRepository.layLoaiPhongHoSo(profile.maDangKy);
+  const reason = checkRoomCanJoin(current, room, profileRoomTypes);
   if (reason) throw createServiceError(reason, 409);
   await phongQuanTamRepository.themPhongQuanTam(profile.maDangKy, room.maPhong);
   return phongQuanTamRepository.layPhongQuanTam(profile.maDangKy);
