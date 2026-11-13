@@ -62,8 +62,9 @@ export async function taoLichXemPhong({
     }
 
     const profile = hoSo.recordset[0];
-    if (normalizeStatus(profile.TrangThai) !== normalizeStatus('Đã tiếp nhận')) {
-      throw createServiceError('Chỉ được lập lịch cho hồ sơ đã tiếp nhận.');
+    // D-044: không còn bước tiếp nhận riêng; lập lịch cho phiếu mới (Chờ tiếp nhận) cũng là tiếp nhận phiếu.
+    if (![normalizeStatus('Chờ tiếp nhận'), normalizeStatus('Đã tiếp nhận')].includes(normalizeStatus(profile.TrangThai))) {
+      throw createServiceError('Chỉ được lập lịch cho phiếu đang chờ xếp lịch.');
     }
     if (profile.MaNhanVienSale && profile.MaNhanVienSale !== user?.maNguoiDung) {
       throw createServiceError('Hồ sơ đang do nhân viên Sale khác xử lý.', 403);
@@ -118,6 +119,14 @@ export async function taoLichXemPhong({
         VALUES (@MaDangKy, @MaPhong, @STTLich)
       `);
     }
+
+    const acceptRequest = new sql.Request(transaction);
+    acceptRequest.input('MaDangKy', sql.VarChar(6), maDangKy);
+    await acceptRequest.query(`
+      UPDATE dbo.PhieuDangKy
+      SET TrangThai = N'Đã tiếp nhận'
+      WHERE MaDangKy = @MaDangKy AND TrangThai = N'Chờ tiếp nhận'
+    `);
 
     if (nhanVienSaleId) {
       const saleRequest = new sql.Request(transaction);

@@ -9,7 +9,6 @@ import SaleCustomerWorkspace from './SaleCustomerWorkspace.jsx';
 import SaleProfile from './SaleProfile.jsx';
 import LichXemPhongTab from './LichXemPhongTab.jsx';
 import LapHopDongTab from './LapHopDongTab.jsx';
-import HoSoDangKyTab from './HoSoDangKyTab.jsx';
 import DatCocTab from './DatCocTab.jsx';
 import NhanPhongTab from './NhanPhongTab.jsx';
 
@@ -26,7 +25,7 @@ export default function NhanVienSalePage() {
   const [scheduling, setScheduling] = useState(false);
   function navigate(tab) {
     if (scheduling && tab !== activeTab) return;
-    const taskParents = { 'ho-so': 'lich-xem', 'dat-coc': 'tong-quan', 'nhan-phong': 'hop-dong-thue' };
+    const taskParents = { 'dat-coc': 'tong-quan', 'nhan-phong': 'hop-dong-thue' };
     if (taskParents[tab]) { setTask(tab); setActiveTab(taskParents[tab]); }
     else if (navigation.some(item => item.id === tab)) { setTask(null); setActiveTab(tab); }
   }
@@ -34,7 +33,7 @@ export default function NhanVienSalePage() {
     title={navigation.find(item => item.id === activeTab)?.label} items={navigation} activeTab={activeTab}
     onSelect={navigate} isItemDisabled={id => scheduling && activeTab !== id} user={user}
     onAccount={scheduling ? undefined : () => navigate('ho-so-ca-nhan')} onLogout={dangXuat}>
-    {task && <div className="sale-view"><div className="sale-section-heading"><p className="sale-eyebrow">{task === 'ho-so' ? 'TIẾP NHẬN HỒ SƠ' : task === 'dat-coc' ? 'XỬ LÝ ĐẶT CỌC' : 'HỖ TRỢ KHAI NGƯỜI Ở'}</p><button className="ui-btn ui-btn--secondary" disabled={scheduling} onClick={() => setTask(null)}><Icon name="arrow_back" /> Quay lại</button></div>{task === 'ho-so' && <HoSoDangKyTab onSchedulingChange={setScheduling} />}{task === 'dat-coc' && <DatCocTab />}{task === 'nhan-phong' && <NhanPhongTab />}</div>}
+    {task && <div className="sale-view"><div className="sale-section-heading"><p className="sale-eyebrow">{task === 'dat-coc' ? 'XỬ LÝ ĐẶT CỌC' : 'HỖ TRỢ KHAI NGƯỜI Ở'}</p><button className="ui-btn ui-btn--secondary" disabled={scheduling} onClick={() => setTask(null)}><Icon name="arrow_back" /> Quay lại</button></div>{task === 'dat-coc' && <DatCocTab />}{task === 'nhan-phong' && <NhanPhongTab />}</div>}
     {!task && activeTab === 'tong-quan' && <SaleOverview user={user} onNavigate={navigate} />}
     {!task && activeTab === 'lich-xem' && <LichXemPhongTab onNavigate={navigate} onSchedulingChange={setScheduling} />}
     {!task && activeTab === 'hop-dong-thue' && <LapHopDongTab onResidence={() => navigate('nhan-phong')} />}

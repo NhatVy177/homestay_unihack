@@ -203,8 +203,9 @@ try {
     await saleCtx.page.locator('h1').first().waitFor();
     if (width === 390) await saleCtx.page.getByRole('button', { name: 'Mở menu', exact: true }).click();
     await saleCtx.page.locator('aside nav').getByRole('button', { name: 'Lịch hẹn xem phòng', exact: true }).click();
-    await saleCtx.page.getByRole('button', { name: 'Tiếp nhận hồ sơ đăng ký', exact: false }).click();
-    await saleCtx.page.locator('.ktp-container').waitFor();
+    assert.equal(await saleCtx.page.getByRole('button', { name: /Tiếp nhận hồ sơ/ }).count(), 0, 'không còn nút Tiếp nhận hồ sơ');
+    await saleCtx.page.getByRole('button', { name: 'Lập lịch hẹn', exact: true }).click();
+    await saleCtx.page.getByRole('heading', { name: 'Phiếu nhu cầu đang chờ xếp lịch' }).waitFor();
     assert.equal(await saleCtx.page.getByRole('button', { name: /khách vãng lai/i }).count(), 0, 'Sale không còn nút tạo phiếu khách vãng lai');
     assert.equal(saleCtx.errors.length, 0, `browser errors (Sale): ${saleCtx.errors.join('; ')}`);
     await saleCtx.page.screenshot({ path: `.ui-screens/interested-rooms/sale-tiep-nhan-${width}.png` });

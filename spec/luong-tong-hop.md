@@ -74,7 +74,7 @@ Trạng thái hồ sơ (`PhieuDangKy`): Chờ tiếp nhận → **Đã tiếp nh
 ### 3.1 Giai đoạn 1: Đăng ký và xem phòng (D-026, D-042)
 
 1. Khách tạo tài khoản (email bắt buộc, đúng định dạng, không trùng — D-016), gửi hồ sơ đăng ký: số người, giới tính, giá tối đa, khu vực, ngày vào ở, thời hạn thuê.
-2. Sale tiếp nhận hồ sơ và **hẹn một buổi xem**. Mỗi hồ sơ **chỉ một buổi xem**, gồm **một hoặc nhiều phòng cùng chi nhánh**. Dời giờ vẫn là buổi đó.
+2. Sale mở "Lập lịch hẹn", thấy các phiếu đang chờ xếp lịch và **hẹn một buổi xem** (không còn bước tiếp nhận riêng, D-044: lập lịch cho phiếu mới là tiếp nhận phiếu; Sale vẫn từ chối được phiếu kèm lý do). Mỗi hồ sơ **chỉ một buổi xem**, gồm **một hoặc nhiều phòng cùng chi nhánh**. Dời giờ vẫn là buổi đó.
 3. Sau giờ hẹn, buổi tự thành **"Đã xem"** (hệ thống tự đặt theo giờ). Nếu khách vắng, Sale ghi **"Khách không đến"**.
 4. Sale **chỉ ghi trạng thái của buổi**. Không ghi kết quả từng phòng, không bắt khách chọn phòng ngay, không có hạn chờ, không tự đóng hồ sơ. Khách có thể về nghĩ 2 ngày rồi quay lại.
 5. Khách (hoặc Sale) có nút **"Không thuê nữa"** — là cách duy nhất đóng hồ sơ sau buổi xem. Nút này không bắt buộc bấm.

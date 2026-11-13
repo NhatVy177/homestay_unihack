@@ -11,7 +11,7 @@ const today = dateKey(new Date()), tomorrowDate = new Date(); tomorrowDate.setDa
 const tomorrow = dateKey(tomorrowDate);
 const user = { maNguoiDung: 'NVUI01', hoTen: 'Nhân viên giao diện', vaiTro: 'NhanVien', chucVu: 'Sale', maChiNhanh: 'CNUI01', tenChiNhanh: 'Chi nhánh thử', email: 'ui@example.invalid' };
 const registrations = [
-  { maDangKy: 'DK0001', maKhachHang: 'KH0001', hoTenKhach: 'Khách thử An', ghiChu: `Thời gian xem mong muốn: ngày ${tomorrow.split('-').reverse().join('/')}, Buổi sáng (7:00–11:30).`, sdtKhach: '0900000001', email: 'an@example.invalid', trangThai: 'Đã tiếp nhận', soNguoiO: 1, soNam: 1, soNu: 0, khuVucMongMuon: 'Quận 7', loaiPhongYeuCau: 'Phòng 2 người', mucGiaToiDa: 2500000, ngayDangKy: `${today}T08:00:00` },
+  { maDangKy: 'DK0001', maKhachHang: 'KH0001', phongQuanTam: [{ maPhong: 'P101', tenPhong: 'Phòng 101' }], hoTenKhach: 'Khách thử An', ghiChu: `Thời gian xem mong muốn: ngày ${tomorrow.split('-').reverse().join('/')}, Buổi sáng (7:00–11:30).`, sdtKhach: '0900000001', email: 'an@example.invalid', trangThai: 'Đã tiếp nhận', soNguoiO: 1, soNam: 1, soNu: 0, khuVucMongMuon: 'Quận 7', loaiPhongYeuCau: 'Phòng 2 người', mucGiaToiDa: 2500000, ngayDangKy: `${today}T08:00:00` },
   { maDangKy: 'DK0002', maKhachHang: 'KH0002', hoTenKhach: 'Khách thử Bình', sdtKhach: '0900000002', trangThai: 'Chờ tiếp nhận', ngayDangKy: `${today}T08:10:00` },
 ];
 const schedules = [
@@ -71,7 +71,7 @@ try {
       assert.equal(color, 'rgb(74, 101, 73)', 'active navigation uses primary green token');
       const backgrounds = await page.evaluate(() => [getComputedStyle(document.querySelector('.kp-sidebar')).backgroundColor, getComputedStyle(document.querySelector('.kp-app')).backgroundColor]);
       assert.equal(backgrounds[0], backgrounds[1], 'sidebar and content share the green background');
-      assert.deepEqual(await page.locator('.sale-stat strong').allTextContents(), ['1', '1', String(schedules.filter(s => new Date(s.thoiGianHen) > new Date() && !['Đã hủy', 'Đã xem'].includes(s.trangThai)).length), '2']);
+      assert.deepEqual(await page.locator('.sale-stat strong').allTextContents(), ['2', '1', String(schedules.filter(s => new Date(s.thoiGianHen) > new Date() && !['Đã hủy', 'Đã xem'].includes(s.trangThai)).length), '2']);
     }
     await nav(phase === 'before' ? 'Lịch xem phòng' : 'Lịch hẹn xem phòng');
     await page.getByText('LX0001', { exact: true }).first().waitFor();
@@ -102,6 +102,10 @@ try {
       assert.equal(await page.getByRole('button', { name: 'Hủy lịch', exact: true }).isDisabled(), true);
       await page.getByRole('button', { name: 'Lập lịch hẹn', exact: true }).click();
       await page.getByRole('button', { name: /Khách thử An/ }).waitFor();
+      // D-044: không còn bước tiếp nhận; phiếu "Chờ tiếp nhận" cũng hiện trong danh sách chờ xếp lịch.
+      await page.getByRole('button', { name: /Khách thử Bình/ }).waitFor();
+      assert.match(await page.locator('.sale-pending-card').first().innerText(), /Phòng quan tâm: Phòng 101/);
+      assert.equal(await page.getByRole('button', { name: 'Từ chối', exact: true }).count(), 2, 'mỗi phiếu có nút Từ chối');
       await shot('create-profile-picker');
       await page.getByRole('button', { name: /Khách thử An/ }).click();
       await page.getByRole('checkbox', { name: 'Chọn Phòng 101' }).waitFor();

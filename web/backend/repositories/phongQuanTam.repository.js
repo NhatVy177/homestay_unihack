@@ -90,3 +90,14 @@ export async function layLoaiPhongHoSo(maDangKy) {
   );
   return result.recordset.map((row) => row.maLoaiPhong);
 }
+
+// D-044: màn chọn phiếu của Sale hiện tên các phòng khách đã quan tâm (một lần cho cả danh sách).
+export async function layTenPhongQuanTamTatCaHoSo() {
+  const result = await executeQuery(`
+    SELECT q.MaDangKy AS maDangKy, q.MaPhong AS maPhong, p.TenPhong AS tenPhong
+    FROM dbo.PhieuDangKyPhongQuanTam q
+    JOIN dbo.Phong p ON p.MaPhong = q.MaPhong
+    ORDER BY q.ThoiGianThem, q.MaPhong;
+  `);
+  return result.recordset;
+}

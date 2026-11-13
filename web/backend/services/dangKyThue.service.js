@@ -1,6 +1,7 @@
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import { assertSingleRoomTypeCapacity } from './rentRegistrationRules.js';
 import * as dangKyThueRepository from '../repositories/dangKyThue.repository.js';
+import * as phongQuanTamRepository from '../repositories/phongQuanTam.repository.js';
 
 function handleDatabaseError(error) {
   mapDatabaseError(error, {
@@ -168,11 +169,13 @@ export async function getHoSoDangKy(filter = {}) {
   const rows = await dangKyThueRepository.layDanhSachHoSoDangKy(filter);
   const cancelledRows = await dangKyThueRepository.layMaDangKyBiHuyDoTatCaLichXemBiHuy();
   const cancelledIds = new Set(cancelledRows.map((row) => row.MaDangKy));
+  const interestedRows = await phongQuanTamRepository.layTenPhongQuanTamTatCaHoSo();
 
   return rows.map((row) => {
     const biHuyDoTatCaLich = cancelledIds.has(row.maDangKy);
     return {
       ...row,
+      phongQuanTam: interestedRows.filter((item) => item.maDangKy === row.maDangKy),
       biHuyDoTatCaLich,
       trangThaiHienThi: biHuyDoTatCaLich ? 'Hủy' : row.trangThai
     };

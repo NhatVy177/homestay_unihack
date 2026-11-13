@@ -334,8 +334,8 @@ export async function getPhongPhuHop(maDangKy, user = null) {
     if (!profileRecord) {
       throw createServiceError('Không tìm thấy hồ sơ đăng ký.', 404);
     }
-    if (normalizeStatus(profileRecord.TrangThai) !== normalizeStatus('Đã tiếp nhận')) {
-      throw createServiceError('Chỉ được kiểm tra phòng cho hồ sơ đã tiếp nhận.');
+    if (![normalizeStatus('Chờ tiếp nhận'), normalizeStatus('Đã tiếp nhận')].includes(normalizeStatus(profileRecord.TrangThai))) {
+      throw createServiceError('Chỉ được kiểm tra phòng cho phiếu đang chờ xếp lịch.');
     }
     if (profileRecord.MaNhanVienSale && profileRecord.MaNhanVienSale !== user?.maNguoiDung) {
       throw createServiceError('Hồ sơ đang do nhân viên Sale khác xử lý.', 403);
