@@ -71,11 +71,7 @@
 .ui-list-search:focus-within { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-soft); }
 .ui-search-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .ui-list-toolbar .status-pill-tabs { flex: 0 1 auto; gap: var(--space-2); padding: 0; min-width: 0; }
-.ui-list-toolbar .status-pill-tab { min-height: 44px; padding: 10px var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-pill); color: var(--color-text-muted); background: var(--color-surface); font-size: 13px; font-weight: 600; }
-.ui-list-toolbar .status-pill-tab.is-active { background: var(--color-accent-soft); border-color: var(--color-accent); color: var(--color-accent); }
-.ui-list-toolbar .status-pill-count { min-width: 0; height: auto; padding: 0; background: transparent; color: inherit; font-size: inherit; }
-.ui-list-toolbar .status-pill-count::before { content: '('; }
-.ui-list-toolbar .status-pill-count::after { content: ')'; }
+.ui-list-toolbar .status-pill-tab { min-height: 44px; padding: 10px var(--space-4); }
 .ui-list-toolbar > button { min-height: 44px; border-radius: var(--radius-pill); }
 .ui-list-table-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow-x: auto; }
 .ui-list-toolbar.residence-filter { display: flex; }

@@ -922,3 +922,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Sửa: `web/frontend/src/pages/khachHang/khachHangPortal.css` đổi sang `var(--color-text)` và `var(--shadow-md)`. Thêm `web/frontend/scripts/ui-contrast-scan.mjs` (lệnh `npm run test:contrast-ui`, thêm vào `package.json`): mở mọi tab của khách, Sale, quản lý, kế toán ở hai chế độ (dữ liệu rỗng, mọi API lỗi 500), tính tỉ lệ tương phản chữ/nền, báo chữ dưới 2:1; hiện luôn toast để kiểm.
 - Kiểm tra: bỏ bản sửa thì bộ quét báo đúng `div.kh-toast.show` (tương phản 1,05); có bản sửa thì 0 lỗi ở cả hai chế độ. Build qua; `ui-interested-rooms`, `ui-customer-register-modal`, `ui-shell`, `ui-list-kit`, `ui-sale-workspace`, `ui-viewing-outcomes`, `test:avalanche-ui` PASS; backend 57 pass/3 skip/0 fail. Dữ liệu giả, chưa đăng nhập thật.
 - Giới hạn: bộ quét chỉ thấy chữ nằm trong DOM lúc quét với dữ liệu giả; thông báo lỗi chỉ hiện sau thao tác riêng (gửi form thật, v.v.) chưa được kích hoạt hết. Màu thông báo vẫn một kiểu (nền tối) cho cả lỗi lẫn thành công; chưa tách màu lỗi.
+
+## 2026-11-13 14:55:00 +07:00 — J-C078 — Nút lọc trạng thái ở các màn danh sách dùng lại kiểu xanh chung
+
+- Người thực hiện: Claude theo yêu cầu Vy (ảnh: nút lọc màu nâu, số dạng "(1)" ở Sale; muốn xanh như kiểu có số trong viên tròn).
+- File: `web/frontend/src/styles/lists.css` bỏ phần ghi đè của `.ui-list-toolbar` (màu nâu `accent` khi chọn, đổi số thành "(n)"), còn giữ chiều cao 44px; nút lọc nay theo `global.css`: xanh `primary-soft` khi chọn, số trong viên tròn. Thẻ tổng quan đang chọn (`ui-overview-card.is-active`) vẫn viền nâu, chưa đổi vì không phải nút lọc. Điều chỉnh này thay phần "số trong ngoặc" của D-033.
+- Kiểm tra: `ui-interested-rooms`, `test:contrast-ui`, `ui-list-kit` PASS; xem ảnh màn Sale 1440px.
