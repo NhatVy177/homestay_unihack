@@ -1,6 +1,8 @@
 import { executeProcedure, executeQuery, getPool, sql } from '../database/connection.js';
 import { coTheQuanTam, ganTrangThaiQuanTam, getDanhSachPhongKhamPha } from './phongKhamPha.service.js';
 import { isUnderAdultAge } from './customerAgeRules.js';
+import { checkProfileEditable, checkRoomCanJoin } from './interestedRoomsRules.js';
+import * as phongQuanTamRepository from '../repositories/phongQuanTam.repository.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as phieuTraPhongRepository from '../repositories/phieuTraPhong.repository.js';
 import { getPaymentAccount } from '../config/payment.js';
@@ -159,18 +161,28 @@ function assertContactFormat(data = {}) {
   }
 }
 
-// D-042: phòng hết hẳn không được chọn làm phòng quan tâm (frontend gửi mã phòng kèm tên).
+// D-042/D-043: phòng quan tâm khi tạo hồ sơ không được hết chỗ, phải cùng chi nhánh, tối đa 5 phòng.
 async function assertRoomsCanBeInterested(roomIds) {
   const ids = [...new Set((Array.isArray(roomIds) ? roomIds : [])
     .map((id) => String(id || '').trim())
     .filter(Boolean))];
-  if (!ids.length) return;
+  if (!ids.length) return [];
 
   const rooms = await ganTrangThaiQuanTam(ids.map((maPhong) => ({ maPhong })));
   const full = rooms.filter((room) => !coTheQuanTam(room.trangThaiQuanTam));
   if (full.length) {
     throw createServiceError(`Phòng ${full.map((room) => room.maPhong).join(', ')} đã hết chỗ, vui lòng chọn phòng khác.`);
   }
+
+  const info = await phongQuanTamRepository.layThongTinPhong(ids);
+  if (info.length !== ids.length) throw createServiceError('Có phòng không tồn tại, vui lòng chọn lại.');
+  const accepted = [];
+  for (const room of info) {
+    const reason = checkRoomCanJoin(accepted, room);
+    if (reason) throw createServiceError(reason);
+    accepted.push(room);
+  }
+  return info.map((room) => room.maPhong);
 }
 
 async function assertUniqueCustomerContact(data = {}, khachHangId) {
@@ -300,6 +312,10 @@ export async function getTongQuan(user) {
     getSchedules(khachHangId),
     getAvailableRooms()
   ]);
+  const interestedRows = await phongQuanTamRepository.layPhongQuanTamCuaKhach(khachHangId);
+  for (const profile of hoSo) {
+    profile.danhSachPhongQuanTam = interestedRows.filter((row) => row.maDangKy === profile.maDangKy);
+  }
 
   return {
     trangThai,
@@ -327,7 +343,7 @@ export async function createHoSo(user, data = {}) {
 
   await assertCanCreateRentRegistration(khachHangId);
   await assertUniqueCustomerContact(data, khachHangId);
-  await assertRoomsCanBeInterested(data.phongQuanTamIds);
+  const interestedRoomIds = await assertRoomsCanBeInterested(data.phongQuanTamIds);
 
   try {
     let finalGhiChu = data.ghiChu || '';
@@ -354,10 +370,60 @@ export async function createHoSo(user, data = {}) {
       { name: 'CCCDKhach', type: sql.VarChar(20), value: data.cccd || null }
     ]);
 
-    return result.recordset[0] || null;
+    const created = result.recordset[0] || null;
+    const maDangKy = created?.maDangKy || created?.MaDangKy;
+    for (const maPhong of interestedRoomIds) {
+      try {
+        await phongQuanTamRepository.themPhongQuanTam(maDangKy, maPhong);
+      } catch (roomError) {
+        // Hồ sơ đã tạo xong; không báo lỗi cho khách chỉ vì không ghi được một phòng quan tâm.
+        console.error('Không ghi được phòng quan tâm', maDangKy, maPhong, roomError.message);
+      }
+    }
+    return created;
   } catch (error) {
     handleDatabaseError(error);
   }
+}
+
+// D-043: khách thêm/gỡ phòng quan tâm trên hồ sơ chưa lập lịch xem.
+async function loadEditableProfile(user, maDangKy) {
+  const khachHangId = requireCustomer(user);
+  const id = String(maDangKy || '').trim();
+  if (!id) throw createServiceError('Mã đăng ký không hợp lệ', 400);
+  const profile = await phongQuanTamRepository.layHoSoCuaKhach(id, khachHangId);
+  if (!profile) throw createServiceError('Không tìm thấy hồ sơ của bạn.', 404);
+  const reason = checkProfileEditable(profile);
+  if (reason) throw createServiceError(reason, 409);
+  return profile;
+}
+
+export async function getPhongQuanTam(user, maDangKy) {
+  const khachHangId = requireCustomer(user);
+  const profile = await phongQuanTamRepository.layHoSoCuaKhach(String(maDangKy || '').trim(), khachHangId);
+  if (!profile) throw createServiceError('Không tìm thấy hồ sơ của bạn.', 404);
+  return phongQuanTamRepository.layPhongQuanTam(profile.maDangKy);
+}
+
+export async function themPhongQuanTam(user, maDangKy, maPhong) {
+  const profile = await loadEditableProfile(user, maDangKy);
+  const [room] = await phongQuanTamRepository.layThongTinPhong([maPhong]);
+  if (!room) throw createServiceError('Không tìm thấy phòng.', 404);
+  const [withStatus] = await ganTrangThaiQuanTam([room]);
+  if (!coTheQuanTam(withStatus.trangThaiQuanTam)) {
+    throw createServiceError(`Phòng ${room.tenPhong} đã hết chỗ, vui lòng chọn phòng khác.`, 409);
+  }
+  const current = await phongQuanTamRepository.layPhongQuanTam(profile.maDangKy);
+  const reason = checkRoomCanJoin(current, room);
+  if (reason) throw createServiceError(reason, 409);
+  await phongQuanTamRepository.themPhongQuanTam(profile.maDangKy, room.maPhong);
+  return phongQuanTamRepository.layPhongQuanTam(profile.maDangKy);
+}
+
+export async function goPhongQuanTam(user, maDangKy, maPhong) {
+  const profile = await loadEditableProfile(user, maDangKy);
+  await phongQuanTamRepository.goPhongQuanTam(profile.maDangKy, String(maPhong || '').trim());
+  return phongQuanTamRepository.layPhongQuanTam(profile.maDangKy);
 }
 
 export async function getHoSoDetail(user, maDangKy) {

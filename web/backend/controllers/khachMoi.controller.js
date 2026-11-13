@@ -140,3 +140,27 @@ export async function ghiNhanThanhToanDoiSoatTraPhong(req, res, next) {
     next(error);
   }
 }
+
+export async function getPhongQuanTam(req, res, next) {
+  try {
+    res.json(await service.getPhongQuanTam(req.user, req.params.id));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function themPhongQuanTam(req, res, next) {
+  try {
+    res.status(201).json(await service.themPhongQuanTam(req.user, req.params.id, req.body?.maPhong));
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function goPhongQuanTam(req, res, next) {
+  try {
+    res.json(await service.goPhongQuanTam(req.user, req.params.id, req.params.maPhong));
+  } catch (error) {
+    next(error);
+  }
+}

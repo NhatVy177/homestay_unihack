@@ -174,8 +174,11 @@ export default function LapLichChoHoSo({ profile, onBack, onCreated }) {
     lichXemPhongApi.getPhongPhuHop(profile.maDangKy)
       .then((res) => {
         const payload = res.data;
-        const list = normalizeRooms(payload);
+        const wanted = new Set(payload?.phongQuanTamIds || []);
+        const list = normalizeRooms(payload).map((room) => ({ ...room, khachQuanTam: wanted.has(room.maPhong) }));
         setRooms(list);
+        // D-043: phòng khách đã quan tâm được chọn sẵn, Sale chỉ xem lại và bỏ/thêm nếu cần.
+        setSelectedRoomIds(list.filter((room) => room.khachQuanTam).map((room) => room.maPhong));
         setRegionValid(payload?.isRegionValid ?? !payload?.khongCoChiNhanhPhuHop);
       })
       .catch((err) => {

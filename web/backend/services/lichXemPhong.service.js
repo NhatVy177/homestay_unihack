@@ -1,5 +1,6 @@
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as lichXemPhongRepository from '../repositories/lichXemPhong.repository.js';
+import * as phongQuanTamRepository from '../repositories/phongQuanTam.repository.js';
 import { ghiNhanKetQuaBuoiXem } from './ketQuaBuoiXem.service.js';
 
 function handleDatabaseError(error) {
@@ -362,8 +363,12 @@ export async function getPhongPhuHop(maDangKy, user = null) {
         status: row.tinhTrang
       }));
 
+    // D-043: phòng khách đã quan tâm trên hồ sơ, để màn lập lịch chọn sẵn.
+    const phongQuanTam = await phongQuanTamRepository.layPhongQuanTam(hoSoId);
+
     return {
       rooms,
+      phongQuanTamIds: phongQuanTam.map((room) => room.maPhong),
       isRegionValid: !khongCoChiNhanhPhuHop,
       khongCoChiNhanhPhuHop
     };

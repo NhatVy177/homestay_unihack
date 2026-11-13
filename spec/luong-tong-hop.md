@@ -79,7 +79,7 @@ Trạng thái hồ sơ (`PhieuDangKy`): Chờ tiếp nhận → **Đã tiếp nh
 4. Sale **chỉ ghi trạng thái của buổi**. Không ghi kết quả từng phòng, không bắt khách chọn phòng ngay, không có hạn chờ, không tự đóng hồ sơ. Khách có thể về nghĩ 2 ngày rồi quay lại.
 5. Khách (hoặc Sale) có nút **"Không thuê nữa"** — là cách duy nhất đóng hồ sơ sau buổi xem. Nút này không bắt buộc bấm.
 6. *(Mục 11, D-031, giao diện đợt 2)* Thẻ lịch xem của khách có thanh tiến trình: Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ.
-7. *(D-042, có code + test local, J-C075)* Khách chọn phòng quan tâm khi gửi hồ sơ: phòng còn trống hoặc đang chờ cọc thì chọn được, phòng hết hẳn thì không. Sale chỉ tiếp nhận hồ sơ khách gửi rồi lập lịch xem luôn; Sale không tạo hồ sơ thay khách (bỏ form khách vãng lai). "Phòng quan tâm" chỉ là gợi ý, không giữ chỗ.
+7. *(D-042, có code + test local, J-C075)* Khách chọn phòng quan tâm khi gửi hồ sơ: phòng còn trống hoặc đang chờ cọc thì chọn được, phòng hết hẳn thì không. Sale chỉ tiếp nhận hồ sơ khách gửi rồi lập lịch xem luôn; Sale không tạo hồ sơ thay khách (bỏ form khách vãng lai). "Phòng quan tâm" chỉ là gợi ý, không giữ chỗ. *(D-043)* Khách quan tâm nhiều phòng trong **một hồ sơ**: phòng đầu qua form, các phòng sau bấm "Thêm vào hồ sơ" (khi chưa lập lịch; tối đa 5, cùng chi nhánh); Sale lập lịch thấy các phòng đó chọn sẵn.
 
 ### 3.2 Giai đoạn 2: Giữ chỗ (D-026, D-023, D-031)
 

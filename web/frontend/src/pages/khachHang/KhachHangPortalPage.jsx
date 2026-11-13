@@ -734,7 +734,7 @@ function GalleryPhoto({ urlAnh, fallbackUrl, moTa, index }) {
   return <img src={src} alt={moTa || `Ảnh ${index + 1}`} onError={() => setFailed(true)} loading="lazy" />;
 }
 
-function ChiTietPhongView({ phong, onBack, onRent }) {
+function ChiTietPhongView({ phong, onBack, onRent, profile = null, isInProfile = false, profileBusy = false, onAddToProfile, onRemoveFromProfile }) {
   const [lightbox, setLightbox] = useState(null);
   const anh = phong.hinhAnh || [];
   const tienNghi = phong.tienNghi || [];
@@ -858,15 +858,32 @@ function ChiTietPhongView({ phong, onBack, onRent }) {
                 ))}
               </div>
             )}
-            <button
-              className="kp-btn kp-btn-primary kp-full kh-detail-cta kh-detail-register"
-              type="button"
-              disabled={phong.trangThaiQuanTam === ROOM_FULL_LABEL}
-              onClick={() => onRent(phong)}
-            >
-              <Icon name="profile" />
-              {phong.trangThaiQuanTam === ROOM_FULL_LABEL ? ROOM_FULL_LABEL : 'Tôi quan tâm phòng này'}
-            </button>
+            {profile ? (
+              <>
+                <button
+                  className="kp-btn kp-btn-primary kp-full kh-detail-cta kh-detail-register"
+                  type="button"
+                  disabled={phong.trangThaiQuanTam === ROOM_FULL_LABEL || isInProfile || profileBusy}
+                  onClick={() => onAddToProfile(phong)}
+                >
+                  <Icon name="profile" />
+                  {phong.trangThaiQuanTam === ROOM_FULL_LABEL ? ROOM_FULL_LABEL : isInProfile ? `Đã thêm vào hồ sơ ${profile.maDangKy}` : `Thêm vào hồ sơ ${profile.maDangKy}`}
+                </button>
+                {isInProfile && (
+                  <button className="kp-btn kp-btn-soft kp-full" type="button" disabled={profileBusy} onClick={() => onRemoveFromProfile(phong)}>Gỡ khỏi hồ sơ</button>
+                )}
+              </>
+            ) : (
+              <button
+                className="kp-btn kp-btn-primary kp-full kh-detail-cta kh-detail-register"
+                type="button"
+                disabled={phong.trangThaiQuanTam === ROOM_FULL_LABEL}
+                onClick={() => onRent(phong)}
+              >
+                <Icon name="profile" />
+                {phong.trangThaiQuanTam === ROOM_FULL_LABEL ? ROOM_FULL_LABEL : 'Tôi quan tâm phòng này'}
+              </button>
+            )}
             <p className="kh-detail-flow-note">
               {phong.trangThaiQuanTam === ROOM_FULL_LABEL
                 ? 'Phòng này đã hết chỗ. Vui lòng chọn phòng khác.'
@@ -930,6 +947,7 @@ export default function KhachHangPortalPage() {
   const [filters, setFilters] = useState(filtersInitial);
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [rentModal, setRentModal] = useState(false);
+  const [profileBusy, setProfileBusy] = useState(false);
   const [rentForm, setRentForm] = useState(rentInitial);
   const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(true);
@@ -976,6 +994,14 @@ export default function KhachHangPortalPage() {
   const [registrationNoticeOpen, setRegistrationNoticeOpen] = useState(false);
   const locks = getNavLocks(overview?.trangThai || {});
   const registrationLocked = Boolean(overview?.trangThai?.coQuyTrinhThueDangHoatDong);
+  // D-043: hồ sơ còn mở (chưa lập lịch xem) nhận thêm phòng quan tâm bằng một lần bấm, không điền lại form.
+  const openProfile = (overview?.hoSo || []).find((item) => (
+    ['Chờ tiếp nhận', 'Đã tiếp nhận'].includes(item.trangThai)
+    && !item.biHuyDoTatCaLich
+    && !(item.sttLich != null && item.trangThaiLich !== 'Đã hủy')
+  )) || null;
+  const interestedRooms = openProfile?.danhSachPhongQuanTam || [];
+  const interestedIds = new Set(interestedRooms.map((room) => room.maPhong));
   const registrationLockedMessage = overview?.trangThai?.thongBaoKhoaDangKy
     || 'Bạn đang có phiếu đăng ký/đặt cọc/hợp đồng chưa kết thúc. Chỉ được tạo phiếu đăng ký mới khi luồng thuê hiện tại kết thúc.';
 
@@ -1164,6 +1190,34 @@ export default function KhachHangPortalPage() {
   function getLatestProfileForRentDefaults() {
     const profiles = Array.isArray(overview?.hoSo) ? overview.hoSo : [];
     return [...profiles].sort((a, b) => getProfileSortValue(b) - getProfileSortValue(a))[0] || null;
+  }
+
+  async function addRoomToProfile(room) {
+    if (!openProfile) return;
+    setProfileBusy(true);
+    try {
+      await khachMoiApi.themPhongQuanTam(openProfile.maDangKy, room.maPhong || room.id);
+      setToast(`Đã thêm ${room.tenPhong} vào hồ sơ ${openProfile.maDangKy}.`);
+      await loadPortal(filters);
+    } catch (requestError) {
+      setToast(requestError.response?.data?.message || 'Không thể thêm phòng vào hồ sơ lúc này.');
+    } finally {
+      setProfileBusy(false);
+    }
+  }
+
+  async function removeRoomFromProfile(room) {
+    if (!openProfile) return;
+    setProfileBusy(true);
+    try {
+      await khachMoiApi.goPhongQuanTam(openProfile.maDangKy, room.maPhong || room.id);
+      setToast(`Đã gỡ ${room.tenPhong || room.maPhong} khỏi hồ sơ ${openProfile.maDangKy}.`);
+      await loadPortal(filters);
+    } catch (requestError) {
+      setToast(requestError.response?.data?.message || 'Không thể gỡ phòng khỏi hồ sơ lúc này.');
+    } finally {
+      setProfileBusy(false);
+    }
   }
 
   function canOpenRentForm() {
@@ -1424,6 +1478,23 @@ export default function KhachHangPortalPage() {
       <section className="kh-explore-view">
         <div className="kh-shell-grid">
           <div className="kh-left-content">
+            {openProfile && (
+              <div className="kh-profile-banner" role="status">
+                <div>
+                  <strong>Hồ sơ {openProfile.maDangKy} · {openProfile.trangThai}</strong>
+                  <p>Bấm "Thêm vào hồ sơ" ở phòng bạn quan tâm, không cần điền lại thông tin. Sale sẽ xếp lịch xem các phòng này cùng lúc.</p>
+                </div>
+                <div className="kh-profile-banner-rooms">
+                  {interestedRooms.length === 0 && <span className="kh-profile-banner-empty">Chưa có phòng quan tâm nào.</span>}
+                  {interestedRooms.map((room) => (
+                    <span className="kh-profile-room" key={room.maPhong}>
+                      {room.tenPhong}
+                      <button type="button" aria-label={`Gỡ ${room.tenPhong} khỏi hồ sơ`} disabled={profileBusy} onClick={() => removeRoomFromProfile(room)}>×</button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
             <form className="kh-filter-panel" onSubmit={applyFilters}>
               <div className="kh-filter-controls">
                 <SelectField label="Khu vực" value={filters.khuVuc} options={filterOptions.khuVuc} onChange={(value) => setFilters({ ...filters, khuVuc: value })} />
@@ -1453,6 +1524,11 @@ export default function KhachHangPortalPage() {
                       </div>
                       <div className="kh-room-actions">
                         <button className="kp-btn kp-btn-soft kp-full" type="button" onClick={() => openRoomDetail(room)}>Xem chi tiết</button>
+                        {openProfile && room.trangThaiQuanTam !== ROOM_FULL_LABEL && (
+                          interestedIds.has(room.maPhong || room.id)
+                            ? <button className="kp-btn kp-btn-soft kp-full" type="button" disabled>Đã thêm vào hồ sơ</button>
+                            : <button className="kp-btn kp-btn-primary kp-full" type="button" disabled={profileBusy} onClick={() => addRoomToProfile(room)}>Thêm vào hồ sơ</button>
+                        )}
                       </div>
                     </div>
                   </article>
@@ -1469,6 +1545,7 @@ export default function KhachHangPortalPage() {
           </div>
 
           <aside className="kh-rightbar">
+            {!openProfile && (
             <article className="kh-rent-help">
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', marginBottom: '16px' }}>
                 <Icon name="support" />Bạn muốn thuê phòng?
@@ -1482,6 +1559,7 @@ export default function KhachHangPortalPage() {
                 </button>
               </div>
             </article>
+            )}
           </aside>
         </div>
       </section>
@@ -3994,6 +4072,11 @@ export default function KhachHangPortalPage() {
           phong={detailPhong}
           onBack={() => setDetailPhong(null)}
           onRent={(room) => { setDetailPhong(null); openRentForm(room); }}
+          profile={openProfile}
+          isInProfile={interestedIds.has(detailPhong.maPhong || detailPhong.id)}
+          profileBusy={profileBusy}
+          onAddToProfile={addRoomToProfile}
+          onRemoveFromProfile={removeRoomFromProfile}
         />
       );
     }
