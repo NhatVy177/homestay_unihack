@@ -4372,3 +4372,40 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* D-042: nhãn trạng thái phòng để khách biết phòng nào còn quan tâm được */
+.kh-pills span.kh-room-status {
+  font-weight: 800;
+}
+
+.kh-room-status.is-open {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.kh-room-status.is-waiting {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.kh-room-status.is-full {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.kh-detail-room-status {
+  margin: 0;
+}
+
+.kh-detail-room-status .kh-room-status {
+  border-radius: 6px;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 10px;
+}
+
+.kh-detail-register:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}

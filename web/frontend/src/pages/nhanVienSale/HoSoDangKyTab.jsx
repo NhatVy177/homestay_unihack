@@ -64,140 +64,8 @@ const branchPrimaryAreaMap = {
   CN0003: 'Thủ Đức'
 };
 
-const ALLOWED_RENT_AREAS = [
-  'Quận 1', 'Quận 2', 'Quận 3', 'Quận 4', 'Quận 5', 'Quận 9', 'Quận 10',
-  'Bình Thạnh', 'Phú Nhuận', 'Gò Vấp', 'Tân Bình', 'Thủ Đức'
-];
-
-const ROOM_TYPE_OPTIONS = ['Phòng 2 người', 'Phòng 4 người', 'Phòng 6 người', 'Phòng VIP 2 người'];
-const ROOM_TYPE_CAPACITY = {
-  'Phòng 2 người': 2,
-  'Phòng 4 người': 4,
-  'Phòng 6 người': 6,
-  'Phòng VIP 2 người': 2
-};
-
-const EMPTY_CREATE_FORM = {
-  hoTen: '',
-  ngaySinh: '',
-  gioiTinh: 'Nam',
-  quocTich: 'Việt Nam',
-  cccd: '',
-  sdt: '',
-  email: '',
-  soNguoi: 1,
-  gioiTinhO: 'Nam',
-  soNam: 1,
-  soNu: 0,
-  hinhThuc: 'Ghép giường',
-  khuVuc: '',
-  loaiPhong: '',
-  mucGia: '',
-  ngayVao: '',
-  thoiHan: '',
-  yeuCau: ''
-};
-
-function normalizeAreaInput(value) {
-  return String(value || '')
-    .trim()
-    .toLocaleLowerCase('vi-VN')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/\s+/g, ' ');
-}
-
-function getAreaAliases(area) {
-  const normalized = normalizeAreaInput(area);
-  const aliases = [normalized];
-
-  if (!normalized.startsWith('quan ') && normalized !== 'thu duc') {
-    aliases.push(`quan ${normalized}`);
-  }
-  if (normalized === 'thu duc') {
-    aliases.push('quan thu duc', 'thanh pho thu duc', 'tp thu duc');
-  }
-
-  return aliases;
-}
-
-function resolveAllowedArea(value) {
-  const normalized = normalizeAreaInput(value);
-  return ALLOWED_RENT_AREAS.find((area) => getAreaAliases(area).includes(normalized)) || '';
-}
-
 function isSaleUser(user = {}) {
   return (user?.vaiTro === 'NhanVien' && user?.chucVu === 'Sale') || user?.vaiTro === 'NhanVienSale';
-}
-
-function onlyDigits(value, maxLength) {
-  return String(value || '').replace(/\D/g, '').slice(0, maxLength);
-}
-
-function toLocalDateInputValue(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-function getMaxBirthDate() {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  return toLocalDateInputValue(yesterday);
-}
-
-function getMinMoveInDate() {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  return toLocalDateInputValue(tomorrow);
-}
-
-function getBirthDateError(value) {
-  if (!value) return '';
-  return value <= getMaxBirthDate() ? '' : 'Ngày sinh phải trước ngày hiện tại.';
-}
-
-function getMoveInDateError(value) {
-  if (!value) return '';
-  return value >= getMinMoveInDate() ? '' : 'Ngày dự kiến vào ở phải sau ngày hiện tại.';
-}
-
-function getPhoneError(value) {
-  if (!value) return '';
-  return /^\d{10}$/.test(value) ? '' : 'SĐT phải có đúng 10 chữ số.';
-}
-
-function getCccdError(value) {
-  if (!value) return '';
-  return /^\d{12}$/.test(value) ? '' : 'CCCD phải có đúng 12 chữ số.';
-}
-
-function getAreaError(value) {
-  if (!value) return '';
-  return resolveAllowedArea(value) ? '' : 'Khu vực không hợp lệ.';
-}
-
-function getCreateGenderCounts(form) {
-  const soNguoi = Math.max(1, Number(form.soNguoi || 1));
-  if (form.gioiTinhO === 'Nam') return { soNam: soNguoi, soNu: 0 };
-  if (form.gioiTinhO === 'Nữ') return { soNam: 0, soNu: soNguoi };
-  return {
-    soNam: Math.max(0, Number(form.soNam || 0)),
-    soNu: Math.max(0, Number(form.soNu || 0))
-  };
-}
-
-function splitRoomTypes(value) {
-  return String(value || '').split(',').map((item) => item.trim()).filter(Boolean);
-}
-
-function getRoomTypeCapacity(roomType) {
-  if (!roomType) return null;
-  if (ROOM_TYPE_CAPACITY[roomType]) return ROOM_TYPE_CAPACITY[roomType];
-  const capacity = String(roomType).match(/(\d+)\s*người/i)?.[1];
-  return capacity ? Number(capacity) : null;
 }
 
 function areaBelongsToBranch(area, branchId) {
@@ -287,7 +155,6 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
   const [filterStatus, setFilterStatus] = useState('Chờ tiếp nhận');
   const [list, setList] = useState([]);
   const [selectedReg, setSelectedReg] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [schedulingProfile, setSchedulingProfile] = useState(null);
 
   const [acceptedReg, setAcceptedReg] = useState(null);
@@ -305,87 +172,11 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
   const [showAreaConfirmModal, setShowAreaConfirmModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('Không còn phòng/giường phù hợp');
   const [rejectNote, setRejectNote] = useState('');
-  const [createStep, setCreateStep] = useState(1);
-  const [createForm, setCreateForm] = useState(EMPTY_CREATE_FORM);
-  const [createErrors, setCreateErrors] = useState({});
-  const [createDuplicateErrors, setCreateDuplicateErrors] = useState({});
-  const [createDuplicateChecking, setCreateDuplicateChecking] = useState({ sdt: false, cccd: false });
 
   useEffect(() => {
     onSchedulingChange?.(Boolean(schedulingProfile));
     return () => onSchedulingChange?.(false);
   }, [schedulingProfile, onSchedulingChange]);
-
-  useEffect(() => {
-    if (!showCreateModal) return;
-    const sdt = createForm.sdt;
-
-    setCreateDuplicateErrors((current) => ({ ...current, sdt: '' }));
-    setCreateDuplicateChecking((current) => ({ ...current, sdt: false }));
-    if (sdt.length !== 10) return;
-
-    let alive = true;
-    setCreateDuplicateChecking((current) => ({ ...current, sdt: true }));
-    const timer = setTimeout(async () => {
-      try {
-        const { data } = await dangKyThueApi.kiemTraKhachHangTonTai({ sdt });
-        if (!alive) return;
-        setCreateDuplicateErrors((current) => ({
-          ...current,
-          sdt: data?.dangCoLuongThueDangHoatDong
-            ? data.thongBao
-            : ''
-        }));
-      } catch (err) {
-        if (!alive) return;
-        setCreateDuplicateErrors((current) => ({ ...current, sdt: 'Không thể kiểm tra SĐT lúc này.' }));
-      } finally {
-        if (alive) setCreateDuplicateChecking((current) => ({ ...current, sdt: false }));
-      }
-    }, 350);
-
-    return () => {
-      alive = false;
-      clearTimeout(timer);
-    };
-  }, [createForm.sdt, showCreateModal]);
-
-  useEffect(() => {
-    if (!showCreateModal) return;
-    const cccd = createForm.cccd;
-
-    setCreateDuplicateErrors((current) => ({ ...current, cccd: '' }));
-    setCreateDuplicateChecking((current) => ({ ...current, cccd: false }));
-    if (cccd.length !== 12 || createForm.sdt.length !== 10) return;
-
-    let alive = true;
-    setCreateDuplicateChecking((current) => ({ ...current, cccd: true }));
-    const timer = setTimeout(async () => {
-      try {
-        const { data } = await dangKyThueApi.kiemTraKhachHangTonTai({
-          sdt: createForm.sdt,
-          cccd
-        });
-        if (!alive) return;
-        setCreateDuplicateErrors((current) => ({
-          ...current,
-          cccd: data?.cccdThuocKhachKhac
-            ? 'CCCD đã thuộc một khách hàng có SĐT khác.'
-            : ''
-        }));
-      } catch (err) {
-        if (!alive) return;
-        setCreateDuplicateErrors((current) => ({ ...current, cccd: 'Không thể kiểm tra CCCD lúc này.' }));
-      } finally {
-        if (alive) setCreateDuplicateChecking((current) => ({ ...current, cccd: false }));
-      }
-    }, 350);
-
-    return () => {
-      alive = false;
-      clearTimeout(timer);
-    };
-  }, [createForm.cccd, createForm.sdt, showCreateModal]);
 
   // Lọc theo chi nhánh
   const branchFilteredList = useMemo(() => {
@@ -533,111 +324,6 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
     }
   };
 
-  const resetCreateForm = () => {
-    setShowCreateModal(false);
-    setCreateStep(1);
-    setCreateForm(EMPTY_CREATE_FORM);
-    setCreateErrors({});
-    setCreateDuplicateErrors({});
-    setCreateDuplicateChecking({ sdt: false, cccd: false });
-  };
-
-  const validateStep1 = () => {
-    const errors = {};
-    if (!createForm.hoTen.trim()) errors.hoTen = 'Vui lòng nhập họ tên.';
-    if (!createForm.ngaySinh) errors.ngaySinh = 'Vui lòng chọn ngày sinh.';
-    else if (getBirthDateError(createForm.ngaySinh)) errors.ngaySinh = getBirthDateError(createForm.ngaySinh);
-    if (!createForm.sdt) errors.sdt = 'Vui lòng nhập SĐT.';
-    else if (getPhoneError(createForm.sdt)) errors.sdt = getPhoneError(createForm.sdt);
-    else if (createDuplicateChecking.sdt) errors.sdt = 'Đang kiểm tra SĐT, vui lòng chờ.';
-    else if (createDuplicateErrors.sdt) errors.sdt = createDuplicateErrors.sdt;
-    if (!createForm.cccd) errors.cccd = 'Vui lòng nhập CCCD.';
-    else if (getCccdError(createForm.cccd)) errors.cccd = getCccdError(createForm.cccd);
-    else if (createDuplicateChecking.cccd) errors.cccd = 'Đang kiểm tra CCCD, vui lòng chờ.';
-    else if (createDuplicateErrors.cccd) errors.cccd = createDuplicateErrors.cccd;
-    if (createForm.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(createForm.email)) {
-      errors.email = 'Email không hợp lệ.';
-    }
-    return errors;
-  };
-
-  const validateStep2 = () => {
-    const errors = {};
-    const soNguoi = Number(createForm.soNguoi || 0);
-    const thoiHan = Number(createForm.thoiHan || 0);
-    const mucGia = parseMoney(createForm.mucGia);
-    const { soNam, soNu } = getCreateGenderCounts(createForm);
-
-    if (!soNguoi || soNguoi < 1) errors.soNguoi = 'Số người ở phải ít nhất là 1.';
-    if (createForm.gioiTinhO === 'Khác' && soNam + soNu !== soNguoi) {
-      errors.gioiTinhO = 'Tổng số nam và nữ phải khớp số người ở.';
-    }
-    if (!createForm.khuVuc.trim()) errors.khuVuc = 'Vui lòng nhập khu vực mong muốn.';
-    else if (getAreaError(createForm.khuVuc)) errors.khuVuc = getAreaError(createForm.khuVuc);
-    const roomTypes = splitRoomTypes(createForm.loaiPhong);
-    const roomTypeCapacity = getRoomTypeCapacity(roomTypes[0]);
-    if (roomTypes.length === 0) errors.loaiPhong = 'Vui lòng chọn một loại phòng.';
-    else if (roomTypes.length > 1) errors.loaiPhong = 'Phiếu đăng ký chỉ được chọn một loại phòng.';
-    else if (roomTypeCapacity && soNguoi > roomTypeCapacity) {
-      errors.soNguoi = `Số người ở dự kiến không được vượt quá ${roomTypeCapacity} người của loại phòng ${roomTypes[0]}.`;
-    }
-    if (!mucGia || mucGia <= 0) errors.mucGia = 'Vui lòng nhập mức giá mong muốn hợp lệ.';
-    if (!createForm.ngayVao) errors.ngayVao = 'Vui lòng chọn ngày dự kiến vào ở.';
-    else if (getMoveInDateError(createForm.ngayVao)) errors.ngayVao = getMoveInDateError(createForm.ngayVao);
-    if (!thoiHan || thoiHan < 1) errors.thoiHan = 'Thời hạn thuê phải ít nhất 1 tháng.';
-    return errors;
-  };
-
-  const nextStep = () => {
-    const errors = validateStep1();
-
-    if (Object.keys(errors).length > 0) {
-      setCreateErrors(errors);
-      return;
-    }
-    setCreateErrors({});
-    setCreateStep(2);
-  };
-
-  const handleSaveCreate = async () => {
-    const errors = { ...validateStep1(), ...validateStep2() };
-    if (Object.keys(errors).length > 0) {
-      setCreateErrors(errors);
-      return;
-    }
-
-    try {
-      const { soNam, soNu } = getCreateGenderCounts(createForm);
-      const finalForm = {
-        ...createForm,
-        hoTen: createForm.hoTen.trim(),
-        sdt: onlyDigits(createForm.sdt, 10),
-        cccd: onlyDigits(createForm.cccd, 12),
-        email: createForm.email.trim(),
-        khuVuc: resolveAllowedArea(createForm.khuVuc),
-        mucGia: parseMoney(createForm.mucGia),
-        soNguoi: Number(createForm.soNguoi),
-        soNam,
-        soNu,
-        thoiHan: Number(createForm.thoiHan)
-      };
-
-      const res = await dangKyThueApi.taoHoSoKhachVangLai(finalForm);
-      setAcceptedReg({
-        ...(res.data || {
-        id: 'Hồ sơ mới',
-        customerName: createForm.hoTen || 'Khách vãng lai'
-        }),
-        isWalkInCreated: true
-      });
-      resetCreateForm();
-      setFilterStatus('Chờ tiếp nhận');
-      fetchData();
-    } catch (err) {
-      alert('Lỗi: ' + (err.response?.data?.message || err.message));
-    }
-  };
-
   if (schedulingProfile) {
     return (
       <LapLichChoHoSo
@@ -660,8 +346,6 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
   const selectedNeedsAreaConsultation = needsAreaConsultation(selectedReg?.khuVucMongMuon, user?.maChiNhanh);
   const selectedIsPending = isPendingRegistration(selectedReg);
   const selectedDisplayStatus = getRegistrationDisplayStatus(selectedReg);
-  const createSdtError = createErrors.sdt || createDuplicateErrors.sdt || getPhoneError(createForm.sdt);
-  const createCccdError = createErrors.cccd || createDuplicateErrors.cccd || getCccdError(createForm.cccd);
 
   return (
     <div className="ktp-container">
@@ -686,9 +370,6 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
           onChange={setFilterStatus}
         />
 
-        <button className="ktp-btn-action-fill" style={{ backgroundColor: 'var(--color-primary)', borderRadius: 'var(--radius-sm)', whiteSpace: 'nowrap' }} onClick={() => setShowCreateModal(true)}>
-          <Icon name="add_circle" /> Tạo phiếu mới cho khách vãng lai
-        </button>
       </section>
 
       {/* TABLE */}
@@ -1030,7 +711,7 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
           <div className="ktp-modal" onClick={(e) => e.stopPropagation()} style={{ width: '400px', maxWidth: '90vw' }}>
             <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#2f6765', color: '#ffffff' }}>
               <h3 style={{ fontSize: '18px', margin: 0, color: '#ffffff' }}>
-                {acceptedReg.isWalkInCreated ? 'Tạo phiếu thành công' : 'Tiếp nhận thành công'}
+                Tiếp nhận thành công
               </h3>
             </div>
             <div className="ktp-modal-body" style={{ padding: '24px', textAlign: 'center', flex: 'none', display: 'block' }}>
@@ -1038,237 +719,15 @@ export default function HoSoDangKyTab({ onNavigate, onSchedulingChange }) {
                 <Icon name="check_circle" />
               </div>
               <p style={{ margin: '0 0 8px', fontWeight: 'bold', color: '#191c1d', fontSize: '16px' }}>
-                Phiếu đăng ký {acceptedReg.maDangKy || acceptedReg.id} {acceptedReg.isWalkInCreated ? 'đã được tạo.' : 'đã được tiếp nhận.'}
+                Phiếu đăng ký {acceptedReg.maDangKy || acceptedReg.id} đã được tiếp nhận.
               </p>
             </div>
             <div className="ktp-modal-footer" style={{ justifyContent: 'center', gap: '16px' }}>
-              {acceptedReg.isWalkInCreated ? (
-                <button className="ktp-btn-submit" onClick={() => setAcceptedReg(null)}>Đóng</button>
-              ) : (
-                <button className="ktp-btn-submit" onClick={() => {
-                  const profileToSchedule = acceptedReg;
-                  setAcceptedReg(null);
-                  setSchedulingProfile(profileToSchedule);
-                }}>Lập lịch tiếp</button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL TẠO PHIẾU KHÁCH VÃNG LAI */}
-      {showCreateModal && (
-        <div className="ktp-modal-overlay" onClick={resetCreateForm}>
-          <div className="ktp-modal ui-registration-form" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="ui-registration-title">
-            <div className="ktp-modal-header">
-              <div className="ui-dialog-heading">
-                <span className="ui-heading-symbol"><Icon name="person_add" /></span>
-                <h3 id="ui-registration-title">Tạo phiếu mới cho khách vãng lai</h3>
-              </div>
-              <button className="ktp-modal-close" onClick={resetCreateForm} aria-label="Đóng"><Icon name="close" /></button>
-            </div>
-
-            <div className="ktp-modal-body" style={{ padding: '24px', flex: 1, minHeight: 0, overflowY: 'auto', display: 'block' }}>
-              {/* Stepper */}
-              <div className="ui-form-stepper">
-                <div className={createStep === 1 ? 'is-active' : ''} aria-current={createStep === 1 ? 'step' : undefined}>
-                  1. Thông tin khách hàng
-                </div>
-                <div className={createStep === 2 ? 'is-active' : ''} aria-current={createStep === 2 ? 'step' : undefined}>
-                  2. Nhu cầu thuê
-                </div>
-              </div>
-
-              {createStep === 1 && (
-                <div className="ktp-grid-2 ui-form-grid">
-                  <div>
-                    <label className="ktp-filter-label">Họ tên <span className="ui-required">*</span></label>
-                    <input className={`ktp-input ${createErrors.hoTen ? 'is-invalid' : ''}`} type="text" value={createForm.hoTen} onChange={e => setCreateForm({...createForm, hoTen: e.target.value})} />
-                    {createErrors.hoTen && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.hoTen}</span>}
-                  </div>
-                  <div>
-                    <label className="ktp-filter-label">SĐT <span className="ui-required">*</span></label>
-                    <input
-                      className={`ktp-input ${createSdtError ? 'is-invalid' : ''}`}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={10}
-                      value={createForm.sdt}
-                      onChange={e => {
-                        setCreateForm({...createForm, sdt: onlyDigits(e.target.value, 10)});
-                        setCreateErrors((current) => ({ ...current, sdt: '' }));
-                      }}
-                    />
-                    {createSdtError && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createSdtError}</span>}
-                    {createDuplicateChecking.sdt && !createSdtError && <span style={{ display: 'block', marginTop: '4px', color: '#6f797a', fontSize: '12px' }}>Đang kiểm tra SĐT...</span>}
-                  </div>
-                  <div>
-                    <label className="ktp-filter-label">CCCD <span className="ui-required">*</span></label>
-                    <input
-                      className={`ktp-input ${createCccdError ? 'is-invalid' : ''}`}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={12}
-                      value={createForm.cccd}
-                      onChange={e => {
-                        setCreateForm({...createForm, cccd: onlyDigits(e.target.value, 12)});
-                        setCreateErrors((current) => ({ ...current, cccd: '' }));
-                      }}
-                    />
-                    {createCccdError && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createCccdError}</span>}
-                    {createDuplicateChecking.cccd && !createCccdError && <span style={{ display: 'block', marginTop: '4px', color: '#6f797a', fontSize: '12px' }}>Đang kiểm tra CCCD...</span>}
-                  </div>
-                  <div>
-                    <label className="ktp-filter-label">Ngày sinh <span className="ui-required">*</span></label>
-                    <input className={`ktp-input ${createErrors.ngaySinh ? 'is-invalid' : ''}`} type="date" max={getMaxBirthDate()} value={createForm.ngaySinh} onChange={e => setCreateForm({...createForm, ngaySinh: e.target.value})} />
-                    {createErrors.ngaySinh && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.ngaySinh}</span>}
-                  </div>
-                  <div>
-                    <label className="ktp-filter-label">Giới tính</label>
-                    <select className="ktp-input" value={createForm.gioiTinh} onChange={e => setCreateForm({...createForm, gioiTinh: e.target.value})}>
-                      <option>Nam</option><option>Nữ</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="ktp-filter-label">Quốc tịch</label>
-                    <input className="ktp-input" type="text" value={createForm.quocTich} onChange={e => setCreateForm({...createForm, quocTich: e.target.value})} />
-                  </div>
-                  <div>
-                    <label className="ktp-filter-label">Email</label>
-                    <input className={`ktp-input ${createErrors.email ? 'is-invalid' : ''}`} type="email" value={createForm.email} onChange={e => setCreateForm({...createForm, email: e.target.value})} />
-                    {createErrors.email && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.email}</span>}
-                  </div>
-                </div>
-              )}
-
-              {createStep === 2 && (
-                <div className="ktp-grid-2 ui-form-grid">
-                  <div>
-                    <label className="ktp-filter-label">Giới tính thuê</label>
-                    <select
-                      className={`ktp-input ${createErrors.gioiTinhO ? 'is-invalid' : ''}`}
-                      value={createForm.gioiTinhO}
-                      onChange={e => {
-                        const gioiTinhO = e.target.value;
-                        const soNguoi = Math.max(1, Number(createForm.soNguoi || 1));
-                        setCreateForm({
-                          ...createForm,
-                          gioiTinhO,
-                          soNam: gioiTinhO === 'Nam' ? soNguoi : (gioiTinhO === 'Nữ' ? 0 : createForm.soNam),
-                          soNu: gioiTinhO === 'Nữ' ? soNguoi : (gioiTinhO === 'Nam' ? 0 : createForm.soNu)
-                        });
-                      }}
-                    >
-                      <option>Nam</option><option>Nữ</option><option>Khác</option>
-                    </select>
-                    {createErrors.gioiTinhO && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.gioiTinhO}</span>}
-                  </div>
-                  {createForm.gioiTinhO === 'Khác' && (
-                    <>
-                      <div>
-                        <label className="ktp-filter-label">Số lượng nam <span className="ui-required">*</span></label>
-                        <input className={`ktp-input ${createErrors.gioiTinhO ? 'is-invalid' : ''}`} type="number" min="0" value={createForm.soNam} onChange={e => setCreateForm({...createForm, soNam: e.target.value})} />
-                      </div>
-                      <div>
-                        <label className="ktp-filter-label">Số lượng nữ <span className="ui-required">*</span></label>
-                        <input className={`ktp-input ${createErrors.gioiTinhO ? 'is-invalid' : ''}`} type="number" min="0" value={createForm.soNu} onChange={e => setCreateForm({...createForm, soNu: e.target.value})} />
-                      </div>
-                    </>
-                  )}
-                  <div>
-                    <label className="ktp-filter-label">Số người ở <span className="ui-required">*</span></label>
-                    <input
-                      className={`ktp-input ${createErrors.soNguoi ? 'is-invalid' : ''}`}
-                      type="number"
-                      min="1"
-                      max={getRoomTypeCapacity(createForm.loaiPhong) || undefined}
-                      value={createForm.soNguoi}
-                      onChange={e => {
-                        const soNguoi = e.target.value;
-                        setCreateForm({
-                          ...createForm,
-                          soNguoi,
-                          soNam: createForm.gioiTinhO === 'Nam' ? soNguoi : createForm.soNam,
-                          soNu: createForm.gioiTinhO === 'Nữ' ? soNguoi : createForm.soNu
-                        });
-                      }}
-                    />
-                    {createErrors.soNguoi && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.soNguoi}</span>}
-                  </div>
-                  <div>
-                    <label className="ktp-filter-label">Khu vực <span className="ui-required">*</span></label>
-                    <input
-                      className={`ktp-input ${createErrors.khuVuc ? 'is-invalid' : ''}`}
-                      type="text"
-                      list="sale-create-area-options"
-                      placeholder="VD: Quận 1, Thủ Đức..."
-                      value={createForm.khuVuc}
-                      onChange={e => setCreateForm({...createForm, khuVuc: e.target.value})}
-                      onBlur={e => {
-                        const resolved = resolveAllowedArea(e.target.value);
-                        if (resolved) setCreateForm((current) => ({ ...current, khuVuc: resolved }));
-                      }}
-                    />
-                    <datalist id="sale-create-area-options">
-                      {ALLOWED_RENT_AREAS.map((area) => <option key={area} value={area} />)}
-                    </datalist>
-                    {createErrors.khuVuc && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.khuVuc}</span>}
-                  </div>
-                  <div style={{ gridColumn: '1 / -1' }}>
-                    <label className="ktp-filter-label">Loại phòng <span className="ui-required">*</span></label>
-                    <select
-                      className={`ktp-input ${createErrors.loaiPhong ? 'is-invalid' : ''}`}
-                      value={createForm.loaiPhong}
-                      onChange={(e) => setCreateForm({...createForm, loaiPhong: e.target.value})}
-                    >
-                      <option value="">Chọn một loại phòng</option>
-                      {ROOM_TYPE_OPTIONS.map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                    {getRoomTypeCapacity(createForm.loaiPhong) && (
-                      <span style={{ display: 'block', marginTop: '4px', color: '#6f797a', fontSize: '12px' }}>
-                        Tối đa {getRoomTypeCapacity(createForm.loaiPhong)} người.
-                      </span>
-                    )}
-                    {createErrors.loaiPhong && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.loaiPhong}</span>}
-                  </div>
-                  <div>
-                    <label className="ktp-filter-label">Mức giá mong muốn <span className="ui-required">*</span></label>
-                    <input className={`ktp-input ${createErrors.mucGia ? 'is-invalid' : ''}`} type="text" inputMode="numeric" placeholder="VD: 3.000.000" value={createForm.mucGia} onChange={e => setCreateForm({...createForm, mucGia: e.target.value})} />
-                    {createErrors.mucGia && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.mucGia}</span>}
-                  </div>
-                  <div>
-                    <label className="ktp-filter-label">Thời gian dự kiến dọn vào <span className="ui-required">*</span></label>
-                    <input className={`ktp-input ${createErrors.ngayVao ? 'is-invalid' : ''}`} type="date" min={getMinMoveInDate()} value={createForm.ngayVao} onChange={e => setCreateForm({...createForm, ngayVao: e.target.value})} />
-                    {createErrors.ngayVao && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.ngayVao}</span>}
-                  </div>
-                  <div>
-                    <label className="ktp-filter-label">Thời hạn thuê (tháng) <span className="ui-required">*</span></label>
-                    <input className={`ktp-input ${createErrors.thoiHan ? 'is-invalid' : ''}`} type="number" min="1" value={createForm.thoiHan} onChange={e => setCreateForm({...createForm, thoiHan: e.target.value})} />
-                    {createErrors.thoiHan && <span className="ktp-text-error" style={{ fontSize: '12px' }}>{createErrors.thoiHan}</span>}
-                  </div>
-                  <div style={{ gridColumn: '1 / -1' }}>
-                    <label className="ktp-filter-label">Yêu cầu khác</label>
-                    <textarea className="ktp-textarea" rows="2" value={createForm.yeuCau} onChange={e => setCreateForm({...createForm, yeuCau: e.target.value})}></textarea>
-                  </div>
-
-                </div>
-              )}
-            </div>
-
-            <div className="ktp-modal-footer">
-              {createStep === 1 ? (
-                <>
-                  <button className="ktp-btn-cancel" onClick={resetCreateForm}>Hủy</button>
-                  <button className="ktp-btn-submit" onClick={nextStep}>Tiếp tục</button>
-                </>
-              ) : (
-                <>
-                  <button className="ktp-btn-cancel" onClick={() => setCreateStep(1)}>Quay lại</button>
-                  <button className="ktp-btn-submit" onClick={handleSaveCreate}>Lưu đơn đăng ký</button>
-                </>
-              )}
+              <button className="ktp-btn-submit" onClick={() => {
+                const profileToSchedule = acceptedReg;
+                setAcceptedReg(null);
+                setSchedulingProfile(profileToSchedule);
+              }}>Lập lịch tiếp</button>
             </div>
           </div>
         </div>

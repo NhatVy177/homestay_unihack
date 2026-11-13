@@ -70,7 +70,7 @@ Nhánh tích hợp đã vào main; các nhánh cũ đã gộp có thể được
 | | Điều khoản xác nhận điện tử trong mẫu hợp đồng; ô đồng ý dữ liệu cá nhân | D-038 | Chưa làm (C6) |
 | | Danh sách "Chờ khách xác nhận", nhắc 24/72 giờ | D-028 | Có nút nhắc tay; C4 thêm tự nhắc 24/72 giờ và "Quá hạn phản hồi" sau 7 ngày (job nền, tôn trọng `SCHEDULERS_ENABLED`); chờ migration C4 |
 | **Nên có** | Khách tự giữ chỗ; từ chối → "Đã xem"; "Không thuê nữa"; "Khách không đến" | D-026 | C5-a có code + test nút Sale và bỏ tự đánh dấu, đã migrate, chờ merge/restart; các phần giữ chỗ/Không thuê nữa/chặn lịch thứ hai vẫn chưa hoàn tất |
-| | Khách quan tâm phòng chờ cọc; Sale chỉ tiếp nhận hồ sơ khách gửi, bỏ phiếu khách vãng lai | D-042 | Mới ghi quyết định (J-C074); chưa làm code. Cần mở rộng truy vấn phòng của khách và gỡ form khách vãng lai ở Sale |
+| | Khách quan tâm phòng chờ cọc; Sale chỉ tiếp nhận hồ sơ khách gửi, bỏ phiếu khách vãng lai | D-042 | **Xong code + test local (J-C075)** trên `feat/d042-interested-rooms`: nhãn trạng thái phòng, nút mờ khi hết chỗ, chặn dưới 18 tuổi, gỡ form khách vãng lai ở Sale; backend 57 pass/3 skip, build qua, 5 smoke UI qua (dữ liệu giả). Chưa chạy qua giao diện với SQL thật; route backend `/dang-ky-thue/khach-vang-lai` còn, chưa gỡ |
 | | Chính sách hoàn cọc trên phiếu và email cọc | D-031, D-034 | **Xong code + test (C1)**; chưa thử SMTP thật |
 | | Thẻ "Kích hoạt xác nhận điện tử" sau khi trả cọc | D-028 | Chưa làm |
 | **Để sau nếu trễ** | Khách tự khai người ở; thành viên bị loại hoàn 80%; hợp đồng "Chờ ký" | D-026, D-027 | Chưa làm |

@@ -1,5 +1,6 @@
 import { executeProcedure, executeQuery, getPool, sql } from '../database/connection.js';
-import { getDanhSachPhongKhamPha } from './phongKhamPha.service.js';
+import { coTheQuanTam, ganTrangThaiQuanTam, getDanhSachPhongKhamPha } from './phongKhamPha.service.js';
+import { isUnderAdultAge } from './customerAgeRules.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as phieuTraPhongRepository from '../repositories/phieuTraPhong.repository.js';
 import { getPaymentAccount } from '../config/payment.js';
@@ -152,6 +153,24 @@ function assertContactFormat(data = {}) {
   if (cccd && !/^\d{12}$/.test(cccd)) {
     throw createServiceError('CCCD phải có đúng 12 chữ số.');
   }
+  // D-042: chặn ngay từ form, không để tới bước duyệt cư trú (D-024) mới bị loại.
+  if (data.ngaySinh && isUnderAdultAge(data.ngaySinh)) {
+    throw createServiceError('Bạn cần từ đủ 18 tuổi để đăng ký thuê phòng.');
+  }
+}
+
+// D-042: phòng hết hẳn không được chọn làm phòng quan tâm (frontend gửi mã phòng kèm tên).
+async function assertRoomsCanBeInterested(roomIds) {
+  const ids = [...new Set((Array.isArray(roomIds) ? roomIds : [])
+    .map((id) => String(id || '').trim())
+    .filter(Boolean))];
+  if (!ids.length) return;
+
+  const rooms = await ganTrangThaiQuanTam(ids.map((maPhong) => ({ maPhong })));
+  const full = rooms.filter((room) => !coTheQuanTam(room.trangThaiQuanTam));
+  if (full.length) {
+    throw createServiceError(`Phòng ${full.map((room) => room.maPhong).join(', ')} đã hết chỗ, vui lòng chọn phòng khác.`);
+  }
 }
 
 async function assertUniqueCustomerContact(data = {}, khachHangId) {
@@ -270,7 +289,7 @@ async function getAvailableRooms(filter = {}) {
     { name: 'KhuVuc', type: sql.NVarChar(100), value: filter.khuVuc || null },
     { name: 'MucGiaToiDa', type: sql.Decimal(15, 2), value: normalizeMoneyVnd(filter.mucGiaToiDa) }
   ]);
-  return result.recordset;
+  return ganTrangThaiQuanTam(result.recordset);
 }
 
 export async function getTongQuan(user) {
@@ -308,6 +327,7 @@ export async function createHoSo(user, data = {}) {
 
   await assertCanCreateRentRegistration(khachHangId);
   await assertUniqueCustomerContact(data, khachHangId);
+  await assertRoomsCanBeInterested(data.phongQuanTamIds);
 
   try {
     let finalGhiChu = data.ghiChu || '';

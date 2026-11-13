@@ -9,6 +9,5 @@ export const dangKyThueApi = {
   kiemTraDieuKien: (id) => httpClient.get(`/dang-ky-thue/${id}/kiem-tra-dieu-kien`),
   capNhatKetQuaXuLy: (id, data) => httpClient.put(`/dang-ky-thue/${id}/ket-qua-xu-ly`, data),
   tiepNhan: (id) => httpClient.put(`/dang-ky-thue/${id}/tiep-nhan`),
-  huyTiepNhan: (id) => httpClient.put(`/dang-ky-thue/${id}/huy-tiep-nhan`),
-  taoHoSoKhachVangLai: (data) => httpClient.post('/dang-ky-thue/khach-vang-lai', data)
+  huyTiepNhan: (id) => httpClient.put(`/dang-ky-thue/${id}/huy-tiep-nhan`)
 };
