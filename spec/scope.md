@@ -89,6 +89,8 @@ Theo yêu cầu Vy ngày 11/11: tạo ba ví mới (deployer kiêm manager, acco
 
 ### Không gian Sale — D-035
 
+**Bố cục lịch hẹn theo ảnh Vy (14/11, J-X080):** cột trái là lịch tháng và bảng danh sách ngay bên dưới; cột phải là thẻ xanh “Lịch hẹn 24h tới” và tiến trình/thao tác của lịch đang chọn. Mobile xếp lịch → danh sách → tóm tắt, bảng cuộn trong khung. Giữ bộ lọc, số đếm, chọn ngày/lịch, quyền và API đổi/hủy/ghi kết quả. Thẻ 24 giờ và tiến trình chỉ đọc dữ liệu hiện có, không tự đặt trạng thái hoặc thêm bước xác nhận của mẫu vào nghiệp vụ.
+
 **D-036 thay phần trình bày/vị trí:** nền sidebar và nội dung cùng token xanh; Tra cứu chỉ tìm/xem khách, không chứa thanh hồ sơ/cọc/cư trú/trả phòng. Sale không còn lối Trả phòng; luồng các vai trò khác giữ nguyên. Tiếp nhận hồ sơ mở từ lịch hẹn/tổng quan, xử lý cọc tiền mặt từ tổng quan, nhập hộ cư trú từ lập hợp đồng. Màn hợp đồng mở bằng danh sách đủ điều kiện và lối xem hợp đồng đã lập; không thêm chức năng bản nháp không có API. Các mô tả vị trí ở D-035 bên dưới là mốc trước D-036.
 
 - Menu chính 5 mục theo bố cục Vy gửi: Tổng quan, Lịch hẹn xem phòng, Lập hợp đồng thuê, Tra cứu khách hàng, Hồ sơ cá nhân. Không có tab Kiểm tra phòng/giường hoặc Ghi nhận cư trú độc lập.

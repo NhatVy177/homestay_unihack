@@ -1,8 +1,10 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-12 22:21:42 +07:00** (J-X074, bản vá danh sách hoàn cọc C4 chờ duyệt/migration). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-14 02:48:06 +07:00** (J-X080, bố cục lịch hẹn Sale). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
+
+Lịch hẹn Sale: nhánh `feat/ui-sale-calendar-layout` từ `origin/main` `45c63f7`, worktree riêng của Codex `D:\HomeStayDorm-ui-small-fixes`. Lịch tháng và bảng danh sách ở cột trái; thẻ xanh lịch 24h tới và tiến trình/thao tác ở cột phải; mobile xếp dọc. Dữ liệu/quyền/handler lịch giữ nguyên, không tự chuyển kết quả hoặc thêm bước xác nhận. Build + avalanche UI qua; bộ Sale 32 ảnh và kiểm C5-a 6 ảnh qua 1440/390; bộ bố cục/24h qua 1440/1024/390 với 9 ảnh ở `.ui-screens/sale-appointment-layout/`. Backend 57/3 skip, blockchain local 25/1 skip; toàn bộ UI dùng API giả. Bản riêng xem ở 5199; frontend Claude 5173 và nhánh D-044 chưa merge giữ nguyên. Chờ Vy review/merge; chưa nghiệm thu thao tác SQL thật/A3.
 
 C4 đã merge PR #10/#11 và migrate HOMEDORM4 (J-C069/J-C070). Bản vá bổ sung `fix/c4-refund-before-close` gỡ điều kiện danh sách hoàn cọc đòi hợp đồng đã thanh lý (D-041); backend 53 pass/3 skip, SQL C4 riêng 1/1 trên CSDL tạm, blockchain 25 pass/1 skip, build và avalanche UI qua. Chưa áp dụng phần SP bổ sung lên HOMEDORM4; chờ Vy duyệt và cho phép. Chưa nghiệm thu C4 bằng hồ sơ thật.
 
