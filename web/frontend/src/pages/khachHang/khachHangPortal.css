@@ -4990,3 +4990,76 @@
   margin-top: 2px;
   width: 20px;
 }
+
+/* Phiếu nhu cầu thuê: thời gian xem, tiện ích, chân phiếu */
+.kh-amenity-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.kh-rent-card .kh-amenity-chip {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+  min-height: 40px;
+  padding: 8px 16px;
+}
+
+.kh-rent-card .kh-amenity-chip:hover {
+  border-color: var(--color-primary);
+}
+
+.kh-rent-card .kh-amenity-chip.is-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.kh-rent-footer {
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: var(--space-4);
+  justify-content: space-between;
+  padding-top: var(--space-4);
+}
+
+.kh-rent-footer p {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 460px;
+}
+
+.kh-rent-footer-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--space-3);
+}
+
+.kh-rent-submit {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.kh-rent-submit .kp-line-icon {
+  height: 18px;
+  width: 18px;
+}
+
+@media (max-width: 900px) {
+  .kh-rent-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .kh-rent-footer-actions {
+    flex-direction: column-reverse;
+  }
+}

@@ -21,10 +21,12 @@ async function newPage(width, user, overview = { trangThai: 'Khách mới', hoSo
   const context = await browser.newContext({ viewport: { width, height: 1000 }, reducedMotion: 'reduce' });
   await context.addInitScript(value => localStorage.setItem('happyroom_session', JSON.stringify({ _v: 2, token: 'ui-fixture-only', user: value })), user);
   const writes = [];
+  const bodies = [];
   await context.route('**/api/**', route => {
     const url = new URL(route.request().url());
     if (!url.pathname.startsWith('/api/')) return route.fallback();
-    if (!['GET', 'OPTIONS'].includes(route.request().method())) writes.push(url.pathname);
+    if (!['GET', 'OPTIONS'].includes(route.request().method())) { writes.push(url.pathname); bodies.push({ path: url.pathname, body: route.request().postDataJSON() }); }
+    if (route.request().method() === 'POST' && url.pathname.endsWith('/khach-moi/ho-so')) return route.fulfill({ status: 201, json: { maDangKy: 'DK9999' } });
     if (url.pathname.endsWith('/auth/toi')) return route.fulfill({ json: user });
     if (url.pathname.endsWith('/avalanche/config')) return route.fulfill({ json: { enabled: false } });
     if (url.pathname.endsWith('/khach-moi/tong-quan')) return route.fulfill({ json: overview });
@@ -37,7 +39,7 @@ async function newPage(width, user, overview = { trangThai: 'Khách mới', hoSo
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  return { context, page, errors, writes };
+  return { context, page, errors, writes, bodies };
 }
 
 const results = [];
@@ -114,6 +116,43 @@ try {
     assert.equal(writes.length, 0, 'không gửi thao tác ghi nào');
     results.push({ width, role: 'khách', ok: true });
     await context.close();
+
+    // --- Phiếu đầy đủ: thời gian xem, tiện ích, ghi chú được gộp vào ghi chú hồ sơ gửi lên
+    const fill = await newPage(width, customer);
+    await fill.page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await fill.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
+    await fill.page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết' }).click();
+    await fill.page.getByRole('button', { name: 'Tôi quan tâm phòng này' }).click();
+    const form = fill.page.locator('.kh-register-modal').first();
+    await form.waitFor();
+    const labelled = (text) => form.locator('label', { hasText: text }).locator('input, select, textarea').first();
+    await labelled('Ngày sinh').fill('2000-01-01');
+    await labelled('Giới tính*').selectOption('Nam');
+    await labelled('Số điện thoại').fill('0901234567');
+    await labelled('Quốc tịch').fill('Việt Nam');
+    await labelled('CCCD').fill('012345678901');
+    await labelled('Khu vực mong muốn').fill('Quận 1');
+    await labelled('Thời gian dự kiến dọn vào').fill('2026-12-20');
+    await labelled('Thời hạn thuê').fill('6');
+    await labelled('Ngày có thể đến xem').fill('2026-12-01');
+    await labelled('Khung giờ rảnh').selectOption('Buổi chiều (13:00–17:00)');
+    await labelled('Ghi chú thời gian').fill('sau 16:00');
+    await form.getByRole('button', { name: 'Máy lạnh' }).click();
+    await form.getByRole('button', { name: 'Wifi mạnh' }).click();
+    assert.equal(await form.getByRole('button', { name: 'Máy lạnh' }).getAttribute('aria-pressed'), 'true');
+    await form.getByPlaceholder(/muốn ở gần trường/).fill('Cần chỗ để xe');
+    await fill.page.screenshot({ path: `.ui-screens/interested-rooms/form-day-du-${width}.png`, fullPage: true });
+    await form.getByRole('button', { name: 'Gửi phiếu đăng ký' }).click();
+    await fill.page.waitForTimeout(800);
+    const sent = fill.bodies.find((item) => item.path.endsWith('/khach-moi/ho-so'));
+    assert.ok(sent, `đã gửi phiếu (writes: ${fill.writes.join(', ')})`);
+    assert.match(sent.body.ghiChu, /Thời gian xem mong muốn: ngày 01\/12\/2026, Buổi chiều \(13:00–17:00\) \(sau 16:00\)\./);
+    assert.match(sent.body.ghiChu, /Tiện ích mong muốn: Máy lạnh, Wifi mạnh\./);
+    assert.match(sent.body.ghiChu, /Cần chỗ để xe/);
+    assert.deepEqual(sent.body.phongQuanTamIds, ['P901']);
+    assert.equal(fill.errors.length, 0, `browser errors: ${fill.errors.join('; ')}`);
+    results.push({ width, role: 'khách gửi phiếu đầy đủ', ok: true });
+    await fill.context.close();
 
     // --- D-043: khách đã có hồ sơ mở thì thêm phòng bằng một lần bấm, không mở form
     const withProfile = { trangThai: { coQuyTrinhThueDangHoatDong: true }, hoSo: [{ maDangKy: 'DK0001', trangThai: 'Chờ tiếp nhận', loaiPhongYeuCau: 'Phòng 4 người', danhSachPhongQuanTam: [{ maPhong: 'P901', tenPhong: 'Phòng P901', maChiNhanh: 'CN0001', chiNhanh: 'Chi nhánh giao diện' }] }], lichXem: [], phongGoiY: [] };

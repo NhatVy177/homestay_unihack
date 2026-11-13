@@ -54,8 +54,27 @@ const rentInitial = {
   soNu: 0,
   ngayDuKienVaoO: '',
   thoiHanThue: '',
-  ghiChu: ''
+  ghiChu: '',
+  ngayXemMongMuon: '',
+  khungGioRanh: 'Linh hoạt theo Sale',
+  ghiChuThoiGian: '',
+  tienIchMongMuon: []
 };
+
+const VIEWING_SLOTS = ['Linh hoạt theo Sale', 'Buổi sáng (7:00–11:30)', 'Buổi chiều (13:00–17:00)'];
+const AMENITY_OPTIONS = ['Máy lạnh', 'Wifi mạnh', 'WC riêng', 'Bếp chung', 'Máy giặt'];
+
+// Thời gian xem và tiện ích chưa có cột riêng: gộp vào ghi chú của hồ sơ để Sale đọc khi tiếp nhận.
+function composeRentNote(form = {}) {
+  const lines = [];
+  const viewing = [form.ngayXemMongMuon ? `ngày ${form.ngayXemMongMuon.split('-').reverse().join('/')}` : '', form.khungGioRanh || '']
+    .filter(Boolean).join(', ');
+  if (viewing) lines.push(`Thời gian xem mong muốn: ${viewing}${form.ghiChuThoiGian ? ` (${form.ghiChuThoiGian.trim()})` : ''}.`);
+  else if (form.ghiChuThoiGian) lines.push(`Thời gian xem mong muốn: ${form.ghiChuThoiGian.trim()}.`);
+  if (form.tienIchMongMuon?.length) lines.push(`Tiện ích mong muốn: ${form.tienIchMongMuon.join(', ')}.`);
+  if (form.ghiChu?.trim()) lines.push(form.ghiChu.trim());
+  return lines.join('\n');
+}
 
 const filterOptions = {
   hinhThucThue: ['', 'Ghép nam', 'Ghép nữ', 'Nguyên căn'],
@@ -156,6 +175,12 @@ function toLocalDateInputValue(date) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+function getTomorrowInputValue() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return toLocalDateInputValue(tomorrow);
 }
 
 function getMaxBirthDate() {
@@ -282,6 +307,8 @@ function Icon({ name, className = '' }) {
       </>
     ),
     bed: <path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9" />,
+    sparkle: <><path d="M12 3.5 13.8 9l5.7 1.8-5.7 1.8L12 18.5l-1.8-5.9-5.7-1.8L10.2 9z" /><path d="M19 3v4M17 5h4" /></>,
+    send: <><path d="m21.5 3.5-9.4 17-2.2-7.4-7.4-2.2z" /><path d="m9.9 13.1 4.6-4.6" /></>,
     heart: <path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2Z" />,
     shield: <><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6l-7-3Z" /><path d="m9 12 2 2 4-4" /></>,
     bell: <><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" /><path d="M10 20a2 2 0 0 0 4 0" /></>
@@ -1378,7 +1405,7 @@ export default function KhachHangPortalPage() {
         gioiTinhThue: rentForm.gioiTinhThue,
         soNam: rentForm.soNam || 0,
         soNu: rentForm.soNu || 0,
-        ghiChu: rentForm.ghiChu || ''
+        ghiChu: composeRentNote(rentForm)
       });
       const maDangKy = data?.maDangKy || data?.MaDangKy;
       setRentModal(false);
@@ -4101,19 +4128,73 @@ export default function KhachHangPortalPage() {
                   <label><span>Mức giá tối đa (đ/tháng)*</span><input type="number" min="0" value={rentForm.mucGiaToiDa} onChange={(event) => setRentForm({ ...rentForm, mucGiaToiDa: event.target.value })} placeholder="VD: 3.000.000" required /></label>
                   <label className="is-half"><span>Thời gian dự kiến dọn vào*</span><input type="date" value={rentForm.ngayDuKienVaoO} onChange={(event) => setRentForm({ ...rentForm, ngayDuKienVaoO: event.target.value })} required /></label>
                   <label className="is-half"><span>Thời hạn thuê (tháng)*</span><input type="number" min="1" value={rentForm.thoiHanThue} onChange={(event) => setRentForm({ ...rentForm, thoiHanThue: event.target.value })} placeholder="Ví dụ: 6" required /></label>
+                </div>
+              </section>
+
+              <section className="kh-register-section">
+                <h3><Icon name="calendar" />Thời gian xem phòng mong muốn</h3>
+                <div className="kh-register-grid kh-balanced-grid">
+                  <label className="is-half">
+                    <span>Ngày có thể đến xem</span>
+                    <input type="date" min={getTomorrowInputValue()} value={rentForm.ngayXemMongMuon || ''} onChange={(event) => setRentForm({ ...rentForm, ngayXemMongMuon: event.target.value })} />
+                  </label>
+                  <label className="is-half">
+                    <span>Khung giờ rảnh</span>
+                    <select value={rentForm.khungGioRanh || VIEWING_SLOTS[0]} onChange={(event) => setRentForm({ ...rentForm, khungGioRanh: event.target.value })}>
+                      {VIEWING_SLOTS.map((slot) => <option key={slot} value={slot}>{slot}</option>)}
+                    </select>
+                  </label>
+                  <label className="is-wide">
+                    <span>Ghi chú thời gian</span>
+                    <input value={rentForm.ghiChuThoiGian || ''} onChange={(event) => setRentForm({ ...rentForm, ghiChuThoiGian: event.target.value })} placeholder="Ví dụ: chỉ rảnh sau 16:00 hoặc cuối tuần" />
+                  </label>
+                </div>
+              </section>
+
+              <section className="kh-register-section">
+                <h3><Icon name="sparkle" />Tiện ích và ghi chú</h3>
+                <div className="kh-register-grid kh-balanced-grid">
                   <div className="is-wide kh-register-stack">
-                    <span className="kh-register-field-title">Yêu cầu khác</span>
+                    <span className="kh-register-field-title">Tiện ích mong muốn</span>
+                    <div className="kh-amenity-chips" role="group" aria-label="Tiện ích mong muốn">
+                      {AMENITY_OPTIONS.map((item) => {
+                        const chosen = rentForm.tienIchMongMuon || [];
+                        const active = chosen.includes(item);
+                        return (
+                          <button
+                            key={item}
+                            type="button"
+                            className={`kh-amenity-chip ${active ? 'is-active' : ''}`}
+                            aria-pressed={active}
+                            onClick={() => setRentForm({
+                              ...rentForm,
+                              tienIchMongMuon: active ? chosen.filter((value) => value !== item) : [...chosen, item]
+                            })}
+                          >
+                            {item}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="is-wide kh-register-stack">
+                    <span className="kh-register-field-title">Ghi chú thêm</span>
                     <label>
-                      <textarea value={rentForm.ghiChu} onChange={(event) => setRentForm({ ...rentForm, ghiChu: event.target.value })} placeholder="Giờ giấc sinh hoạt, yêu cầu yên tĩnh, gửi xe..." />
+                      <textarea value={rentForm.ghiChu} onChange={(event) => setRentForm({ ...rentForm, ghiChu: event.target.value })} placeholder="Ví dụ: muốn ở gần trường, cần chỗ để xe, ưu tiên phòng yên tĩnh..." />
                     </label>
                   </div>
                 </div>
               </section>
           </div>
 
-          <div className="kp-modal-actions kh-register-actions">
-            <button className="kp-btn kp-btn-soft" type="button" onClick={() => setRentModal(false)}>Hủy</button>
-            <button className="kp-btn kp-btn-primary" type="submit" disabled={submitting}>{submitting ? 'Đang gửi...' : 'Gửi yêu cầu đăng ký'}</button>
+          <div className="kh-rent-footer">
+            <p>Phiếu này sẽ được gửi đến nhân viên Sale để kiểm tra phòng/giường phù hợp trước khi lập lịch xem phòng.</p>
+            <div className="kh-rent-footer-actions">
+              <button className="kp-btn kp-btn-soft" type="button" onClick={() => setRentModal(false)}>Hủy</button>
+              <button className="kp-btn kp-btn-primary kh-rent-submit" type="submit" disabled={submitting}>
+                {submitting ? 'Đang gửi...' : <>Gửi phiếu đăng ký<Icon name="send" /></>}
+              </button>
+            </div>
           </div>
         </form>
 

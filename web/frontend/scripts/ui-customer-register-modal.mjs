@@ -30,7 +30,7 @@ try {
     await page.getByRole('button', { name: /Đăng ký nhu cầu thuê|Tạo nhu cầu thuê/ }).first().click();
     const modal = page.locator('.kh-register-modal').first();
     await modal.waitFor({ timeout: 8000 });
-    const submit = modal.getByRole('button', { name: 'Gửi yêu cầu đăng ký' });
+    const submit = modal.getByRole('button', { name: 'Gửi phiếu đăng ký' });
     const check = {
       modalBackground: await modal.evaluate(el => getComputedStyle(el).backgroundColor),
       submitBackground: await submit.evaluate(el => getComputedStyle(el).backgroundColor),
