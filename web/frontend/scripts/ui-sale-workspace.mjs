@@ -11,7 +11,7 @@ const today = dateKey(new Date()), tomorrowDate = new Date(); tomorrowDate.setDa
 const tomorrow = dateKey(tomorrowDate);
 const user = { maNguoiDung: 'NVUI01', hoTen: 'Nhân viên giao diện', vaiTro: 'NhanVien', chucVu: 'Sale', maChiNhanh: 'CNUI01', tenChiNhanh: 'Chi nhánh thử', email: 'ui@example.invalid' };
 const registrations = [
-  { maDangKy: 'DK0001', maKhachHang: 'KH0001', hoTenKhach: 'Khách thử An', sdtKhach: '0900000001', email: 'an@example.invalid', trangThai: 'Đã tiếp nhận', soNguoiO: 1, soNam: 1, soNu: 0, khuVucMongMuon: 'Quận 7', loaiPhongYeuCau: 'Phòng 2 người', mucGiaToiDa: 2500000, ngayDangKy: `${today}T08:00:00` },
+  { maDangKy: 'DK0001', maKhachHang: 'KH0001', hoTenKhach: 'Khách thử An', ghiChu: `Thời gian xem mong muốn: ngày ${tomorrow.split('-').reverse().join('/')}, Buổi sáng (7:00–11:30).`, sdtKhach: '0900000001', email: 'an@example.invalid', trangThai: 'Đã tiếp nhận', soNguoiO: 1, soNam: 1, soNu: 0, khuVucMongMuon: 'Quận 7', loaiPhongYeuCau: 'Phòng 2 người', mucGiaToiDa: 2500000, ngayDangKy: `${today}T08:00:00` },
   { maDangKy: 'DK0002', maKhachHang: 'KH0002', hoTenKhach: 'Khách thử Bình', sdtKhach: '0900000002', trangThai: 'Chờ tiếp nhận', ngayDangKy: `${today}T08:10:00` },
 ];
 const schedules = [
@@ -147,28 +147,32 @@ try {
       const root = (dom.createRoot || dom.default.createRoot)(host);
       root.render(React.createElement(Form, { profile, onBack: () => {}, onCreated: () => {} }));
     }, registrations[0]);
-    await page.getByText('Phòng 101', { exact: true }).waitFor();
+    await page.getByRole('heading', { name: 'Phòng 101', exact: true }).waitFor();
     await shot('create-rooms');
+    const submit = page.getByRole('button', { name: /Tạo lịch hẹn & gửi cho khách/ });
     if (phase === 'after') {
+      // Ngày/giờ khách mong muốn được điền sẵn (buổi sáng -> 08:30).
+      assert.equal(await page.locator('input[type=date]').inputValue(), tomorrow);
+      assert.equal(await page.locator('input[type=time]').inputValue(), '08:30');
+      await page.locator('input[type=date]').fill(tomorrow);
+      await page.locator('input[type=time]').fill('08:30');
       await page.getByRole('checkbox', { name: 'Chọn Phòng 102' }).check();
-      assert.equal(await page.getByRole('button', { name: 'Tiếp tục', exact: true }).isDisabled(), true, 'wrong-gender room still blocks continuation');
+      assert.equal(await submit.isDisabled(), true, 'wrong-gender room still blocks scheduling');
       await page.getByRole('checkbox', { name: 'Chọn Phòng 102' }).uncheck();
     }
-    await page.locator('article input[type=checkbox]').first().check();
+    await page.getByRole('checkbox', { name: 'Chọn Phòng 101' }).check();
     if (phase === 'after') await page.getByRole('checkbox', { name: 'Chọn Phòng 103' }).check();
-    await page.getByRole('button', { name: 'Tiếp tục', exact: true }).click();
     await shot('create-time');
     if (phase === 'after') {
-      await page.locator('input[type=date]').fill(tomorrow);
       const previousWrites = writes.length;
       let validation = '';
       page.once('dialog', async dialog => { validation = dialog.message(); await dialog.dismiss(); });
       await page.locator('input[type=time]').fill('19:00');
-      await page.getByRole('button', { name: 'Lưu lịch hẹn' }).click();
+      await submit.click();
       assert.ok(validation.includes('07:00') && validation.includes('17:00'));
       assert.equal(writes.length, previousWrites, 'outside-hours booking must not call API');
       await page.locator('input[type=time]').fill('08:30');
-      await page.getByRole('button', { name: 'Lưu lịch hẹn' }).click();
+      await submit.click();
       await page.getByText('Đã lập lịch xem phòng', { exact: true }).waitFor();
       assert.deepEqual(writes.at(-1).body.rooms, [{ maPhong: 'P101' }, { maPhong: 'P103' }]);
       assert.equal(writes.at(-1).body.maDangKy, 'DK0001');

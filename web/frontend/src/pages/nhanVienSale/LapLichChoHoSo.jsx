@@ -15,6 +15,22 @@ function formatMoney(value) {
   return normalized.toLocaleString('vi-VN') + 'đ';
 }
 
+// Phiếu khách ghi "Thời gian xem mong muốn: ngày dd/mm/yyyy, <khung giờ> (<ghi chú>)." trong ghi chú hồ sơ (J-C082).
+export function parseViewingPreference(note = '') {
+  const line = String(note || '').split(/\r?\n/).find((item) => item.startsWith('Thời gian xem mong muốn:'));
+  if (!line) return null;
+  const summary = line.replace('Thời gian xem mong muốn:', '').trim().replace(/\.$/, '');
+  const date = summary.match(/ngày (\d{2})\/(\d{2})\/(\d{4})/);
+  const slot = ['Buổi sáng', 'Buổi chiều', 'Linh hoạt theo Sale'].find((item) => summary.includes(item)) || '';
+  return {
+    summary,
+    dateIso: date ? `${date[3]}-${date[2]}-${date[1]}` : '',
+    dateLabel: date ? `${date[1]}/${date[2]}/${date[3]}` : '',
+    slot: slot ? summary.slice(summary.indexOf(slot)).replace(/\s*\(.*$/, '').replace(/\)$/, '') : '',
+    suggestedTime: slot === 'Buổi sáng' ? '08:30' : slot === 'Buổi chiều' ? '14:00' : ''
+  };
+}
+
 function formatGender(profile = {}) {
   const soNam = Number(profile.soNam || 0);
   const soNu = Number(profile.soNu || 0);
@@ -200,6 +216,14 @@ export default function LapLichChoHoSo({ profile, onBack, onCreated }) {
     [selectedRooms, profile]
   );
   const minScheduleDate = useMemo(() => getTomorrowDateInputValue(), []);
+  const viewingPreference = useMemo(() => parseViewingPreference(profile?.ghiChu), [profile?.ghiChu]);
+
+  // Điền sẵn ngày/giờ theo mong muốn của khách; Sale vẫn đổi được.
+  useEffect(() => {
+    if (!viewingPreference) return;
+    if (viewingPreference.dateIso && viewingPreference.dateIso >= minScheduleDate) setFormDate((current) => current || viewingPreference.dateIso);
+    if (viewingPreference.suggestedTime) setFormTime((current) => current || viewingPreference.suggestedTime);
+  }, [viewingPreference, minScheduleDate]);
 
   const toggleRoom = (roomId) => {
     setSelectedRoomIds((current) => (
@@ -238,5 +262,5 @@ export default function LapLichChoHoSo({ profile, onBack, onCreated }) {
     }
   };
 
-  return <SaleBookingView {...{unfitInterested,profile,onBack,rooms,selectedRoomIds,selectedRooms,loadingRooms,regionValid,roomError,step,setStep,formDate,setFormDate,formTime,setFormTime,formNote,setFormNote,saving,createdSchedule,selectionPlan,minScheduleDate,toggleRoom,handleCreateSchedule,formatMoney,formatGender,getAvailableSlots,isWholeRoomOption}} />;
+  return <SaleBookingView {...{unfitInterested,viewingPreference,profile,onBack,rooms,selectedRoomIds,selectedRooms,loadingRooms,regionValid,roomError,step,setStep,formDate,setFormDate,formTime,setFormTime,formNote,setFormNote,saving,createdSchedule,selectionPlan,minScheduleDate,toggleRoom,handleCreateSchedule,formatMoney,formatGender,getAvailableSlots,isWholeRoomOption}} />;
 }

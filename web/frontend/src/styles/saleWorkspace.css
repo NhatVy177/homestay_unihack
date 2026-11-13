@@ -174,3 +174,23 @@
   .sale-booking-summary { padding: var(--space-3); }
   .sale-booking-footer .ui-btn { flex: 1; }
 }
+
+/* D-043: lập lịch xem phòng một trang — phòng đã chọn bên trái, lịch hẹn bên phải */
+.sale-booking-layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr); gap: var(--space-6); align-items: start; }
+.sale-booking-main { display: grid; gap: var(--space-4); min-width: 0; }
+.sale-booking-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); margin: 0; }
+.sale-booking-facts dt { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: var(--space-1); }
+.sale-booking-facts dd { margin: 0; font-weight: 700; }
+.sale-booking-note { margin: 0; padding: var(--space-3) var(--space-4); background: var(--color-surface-alt); border-radius: var(--radius-md); color: var(--color-text-muted); font-size: 13px; white-space: pre-line; }
+.sale-panel-hint { margin: 0; color: var(--color-text-muted); font-size: 13px; }
+.sale-booking-aside { position: sticky; top: var(--space-4); display: grid; gap: var(--space-4); }
+.sale-booking-aside h3 { display: flex; align-items: center; gap: var(--space-2); margin: 0; }
+.sale-booking-picked { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); padding: var(--space-3); background: var(--color-surface-alt); border-radius: var(--radius-md); }
+.sale-booking-picked span { display: block; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--color-text-muted); }
+.sale-booking-picked strong { font-size: 14px; }
+.sale-booking-submit { width: 100%; justify-content: center; }
+@media (max-width: 1100px) {
+  .sale-booking-layout { grid-template-columns: 1fr; }
+  .sale-booking-aside { position: static; }
+  .sale-booking-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
