@@ -29,3 +29,12 @@ test('viewed-rooms lookup is scoped to the owner and reports people count', asyn
   const out = await getPhongDaXemCuaKhach(khach, 'DK0001', { query: profile(), run: async () => ({ recordset: [{ maPhong: 'P101', daXem: 1 }] }) });
   assert.deepEqual(out, { soNguoi: 2, khacGioi: false, daGuiYeuCau: false, phong: [{ maPhong: 'P101', daXem: 1 }] });
 });
+
+import { getYeuCauGiuChoCuaKhach } from '../services/khachGiuCho.service.js';
+test('pending hold requests are scoped to the signed-in customer and only those awaiting the manager', async () => {
+  let call;
+  const rows = await getYeuCauGiuChoCuaKhach(khach, async (text, params) => { call = { text, params }; return { recordset: [{ maDangKy: 'DK0001' }] }; });
+  assert.equal(call.params[0].value, 'KH0001'); assert.match(call.text, /MaKhachHang = @MaKhachHang/); assert.match(call.text, /N'Chờ xác nhận cọc'/);
+  assert.equal(rows.length, 1);
+  await assert.rejects(getYeuCauGiuChoCuaKhach({ vaiTro: 'NhanVien', maNguoiDung: 'NV0001' }, async () => ({ recordset: [] })), { statusCode: 403 });
+});

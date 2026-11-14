@@ -5104,3 +5104,4 @@
   .dpay-bank { width: 100%; }
 }
 .cinv-table td:nth-child(6) { white-space: nowrap; }
+.dpay-main, .dpay-side { grid-template-columns: minmax(0, 1fr); }

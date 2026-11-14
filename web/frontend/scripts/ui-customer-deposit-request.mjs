@@ -53,7 +53,7 @@ try {
     await page.getByRole('alertdialog').getByText('Đã gửi yêu cầu giữ chỗ', { exact: true }).waitFor();
     assert.deepEqual(writes, [{ maDangKy: 'DK0001', maPhong: 'A101', hinhThucThue: 'Ghép giường', giuongs: ['G1', 'G2'] }]);
     await page.getByRole('alertdialog').getByRole('button', { name: 'Đã hiểu', exact: true }).click();
-    await page.getByText('Bạn đã gửi yêu cầu giữ chỗ.', { exact: false }).first().waitFor();
+    await page.getByRole('heading', { name: 'Lịch sử đặt cọc', level: 2 }).waitFor(); // gửi xong tự chuyển sang tab lịch sử
     assert.deepEqual(errors, []);
     report.push({ width, writes: writes.length });
   }

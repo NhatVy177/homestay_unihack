@@ -169,3 +169,8 @@ import { getHoaDonCuaKhach } from '../services/khachHoaDon.service.js';
 export async function getHoaDon(req, res, next) {
   try { res.json(await getHoaDonCuaKhach(req.user)); } catch (error) { next(error); }
 }
+
+import { getYeuCauGiuChoCuaKhach } from '../services/khachGiuCho.service.js';
+export async function getYeuCauGiuCho(req, res, next) {
+  try { res.json(await getYeuCauGiuChoCuaKhach(req.user)); } catch (error) { next(error); }
+}

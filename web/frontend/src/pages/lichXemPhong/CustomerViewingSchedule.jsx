@@ -11,7 +11,7 @@ import { lichXemPhongApi } from './lichXemPhong.api.js';
 import './customerViewingSchedule.css';
 
 const EMPTY_SCHEDULES=[];
-export default function CustomerViewingSchedule({schedules=EMPTY_SCHEDULES,onViewRoomDetail,onReschedule,onCancel}){
+export default function CustomerViewingSchedule({schedules=EMPTY_SCHEDULES,onViewRoomDetail,onReschedule,onCancel,onDepositRequested}){
   const [rows,setRows]=useState(schedules),[draft,setDraft]=useState(''),[query,setQuery]=useState(''),[group,setGroup]=useState('active'),[selectedDay,setSelectedDay]=useState('');
   const [reschedule,setReschedule]=useState(null),[cancel,setCancel]=useState(null),[deposit,setDeposit]=useState(null),[busy,setBusy]=useState(''),[loading,setLoading]=useState(false),[error,setError]=useState(''),[result,setResult]=useState(null);
   const confirming=useRef(false);
@@ -51,8 +51,8 @@ export default function CustomerViewingSchedule({schedules=EMPTY_SCHEDULES,onVie
     </section><ViewingMonthCalendar schedules={searched} selectedDay={selectedDay} onDay={setSelectedDay}/></div>
     <p className="customer-viewing-hint">Nếu có thay đổi, hãy gửi yêu cầu đổi lịch trước giờ hẹn ít nhất 2 tiếng. Nhân viên sẽ kiểm tra và phản hồi.</p>
     {reschedule&&<RescheduleModal appt={reschedule} onClose={()=>setReschedule(null)} onSubmit={onReschedule}/>}
-    {deposit&&<CustomerDepositRequestModal row={deposit} onClose={()=>setDeposit(null)} onSent={()=>{setDeposit(null);refresh();setResult({type:'success',title:'Đã gửi yêu cầu giữ chỗ',message:'Quản lý chi nhánh sẽ xác nhận trong tối đa 12 giờ. Phòng chưa được giữ cho đến khi được xác nhận.'});}}/>}
+    {deposit&&<CustomerDepositRequestModal row={deposit} onClose={()=>setDeposit(null)} onSent={()=>{setDeposit(null);refresh();setResult({type:'success',title:'Đã gửi yêu cầu giữ chỗ',message:'Quản lý chi nhánh sẽ xác nhận trong tối đa 12 giờ. Phòng chưa được giữ cho đến khi được xác nhận.',goHistory:true});}}/>}
     {cancel&&<CancelModal appt={cancel} onClose={()=>setCancel(null)} onSubmit={onCancel}/>}
-    <ResultModal open={Boolean(result)} type={result?.type} title={result?.title} message={result?.message} confirmText="Đã hiểu" onClose={()=>setResult(null)}/>
+    <ResultModal open={Boolean(result)} type={result?.type} title={result?.title} message={result?.message} confirmText="Đã hiểu" onClose={()=>{const next=result?.goHistory;setResult(null);if(next)onDepositRequested?.();}}/>
   </div>;
 }

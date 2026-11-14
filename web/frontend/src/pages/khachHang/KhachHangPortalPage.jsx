@@ -13,12 +13,13 @@ import LichXemPhongPage from '../lichXemPhong/LichXemPhongPage.jsx';
 import { httpClient } from '../../api/httpClient.js';
 import ThuNhanPhongWalletCard from './ThuNhanPhongWalletCard.jsx';
 import CustomerInvoicesList from './CustomerInvoicesList.jsx';
+import CustomerDepositHistory from './CustomerDepositHistory.jsx';
 import VietQrCode from '../../components/common/VietQrCode.jsx';
 import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Claude), one line agreed with Vy
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
 const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
-const PORTAL_TABS = ['kham-pha', 'ho-so', 'lich-xem', 'dat-coc', 'hop-dong', 'tra-phong'];
+const PORTAL_TABS = ['kham-pha', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'hop-dong', 'tra-phong'];
 
 // Gốc backend để mở lại file chứng từ đã upload (DB lưu đường dẫn /uploads/chung-tu/..).
 const FILE_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
@@ -685,6 +686,7 @@ function getNavLocks(state = {}) {
     'ho-so': false,
     'lich-xem': false,
     'dat-coc': !hasDeposit,
+    'lich-su-coc': false,
     'hop-dong': !hasContract,
     'tra-phong': !(hasDeposit || hasContract),
     'tai-khoan': false,
@@ -1017,6 +1019,9 @@ export default function KhachHangPortalPage() {
   const [depositDetailOpen, setDepositDetailOpen] = useState(() => Boolean(new URLSearchParams(window.location.search).get('phieu')));
   const [invoices, setInvoices] = useState(null);
   const [invoicesError, setInvoicesError] = useState('');
+  // Tab "Lịch sử đặt cọc": yêu cầu giữ chỗ đang chờ quản lý + các phiếu cọc.
+  const [holdRequests, setHoldRequests] = useState(null);
+  const [holdRequestsError, setHoldRequestsError] = useState('');
   const [depositClock, setDepositClock] = useState(Date.now());
   useEffect(() => {
     if (activeTab !== 'dat-coc') return undefined;
@@ -1095,6 +1100,7 @@ export default function KhachHangPortalPage() {
     { id: 'ho-so', icon: 'description', title: 'Hồ sơ đăng ký' },
     { id: 'lich-xem', icon: 'event_note', title: 'Lịch xem phòng' },
     { id: 'dat-coc', icon: 'payments', title: 'Hóa đơn & thanh toán' },
+    { id: 'lich-su-coc', icon: 'receipt_long', title: 'Lịch sử đặt cọc' },
     { id: 'hop-dong', icon: 'article', title: 'Hợp đồng' },
     { id: 'tra-phong', icon: 'logout', title: 'Trả phòng' }
   ];
@@ -1138,12 +1144,16 @@ export default function KhachHangPortalPage() {
   }, [registrationNoticeOpen]);
 
   useEffect(() => {
-    if ((activeTab === 'dat-coc' || activeTab === 'tra-phong') && !datCocList && !datCocLoading) {
+    if ((activeTab === 'dat-coc' || activeTab === 'lich-su-coc' || activeTab === 'tra-phong') && !datCocList && !datCocLoading) {
       loadDatCoc();
     }
     if (activeTab === 'dat-coc' && invoices === null) {
       khachMoiApi.getHoaDon().then(({ data }) => setInvoices(Array.isArray(data) ? data : []))
         .catch(() => { setInvoices([]); setInvoicesError('Chưa tải được hóa đơn các kỳ. Phiếu cọc vẫn hiển thị bình thường.'); });
+    }
+    if (activeTab === 'lich-su-coc' && holdRequests === null) {
+      khachMoiApi.getYeuCauGiuCho().then(({ data }) => { setHoldRequests(Array.isArray(data) ? data : []); setHoldRequestsError(''); })
+        .catch(() => { setHoldRequests([]); setHoldRequestsError('Chưa tải được yêu cầu giữ chỗ đang chờ. Các phiếu cọc vẫn hiển thị bình thường.'); });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, datCocList, datCocLoading]);
@@ -1800,6 +1810,7 @@ export default function KhachHangPortalPage() {
       <LichXemPhongPage
         schedules={overview?.lichXem || []}
         onViewRoomDetail={(schedule) => openScheduleDetail(schedule)}
+        onDepositRequested={() => { setHoldRequests(null); goTo('lich-su-coc'); }}
         onReschedule={async (appointment, form) => {
           const schedule = appointment.rawSchedule || {};
           await khachMoiApi.yeuCauDieuChinhLich(schedule.id || appointment.id, {
@@ -3696,7 +3707,7 @@ export default function KhachHangPortalPage() {
       setDatCocList((prev) => prev.map((p) => p.maPhieuCoc === updated.maPhieuCoc ? updated : p));
       // Gửi xong thì về danh sách hóa đơn & thanh toán, phiếu hiện "Chờ xác nhận" cho tới khi kế toán duyệt.
       setDepositDetailOpen(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      goTo('lich-su-coc');
     } catch {
       setToast('Gửi chứng từ thất bại.');
     } finally {
@@ -3758,7 +3769,7 @@ export default function KhachHangPortalPage() {
     const roomFacts = [['Cơ sở', phieu.tenChiNhanh], ['Loại phòng', phieu.loaiPhong], ['Hình thức thuê', phieu.hinhThucThue]].filter(([, value]) => value);
     const steps = [
       { label: 'Đang chờ thanh toán', desc: isCash ? 'Đến quầy nộp tiền mặt theo hướng dẫn bên dưới' : 'Vui lòng chuyển khoản hoặc thanh toán theo phương thức đã chọn', state: 'current' },
-      { label: 'Đã nộp minh chứng', desc: 'Đang chờ Quản lý duyệt giao dịch', state: 'todo' },
+      { label: 'Đã nộp minh chứng', desc: 'Kế toán đang kiểm tra và xác nhận đã nhận tiền', state: 'todo' },
       { label: 'Hoàn tất', desc: 'Đặt cọc thành công', state: 'todo' }
     ];
     return (
@@ -4093,6 +4104,13 @@ export default function KhachHangPortalPage() {
     );
   }
 
+  function renderDepositHistory() {
+    return <CustomerDepositHistory deposits={datCocList || []} requests={holdRequests || []}
+      loading={datCocList === null || holdRequests === null} error={holdRequestsError}
+      onGoViewing={() => goTo('lich-xem')}
+      onOpenDeposit={(phieu) => { setDatCocSelected(phieu); setDepositDetailOpen(true); goTo('dat-coc'); }} />;
+  }
+
   function renderDatCoc() {
     if (locks['dat-coc']) return renderLocked('dat-coc');
     if (depositDetailOpen && datCocSelected) return <>
@@ -4347,6 +4365,7 @@ export default function KhachHangPortalPage() {
     if (activeTab === 'ho-so') return renderProfiles();
     if (activeTab === 'lich-xem') return renderSchedules();
     if (activeTab === 'dat-coc') return renderDatCoc();
+    if (activeTab === 'lich-su-coc') return renderDepositHistory();
     if (activeTab === 'hop-dong') return renderHopDongTab();
     if (activeTab === 'tra-phong') return renderHopDong();
     if (activeTab === 'tai-khoan') return renderAccount();

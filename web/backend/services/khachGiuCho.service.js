@@ -62,3 +62,18 @@ export async function khachGuiYeuCauGiuCho(user, data = {}, { query = executeQue
     return row;
   } catch (error) { mapDatabaseError(error, KHACH_ERRORS); }
 }
+
+// Yêu cầu giữ chỗ của chính khách đang chờ quản lý xác nhận (tối đa 12 giờ, D-026). Sau khi quản lý duyệt,
+// yêu cầu thành phiếu cọc và hiện ở danh sách phiếu cọc; bị từ chối/quá hạn thì hồ sơ về "Đã xem" nên không còn ở đây.
+export async function getYeuCauGiuChoCuaKhach(user, query = executeQuery) {
+  assertCustomer(user);
+  const result = await query(`SELECT y.MaDangKy AS maDangKy, y.MaPhong AS maPhong, p.TenPhong AS tenPhong,
+      cn.TenChiNhanh AS tenChiNhanh, y.HinhThucThue AS hinhThucThue, y.DanhSachGiuong AS danhSachGiuong, y.GuiLuc AS guiLuc
+    FROM dbo.YeuCauDatCocChiTiet y
+    JOIN dbo.PhieuDangKy d ON d.MaDangKy = y.MaDangKy
+    JOIN dbo.Phong p ON p.MaPhong = y.MaPhong
+    JOIN dbo.ChiNhanh cn ON cn.MaChiNhanh = p.MaChiNhanh
+    WHERE d.MaKhachHang = @MaKhachHang AND d.TrangThai = N'Chờ xác nhận cọc'
+    ORDER BY y.GuiLuc DESC`, [{ name: 'MaKhachHang', type: sql.VarChar(6), value: user.maNguoiDung }]);
+  return result.recordset;
+}
