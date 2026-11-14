@@ -5068,3 +5068,38 @@
 .vietqr-code { margin: 0 0 16px; display: grid; justify-items: center; gap: 8px; text-align: center; }
 .vietqr-code img { width: min(260px, 100%); height: auto; border-radius: 12px; border: 1px solid var(--color-border); background: #fff; }
 .vietqr-code figcaption { color: var(--color-text-muted); font-size: 13px; max-width: 360px; }
+
+/* Màn thanh toán đặt cọc (theo mẫu) */
+.dpay-head h2 { margin: 0 0 4px; font-size: 28px; color: var(--color-primary); }
+.dpay-head p { margin: 0 0 16px; color: var(--color-text-muted); }
+.dpay-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+.dpay-main, .dpay-side { display: grid; gap: 16px; align-content: start; }
+.dpay-card { display: grid; gap: 12px; }
+.dpay-tabs { display: flex; flex-wrap: wrap; gap: 10px; }
+.dpay-tab { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid transparent; background: #eceee8; color: var(--color-text); font: inherit; font-weight: 600; cursor: pointer; }
+.dpay-tab.is-active { background: var(--color-primary); color: #fff; }
+.dpay-transfer { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; align-items: start; padding: 16px; border: 1px solid var(--color-border); border-radius: 16px; }
+.dpay-bank > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px solid var(--color-border); }
+.dpay-bank > div:last-child { border-bottom: 0; }
+.dpay-bank button { min-height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--color-border); background: var(--color-surface); font: inherit; font-size: 13px; cursor: pointer; }
+.dpay-wallet { margin-top: 4px; }
+.dpay-amount { padding: 24px; border-radius: 20px; background: linear-gradient(135deg, #8b7355, #76634a); color: #fff; display: grid; gap: 6px; }
+.dpay-amount span { font-size: 14px; opacity: .9; }
+.dpay-amount strong { font-size: 30px; }
+.dpay-pill { display: inline-flex; align-items: center; gap: 8px; width: fit-content; margin: 8px 0 0; padding: 8px 14px; border-radius: 999px; background: rgba(255, 255, 255, .18); font-size: 14px; }
+.dpay-room-facts { display: grid; gap: 10px; margin: 0; }
+.dpay-room-facts div { display: flex; justify-content: space-between; gap: 12px; }
+.dpay-room-facts dt { color: var(--color-text-muted); }
+.dpay-room-facts dd { margin: 0; font-weight: 600; text-align: right; }
+.dpay-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.dpay-steps li { position: relative; padding-left: 28px; display: grid; gap: 2px; }
+.dpay-steps li::before { content: ''; position: absolute; left: 0; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #d8dcd3; }
+.dpay-steps li.is-current::before { background: var(--color-primary); }
+.dpay-steps li.is-current strong { color: var(--color-primary); }
+.dpay-steps li.is-todo { color: var(--color-text-muted); }
+.dpay-steps span { font-size: 13px; color: var(--color-text-muted); }
+@media (max-width: 900px) {
+  .dpay-grid { grid-template-columns: minmax(0, 1fr); }
+  .dpay-transfer { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .dpay-bank { width: 100%; }
+}

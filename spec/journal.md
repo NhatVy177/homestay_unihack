@@ -1069,3 +1069,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Sửa: thêm `PAYMENT_VIETQR_HIEN_SO_TIEN=false` vào `web/backend/.env` (không commit), thêm dòng `true` có chú thích vào `web/backend/.env.example`; khởi động lại backend; kiểm tra `getPaymentAccount().hienSoTienQr` trả `false`. Code frontend không đổi.
 - Kiểm tra: `ui-customer-invoices` PASS sau build. Chưa quét lại bằng MoMo.
 - Việc còn lại: Vy tải lại trang (Ctrl+F5), quét QR mới rồi báo kết quả.
+
+## 2026-11-15 09:40:00 +07:00 — J-C097 — Màn "Thanh toán đặt cọc" theo mẫu cho phiếu đang chờ thanh toán
+- Người thực hiện: Claude. Lý do: Vy gửi ảnh mẫu, yêu cầu chuyển giao diện trả cọc sang bố cục đó.
+- Thay đổi: khi phiếu "Chờ thanh toán", tab hiện màn mới gồm cột trái (phương thức, mã QR + thông tin chuyển khoản có nút sao chép, nút ví mô phỏng, khung minh chứng, chính sách hoàn cọc) và cột phải (thẻ số tiền + hạn, thông tin phòng, tiến trình đặt cọc). Các trạng thái khác (từ chối, đã gửi, hoàn tất, hết hạn) vẫn dùng bố cục cũ.
+- Khác mẫu có chủ ý: không có tab ATM/Visa vì hệ thống chưa có cổng thẻ; "Tiền mặt tại quầy" thay cho tab thứ ba; nút "Gửi chứng từ thanh toán" giữ nguyên thay cho "Xác nhận đã thanh toán", vì xác nhận chỉ do kế toán làm (D-023); nội dung chuyển khoản vẫn là `mã phiếu + sđt`, không dùng mẫu "HS DORM Phòng101".
+- File: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (`renderDepositPaymentLayout`, nhánh sớm `if (isWaiting)`), `khachHangPortal.css` (`.dpay-*`), `scripts/ui-customer-invoices.mjs` (kiểm tra tiêu đề, tab đang chọn, nút ví).
+- Kiểm tra: build OK; `ui-customer-invoices` PASS ở 1440/390 (fixture API, không ghi DB); đã xem ảnh màn hình 1440.
+- Việc còn lại: Vy xem trên điện thoại và trạng thái đã gửi chứng từ (bố cục cũ, chưa đổi).

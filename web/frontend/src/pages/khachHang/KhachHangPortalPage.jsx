@@ -3742,6 +3742,91 @@ export default function KhachHangPortalPage() {
     return renderDatCocDetail(datCocSelected || datCocList[0]);
   }
 
+  // Màn "Thanh toán đặt cọc" khi phiếu đang chờ thanh toán (theo mẫu): phương thức bên trái; số tiền, phòng, tiến trình bên phải.
+  function renderDepositPaymentLayout(phieu) {
+    const deadlineMs = phieu.thoiHanThanhToan ? new Date(phieu.thoiHanThanhToan).getTime() - 7 * 60 * 60 * 1000 : 0;
+    const remainingMinutes = Math.max(0, Math.ceil((deadlineMs - depositClock) / 60000));
+    const account = getPaymentAccount(phieu);
+    const transferContent = `${phieu.maPhieuCoc} ${phieu.sdtKhachHang || ''}`.trim();
+    const amount = Number(phieu.soTienCoc) || 0;
+    const method = phieu.phuongThucThanhToan || 'Chuyển khoản';
+    const isTransfer = method === 'Chuyển khoản';
+    const isCash = method === 'Tiền mặt';
+    const roomFacts = [['Cơ sở', phieu.tenChiNhanh], ['Loại phòng', phieu.loaiPhong], ['Hình thức thuê', phieu.hinhThucThue]].filter(([, value]) => value);
+    const steps = [
+      { label: 'Đang chờ thanh toán', desc: isCash ? 'Đến quầy nộp tiền mặt theo hướng dẫn bên dưới' : 'Vui lòng chuyển khoản hoặc thanh toán theo phương thức đã chọn', state: 'current' },
+      { label: 'Đã nộp minh chứng', desc: 'Đang chờ Quản lý duyệt giao dịch', state: 'todo' },
+      { label: 'Hoàn tất', desc: 'Đặt cọc thành công', state: 'todo' }
+    ];
+    return (
+      <section className="dc-detail dpay">
+        {!!deadlineMs && <div className="dc-banner dc-banner-info">
+          <Icon name="schedule" /> <strong>Còn {Math.floor(remainingMinutes / 60)} giờ {remainingMinutes % 60} phút để thanh toán</strong>
+        </div>}
+        <header className="dpay-head">
+          <h2>Thanh toán đặt cọc</h2>
+          <p>Vui lòng hoàn tất thanh toán để giữ chỗ phòng của bạn.</p>
+        </header>
+        <div className="dpay-grid">
+          <div className="dpay-main">
+            <section className="dc-section-card dpay-card">
+              <h3 className="dc-section-title">Phương thức thanh toán</h3>
+              <div className="dpay-tabs" role="group" aria-label="Chọn phương thức thanh toán">
+                <button type="button" aria-pressed={isTransfer} className={`dpay-tab${isTransfer ? ' is-active' : ''}`} onClick={() => { if (!isTransfer) chonPhuongThucCoc('Chuyển khoản'); }}><Icon name="invoice" /> QR chuyển khoản</button>
+                <button type="button" aria-pressed={isCash} className={`dpay-tab${isCash ? ' is-active' : ''}`} onClick={() => { if (!isCash) chonPhuongThucCoc('Tiền mặt'); }}><Icon name="profile" /> Tiền mặt tại quầy</button>
+              </div>
+              {isTransfer && <div className="dpay-transfer">
+                <VietQrCode account={account} amount={amount} content={transferContent} />
+                <div className="dc-bank-info dpay-bank">
+                  <div><span>Ngân hàng</span><strong>{account.nganHang}</strong></div>
+                  <div><span>Số tài khoản</span><strong>{account.soTaiKhoan}</strong><button type="button" onClick={() => navigator.clipboard.writeText(account.soTaiKhoan)}>Sao chép</button></div>
+                  <div><span>Chủ tài khoản</span><strong>{account.chuTaiKhoan}</strong></div>
+                  <div><span>Nội dung chuyển khoản</span><strong>{transferContent}</strong><button type="button" onClick={() => navigator.clipboard.writeText(transferContent)}>Sao chép</button></div>
+                </div>
+              </div>}
+              {isCash && <p className="dc-bank-note">Bạn đến quầy {phieu.tenChiNhanh || 'của cơ sở'} để nộp {amount.toLocaleString('vi-VN')} VNĐ bằng tiền mặt. Nhân viên sẽ lập giấy biên nhận đặt cọc để hai bên cùng ký.</p>}
+              <button type="button" className="kp-btn kp-btn-soft kp-full dpay-wallet" onClick={thanhToanViMoPhong}><Icon name="payment" /> Thanh toán bằng ví điện tử (mô phỏng)</button>
+              <p className="dc-bank-note">Ví mô phỏng chỉ dùng để thử luồng, không trừ tiền thật.</p>
+            </section>
+            {isTransfer && <section className="dc-section-card dpay-card">
+              <h3 className="dc-section-title"><Icon name="profile" />Minh chứng thanh toán</h3>
+              <p className="dc-bank-note">Vui lòng tải lên ảnh chụp biên lai hoặc màn hình giao dịch thành công.</p>
+              <form onSubmit={submitMinhChung} className="dc-upload-form">
+                <label className="dc-file-drop">
+                  <input type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={handleFileUpload} />
+                  {uploadForm.fileName
+                    ? <span className="dc-file-name">📎 {uploadForm.fileName}</span>
+                    : <><Icon name="profile" /><span>Kéo thả file vào đây hoặc <u>Chọn từ máy tính</u></span><small>Định dạng hỗ trợ: JPG, PNG, PDF (Tối đa 5MB)</small></>}
+                </label>
+                <button className="kp-btn kp-btn-primary kp-full" type="submit" disabled={uploading}>{uploading ? 'Đang gửi...' : 'Gửi chứng từ thanh toán'}</button>
+              </form>
+            </section>}
+            <DepositPolicyPanel key={phieu.maPhieuCoc} depositId={phieu.maPhieuCoc} />
+          </div>
+          <aside className="dpay-side">
+            <section className="dpay-amount">
+              <span>Số tiền đặt cọc</span>
+              <strong>{amount.toLocaleString('vi-VN')} VNĐ</strong>
+              {phieu.thoiHanThanhToan && <p className="dpay-pill"><Icon name="schedule" /> Thời hạn thanh toán: {formatDate(phieu.thoiHanThanhToan, true)}</p>}
+            </section>
+            <section className="dc-section-card dpay-room">
+              <h3 className="dc-section-title">{phieu.tenPhong || 'Phòng đã chọn'}</h3>
+              {roomFacts.length > 0 && <dl className="dpay-room-facts">
+                {roomFacts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
+              </dl>}
+            </section>
+            <section className="dc-section-card">
+              <h3 className="dc-section-title">Trạng thái đặt cọc</h3>
+              <ol className="dpay-steps" aria-label="Tiến trình đặt cọc">
+                {steps.map((step) => <li key={step.label} className={`is-${step.state}`}><strong>{step.label}</strong><span>{step.desc}</span></li>)}
+              </ol>
+            </section>
+          </aside>
+        </div>
+      </section>
+    );
+  }
+
   function renderDatCocDetail(phieu) {
     // minhChungThanhToan giờ là ĐƯỜNG DẪN file (vd /uploads/chung-tu/..); vẫn đỡ được dữ liệu JSON cũ.
     const minhChung = (() => {
@@ -3786,6 +3871,7 @@ export default function KhachHangPortalPage() {
     const deadlineMs = phieu.thoiHanThanhToan ? new Date(phieu.thoiHanThanhToan).getTime() - 7 * 60 * 60 * 1000 : 0;
     const remainingMinutes = Math.max(0, Math.ceil((deadlineMs - depositClock) / 60000));
 
+    if (isWaiting) return renderDepositPaymentLayout(phieu);
     return (
       <section className="dc-detail">
         <DepositPolicyPanel key={phieu.maPhieuCoc} depositId={phieu.maPhieuCoc} />

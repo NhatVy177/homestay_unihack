@@ -43,6 +43,9 @@ try {
     assert.equal(await rows.count(), 1); assert.match(await rows.first().innerText(), /DC0003/);
     await page.getByRole('button', { name: 'Thanh toán', exact: true }).click();
     await page.getByRole('button', { name: /Quay lại danh sách/ }).waitFor();
+    await page.getByRole('heading', { name: 'Thanh toán đặt cọc', level: 2 }).waitFor();
+    assert.equal(await page.getByRole('button', { name: 'QR chuyển khoản', exact: true }).getAttribute('aria-pressed'), 'true');
+    assert.equal(await page.getByRole('button', { name: /ví điện tử \(mô phỏng\)/ }).count(), 1);
     const qr = page.locator('.vietqr-code img');
     await qr.waitFor();
     const src = await qr.getAttribute('src');
