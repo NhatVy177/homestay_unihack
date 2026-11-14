@@ -75,7 +75,7 @@ Trạng thái hồ sơ (`PhieuDangKy`): Chờ tiếp nhận → **Đã tiếp nh
 
 1. Khách tạo tài khoản (email bắt buộc, đúng định dạng, không trùng — D-016), gửi hồ sơ đăng ký: số người, giới tính, giá tối đa, khu vực, ngày vào ở, thời hạn thuê.
 2. Sale tiếp nhận hồ sơ và **hẹn một buổi xem**. Mỗi hồ sơ **chỉ một buổi xem**, gồm **một hoặc nhiều phòng cùng chi nhánh**. Dời giờ vẫn là buổi đó.
-3. Sau giờ hẹn, buổi tự thành **"Đã xem"** (hệ thống tự đặt theo giờ). Nếu khách vắng, Sale ghi **"Khách không đến"**.
+3. *(D-045)* Khách bấm **Xác nhận lịch** đúng phiên bản ngày/giờ. Khi Sale đổi ngày/giờ, khách xác nhận lại; không tự xác nhận thay khách. **Chưa xác nhận thì Sale không được ghi Đã xem/Khách không đến**, kể cả đã tới giờ. Sau khi khách xác nhận và đã đến giờ, Sale ghi kết quả theo D-026/C5-a; hệ thống không tự đánh dấu theo giờ.
 4. Sale **chỉ ghi trạng thái của buổi**. Không ghi kết quả từng phòng, không bắt khách chọn phòng ngay, không có hạn chờ, không tự đóng hồ sơ. Khách có thể về nghĩ 2 ngày rồi quay lại.
 5. Khách (hoặc Sale) có nút **"Không thuê nữa"** — là cách duy nhất đóng hồ sơ sau buổi xem. Nút này không bắt buộc bấm.
 6. *(Mục 11, D-031, giao diện đợt 2)* Thẻ lịch xem của khách có thanh tiến trình: Đã lên lịch → Đã xác nhận → Đã xem → Giữ chỗ.

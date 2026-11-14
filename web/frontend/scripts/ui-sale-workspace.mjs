@@ -77,6 +77,17 @@ try {
     await page.getByText('LX0001', { exact: true }).first().waitFor();
     await shot('schedules');
     if (phase === 'after') {
+      const layout = await page.locator('.sale-appointments-layout').evaluate(el => {
+        const rect = selector => { const r = el.querySelector(selector).getBoundingClientRect(); return { x: r.x, y: r.y, right: r.right, bottom: r.bottom }; };
+        return { calendar: rect('.sale-calendar'), list: rect('.sale-appointments-list'), rail: rect('.sale-appointments-rail') };
+      });
+      assert.ok(layout.list.y >= layout.calendar.bottom, 'appointment list sits below the calendar');
+      assert.equal(layout.list.x, layout.calendar.x, 'calendar and list share the left edge');
+      if (width === 1440) assert.ok(layout.rail.x >= layout.calendar.right, 'summary stays in the right column');
+      else assert.ok(layout.rail.y >= layout.list.bottom, 'mobile summaries follow the calendar and list');
+      assert.equal(await page.getByRole('region', { name: 'Lịch hẹn 24 giờ tới', exact: true }).count(), 1);
+    }
+    if (phase === 'after') {
       assert.equal(await page.locator('aside nav button').count(), 5);
       assert.equal(await page.locator('aside nav').getByText('Ghi nhận cư trú').count(), 0);
       const title = await page.locator('.sale-calendar-heading h2').textContent();

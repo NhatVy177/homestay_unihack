@@ -1,0 +1,12 @@
+/* Keep room-detail layout fixes separate from the customer workflow stylesheet. */
+@media (min-width: 901px) {
+  .kh-detail-view .kh-detail-body {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: var(--space-8);
+  }
+}
+
+.kh-detail-view .kh-detail-cta {
+  word-break: normal;
+  overflow-wrap: normal;
+}

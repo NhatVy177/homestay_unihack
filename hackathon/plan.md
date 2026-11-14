@@ -274,6 +274,8 @@ Cổng thanh toán mô phỏng chỉ xuất hiện thêm nếu hoàn thiện s�
 
 **Xác nhận lịch khách D-045 (14/11, J-X081):** thêm xác nhận đúng phiên bản và reset khi Sale đổi giờ; Sale chỉ ghi kết quả buổi xem sau khi khách xác nhận (Vy đã chốt). Làm lại trang lịch khách theo ảnh, tự viết React/CSS token. Nhánh `feat/customer-viewing-confirmation` từ main; chuẩn bị migration chạy lại được và kiểm quyền/chống xác nhận nhầm phiên bản/đồng thời. Hỏi Vy trước khi chạy HOMEDORM4; chưa coi phần này là nghiệm thu A3/Fuji.
 
+J-X082: code D-045 và kiểm tự động/SQL tạm đã qua; chờ Vy cho chạy migration mới trên HOMEDORM4 rồi khách nghiệm thu. Một bản xem `localhost:5199` chứa thêm các sửa UI Codex đã làm ở J-X079/J-X080 (khung phòng, bố cục lịch Sale), không merge code Claude chưa duyệt hoặc main. Nguồn/lệnh SQL và trạng thái duyệt nằm ở `docs/cau-hinh.md` và `spec/progress.md`.
+
 **Đợt Sale D-035 (11/11, J-X063):** Vy cho sửa Sale trước theo bố cục mẫu Hằng: menu 5 mục, tổng quan, lịch tháng và form lập lịch; bỏ mục kiểm tra phòng/giường và tab cư trú riêng, giữ nhập hộ trong Tra cứu khách hàng. Nghiệp vụ hồ sơ/cọc/trả phòng vẫn có lối truy cập. Nhánh `feat/ui-sale-workspace` từ `origin/main` (`dcc1a59`), worktree riêng; không tự merge/push main. Phạm vi này không làm khách tự khai cư trú hoặc thay backend/SQL/quyền/luồng D-026; phần đó tiếp tục ở đợt nghiệp vụ tương ứng.
 
 **Lịch hiện hành theo D-025 (Vy chốt 2026-11-10 00:47 +07:00): làm giao diện trước Fuji.** Lịch này thay bảng mốc cũ tại mục này và phần lịch 15 ngày của D-019; không thay scope nghiệp vụ hoặc coi kiểm thử local là kết quả Fuji. Đây là lịch nội bộ của Vy, không phải xác minh lại hạn BTC.

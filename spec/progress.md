@@ -1,10 +1,14 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-12 22:21:42 +07:00** (J-X074, bản vá danh sách hoàn cọc C4 chờ duyệt/migration). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-14 15:32:01 +07:00** (J-X082, D-045 có code và kiểm tra; chờ duyệt migration). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
 
-Đang làm D-045: `feat/customer-viewing-confirmation` từ origin/main `45c63f7` trong worktree riêng Codex. Vy chốt chặn Sale ghi Đã xem/Khách không đến cho đến khi khách xác nhận lịch; đổi ngày/giờ cần xác nhận lại. Hiện chưa có API lưu xác nhận, đang bổ sung backend/migration và làm lại trang lịch khách theo ảnh. Chưa chạy SQL HOMEDORM4; sẽ trình migration cụ thể để Vy duyệt. Các nhánh sửa UI lịch Sale/khung phòng trước vẫn riêng, chưa tự ghép code Claude.
+D-045 có code trên `feat/customer-viewing-confirmation` từ origin/main `45c63f7`, worktree riêng `D:\HomeStayDorm-ui-small-fixes`: trang lịch khách theo ảnh, API xác nhận đúng phiên bản, reset khi đổi giờ, chặn Đã xem/Khách không đến tới khi khách xác nhận. Build + avalanche UI qua; backend 61 pass/4 skip SQL, blockchain local 25 pass/1 skip; SQL D-045 riêng 1 pass trên DB tạm tự xóa, đã thử migration hai lần/race/quyền/guard. UI fixture qua 1440/390 với 18 ảnh `.ui-screens/customer-viewing-confirmation/`, C5-a có thêm ca chưa xác nhận và vẫn giữ đổi/hủy/ghi kết quả. Không phải nghiệm thu A3/Fuji hay xác nhận trên hồ sơ thật.
+
+**Đã migrate (J-C086, 2026-11-14 15:53:57 +07:00):** Vy cho chạy `viewing-confirmation:db:migrate` lên HOMEDORM4; đã chạy, `ready:true` (3 cột PhienBanLich/KhachXacNhanPhienBan/ThoiGianKhachXacNhan, SP xác nhận, trigger đổi giờ, guard ghi kết quả). 3 lịch có sẵn giữ nguyên, chưa ai xác nhận. Còn lại: khách tự đăng nhập và bấm xác nhận để nghiệm thu thật; Claude đã commit/push hộ code D-045 của Codex theo ý Vy.
+
+**Bản xem thống nhất của Codex:** `http://localhost:5199`, backend riêng 5002 (scheduler tắt). Đã đưa code UI của chính Codex từ J-X079/J-X080 vào nhánh D-045: khung phòng rộng 320px, danh sách dưới lịch Sale, thẻ 24h/tiến trình bên phải và bước xác nhận mới. Không merge main/nhánh Claude, không đổi frontend Claude 5173 hoặc backend đang dùng của Claude. Các nhánh UI cũ vẫn có trên remote; nhánh D-045 đã chứa phần code UI đó để Vy review cùng nhau.
 
 C4 đã merge PR #10/#11 và migrate HOMEDORM4 (J-C069/J-C070). Bản vá bổ sung `fix/c4-refund-before-close` gỡ điều kiện danh sách hoàn cọc đòi hợp đồng đã thanh lý (D-041); backend 53 pass/3 skip, SQL C4 riêng 1/1 trên CSDL tạm, blockchain 25 pass/1 skip, build và avalanche UI qua. Chưa áp dụng phần SP bổ sung lên HOMEDORM4; chờ Vy duyệt và cho phép. Chưa nghiệm thu C4 bằng hồ sơ thật.
 

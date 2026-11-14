@@ -17,6 +17,8 @@
     "checkout-photos:db:migrate": "node scripts/checkout-photos-db.mjs",
     "viewing-status:db:check": "node scripts/viewing-status-db.mjs check",
     "viewing-status:db:migrate": "node scripts/viewing-status-db.mjs migrate",
+    "viewing-confirmation:db:check": "node scripts/viewing-confirmation-db.mjs check",
+    "viewing-confirmation:db:migrate": "node scripts/viewing-confirmation-db.mjs migrate",
     "checkout-lifecycle:db:check": "node scripts/checkout-lifecycle-db.mjs check",
     "checkout-lifecycle:db:migrate": "node scripts/checkout-lifecycle-db.mjs migrate",
     "settlement-topup:db:migrate": "node scripts/settlement-topup-db.mjs",

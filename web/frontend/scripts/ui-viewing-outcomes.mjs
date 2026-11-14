@@ -19,8 +19,8 @@ try {
   for(const width of [1440,390]) {
     const user={maNguoiDung:'NV0001',vaiTro:'NhanVien',chucVu:'Sale',hoTen:'Sale kiểm thử',maChiNhanh:'CN0001'};
     const past=new Date(Date.now()-3600000).toISOString(), future=new Date(Date.now()+86400000).toISOString();
-    const schedules=[1,2,3,4].map(n=>({id:`DK000${n}-1`,maDangKy:`DK000${n}`,hoTenKhach:`Khách thử ${n}`,danhSachPhong:'Phòng thử',
-      thoiGianHen:n===3?future:past,trangThai:'Chờ xem',coTheHuy:false,coTheGhiNhanKetQua:[1,4].includes(n)}));
+    const schedules=[1,2,3,4,5].map(n=>({id:`DK000${n}-1`,maDangKy:`DK000${n}`,hoTenKhach:`Khách thử ${n}`,danhSachPhong:'Phòng thử',
+      thoiGianHen:n===3?future:past,trangThai:'Chờ xem',coTheHuy:false,coTheGhiNhanKetQua:[1,4,5].includes(n),khachDaXacNhanLich:[1,4].includes(n)}));
     let fail=true; const writes=[],errors=[];
     const context=await browser.newContext({viewport:{width,height:1000}});
     await context.addInitScript(user=>localStorage.setItem('happyroom_session',JSON.stringify({_v:2,token:'fixture-only',user})),user);
@@ -50,11 +50,13 @@ try {
       assert.deepEqual(errors,[]);
       await page.screenshot({path:resolve(directory,`${name}-${width}.png`),fullPage:true});
     };
-    for(const n of [2,3]) {
+    for(const n of [2,3,5]) {
       await choose(n);
       assert.equal(await page.getByRole('button',{name:'Đã xem',exact:true}).isDisabled(),true);
       assert.equal(await page.getByRole('button',{name:'Khách không đến',exact:true}).isDisabled(),true);
     }
+    await page.getByText('Chờ khách xác nhận lịch hiện tại. Chưa thể ghi Đã xem hoặc Khách không đến.',{exact:true}).waitFor();
+    await shot('unconfirmed');
     await choose(1);await page.getByRole('button',{name:'Đã xem',exact:true}).click();
     await page.getByLabel('Ghi chú buổi xem').fill('Đã thực hiện buổi xem thử.');
     await page.getByRole('button',{name:'Xác nhận Đã xem',exact:true}).click();

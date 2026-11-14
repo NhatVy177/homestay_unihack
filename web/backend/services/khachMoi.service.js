@@ -4,6 +4,7 @@ import { isUnderAdultAge } from './customerAgeRules.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as phieuTraPhongRepository from '../repositories/phieuTraPhong.repository.js';
 import { getPaymentAccount } from '../config/payment.js';
+import { attachViewingConfirmations } from './viewingConfirmation.service.js';
 
 function requireCustomer(user) {
   if (!user || user.vaiTro !== 'KhachHang') {
@@ -297,7 +298,7 @@ export async function getTongQuan(user) {
   const trangThai = await assertNewCustomer(khachHangId);
   const [hoSo, lichXem, phongGoiY] = await Promise.all([
     getProfiles(khachHangId),
-    getSchedules(khachHangId),
+    getSchedules(khachHangId).then(attachViewingConfirmations),
     getAvailableRooms()
   ]);
 

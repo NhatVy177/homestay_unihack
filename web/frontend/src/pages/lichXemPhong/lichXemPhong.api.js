@@ -5,5 +5,6 @@ export const lichXemPhongApi = {
   getPhongPhuHop: (maDangKy) => httpClient.get('/lich-xem-phong/phong-phu-hop', { params: { maDangKy } }),
   create: (data) => httpClient.post('/lich-xem-phong', data),
   yeuCauDieuChinh: (id, data) => httpClient.put(`/lich-xem-phong/${id}/yeu-cau-dieu-chinh`, data),
-  capNhat: (id, data) => httpClient.put(`/lich-xem-phong/${id}/cap-nhat`, data)
+  capNhat: (id, data) => httpClient.put(`/lich-xem-phong/${id}/cap-nhat`, data),
+  xacNhan: (id, phienBanLich) => httpClient.put(`/lich-xem-phong/${id}/xac-nhan`, { phienBanLich })
 };

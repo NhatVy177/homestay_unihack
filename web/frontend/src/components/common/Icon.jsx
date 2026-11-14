@@ -2,6 +2,7 @@ import React from 'react';
 
 export function Icon({ name, className = '', style = {} }) {
   const shapes = {
+    call: <path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3.1 5.2 2 2 0 0 1 5.1 3h3a2 2 0 0 1 2 1.7l.4 2.8a2 2 0 0 1-.6 1.7L8.6 10.5a16 16 0 0 0 4.9 4.9l1.3-1.3a2 2 0 0 1 1.7-.6l2.8.4a2 2 0 0 1 1.7 2Z" />,
     dashboard: <><rect x="3" y="3" width="7" height="9" /><rect x="14" y="3" width="7" height="5" /><rect x="14" y="12" width="7" height="9" /><rect x="3" y="16" width="7" height="5" /></>,
     payments: <><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" /><path d="M6 12h.01M18 12h.01" /></>,
     meeting_room: <><path d="M14 19V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v14" /><path d="M22 19H2" /><path d="M10 12h2" /></>,
