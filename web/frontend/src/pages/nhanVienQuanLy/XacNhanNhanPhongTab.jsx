@@ -2,6 +2,7 @@ import OverviewCards from '../../components/common/OverviewCards.jsx';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { datCocApi } from '../datCoc/datCoc.api.js';
+import { moTaCachTinhCoc } from '../../utils/tienCoc.js';
 import ResultModal from '../../components/common/ResultModal.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import SharedStatusBadge from '../../components/common/StatusBadge.jsx';
@@ -307,6 +308,7 @@ export default function XacNhanNhanPhongTab() {
                           <span>Trống: <strong style={{ color: '#191c1d' }}>{selected.soChoTrong ?? 0}</strong> giường</span>
                           <span>Hình thức: <strong>{selected.hinhThucThue || '—'}</strong></span>
                           {selected.danhSachGiuong && <span>Giường đã chọn: <strong>{selected.danhSachGiuong}</strong></span>}
+                          {selected.tienCocDuKien && <span>Tiền cọc dự kiến: <strong>{moTaCachTinhCoc(selected.tienCocDuKien)}</strong></span>}
                         </div>
                       </div>
 

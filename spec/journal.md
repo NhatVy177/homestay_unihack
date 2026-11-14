@@ -1105,3 +1105,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Claude giải thích luồng hiện tại (D-020, D-021, D-023): quản lý duyệt giữ phòng, hệ thống tự tính và lập phiếu, kế toán xác nhận đã nhận tiền. Lý do: kế toán là người có sao kê và quỹ; tách người duyệt phòng với người xác nhận tiền; kế toán đã đối chiếu số tiền khi xác nhận; sai số thường do dữ liệu giá, kế toán lập tay cũng không bắt được.
 - **Đề xuất (chưa chốt):** giữ luồng, thêm hiển thị cách tính tiền cọc trên phiếu và màn duyệt của quản lý.
 - Câu hỏi mở: Vy chọn giữ luồng + hiện cách tính, hay đổi sang kế toán lập hóa đơn và quản lý xác nhận tiền (sẽ cần D mới thay D-021/D-023).
+
+## 2026-11-15 00:29:56 +07:00 — J-C102 — Giữ luồng duyệt cọc; hiện cách tính tiền cọc
+- Người thực hiện: Claude. Trả lời câu hỏi mở J-C101: Vy chọn **giữ luồng** (quản lý duyệt giữ phòng, hệ thống tự tính và lập phiếu, kế toán xác nhận đã nhận tiền; giữ D-020, D-021, D-023) và thêm phần hiện cách tính.
+- Công thức lấy đúng trigger `TRG_ChiTietDatCoc_TinhGiaThue_Va_SoTienCoc`: tiền cọc = tổng giá thuê 1 tháng (giá/giường khi ghép, giá nguyên phòng khi thuê nguyên phòng) × 2.
+- File: `web/backend/services/tienCoc.js` (mới: `cachTinhCoc`, `cachTinhCocDuKien`, `SO_THANG_COC`), `services/khachMoi.service.js` (phiếu cọc của khách có `cachTinhCoc`), `services/datCoc.service.js` (hàng đợi duyệt của quản lý có `tienCocDuKien` theo giá loại phòng), `test/tien-coc.test.mjs`; frontend `src/utils/tienCoc.js` (câu diễn giải), `pages/khachHang/KhachHangPortalPage.jsx` + `khachHangPortal.css` (dòng "Cách tính" dưới số tiền ở màn thanh toán cọc), `pages/nhanVienQuanLy/XacNhanNhanPhongTab.jsx` (dòng "Tiền cọc dự kiến"), `scripts/ui-customer-invoices.mjs`.
+- Kiểm tra: backend 80 pass, 4 skip, 0 fail; UI PASS `ui-customer-invoices`, `ui-customer-deposit-history` (fixture). Gọi thật hàng đợi duyệt trên HOMEDORM4 (chỉ đọc): P103 ghép 1 giường → 1.800.000đ × 1 × 2 = 3.600.000đ. Chưa có test giao diện cho màn duyệt của quản lý.
+- Vy hỏi nút "Lưu mẫu" trong ảnh bill: đó là nút của app MoMo nằm trong ảnh chụp giao dịch khách tải lên, không phải chức năng hệ thống; không làm gì.

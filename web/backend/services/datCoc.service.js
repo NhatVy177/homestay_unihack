@@ -1,4 +1,5 @@
-import { executeProcedure, getPool, sql } from '../database/connection.js';
+import { executeProcedure, executeQuery, getPool, sql } from '../database/connection.js';
+import { cachTinhCocDuKien } from './tienCoc.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import { attachPaymentAccount } from '../config/payment.js';
 import { notifyDeposit } from '../integrations/mail/datCocNotifications.js';
@@ -150,11 +151,20 @@ export async function capNhatThongTinCaNhan(maDangKy, data = {}) {
   }
 }
 
-export async function getDanhSachChoXacNhan(maNhanVien) {
-  const result = await executeProcedure('dbo.SP_DanhSachChoXacNhanCoc', [
+export async function getDanhSachChoXacNhan(maNhanVien, { run = executeProcedure, query = executeQuery } = {}) {
+  const result = await run('dbo.SP_DanhSachChoXacNhanCoc', [
     { name: 'MaNhanVien', type: sql.VarChar(6), value: String(maNhanVien || '').trim() }
   ]);
-  return result.recordset;
+  const rows = result.recordset || [];
+  // Hiện cách tính tiền cọc dự kiến để quản lý thấy sai giá trước khi duyệt (J-C102).
+  const rooms = [...new Set(rows.map((row) => row.maPhong).filter(Boolean))];
+  if (!rooms.length) return rows;
+  const prices = await query(`SELECT p.MaPhong AS maPhong, lp.GiaThueTheoGiuong AS giaTheoGiuong, lp.GiaThueNguyenPhong AS giaNguyenPhong
+    FROM dbo.Phong p JOIN dbo.LoaiPhong lp ON lp.MaLoaiPhong = p.MaLoaiPhong
+    WHERE p.MaPhong IN (SELECT LTRIM(RTRIM(value)) FROM STRING_SPLIT(@DanhSachPhong, ','))`,
+  [{ name: 'DanhSachPhong', type: sql.NVarChar(4000), value: rooms.join(',') }]);
+  const byRoom = new Map((prices.recordset || []).map((price) => [price.maPhong, price]));
+  return rows.map((row) => ({ ...row, tienCocDuKien: cachTinhCocDuKien({ ...row, ...(byRoom.get(row.maPhong) || {}) }) }));
 }
 
 export async function xacNhanKhaNangNhanCoc(user, id, data = {}) {

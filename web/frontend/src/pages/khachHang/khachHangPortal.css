@@ -5105,3 +5105,4 @@
 }
 .cinv-table td:nth-child(6) { white-space: nowrap; }
 .dpay-main, .dpay-side { grid-template-columns: minmax(0, 1fr); }
+.dpay-formula { margin: 0; font-size: 13px; opacity: .92; }

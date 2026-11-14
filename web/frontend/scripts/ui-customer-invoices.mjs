@@ -9,6 +9,7 @@ try {
   for (const width of [1440, 390]) {
     const user = { maNguoiDung: 'KH0001', maKhachHang: 'KH0001', hoTen: 'Khách hóa đơn', vaiTro: 'KhachHang' };
     const deposits = [{ maPhieuCoc: 'DC0003', trangThai: 'Chờ thanh toán', soTienCoc: 2800000, thoiHanThanhToan: '2026-11-15T10:00:00.000Z', ngayLapPhieu: '2026-11-14', tenPhong: 'Phòng 101', hinhThucThue: 'Nguyên phòng', phuongThucThanhToan: 'Chuyển khoản', sdtKhachHang: '0900000000',
+      cachTinhCoc: { soThang: 2, dong: [{ donGia: 1400000, soLuong: 1, donVi: 'giường' }], motThang: 1400000, tong: 2800000 },
       taiKhoanThanhToan: { nganHang: 'MB Bank', maNganHang: '970422', soTaiKhoan: '0000000000', chuTaiKhoan: 'TAI KHOAN KIEM THU', vietQr: true } }];
     const invoices = [
       { maHoaDon: 'HD0001', maHopDong: 'HD0001', kyThanhToan: '2026-11', ngayHanTT: '2026-11-20', tongTien: 3000000, trangThai: 'Chưa TT', ngayBatDau: '2026-11-15', loai: 'Kỳ đầu' },
@@ -46,6 +47,7 @@ try {
     await page.getByRole('heading', { name: 'Thanh toán đặt cọc', level: 2 }).waitFor();
     assert.equal(await page.getByRole('button', { name: 'QR chuyển khoản', exact: true }).getAttribute('aria-pressed'), 'true');
     assert.equal(await page.getByRole('button', { name: /ví điện tử \(mô phỏng\)/ }).count(), 1);
+    assert.match(await page.locator('.dpay-formula').innerText(), /1\.400\.000đ\/giường × 1 giường × 2 tháng = 2\.800\.000đ/);
     const qr = page.locator('.vietqr-code img');
     await qr.waitFor();
     const src = await qr.getAttribute('src');

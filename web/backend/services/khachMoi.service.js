@@ -7,6 +7,7 @@ import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as phieuTraPhongRepository from '../repositories/phieuTraPhong.repository.js';
 import { getPaymentAccount } from '../config/payment.js';
 import { attachViewingConfirmations } from './viewingConfirmation.service.js';
+import { cachTinhCoc } from './tienCoc.js';
 
 function requireCustomer(user) {
   if (!user || user.vaiTro !== 'KhachHang') {
@@ -972,6 +973,7 @@ export async function getDatCoc(user) {
       ...deposit,
       taiKhoanThanhToan,
       phongDatCoc,
+      cachTinhCoc: cachTinhCoc(phongDatCoc),
       taiSan: phongDatCoc.flatMap((room) => room.taiSan || []),
       quyDinh,
       urlImg: deposit.urlImg || phongDatCoc[0]?.urlImg || null,

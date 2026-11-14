@@ -15,6 +15,7 @@ import ThuNhanPhongWalletCard from './ThuNhanPhongWalletCard.jsx';
 import CustomerInvoicesList from './CustomerInvoicesList.jsx';
 import CustomerDepositHistory from './CustomerDepositHistory.jsx';
 import VietQrCode from '../../components/common/VietQrCode.jsx';
+import { moTaCachTinhCoc } from '../../utils/tienCoc.js';
 import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Claude), one line agreed with Vy
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
@@ -3821,6 +3822,7 @@ export default function KhachHangPortalPage() {
             <section className="dpay-amount">
               <span>Số tiền đặt cọc</span>
               <strong>{amount.toLocaleString('vi-VN')} VNĐ</strong>
+              {phieu.cachTinhCoc && <p className="dpay-formula">Cách tính: {moTaCachTinhCoc(phieu.cachTinhCoc)}</p>}
               {phieu.thoiHanThanhToan && <p className="dpay-pill"><Icon name="schedule" /> Thời hạn thanh toán: {formatDate(phieu.thoiHanThanhToan, true)}</p>}
             </section>
             <section className="dc-section-card dpay-room">
