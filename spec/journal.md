@@ -1029,3 +1029,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Sale: `nhanVienSale/LichXemPhongTab.jsx` (tiêu đề "Tiến trình lịch hẹn" + mã lịch, mục "Thao tác"; lịch đã kết thúc chỉ còn nút "Lập lịch xem phòng mới" khi phiếu không còn lịch đang chờ, các nút Đổi lịch/Hủy lịch/ghi kết quả được ẩn thay vì mờ), `nhanVienSale/SaleNewViewingModal.jsx` (bọc `LapLichChoHoSo` trong hộp thoại), `styles/saleAppointmentLayout.css`; sửa kỳ vọng ở `ui-viewing-outcomes`, `ui-sale-calendar-layout`, `ui-sale-workspace`.
 - Kiểm tra: backend `npm test` 71 pass, 4 skip, 0 fail; UI PASS: `ui-customer-deposit-request`, `ui-customer-viewing-confirmation`, `ui-viewing-outcomes`, `ui-sale-calendar-layout`, `ui-sale-workspace` (fixture API, không ghi DB). Chưa kiểm thử tự động hộp thoại "Lập lịch xem phòng mới" của Sale và chưa chạy thật yêu cầu giữ chỗ của khách trên HOMEDORM4.
 - Việc còn lại: Vy thử tay hai luồng; quản lý duyệt yêu cầu giữ chỗ ở tab Đặt cọc như D-026.
+
+## 2026-11-14 22:50:00 +07:00 — J-C091 — Nút "Tôi muốn đặt cọc" đổi sang màu nâu theo ảnh mẫu; rà tab "Cả phòng / Giường lẻ / Nhóm" của nhóm Hằng
+- Người thực hiện: Claude. Vy gửi ảnh mẫu: nút đặt cọc màu nâu; trang "Kiểm duyệt đặt cọc" của quản lý có tab Tất cả loại / Cả phòng / Giường lẻ / Nhóm, kèm câu hỏi có cần mọi thành viên nhóm có tài khoản không.
+- File: `web/frontend/src/pages/lichXemPhong/customerViewingSchedule.css` (`.customer-deposit-cta`, nâu #76634a, chữ trắng, tương phản ~5,7:1).
+- Rà code nhóm Hằng (`apps/frontend/src/features/manager/ManagerDepositsPage.tsx`): các tab là bộ lọc theo `deposit_type` (`room` = cả phòng, `bed` = giường lẻ, `group` = nhiều giường trong một phiếu). Chưa đổi gì ở màn quản lý của HomeStayDorm; chờ Vy chọn (xem câu hỏi trả lời ở phiên).
+- Chưa kiểm thử tự động riêng cho đổi màu.

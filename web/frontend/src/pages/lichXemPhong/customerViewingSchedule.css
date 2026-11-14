@@ -103,6 +103,8 @@
 }
 
 .customer-deposit-cta { width: 100%; justify-content: center; }
+.customer-deposit-cta.ui-btn--primary { background: #76634a; border-color: #76634a; color: #fff; }
+.customer-deposit-cta.ui-btn--primary:hover:not(:disabled) { background: #5f4f3a; border-color: #5f4f3a; }
 .customer-deposit-form { display: grid; gap: var(--space-4, 16px); }
 .customer-deposit-form fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
 .customer-deposit-form legend { font-weight: 700; margin-bottom: 8px; }
