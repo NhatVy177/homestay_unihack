@@ -1062,3 +1062,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `web/backend/config/payment.js` (cờ `hienSoTienQr` từ `PAYMENT_VIETQR_HIEN_SO_TIEN`, mặc định bật), `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (`getPaymentAccount` nhận `hienSoTienQr`), `web/frontend/src/components/common/VietQrCode.jsx` (bỏ tham số `amount` khi tắt; chú thích tương ứng), `web/backend/.env.example`. `web/backend/.env` của worktree đã đặt `PAYMENT_VIETQR_HIEN_SO_TIEN=false` (không commit); backend đã khởi động lại để nạp.
 - Đánh đổi: khi tắt, khách có thể nhập sai số tiền; kế toán vẫn đối chiếu chứng từ như D-023. Chỉ nên tắt khi demo. Bật lại: bỏ dòng hoặc đặt `true`, rồi khởi động lại backend.
 - Kiểm tra: `ui-customer-invoices` PASS; đã gọi thử img.vietqr.io với QR không số tiền (trả 200). Chưa quét thử bằng MoMo.
+
+## 2026-11-15 00:25:00 +07:00 — J-C096 — Đính chính J-C095: cờ tắt số tiền QR chưa được nạp
+- Người thực hiện: Claude. Lý do: Vy báo quét QR mới vẫn bị khóa số tiền.
+- Nguyên nhân: script ghi cấu hình chạy trong thư mục `web` nên đã ghi nhầm `PAYMENT_VIETQR_HIEN_SO_TIEN=false` vào `web/.env` và `web/.env.example` (hai file này do script tạo mới, nội dung chỉ có đúng dòng đó, đã xóa). `web/backend/.env` và `.env.example` không có dòng nào, nên backend vẫn kèm số tiền.
+- Sửa: thêm `PAYMENT_VIETQR_HIEN_SO_TIEN=false` vào `web/backend/.env` (không commit), thêm dòng `true` có chú thích vào `web/backend/.env.example`; khởi động lại backend; kiểm tra `getPaymentAccount().hienSoTienQr` trả `false`. Code frontend không đổi.
+- Kiểm tra: `ui-customer-invoices` PASS sau build. Chưa quét lại bằng MoMo.
+- Việc còn lại: Vy tải lại trang (Ctrl+F5), quét QR mới rồi báo kết quả.
