@@ -1,6 +1,7 @@
 import { executeProcedure, sql } from '../database/connection.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import { ensureViewingConfirmationReady } from './viewingConfirmation.service.js';
+import { boQuaGioHenKhiDemo } from './demoMode.js';
 
 const outcomes = { 'da-xem': 'Đã xem', 'khach-khong-den': 'Khách không đến' };
 
@@ -27,6 +28,7 @@ export async function ghiNhanKetQuaBuoiXem(id, data, user, run = executeProcedur
       { name: 'STTLich', type: sql.Int, value: Number(match[2]) },
       { name: 'KetQua', type: sql.NVarChar(30), value: outcome },
       { name: 'GhiChu', type: sql.NVarChar(500), value: note?.trim() || null },
+      ...(boQuaGioHenKhiDemo() ? [{ name: 'BoQuaGioHen', type: sql.Bit, value: true }] : []),
     ]);
     return result.recordset[0];
   } catch (error) {

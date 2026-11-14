@@ -1,5 +1,6 @@
 import { executeProcedure, executeQuery, getPool, sql } from '../database/connection.js';
 import { createServiceError } from '../errors/serviceErrors.js';
+import { boQuaGioHenKhiDemo } from '../services/demoMode.js';
 
 function normalizeText(value) {
   return String(value || '').trim().toLocaleLowerCase('vi-VN');
@@ -197,7 +198,7 @@ export async function layDanhSachLichXemPhong(filter = {}) {
       END AS BIT) AS coTheHuy,
       CAST(CASE
         WHEN lxp.TrangThai IN (N'Chờ xem', N'Yêu cầu đổi lịch', N'Yêu cầu hủy')
-          AND lxp.ThoiGianHen <= GETDATE()
+          AND ${boQuaGioHenKhiDemo() ? '1 = 1' : 'lxp.ThoiGianHen <= GETDATE()'}
           AND pdk.TrangThai = N'Đã tiếp nhận'
           AND pdk.MaNhanVienSale = @NhanVienSaleId
           AND MIN(p.MaChiNhanh) = @MaChiNhanh AND MAX(p.MaChiNhanh) = @MaChiNhanh
