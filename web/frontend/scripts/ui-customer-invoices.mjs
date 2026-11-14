@@ -30,11 +30,11 @@ try {
     });
     const page = await ctx.newPage(); page.on('pageerror', (e) => errors.push(e.message));
     await page.goto(`${base}/khach-hang?tab=dat-coc`, { waitUntil: 'domcontentloaded' });
-    await page.getByRole('heading', { name: 'Hóa đơn & thanh toán', level: 2 }).waitFor();
+    await page.getByRole('heading', { name: 'Hóa đơn của tôi', level: 2 }).waitFor();
     const rows = page.locator('.cinv-table tbody tr');
     await rows.first().waitFor();
     assert.equal(await rows.count(), 4, 'phiếu cọc + 3 hóa đơn các kỳ');
-    assert.match(await page.locator('.cinv-cards').innerText(), /03\s*khoản/, 'chưa thanh toán = cọc + kỳ đầu + kỳ nợ');
+    assert.match(await page.locator('.cinv-cards').innerText(), /03\s*Hóa đơn/, 'chưa trả = cọc + kỳ đầu + kỳ nợ');
     await page.screenshot({ path: `${folder}/list-${width}.png`, fullPage: true });
     await page.getByRole('button', { name: 'Quá hạn', exact: true }).click();
     assert.equal(await rows.count(), 1); assert.match(await rows.first().innerText(), /HD0003/);
@@ -54,7 +54,7 @@ try {
     await page.waitForFunction(() => { const img = document.querySelector('.vietqr-code img'); return !img || img.complete; });
     await page.screenshot({ path: `${folder}/deposit-${width}.png`, fullPage: true });
     await page.getByRole('button', { name: /Quay lại danh sách/ }).click();
-    await page.getByRole('heading', { name: 'Hóa đơn & thanh toán', level: 2 }).waitFor();
+    await page.getByRole('heading', { name: 'Hóa đơn của tôi', level: 2 }).waitFor();
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width);
     assert.deepEqual(errors, []);
     await ctx.close();

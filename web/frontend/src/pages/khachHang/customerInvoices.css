@@ -27,3 +27,11 @@
   .cinv-table td { border: 0; padding: 4px 0; display: flex; justify-content: space-between; gap: 12px; }
   .cinv-table td::before { content: attr(data-label); color: var(--color-text-muted); font-size: 12px; text-transform: uppercase; }
 }
+.cinv-status { display: inline-flex; align-items: center; justify-content: center; min-width: 104px; height: 28px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.cinv-status--paid { background: rgba(47, 122, 78, .15); color: #2f7a4e; }
+.cinv-status--unpaid { background: rgba(200, 140, 40, .15); color: #8a5a10; }
+.cinv-status--pending { background: #faf2e8; border: 1px solid #e7ded2; color: #8a5a10; }
+.cinv-status--overdue { background: rgba(179, 38, 30, .12); color: #a3271f; }
+.cinv-cards strong.is-danger { color: #b3261e; }
+.cinv-actions .ui-btn { white-space: nowrap; }
+.cinv-table td:nth-child(2), .cinv-table td:nth-child(4), .cinv-table td:nth-child(5) { white-space: nowrap; }

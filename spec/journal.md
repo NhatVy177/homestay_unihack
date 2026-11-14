@@ -1083,3 +1083,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Thay đổi: `submitMinhChung` đóng chi tiết phiếu sau khi gửi thành công và cuộn lên đầu; ô trạng thái trong bảng không xuống dòng.
 - Chưa làm: tab "Lịch sử đặt cọc" riêng. Hiện danh sách hóa đơn và phiếu cọc gộp trong một tab, nên chưa tách. Ảnh mẫu "Hóa đơn của tôi" (mã HD-HDTT, loại "Hoàn cọc") không có trong repo này; chưa rõ đó là ứng dụng nào.
 - Kiểm tra: build OK; `ui-customer-invoices` PASS (fixture API).
+
+## 2026-11-15 11:05:00 +07:00 — J-C099 — Tab "Hóa đơn của tôi" khớp mẫu nhóm (InvoicesDashboardPage.tsx)
+- Người thực hiện: Claude. Lý do: Vy xác nhận ảnh "Hóa đơn của tôi" là tab hóa đơn và thanh toán cần giống, và sau khi thanh toán quay lại phải hiện đúng như vậy.
+- Mẫu: `D:\Nam4\Contest\Homestay-Dorm\apps\frontend\src\features\customer\InvoicesDashboardPage.tsx` và `components/InvoiceTable.tsx` (không phải repo này).
+- Thay đổi: tiêu đề và mô tả như mẫu; 4 thẻ "Hóa đơn chưa trả / Tổng chi phí tháng N / Hạn thanh toán gần nhất / Hóa đơn quá hạn" tính trên toàn bộ khoản; bộ lọc "Tất cả các tháng / Tất cả năm / Tất cả loại" với nhãn loại như mẫu; nhãn trạng thái "Đã thanh toán / Chờ thanh toán / Chờ xác nhận / Quá hạn"; phiếu cọc đã gửi chứng từ là "Chờ xác nhận" (không đếm vào "chưa trả", chỉ hiện khi lọc "Chưa thanh toán"); hóa đơn kỳ đầu là "Nhận phòng", hàng tháng là "Định kỳ".
+- File: `web/frontend/src/pages/khachHang/CustomerInvoicesList.jsx`, `customerInvoices.css`, `scripts/ui-customer-invoices.mjs`.
+- Chưa có: loại "Hoàn cọc" (hoàn tiền cọc khi trả phòng) chưa có trong dữ liệu; các loại "Dịch vụ", "Phát sinh" chưa có nguồn.
+- Kiểm tra: build OK; `ui-customer-invoices` PASS ở 1440/390 (fixture API); đã xem ảnh 1440.
