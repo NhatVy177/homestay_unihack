@@ -1,6 +1,6 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-14 23:10:00 +07:00** (J-C092: D-046 thư mời thành viên cư trú; trước đó J-C090: khách tự gửi giữ chỗ "Tôi muốn đặt cọc", Sale "Lập lịch xem phòng mới"; D-045 đã migrate và gộp ở `integration/d043-d045`). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-14 23:45:21 +07:00** (J-C093: tab khách "Hóa đơn & thanh toán" nhiều kỳ; J-C092: D-046 thư mời thành viên cư trú; trước đó J-C090: khách tự gửi giữ chỗ "Tôi muốn đặt cọc", Sale "Lập lịch xem phòng mới"; D-045 đã migrate và gộp ở `integration/d043-d045`). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
 

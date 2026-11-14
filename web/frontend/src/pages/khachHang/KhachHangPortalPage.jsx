@@ -12,6 +12,7 @@ import './khachHangPortal.css';
 import LichXemPhongPage from '../lichXemPhong/LichXemPhongPage.jsx';
 import { httpClient } from '../../api/httpClient.js';
 import ThuNhanPhongWalletCard from './ThuNhanPhongWalletCard.jsx';
+import CustomerInvoicesList from './CustomerInvoicesList.jsx';
 import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Claude), one line agreed with Vy
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
@@ -692,7 +693,7 @@ function getNavLocks(state = {}) {
 function getLockedMessage(tab) {
   const messages = {
     'lich-xem': 'Lịch xem phòng sẽ mở khi nhân viên tạo lịch xem cho hồ sơ của bạn.',
-    'dat-coc': 'Đặt cọc sẽ mở khi hồ sơ được duyệt và có phiếu đặt cọc.',
+    'dat-coc': 'Hóa đơn & thanh toán sẽ mở khi hồ sơ được duyệt và có phiếu đặt cọc.',
     'hop-dong': 'Hợp đồng sẽ mở sau khi bạn hoàn tất đặt cọc và ký hợp đồng.',
     'tra-phong': 'Chức năng trả phòng sẽ mở sau khi bạn đã đặt cọc hoặc ký hợp đồng.'
   };
@@ -1007,6 +1008,10 @@ export default function KhachHangPortalPage() {
   const [datCocList, setDatCocList] = useState(null);
   const [datCocLoading, setDatCocLoading] = useState(false);
   const [datCocSelected, setDatCocSelected] = useState(null);
+  // Tab "Hóa đơn & thanh toán": mặc định hiện danh sách; chỉ mở chi tiết phiếu cọc khi bấm vào một dòng hoặc có ?phieu= trên link.
+  const [depositDetailOpen, setDepositDetailOpen] = useState(() => Boolean(new URLSearchParams(window.location.search).get('phieu')));
+  const [invoices, setInvoices] = useState(null);
+  const [invoicesError, setInvoicesError] = useState('');
   const [depositClock, setDepositClock] = useState(Date.now());
   useEffect(() => {
     if (activeTab !== 'dat-coc') return undefined;
@@ -1084,7 +1089,7 @@ export default function KhachHangPortalPage() {
     { id: 'kham-pha', icon: 'search', title: 'Khám phá phòng' },
     { id: 'ho-so', icon: 'description', title: 'Hồ sơ đăng ký' },
     { id: 'lich-xem', icon: 'event_note', title: 'Lịch xem phòng' },
-    { id: 'dat-coc', icon: 'payments', title: 'Đặt cọc' },
+    { id: 'dat-coc', icon: 'payments', title: 'Hóa đơn & thanh toán' },
     { id: 'hop-dong', icon: 'article', title: 'Hợp đồng' },
     { id: 'tra-phong', icon: 'logout', title: 'Trả phòng' }
   ];
@@ -1130,6 +1135,10 @@ export default function KhachHangPortalPage() {
   useEffect(() => {
     if ((activeTab === 'dat-coc' || activeTab === 'tra-phong') && !datCocList && !datCocLoading) {
       loadDatCoc();
+    }
+    if (activeTab === 'dat-coc' && invoices === null) {
+      khachMoiApi.getHoaDon().then(({ data }) => setInvoices(Array.isArray(data) ? data : []))
+        .catch(() => { setInvoices([]); setInvoicesError('Chưa tải được hóa đơn các kỳ. Phiếu cọc vẫn hiển thị bình thường.'); });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, datCocList, datCocLoading]);
@@ -3990,8 +3999,15 @@ export default function KhachHangPortalPage() {
   }
 
   function renderDatCoc() {
-    if (datCocSelected) return renderDatCocDetail(datCocSelected);
-    return renderDatCocList();
+    if (locks['dat-coc']) return renderLocked('dat-coc');
+    if (depositDetailOpen && datCocSelected) return <>
+      <button type="button" className="ui-btn ui-btn--secondary cinv-back" onClick={() => setDepositDetailOpen(false)}><Icon name="arrow_back" /> Quay lại danh sách</button>
+      {renderDatCocDetail(datCocSelected)}
+    </>;
+    return <CustomerInvoicesList deposits={datCocList || []} invoices={invoices || []} loading={datCocLoading || invoices === null || datCocList === null}
+      error={invoicesError}
+      onOpenDeposit={(phieu) => { setDatCocSelected(phieu); setDepositDetailOpen(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+      onOpenContract={(maHopDong) => { goTo('hop-dong'); window.history.replaceState(null, '', `?tab=hop-dong&hopDong=${encodeURIComponent(maHopDong)}`); }} />;
   }
 
   function renderRentRequestPage() {

@@ -164,3 +164,8 @@ export async function goPhongQuanTam(req, res, next) {
     next(error);
   }
 }
+
+import { getHoaDonCuaKhach } from '../services/khachHoaDon.service.js';
+export async function getHoaDon(req, res, next) {
+  try { res.json(await getHoaDonCuaKhach(req.user)); } catch (error) { next(error); }
+}

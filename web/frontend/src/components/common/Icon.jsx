@@ -6,6 +6,7 @@ export function Icon({ name, className = '', style = {} }) {
     dashboard: <><rect x="3" y="3" width="7" height="9" /><rect x="14" y="3" width="7" height="5" /><rect x="14" y="12" width="7" height="9" /><rect x="3" y="16" width="7" height="5" /></>,
     payments: <><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" /><path d="M6 12h.01M18 12h.01" /></>,
     meeting_room: <><path d="M14 19V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v14" /><path d="M22 19H2" /><path d="M10 12h2" /></>,
+    visibility: <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></>,
     receipt_long: <><path d="M14 2H6a2 2 0 0 0-2 2v16l2-2 2 2 2-2 2 2 2-2 2 2V4a2 2 0 0 0-2-2Z" /><path d="M8 6h4M8 10h8M8 14h8" /></>,
     account_balance_wallet: <><path d="M19 5H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z" /><path d="M16 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" /></>,
     search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4 4" /></>,

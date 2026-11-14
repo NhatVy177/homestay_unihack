@@ -14,6 +14,7 @@ export const khachMoiApi = {
   updateHoSo: (id, data) => httpClient.put(`/khach-moi/ho-so/${id}`, data),
   yeuCauDieuChinhLich: (id, data) => httpClient.put(`/khach-moi/lich-xem/${id}/yeu-cau-dieu-chinh`, data),
   getDatCoc: () => httpClient.get('/khach-moi/dat-coc'),
+  getHoaDon: () => httpClient.get('/khach-moi/hoa-don'),
   uploadMinhChung: (id, data) => httpClient.post(`/khach-moi/dat-coc/${id}/minh-chung`, data),
   getHopDongDashboard: (params = {}) => httpClient.get('/khach-moi/hop-dong-dashboard', { params }),
   guiYeuCauTraPhong: (data) => httpClient.post('/khach-moi/hop-dong-dashboard/tra-phong', data),

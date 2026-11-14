@@ -1,0 +1,29 @@
+.cinv-page { display: grid; gap: var(--space-5, 20px); }
+.cinv-head h2 { margin: 0 0 4px; font-size: 28px; color: var(--color-primary); }
+.cinv-head p { margin: 0; color: var(--color-text-muted); }
+.cinv-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4, 16px); }
+.cinv-cards .ui-card { display: grid; gap: 6px; padding: 20px; align-content: start; }
+.cinv-cards small { color: var(--color-text-muted); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; font-size: 12px; }
+.cinv-cards strong { font-size: 24px; color: var(--color-text); }
+.cinv-cards strong em { font-size: 14px; font-style: normal; color: var(--color-text-muted); font-weight: 500; }
+.cinv-icon { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--color-surface-alt, #eef0ea); color: var(--color-primary); }
+.cinv-filters { display: grid; gap: var(--space-3, 12px); padding: 16px 20px; }
+.cinv-selects { display: flex; flex-wrap: wrap; gap: 12px; }
+.cinv-selects select { min-height: 44px; padding: 0 16px; border: 1px solid var(--color-border); border-radius: 999px; background: var(--color-surface); color: var(--color-text); font: inherit; }
+.cinv-table-wrap { padding: 0; overflow-x: auto; }
+.cinv-table { width: 100%; border-collapse: collapse; }
+.cinv-table th { text-align: left; padding: 14px 16px; background: var(--color-surface-alt, #f1f3ee); color: var(--color-text-muted); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.cinv-table td { padding: 14px 16px; border-top: 1px solid var(--color-border); vertical-align: middle; }
+.cinv-type { display: inline-block; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--color-border); font-size: 13px; background: var(--color-surface); }
+.cinv-type--deposit { background: #f7efe3; border-color: #e6d5ba; color: #6b5233; }
+.cinv-actions { display: flex; align-items: center; gap: 8px; }
+@media (max-width: 1000px) { .cinv-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 720px) {
+  .cinv-cards { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cinv-cards .ui-card { padding: 14px; }
+  .cinv-table thead { display: none; }
+  .cinv-table, .cinv-table tbody, .cinv-table tr, .cinv-table td { display: block; width: 100%; }
+  .cinv-table tr { padding: 12px 16px; border-top: 1px solid var(--color-border); }
+  .cinv-table td { border: 0; padding: 4px 0; display: flex; justify-content: space-between; gap: 12px; }
+  .cinv-table td::before { content: attr(data-label); color: var(--color-text-muted); font-size: 12px; text-transform: uppercase; }
+}
