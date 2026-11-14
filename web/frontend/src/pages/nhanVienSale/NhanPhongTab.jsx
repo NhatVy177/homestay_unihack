@@ -630,8 +630,8 @@ export default function NhanPhongTab() {
                         />
                       </label>
                       <label style={{ gridColumn: 'span 2' }}>
-                        Email
-                        <input className="ktp-input" value={member.email} readOnly={isViewOnly} onChange={(event) => !isViewOnly && updateMember(index, 'email', event.target.value)} />
+                        Email (không bắt buộc, dùng để mời tạo tài khoản)
+                        <input className="ktp-input" type="email" value={member.email} readOnly={isViewOnly} onChange={(event) => !isViewOnly && updateMember(index, 'email', event.target.value)} />
                       </label>
                       <label>
                         Quốc tịch

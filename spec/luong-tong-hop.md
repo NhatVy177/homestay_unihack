@@ -118,6 +118,7 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
 5. **Người đại diện bị loại:** gửi **email mời** người khác tạo tài khoản để làm đại diện. Làm **sau cùng**; tạm thời Sale lập hồ sơ mới.
 6. **CCCD gốc** được đối chiếu **một lần duy nhất, lúc ký hợp đồng giấy** (giai đoạn 5), bằng ô tích bắt buộc.
 7. *(D-038)* Khi khai người ở, người đại diện **bắt buộc tích ô xác nhận** các thành viên đồng ý cung cấp thông tin để làm thủ tục thuê và đăng ký tạm trú. CCCD không vào gói bằng chứng, không lên chuỗi.
+8. *(D-046)* Thành viên cùng ở **không bắt buộc có tài khoản**. Ô email của thành viên là tùy chọn; sau khi quản lý duyệt cư trú, thành viên được duyệt có email mà chưa có tài khoản nhận thư mời tạo tài khoản (một lần, không bắt buộc). Người đại diện vẫn là người duy nhất chịu trách nhiệm cọc và ký xác nhận.
 
 ### 3.5 Giai đoạn 5: Hợp đồng và kỳ đầu, "một lần đến" (D-027, D-024, D-018)
 

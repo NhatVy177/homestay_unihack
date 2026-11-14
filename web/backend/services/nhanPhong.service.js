@@ -3,7 +3,7 @@ import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as thuNhanPhongRepository from '../repositories/thuNhanPhong.repository.js';
 import * as banGiaoRepository from '../repositories/banGiao.repository.js';
 import * as cuTruRepository from '../repositories/cuTru.repository.js';
-import { notifyNhanPhong } from '../integrations/mail/nhanPhongNotifications.js';
+import { notifyNhanPhong, notifyMemberInvites } from '../integrations/mail/nhanPhongNotifications.js';
 import {
   HopDongBanGiaoDTO,
   KetQuaLapBienBanBanGiaoDTO,
@@ -83,6 +83,9 @@ function requireValidMembers(members = []) {
     const normalized = normalizeMember(member);
     if (!normalized.hoTen || !normalized.cccd || !normalized.gioiTinh) {
       throw createServiceError(`Thành viên dòng ${index + 1} thiếu họ tên, CCCD hoặc giới tính.`);
+    }
+    if (normalized.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized.email)) {
+      throw createServiceError(`Email của thành viên dòng ${index + 1} không đúng định dạng.`);
     }
     return normalized;
   });
@@ -224,6 +227,7 @@ export async function duyetHoSoCuTru(data = {}) {
     });
     if (result.thanhVien.some(item => item.TrangThai === 'Bị từ chối'))
       await notifyNhanPhong('member-rejected', maHoSoCuTru);
+    if (ketQua === 'Đã duyệt cư trú') await notifyMemberInvites(maHoSoCuTru);
     return result;
   } catch (error) {
     handleDatabaseError(error);

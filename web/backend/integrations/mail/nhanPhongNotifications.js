@@ -137,4 +137,59 @@ export function createNhanPhongNotifier({ residence = loadResidence, contract = 
   };
 }
 
+// D-046 (đề xuất, Vy chọn "ô email tùy chọn + thư mời"): thành viên cư trú đã được duyệt và có email mà chưa có
+// tài khoản thì nhận thư mời tạo tài khoản. Không bắt buộc; người đại diện vẫn là người chịu trách nhiệm cọc/ký.
+export async function loadInviteMembers(id, query = executeQuery) {
+  const result = await query(`SELECT tv.MaThanhVien AS memberId, tv.HoTen AS memberName, tv.Email AS memberEmail,
+      nd.HoTen AS customerName
+    FROM dbo.ThanhVienHopDong tv
+    JOIN dbo.HoSoCuTru hs ON hs.MaHoSoCuTru=tv.MaHoSoCuTru
+    JOIN dbo.PhieuDatCoc pdc ON pdc.MaPhieuDatCoc=hs.MaPhieuDatCoc
+    JOIN dbo.NguoiDung nd ON nd.MaNguoiDung=pdc.MaKhachHang
+    WHERE hs.MaHoSoCuTru=@id AND hs.TrangThaiHoSo=N'Đã duyệt cư trú'
+      AND tv.TrangThai<>N'Bị từ chối' AND LEN(LTRIM(RTRIM(COALESCE(tv.Email,N''))))>0
+      AND NOT EXISTS (SELECT 1 FROM dbo.NguoiDung u WHERE LOWER(u.Email)=LOWER(LTRIM(RTRIM(tv.Email))))`,
+  [param('id', sql.VarChar(6), id)]);
+  return result.recordset;
+}
+
+export function memberInviteMail(member, origin) {
+  const link = `${origin}/?dangKy=1&email=${encodeURIComponent(String(member.memberEmail).trim())}`;
+  return {
+    subject: 'HomeStayDorm - Mời bạn tạo tài khoản',
+    text: `Xin chào ${member.memberName},\n${member.customerName} đã khai bạn là người cùng ở trong hồ sơ thuê phòng tại HomeStayDorm.\n`
+      + `Bạn có thể tạo tài khoản bằng chính email này (không bắt buộc, không ảnh hưởng việc thuê phòng của nhóm): ${link}`,
+    link,
+  };
+}
+
+export function createMemberInviteNotifier({ members = loadInviteMembers, reserve = claim, mark = finish,
+  mailer = createMailer(), origin = appOrigin(), log = console } = {}) {
+  return async function notifyInvites(maHoSoCuTru) {
+    const results = {};
+    try {
+      for (const member of await members(maHoSoCuTru)) {
+        const key = `member-invite:${maHoSoCuTru}:${member.memberId}`;
+        if (!await reserve(key)) { results[member.memberId] = 'duplicate'; continue; }
+        try {
+          const mail = memberInviteMail(member, origin);
+          const html = `<p>${htmlEscape(mail.text).replace(/\n/g, '<br>')}</p>`;
+          const sent = await mailer.send({ to: member.memberEmail, subject: mail.subject, text: mail.text, html });
+          await mark(key, sent.status === 'sent' ? 'Sent' : sent.status === 'logged' ? 'Logged' : 'Skipped');
+          results[member.memberId] = sent.status;
+        } catch (error) {
+          await mark(key, 'Failed').catch(() => {});
+          log.warn(`[member-invite] ${maHoSoCuTru}/${member.memberId}: ${error.message}`);
+          results[member.memberId] = 'failed';
+        }
+      }
+    } catch (error) {
+      log.warn(`[member-invite] ${maHoSoCuTru}: ${error.message}`);
+      return { status: 'failed' };
+    }
+    return { status: 'processed', ...results };
+  };
+}
+
 export const notifyNhanPhong = createNhanPhongNotifier();
+export const notifyMemberInvites = createMemberInviteNotifier();

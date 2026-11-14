@@ -81,12 +81,12 @@ function ProcessIcon({ name }) {
 const INIT_LOGIN = { tenDangNhap: '', matKhau: '' };
 const INIT_REGISTER = { tenDangNhap: '', hoTen: '', ngaySinh: '', gioiTinh: '', email: '', soDienThoai: '', matKhau: '', xacNhanMatKhau: '' };
 
-function AuthModal({ mode, onClose, onSwitchMode }) {
+function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
   const { dangNhap, dangKy } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [loginForm, setLoginForm] = useState(INIT_LOGIN);
-  const [regForm, setRegForm] = useState(INIT_REGISTER);
+  const [regForm, setRegForm] = useState(() => ({ ...INIT_REGISTER, email: initialEmail }));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const overlayRef = useRef();
@@ -717,6 +717,13 @@ export default function TrangChu() {
   const [rooms, setRooms] = useState([]);
   const [loadingRooms, setLoadingRooms] = useState(true);
   const [authModal, setAuthModal] = useState(null); // null | 'login' | 'register'
+  // Link trong thư mời thành viên cư trú: /?dangKy=1&email=... mở sẵn form đăng ký (không bắt buộc).
+  const inviteParams = new URLSearchParams(location.search);
+  const inviteEmail = inviteParams.get('dangKy') === '1' ? String(inviteParams.get('email') || '').slice(0, 100) : '';
+  useEffect(() => {
+    if (inviteParams.get('dangKy') === '1' && !isLoading && !user) setAuthModal('register');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search, isLoading, user]);
   useEffect(() => {
     const next = safeNextPath(new URLSearchParams(location.search).get('next'));
     if (!next || isLoading) return;
@@ -784,7 +791,7 @@ export default function TrangChu() {
 
       {/* Auth Modal */}
       {authModal && (
-        <AuthModal mode={authModal} onClose={closeAuth} onSwitchMode={switchMode} />
+        <AuthModal mode={authModal} onClose={closeAuth} onSwitchMode={switchMode} initialEmail={inviteEmail} />
       )}
     </div>
   );
