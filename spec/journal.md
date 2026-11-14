@@ -1133,3 +1133,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File frontend: `src/utils/genderRules.js` (mới), `pages/khachHang/KhachHangPortalPage.jsx` (bỏ mặc định Nam, ô "Chọn giới tính", cảnh báo + chặn gửi, nút tim mờ), `CustomerResidenceTab.jsx`, `khachHangPortal.css`, `scripts/ui-interested-rooms.mjs`, `scripts/ui-customer-residence.mjs`.
 - Kiểm tra: backend pass (gồm test mới); UI PASS `ui-customer-residence`, `ui-interested-rooms` (có ca nút tim bị khóa vì giới tính), `ui-customer-deposit-request`. Đã chạy truy vấn mới trên HOMEDORM4 (chỉ đọc): phòng P205 khóa Nam, DK0007 ghi 1 nam. Lỗi bắt được khi thử: bảng phiếu đăng ký không có cột `GioiTinh`, đã bỏ.
 - Chưa làm: phiếu DK0007 vẫn đang "Chờ quản lý duyệt" (dữ liệu thử lệch); chưa thêm nhãn "Phòng Nam/Nữ" ở danh sách khám phá.
+
+## 2026-11-15 01:20:15 +07:00 — J-C106 — Sửa dữ liệu thử DK0007/DC0003 để demo4 khai cư trú tiếp
+- Người thực hiện: Claude, Vy đồng ý ("oke") sau J-C105. Ghi vào HOMEDORM4 trong một transaction, dừng nếu phòng có hơn 1 giường bận.
+- Giá trị **cũ** (để hoàn lại): `PhieuDangKy DK0007` SoNam=1, SoNu=0; `Phong P205` GioiTinhChoPhep=N'Nam'; `HoSoCuTru CT0001` TrangThaiHoSo=N'Chờ duyệt cư trú' (ghi chú quản lý "Giới tính không khớp quy định phòng", thành viên TV0001 demo4 Nữ).
+- Giá trị **mới**: DK0007 SoNam=0, SoNu=1; P205 GioiTinhChoPhep=N'Nữ'; CT0001 TrangThaiHoSo=N'Chưa cập nhật' (xóa ghi chú/ngày gửi duyệt/quản lý duyệt). Phiếu cọc DC0003 giữ nguyên (Đã TT, Hiệu lực), giường G01 vẫn đã cọc.
+- Lý do: dữ liệu thử ghi nhầm 1 nam cho khách nữ nên luật D-047 chặn khai lại. Chỉ là sửa dữ liệu thử, không đổi code.
