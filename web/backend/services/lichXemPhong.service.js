@@ -2,6 +2,7 @@ import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as lichXemPhongRepository from '../repositories/lichXemPhong.repository.js';
 import * as phongQuanTamRepository from '../repositories/phongQuanTam.repository.js';
 import { ghiNhanKetQuaBuoiXem } from './ketQuaBuoiXem.service.js';
+import { attachViewingConfirmations } from './viewingConfirmation.service.js';
 
 function handleDatabaseError(error) {
   mapDatabaseError(error, {
@@ -233,13 +234,13 @@ export async function getLichXemPhong(filter = {}, user = null) {
     ? user.maChiNhanh
     : (filter.maChiNhanh ? String(filter.maChiNhanh).trim() : null);
 
-  return lichXemPhongRepository.layDanhSachLichXemPhong({
+  return attachViewingConfirmations(await lichXemPhongRepository.layDanhSachLichXemPhong({
     maDangKy,
     sttLich,
     maKhachHang,
     nhanVienSaleId,
     maChiNhanh
-  });
+  }));
 }
 
 export async function yeuCauDieuChinhLich(id, data = {}, user = null) {

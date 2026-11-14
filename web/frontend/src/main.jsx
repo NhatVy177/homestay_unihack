@@ -9,6 +9,7 @@ import './styles/shell.css';
 import './styles/patterns.css';
 import './styles/lists.css';
 import './styles/evidence.css';
+import './styles/roomDetailLayout.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

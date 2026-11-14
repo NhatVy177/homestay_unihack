@@ -1,5 +1,6 @@
 import { executeProcedure, sql } from '../database/connection.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
+import { ensureViewingConfirmationReady } from './viewingConfirmation.service.js';
 
 const outcomes = { 'da-xem': 'Đã xem', 'khach-khong-den': 'Khách không đến' };
 
@@ -19,6 +20,7 @@ export async function ghiNhanKetQuaBuoiXem(id, data, user, run = executeProcedur
     throw createServiceError('Ghi chú tối đa 500 ký tự.');
   }
   try {
+    if (run === executeProcedure) await ensureViewingConfirmationReady();
     const result = await run('dbo.SP_GhiNhanKetQuaBuoiXem', [
       { name: 'MaNhanVien', type: sql.VarChar(6), value: user.maNguoiDung },
       { name: 'MaDangKy', type: sql.VarChar(6), value: match[1] },
@@ -28,6 +30,6 @@ export async function ghiNhanKetQuaBuoiXem(id, data, user, run = executeProcedur
     ]);
     return result.recordset[0];
   } catch (error) {
-    mapDatabaseError(error, { 50330: 403, 50331: 404, 50332: 409, 50333: 400 });
+    mapDatabaseError(error, { 50330: 403, 50331: 404, 50332: 409, 50333: 400, 50403: 409 });
   }
 }

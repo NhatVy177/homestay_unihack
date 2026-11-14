@@ -77,6 +77,35 @@ Luồng theo D-009 → D-013 trong [spec/decisions.md](../spec/decisions.md). Qu
 
 ## Kiểm thử
 
+### Xác nhận lịch xem phòng — D-045
+
+Code ở nhánh `feat/customer-viewing-confirmation`. Trước khi chạy trên **HOMEDORM4 phải được Vy cho phép riêng**. Migration này cần C5-a (`SP_GhiNhanKetQuaBuoiXem`) đã có; không thay dữ liệu hợp đồng, tiền cọc hoặc kết quả lịch cũ.
+
+Trong `web/backend`:
+
+```powershell
+npm run viewing-confirmation:db:check
+# Chỉ chạy sau khi Vy duyệt:
+npm run viewing-confirmation:db:migrate
+npm run viewing-confirmation:db:check
+```
+
+Nguồn: `database/migrations/20261114_viewing_confirmation.sql` và `scripts/viewing-confirmation-db.mjs`. Script xác minh đúng database, thêm ba cột metadata vào `LichXemPhong` (`PhienBanLich`, `KhachXacNhanPhienBan`, `ThoiGianKhachXacNhan`), trigger đổi giờ và SP khách xác nhận. Phiên bản đầu là 1; xác nhận/thời điểm của lịch cũ để trống. Không suy diễn xác nhận cho lịch đã xem/hủy. Guard D-045 được chèn vào **định nghĩa SP ghi kết quả đang triển khai**, giữ nguyên các kiểm tra quyền/chi nhánh/cọc/thời gian; gặp định nghĩa lạ thì dừng, không ghi đè.
+
+Khách xác nhận bằng `PUT /api/lich-xem-phong/:id/xac-nhan` với `{ "phienBanLich": 1 }`; server lấy danh tính từ phiên đăng nhập. Đúng chủ lịch, đang Chờ xem và đúng phiên bản mới được xác nhận; lặp cùng phiên bản giữ nguyên thời điểm đầu. Đổi ngày/giờ tăng phiên bản và xóa hiệu lực xác nhận ngay trong cùng giao dịch; trang cũ nhận 409. Khách chưa xác nhận phiên bản hiện tại thì API/SQL chặn cả Đã xem và Khách không đến, kể cả đã tới giờ. Xác nhận vẫn có thể thực hiện sau giờ hẹn khi lịch còn Chờ xem; không có hạn tự đóng mới. Đây là Web2, không ký Fuji/Privy.
+
+Sau migration phải chạy backend chứa code D-045 để cổng khách và Sale nhận metadata. Khi chưa đủ schema/guard/trigger, API đọc lịch vẫn trả được dữ liệu với nút ghi kết quả/xác nhận bị khóa; API ghi trả 503. Nếu chạy lại migration C5-a làm thay SP ghi kết quả, chạy D-045 cuối cùng rồi kiểm tra lại guard trước khi dùng.
+
+Kiểm SQL D-045 chỉ trên database tạm, tự xóa sau kiểm tra; không seed/ghi hồ sơ vào HOMEDORM4:
+
+```powershell
+$env:VIEWING_CONFIRM_SQL_TEST='true'
+node --test test/viewing-confirmation-sql.test.mjs
+Remove-Item Env:VIEWING_CONFIRM_SQL_TEST
+```
+
+Giao diện fixture: chạy Vite riêng rồi `node scripts/ui-customer-viewing-confirmation.mjs` trong `web/frontend` (mặc định `http://localhost:5199`, đổi bằng `UI_BASE_URL`). Ảnh/report ở `.ui-screens/customer-viewing-confirmation/`, không commit. Kiểm thao tác SQL thật của khách sau migration vẫn cần tài khoản do Vy đăng nhập; không tự gửi xác nhận thay khách.
+
 | Phần | Lệnh | Ghi chú |
 |---|---|---|
 | Contract và luồng tích hợp trên chain local | `cd blockchain && npm test` | |
