@@ -1098,3 +1098,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: backend `services/khachGiuCho.service.js` (`getYeuCauGiuChoCuaKhach`), `controllers/khachMoi.controller.js`, `routes/khachMoi.routes.js` (`GET /khach-moi/yeu-cau-giu-cho`), `test/khach-giu-cho.test.mjs`; frontend `pages/khachHang/CustomerDepositHistory.jsx` + `customerDepositHistory.css` (4 ô thống kê, tìm kiếm, thẻ yêu cầu/phiếu cọc, mở phiếu để thanh toán), `KhachHangPortalPage.jsx` (tab `lich-su-coc`, gửi chứng từ xong sang tab này), `lichXemPhong/CustomerViewingSchedule.jsx` (gửi yêu cầu giữ chỗ xong, đóng hộp thoại thì sang tab này), `khachMoi.api.js`, `khachHangPortal.css` (sửa tràn ngang trang thanh toán cọc ở 390px), `scripts/ui-customer-deposit-history.mjs`, `ui-customer-deposit-request.mjs`.
 - Kiểm tra: backend test pass; UI PASS `ui-customer-deposit-history`, `ui-customer-deposit-request`, `ui-customer-invoices`, `ui-customer-viewing-confirmation` ở 1440/390 (fixture API); đã xem ảnh 1440. Đã kiểm tra truy vấn yêu cầu giữ chỗ chạy được trên HOMEDORM4 (chỉ đọc).
 - Giới hạn: yêu cầu bị quản lý từ chối hoặc quá hạn 12 giờ không còn hiện (hồ sơ về "Đã xem"); cột "Hình thức thuê" của phiếu cọc để "—" vì API danh sách phiếu cọc chưa trả trường này.
+
+## 2026-11-15 00:25:11 +07:00 — J-C101 — Bàn lại ai xác nhận tiền cọc (chỉ thảo luận)
+- Người thực hiện: Claude, trao đổi với Vy. Chưa đổi file code.
+- Vy hỏi vì sao không để quản lý xác nhận tiền, và đề xuất: kế toán lập hóa đơn (tránh hệ thống tự tính sai), quản lý chỉ kiểm đã nhận đủ tiền.
+- Claude giải thích luồng hiện tại (D-020, D-021, D-023): quản lý duyệt giữ phòng, hệ thống tự tính và lập phiếu, kế toán xác nhận đã nhận tiền. Lý do: kế toán là người có sao kê và quỹ; tách người duyệt phòng với người xác nhận tiền; kế toán đã đối chiếu số tiền khi xác nhận; sai số thường do dữ liệu giá, kế toán lập tay cũng không bắt được.
+- **Đề xuất (chưa chốt):** giữ luồng, thêm hiển thị cách tính tiền cọc trên phiếu và màn duyệt của quản lý.
+- Câu hỏi mở: Vy chọn giữ luồng + hiện cách tính, hay đổi sang kế toán lập hóa đơn và quản lý xác nhận tiền (sẽ cần D mới thay D-021/D-023).
