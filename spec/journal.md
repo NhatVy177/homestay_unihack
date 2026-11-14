@@ -1049,3 +1049,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: backend 76 pass, 4 skip, 0 fail; `ui-customer-invoices` PASS ở 1440/390 (fixture API). Chưa thử với dữ liệu thật trên HOMEDORM4 (DB hiện chưa có hợp đồng/hóa đơn kỳ nào).
 - Giới hạn: hóa đơn tháng chưa trả qua ví được (D-029 chưa làm); nút "Thanh toán" ở dòng hóa đơn kỳ dẫn sang tab Hợp đồng, nơi có thẻ thanh toán kỳ đầu.
 - Câu hỏi mở: Vy hỏi làm QR "thật hơn" kiểu MoMo để demo chuyển khoản được; đã trả lời phương án ở phiên, chờ Vy chọn.
+
+## 2026-11-15 00:05:00 +07:00 — J-C094 — VietQR thật cho cách trả cọc "Chuyển khoản"
+- Người thực hiện: Claude. Lý do: Vy muốn QR "thật hơn" để demo chuyển khoản được; Vy chọn hướng 1 (VietQR chuẩn NAPAS) thay vì MoMo sandbox và gửi tài khoản nhận tiền.
+- Tài khoản nhận tiền chỉ ghi vào `web/backend/.env` của worktree `D:\HomeStayDorm-integ` (đã được gitignore), không ghi vào hồ sơ làm việc.
+- File: `web/backend/config/payment.js` (thêm `maNganHang` từ `PAYMENT_BANK_BIN`, mặc định 970422 = MB Bank; `vietQr` chỉ bật khi có `PAYMENT_ACCOUNT_NUMBER`), `web/backend/.env.example` (bốn khóa, để trống), `web/frontend/src/components/common/VietQrCode.jsx` (ảnh từ img.vietqr.io: tài khoản, số tiền, nội dung `<mã phiếu> <sđt>`; ẩn khi lỗi tải ảnh), `pages/khachHang/KhachHangPortalPage.jsx` (`getPaymentAccount` giữ `maNganHang`/`vietQr`; QR trong thẻ "Thông tin chuyển khoản" của phiếu cọc), `khachHangPortal.css`, `scripts/ui-customer-invoices.mjs` (kiểm tra link QR với tài khoản giả).
+- Không đổi luồng: khách chuyển tiền thật vào tài khoản, rồi gửi chứng từ; kế toán vẫn xác nhận thủ công như D-023. Ví mô phỏng giữ nguyên cho luồng tự động. Ảnh QR cần mạng khi demo.
+- Kiểm tra: `ui-customer-invoices` PASS (QR hiện, đúng mã BIN, số tiền, nội dung); đã gọi thử img.vietqr.io trả ảnh 200. Backend đã khởi động lại để nạp `.env`. Chưa quét thử bằng app ngân hàng thật.

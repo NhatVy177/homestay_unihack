@@ -2,7 +2,11 @@ export const paymentAccount = {
   nganHang: process.env.PAYMENT_BANK || 'MB Bank',
   soTaiKhoan: process.env.PAYMENT_ACCOUNT_NUMBER || '0123456789',
   chuTaiKhoan: process.env.PAYMENT_ACCOUNT_HOLDER || 'HAPPYROOM CO LTD',
-  chiNhanh: process.env.PAYMENT_BRANCH || 'TP. Ho Chi Minh'
+  chiNhanh: process.env.PAYMENT_BRANCH || 'TP. Ho Chi Minh',
+  // Mã BIN ngân hàng theo NAPAS (MB Bank = 970422) để dựng VietQR.
+  maNganHang: process.env.PAYMENT_BANK_BIN || '970422',
+  // Chỉ hiện VietQR khi đã cấu hình tài khoản thật, tránh in mã của số tài khoản mẫu.
+  vietQr: Boolean(process.env.PAYMENT_ACCOUNT_NUMBER)
 };
 
 export function getPaymentAccount() {

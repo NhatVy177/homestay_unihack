@@ -8,7 +8,8 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 try {
   for (const width of [1440, 390]) {
     const user = { maNguoiDung: 'KH0001', maKhachHang: 'KH0001', hoTen: 'Khách hóa đơn', vaiTro: 'KhachHang' };
-    const deposits = [{ maPhieuCoc: 'DC0003', trangThai: 'Chờ thanh toán', soTienCoc: 2800000, thoiHanThanhToan: '2026-11-15T10:00:00.000Z', ngayLapPhieu: '2026-11-14', tenPhong: 'Phòng 101', hinhThucThue: 'Nguyên phòng' }];
+    const deposits = [{ maPhieuCoc: 'DC0003', trangThai: 'Chờ thanh toán', soTienCoc: 2800000, thoiHanThanhToan: '2026-11-15T10:00:00.000Z', ngayLapPhieu: '2026-11-14', tenPhong: 'Phòng 101', hinhThucThue: 'Nguyên phòng', phuongThucThanhToan: 'Chuyển khoản', sdtKhachHang: '0900000000',
+      taiKhoanThanhToan: { nganHang: 'MB Bank', maNganHang: '970422', soTaiKhoan: '0000000000', chuTaiKhoan: 'TAI KHOAN KIEM THU', vietQr: true } }];
     const invoices = [
       { maHoaDon: 'HD0001', maHopDong: 'HD0001', kyThanhToan: '2026-11', ngayHanTT: '2026-11-20', tongTien: 3000000, trangThai: 'Chưa TT', ngayBatDau: '2026-11-15', loai: 'Kỳ đầu' },
       { maHoaDon: 'HD0002', maHopDong: 'HD0001', kyThanhToan: '2026-10', ngayHanTT: '2026-10-10', tongTien: 2900000, trangThai: 'Đã TT', ngayBatDau: '2026-09-15', loai: 'Hàng tháng' },
@@ -42,6 +43,12 @@ try {
     assert.equal(await rows.count(), 1); assert.match(await rows.first().innerText(), /DC0003/);
     await page.getByRole('button', { name: 'Thanh toán', exact: true }).click();
     await page.getByRole('button', { name: /Quay lại danh sách/ }).waitFor();
+    const qr = page.locator('.vietqr-code img');
+    await qr.waitFor();
+    const src = await qr.getAttribute('src');
+    assert.match(src, /^https:\/\/img\.vietqr\.io\/image\/970422-0000000000-compact2\.png\?/);
+    assert.match(src, /amount=2800000/); assert.match(src, /addInfo=DC0003\+0900000000/);
+    await page.waitForFunction(() => { const img = document.querySelector('.vietqr-code img'); return !img || img.complete; });
     await page.screenshot({ path: `${folder}/deposit-${width}.png`, fullPage: true });
     await page.getByRole('button', { name: /Quay lại danh sách/ }).click();
     await page.getByRole('heading', { name: 'Hóa đơn & thanh toán', level: 2 }).waitFor();

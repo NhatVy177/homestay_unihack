@@ -13,6 +13,7 @@ import LichXemPhongPage from '../lichXemPhong/LichXemPhongPage.jsx';
 import { httpClient } from '../../api/httpClient.js';
 import ThuNhanPhongWalletCard from './ThuNhanPhongWalletCard.jsx';
 import CustomerInvoicesList from './CustomerInvoicesList.jsx';
+import VietQrCode from '../../components/common/VietQrCode.jsx';
 import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Claude), one line agreed with Vy
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
@@ -33,7 +34,10 @@ function getPaymentAccount(source = {}) {
   return {
     nganHang: account.nganHang || DEFAULT_PAYMENT_ACCOUNT.nganHang,
     soTaiKhoan: account.soTaiKhoan || DEFAULT_PAYMENT_ACCOUNT.soTaiKhoan,
-    chuTaiKhoan: account.chuTaiKhoan || DEFAULT_PAYMENT_ACCOUNT.chuTaiKhoan
+    chuTaiKhoan: account.chuTaiKhoan || DEFAULT_PAYMENT_ACCOUNT.chuTaiKhoan,
+    // VietQR chỉ khi backend báo đã cấu hình tài khoản thật (không dựng mã cho tài khoản mặc định).
+    maNganHang: account.maNganHang || '',
+    vietQr: Boolean(account.vietQr && account.soTaiKhoan)
   };
 }
 
@@ -3911,6 +3915,7 @@ export default function KhachHangPortalPage() {
 
                 <div className="dc-section-card">
                   <h3 className="dc-section-title"><Icon name="invoice" />Thông tin chuyển khoản</h3>
+                  <VietQrCode account={taiKhoanThanhToan} amount={phieu.soTienCoc} content={transferContent} />
                   <div className="dc-bank-info">
                     <div><span>Ngân hàng</span><strong>{taiKhoanThanhToan.nganHang}</strong></div>
                     <div><span>Số tài khoản</span><strong>{taiKhoanThanhToan.soTaiKhoan}</strong></div>

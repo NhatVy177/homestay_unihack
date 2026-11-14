@@ -5063,3 +5063,8 @@
     flex-direction: column-reverse;
   }
 }
+
+/* VietQR thật trong thẻ chuyển khoản phiếu cọc */
+.vietqr-code { margin: 0 0 16px; display: grid; justify-items: center; gap: 8px; text-align: center; }
+.vietqr-code img { width: min(260px, 100%); height: auto; border-radius: 12px; border: 1px solid var(--color-border); background: #fff; }
+.vietqr-code figcaption { color: var(--color-text-muted); font-size: 13px; max-width: 360px; }
