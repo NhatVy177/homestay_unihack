@@ -89,6 +89,8 @@ Theo yêu cầu Vy ngày 11/11: tạo ba ví mới (deployer kiêm manager, acco
 
 ### Không gian Sale — D-035
 
+**Xác nhận lịch xem — D-045:** khách sở hữu lịch bấm xác nhận đúng phiên bản; Sale đổi ngày/giờ thì cần xác nhận lại. Cả giao diện, API và SQL chặn ghi Đã xem/Khách không đến khi bản hiện tại chưa được khách xác nhận. Không bịa xác nhận lịch sử hoặc thêm mốc Fuji. Trang lịch khách dùng tìm kiếm trong dữ liệu của tài khoản, tổng quan, thẻ lịch có tiến trình/xác nhận/đổi/hủy/liên hệ và lịch tháng theo ảnh Vy, giữ tông xanh.
+
 **D-036 thay phần trình bày/vị trí:** nền sidebar và nội dung cùng token xanh; Tra cứu chỉ tìm/xem khách, không chứa thanh hồ sơ/cọc/cư trú/trả phòng. Sale không còn lối Trả phòng; luồng các vai trò khác giữ nguyên. Tiếp nhận hồ sơ mở từ lịch hẹn/tổng quan, xử lý cọc tiền mặt từ tổng quan, nhập hộ cư trú từ lập hợp đồng. Màn hợp đồng mở bằng danh sách đủ điều kiện và lối xem hợp đồng đã lập; không thêm chức năng bản nháp không có API. Các mô tả vị trí ở D-035 bên dưới là mốc trước D-036.
 
 - Menu chính 5 mục theo bố cục Vy gửi: Tổng quan, Lịch hẹn xem phòng, Lập hợp đồng thuê, Tra cứu khách hàng, Hồ sơ cá nhân. Không có tab Kiểm tra phòng/giường hoặc Ghi nhận cư trú độc lập.

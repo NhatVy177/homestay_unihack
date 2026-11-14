@@ -906,3 +906,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: backend `npm test` 57 pass/3 skip/0 fail (thêm 4 ca); frontend `npm run build` qua; `test:avalanche-ui`, `ui-shell`, `ui-list-kit`, `ui-customer-register-modal`, `ui-sale-workspace`, `ui-viewing-outcomes` và `ui-interested-rooms` đều PASS ở 1440/390px với dữ liệu giả, không có lỗi trình duyệt hay thao tác ghi. Không chạy SQL, không đụng HOMEDORM4.
 - Giới hạn: chưa thử với SQL/giao diện thật; route backend `POST /dang-ky-thue/khach-vang-lai` và service vẫn còn (không còn nơi nào gọi), chờ Vy quyết có gỡ; chặn phòng hết chỗ ở backend chỉ chạy khi frontend gửi `phongQuanTamIds`.
 - Việc còn lại: Vy xem và merge; chạy thử qua giao diện với SQL thật ở đợt A3.
+
+## 2026-11-14 12:33:00 +07:00 — J-X081 — Vy chốt khách xác nhận lịch xem, chặn Sale ghi kết quả khi chưa xác nhận
+
+- Người thực hiện: Codex, theo yêu cầu trang lịch khách như ảnh và câu trả lời của Vy: “Chặn ghi kết quả đến khi khách xác nhận lịch”. Giờ lấy bằng PowerShell Get-Date. Fetch main `45c63f7`; tạo nhánh `feat/customer-viewing-confirmation` từ main trên worktree riêng `D:\HomeStayDorm-ui-small-fixes`; không ghép nhánh của Claude, không push main. Đã kiểm mã trên các remote cao nhất D-044/J-X080 trước khi lấy D-045/J-X081.
+- Code thực tế: trang lịch khách có yêu cầu đổi/hủy nhưng không có API lưu xác nhận lịch, “Chờ xác nhận” hiện chỉ là nhãn trình bày. Cần triển khai xác nhận thật, ràng buộc phiên bản và vô hiệu hóa xác nhận sau đổi ngày/giờ; API/SQL phải chặn kết quả buổi xem chưa được xác nhận. Không tự quyết cho Sale đi tiếp khi thiếu xác nhận; Vy đã chọn chặn.
+- Thêm D-045 và tiêu chí vào scope/plan/progress. Chuẩn bị code/migration/test tiếp; chưa chạy SQL hoặc ghi dữ liệu HOMEDORM4. Lịch sử đã xem/hủy giữ nguyên, không tự xác nhận thay khách hoặc tạo mốc chuỗi mới. Chờ trình migration cụ thể khi đã có code kiểm tra được; chưa yêu cầu lại quyền demo A3 vốn đã được cấp.

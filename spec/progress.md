@@ -4,6 +4,8 @@ Cập nhật: **2026-11-12 22:21:42 +07:00** (J-X074, bản vá danh sách hoàn
 
 ## Tóm tắt
 
+Đang làm D-045: `feat/customer-viewing-confirmation` từ origin/main `45c63f7` trong worktree riêng Codex. Vy chốt chặn Sale ghi Đã xem/Khách không đến cho đến khi khách xác nhận lịch; đổi ngày/giờ cần xác nhận lại. Hiện chưa có API lưu xác nhận, đang bổ sung backend/migration và làm lại trang lịch khách theo ảnh. Chưa chạy SQL HOMEDORM4; sẽ trình migration cụ thể để Vy duyệt. Các nhánh sửa UI lịch Sale/khung phòng trước vẫn riêng, chưa tự ghép code Claude.
+
 C4 đã merge PR #10/#11 và migrate HOMEDORM4 (J-C069/J-C070). Bản vá bổ sung `fix/c4-refund-before-close` gỡ điều kiện danh sách hoàn cọc đòi hợp đồng đã thanh lý (D-041); backend 53 pass/3 skip, SQL C4 riêng 1/1 trên CSDL tạm, blockchain 25 pass/1 skip, build và avalanche UI qua. Chưa áp dụng phần SP bổ sung lên HOMEDORM4; chờ Vy duyệt và cho phép. Chưa nghiệm thu C4 bằng hồ sơ thật.
 
 Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy local. **Contract đã deploy và verify source thật trên Fuji (A2/J-X068)**: `0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C`, block 60882820; Sourcify creation/runtime exact match. Hai ví phụ đã nạp 0,1 AVAX mỗi ví. **Luồng xác nhận của khách mới thử local**, chưa chạy trọn A3 với SQL/SMTP/OTP Privy thật; ba giao dịch hạ tầng A2 không thay kết quả nghiệm thu nghiệp vụ.
