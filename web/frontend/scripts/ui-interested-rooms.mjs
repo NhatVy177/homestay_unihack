@@ -17,7 +17,7 @@ const rooms = [
 const customer = { maNguoiDung: 'KH-DEMO', maKhachHang: 'KH-DEMO', hoTen: 'Khách demo', tenDangNhap: 'kh-demo', vaiTro: 'KhachHang' };
 const sale = { maNguoiDung: 'UI-SALE', vaiTro: 'NhanVien', chucVu: 'Sale', hoTen: 'Sale giao diện', maChiNhanh: 'CN-UI' };
 
-async function newPage(width, user, overview = { trangThai: 'Khách mới', hoSo: [], lichXem: [], phongGoiY: [] }) {
+async function newPage(width, user, overview = { trangThai: 'Khách mới', hoSo: [], lichXem: [], phongGoiY: [] }, roomList = rooms) {
   const context = await browser.newContext({ viewport: { width, height: 1000 }, reducedMotion: 'reduce' });
   await context.addInitScript(value => localStorage.setItem('happyroom_session', JSON.stringify({ _v: 2, token: 'ui-fixture-only', user: value })), user);
   const writes = [];
@@ -30,7 +30,7 @@ async function newPage(width, user, overview = { trangThai: 'Khách mới', hoSo
     if (url.pathname.endsWith('/auth/toi')) return route.fulfill({ json: user });
     if (url.pathname.endsWith('/avalanche/config')) return route.fulfill({ json: { enabled: false } });
     if (url.pathname.endsWith('/khach-moi/tong-quan')) return route.fulfill({ json: overview });
-    if (url.pathname.endsWith('/khach-moi/phong-kha-dung')) return route.fulfill({ json: rooms });
+    if (url.pathname.endsWith('/khach-moi/phong-kha-dung')) return route.fulfill({ json: roomList });
     if (/\/khach-moi\/ho-so\/[^/]+\/phong-quan-tam/.test(url.pathname)) return route.fulfill({ status: 201, json: [] });
     const detail = url.pathname.match(/\/khach-moi\/phong\/(P\d+)$/);
     if (detail) return route.fulfill({ json: { ...rooms.find(room => room.id === detail[1]), hinhAnh: [], tienNghi: [], dichVuUocTinh: [] } });
@@ -128,6 +128,7 @@ try {
     const labelled = (text) => form.locator('label', { hasText: text }).locator('input, select, textarea').first();
     await labelled('Ngày sinh').fill('2000-01-01');
     await labelled('Giới tính*').selectOption('Nam');
+    await labelled('Giới tính thuê*').selectOption('Nam');
     await labelled('Số điện thoại').fill('0901234567');
     await labelled('Quốc tịch').fill('Việt Nam');
     await labelled('CCCD').fill('012345678901');
@@ -179,6 +180,16 @@ try {
     await otherType.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
     assert.equal(await otherType.page.locator('.kh-room-card').nth(0).locator('.kh-heart').isDisabled(), true, 'khác loại phòng thì không thêm được');
     await otherType.context.close();
+
+    // J-C105: hồ sơ nữ thì phòng đã khóa Nam bị khóa trái tim kèm lý do; phòng không phân biệt vẫn thêm được
+    const gender = await newPage(width, customer, { ...withProfile, hoSo: [{ ...withProfile.hoSo[0], soNam: 0, soNu: 1, danhSachPhongQuanTam: [] }] }, rooms.map((room, index) => ({ ...room, gioiTinhChoPhep: index === 0 ? 'Nam' : 'Không phân biệt' })));
+    await gender.page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await gender.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
+    const lockedHeart = gender.page.locator('.kh-room-card').nth(0).locator('.kh-heart');
+    assert.equal(await lockedHeart.isDisabled(), true, 'phòng khóa Nam thì hồ sơ nữ không thêm được');
+    assert.match(await lockedHeart.getAttribute('title'), /chỉ dành cho Nam/);
+    assert.equal(await gender.page.locator('.kh-room-card').nth(1).locator('.kh-heart').isDisabled(), false, 'phòng không phân biệt thì thêm được');
+    await gender.context.close();
 
     // --- Hồ sơ đã có lịch xem: báo rõ, không cho thêm phòng
     const scheduled = { trangThai: { coQuyTrinhThueDangHoatDong: true }, hoSo: [{ maDangKy: 'DK0002', trangThai: 'Đã tiếp nhận', sttLich: 1, trangThaiLich: 'Chờ xem', thoiGianHen: '2026-11-20T09:00:00' }], lichXem: [], phongGoiY: [] };

@@ -17,6 +17,7 @@ import CustomerDepositHistory from './CustomerDepositHistory.jsx';
 import CustomerResidenceTab from './CustomerResidenceTab.jsx';
 import VietQrCode from '../../components/common/VietQrCode.jsx';
 import { moTaCachTinhCoc } from '../../utils/tienCoc.js';
+import { loaiGioiTinhHoSo, lyDoPhongKhongHopGioiTinh } from '../../utils/genderRules.js';
 import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Claude), one line agreed with Vy
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
@@ -1090,6 +1091,8 @@ export default function KhachHangPortalPage() {
     if (profileBranch && room.chiNhanh && room.chiNhanh !== profileBranch) {
       return { disabled: true, title: `Hồ sơ ${openProfile.maDangKy} đang ở ${profileBranch}` };
     }
+    const genderIssue = lyDoPhongKhongHopGioiTinh(loaiGioiTinhHoSo(openProfile), room.gioiTinhChoPhep, room.tenPhong || 'Phòng này');
+    if (genderIssue) return { disabled: true, title: genderIssue };
     return { title: `Quan tâm (thêm vào hồ sơ ${openProfile.maDangKy})` };
   }
 
@@ -1226,6 +1229,11 @@ export default function KhachHangPortalPage() {
     ));
   }
 
+  // Phòng đã chọn không hợp giới tính đang khai trong phiếu (J-C105).
+  const rentGenderIssues = rentModal ? selectedRooms
+    .map((room) => lyDoPhongKhongHopGioiTinh(loaiGioiTinhHoSo(rentForm), room.gioiTinhChoPhep, room.tenPhong || 'Phòng này'))
+    .filter(Boolean) : [];
+
   function getRentDefaultsFromUser() {
     return {
       ...rentInitial,
@@ -1358,7 +1366,7 @@ export default function KhachHangPortalPage() {
       khuVucMongMuon: getArea(firstRoom),
       loaiPhongYeuCau: firstRoom.loaiPhong || '',
       mucGiaToiDa: firstRoom.giaThue ? String(normalizeMoneyVnd(firstRoom.giaThue) || firstRoom.giaThue) : '',
-      gioiTinhThue: firstRoom.gioiTinhChoPhep || rentInitial.gioiTinhThue,
+      gioiTinhThue: options.group ? 'Khác' : (['Nam', 'Nữ'].includes(user?.gioiTinh) ? user.gioiTinh : ''),
       ...(options.group ? { soNguoiO: String(Math.min(2, Number(firstRoom.sucChua) || 2)) } : {})
     });
     setRentGroupMode(Boolean(options.group));
@@ -1417,6 +1425,10 @@ export default function KhachHangPortalPage() {
       return;
     }
 
+    if (!['Nam', 'Nữ', 'Khác'].includes(rentForm.gioiTinhThue)) {
+      setToast('Vui lòng chọn giới tính thuê.');
+      return;
+    }
     if (rentForm.gioiTinhThue === 'Khác') {
       const soNguoiO = Number(rentForm.soNguoiO) || 0;
       const soNam = Number(rentForm.soNam) || 0;
@@ -1425,6 +1437,10 @@ export default function KhachHangPortalPage() {
         setToast('Tổng số lượng nam và nữ không khớp với số người dự kiến ở.');
         return;
       }
+    }
+    if (rentGenderIssues.length) {
+      setToast(rentGenderIssues[0]);
+      return;
     }
 
     setSubmitting(true);
@@ -4239,7 +4255,8 @@ export default function KhachHangPortalPage() {
                 <h3><Icon name="home" />Nhu cầu thuê</h3>
                 <div className="kh-register-grid kh-balanced-grid">
                   <label><span>Số lượng người ở*</span><input type="number" min="1" max={getRoomTypeCapacity(rentForm.loaiPhongYeuCau) || undefined} value={rentForm.soNguoiO} onChange={(event) => setRentForm({ ...rentForm, soNguoiO: event.target.value })} required /></label>
-                  <label><span>Giới tính thuê*</span><select value={rentForm.gioiTinhThue} onChange={(event) => setRentForm({ ...rentForm, gioiTinhThue: event.target.value })} required><option value="Nam">Nam</option><option value="Nữ">Nữ</option><option value="Khác">Khác</option></select></label>
+                  <label><span>Giới tính thuê*</span><select value={rentForm.gioiTinhThue} onChange={(event) => setRentForm({ ...rentForm, gioiTinhThue: event.target.value })} required><option value="" disabled>Chọn giới tính</option><option value="Nam">Nam</option><option value="Nữ">Nữ</option><option value="Khác">Khác</option></select></label>
+                  {rentGenderIssues.length > 0 && <p className="kh-rent-gender-warning is-half" role="alert">{rentGenderIssues[0]}</p>}
                   {rentForm.gioiTinhThue === 'Khác' && (
                     <div className="is-half kh-register-pair">
                       <label><span>Số lượng nam*</span><input type="number" min="0" value={rentForm.soNam ?? ''} onChange={(event) => setRentForm({ ...rentForm, soNam: event.target.value })} required /></label>

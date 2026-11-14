@@ -5106,3 +5106,4 @@
 .cinv-table td:nth-child(6) { white-space: nowrap; }
 .dpay-main, .dpay-side { grid-template-columns: minmax(0, 1fr); }
 .dpay-formula { margin: 0; font-size: 13px; opacity: .92; }
+.kh-rent-gender-warning { margin: 0; padding: 10px 14px; border-radius: 12px; background: rgba(179, 38, 30, .08); color: #8f2019; font-size: 14px; }

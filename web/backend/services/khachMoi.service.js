@@ -8,6 +8,7 @@ import * as phieuTraPhongRepository from '../repositories/phieuTraPhong.reposito
 import { getPaymentAccount } from '../config/payment.js';
 import { attachViewingConfirmations } from './viewingConfirmation.service.js';
 import { cachTinhCoc } from './tienCoc.js';
+import { checkRoomGender, loaiGioiTinhHoSo } from './genderRules.js';
 
 function requireCustomer(user) {
   if (!user || user.vaiTro !== 'KhachHang') {
@@ -187,6 +188,12 @@ async function assertRoomsCanBeInterested(roomIds) {
   return info.map((room) => room.maPhong);
 }
 
+// J-C105: phòng đã khóa giới tính khác thì không cho đăng ký/quan tâm ngay từ đầu.
+function assertRoomsMatchGender(profileGender, rooms) {
+  const issue = rooms.map((room) => checkRoomGender(profileGender, room.gioiTinhChoPhep, room.tenPhong)).find(Boolean);
+  if (issue) throw createServiceError(issue, 409);
+}
+
 async function assertUniqueCustomerContact(data = {}, khachHangId) {
   const phone = String(data.soDienThoai || '').trim() || null;
   const cccd = String(data.cccd || '').trim() || null;
@@ -346,6 +353,10 @@ export async function createHoSo(user, data = {}) {
   await assertCanCreateRentRegistration(khachHangId);
   await assertUniqueCustomerContact(data, khachHangId);
   const interestedRoomIds = await assertRoomsCanBeInterested(data.phongQuanTamIds);
+  if (interestedRoomIds.length) {
+    assertRoomsMatchGender(loaiGioiTinhHoSo({ gioiTinh: data.gioiTinhThue, soNam: data.soNam, soNu: data.soNu }),
+      await phongQuanTamRepository.layThongTinPhong(interestedRoomIds));
+  }
 
   try {
     let finalGhiChu = data.ghiChu || '';
@@ -419,6 +430,7 @@ export async function themPhongQuanTam(user, maDangKy, maPhong) {
   const profileRoomTypes = await phongQuanTamRepository.layLoaiPhongHoSo(profile.maDangKy);
   const reason = checkRoomCanJoin(current, room, profileRoomTypes);
   if (reason) throw createServiceError(reason, 409);
+  assertRoomsMatchGender(loaiGioiTinhHoSo(profile), [room]);
   await phongQuanTamRepository.themPhongQuanTam(profile.maDangKy, room.maPhong);
   return phongQuanTamRepository.layPhongQuanTam(profile.maDangKy);
 }

@@ -84,7 +84,7 @@ Trạng thái hồ sơ (`PhieuDangKy`): Chờ tiếp nhận → **Đã tiếp nh
 ### 3.2 Giai đoạn 2: Giữ chỗ (D-026, D-023, D-031)
 
 1. Khi buổi đã "Đã xem", **khách tự gửi yêu cầu "Giữ chỗ"** trên web: chọn **phòng trong buổi xem**, **nguyên phòng hoặc ghép giường**, và giường. **Sale cũng gửi thay được** khi khách gọi điện hoặc đến quầy.
-2. **Hệ thống kiểm tra ngay:** giường còn trống, giới tính khớp phòng, số người không vượt sức chứa, số giường chọn bằng số người, không có yêu cầu khác đang chờ trùng giường.
+2. *(D-047: giới tính còn được chặn từ lúc đăng ký/quan tâm và khi khai cư trú.)* **Hệ thống kiểm tra ngay:** giường còn trống, giới tính khớp phòng, số người không vượt sức chứa, số giường chọn bằng số người, không có yêu cầu khác đang chờ trùng giường.
 3. Khách thấy lời nhắn: **"Phòng chưa được giữ cho đến khi quản lý chi nhánh xác nhận (tối đa 12 giờ)."**
 4. **Quản lý duyệt** (vì phải kiểm tra tình trạng phòng thật):
    - Màn duyệt hiện sẵn kết luận "đủ/không đủ điều kiện" do hệ thống tính; không đủ thì khóa nút duyệt.

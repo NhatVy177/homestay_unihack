@@ -1,6 +1,7 @@
 import { executeProcedure, executeQuery, sql } from '../database/connection.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import { notifyDeposit } from '../integrations/mail/datCocNotifications.js';
+import { checkRoomGender, loaiGioiTinhHoSo } from './genderRules.js';
 
 // D-026: khách tự gửi yêu cầu giữ chỗ sau buổi "Đã xem". Dùng lại đúng hai thủ tục của Sale,
 // với Sale phụ trách của phiếu làm người đại diện; quản lý vẫn là người duyệt (không tự giữ chỗ).
@@ -48,6 +49,10 @@ export async function khachGuiYeuCauGiuCho(user, data = {}, { query = executeQue
   const profile = await ownProfile(user, maDangKy, query);
   if (profile.trangThai !== 'Đã tiếp nhận') throw createServiceError('Phiếu của bạn đã gửi yêu cầu giữ chỗ hoặc chưa ở bước này.', 409);
   if (!profile.maNhanVienSale) throw createServiceError('Phiếu chưa có nhân viên Sale phụ trách. Vui lòng liên hệ nhân viên.', 409);
+  const room = (await query('SELECT TenPhong AS tenPhong, GioiTinhChoPhep AS gioiTinhChoPhep FROM dbo.Phong WHERE MaPhong = @MaPhong',
+    [{ name: 'MaPhong', type: sql.VarChar(4), value: maPhong }])).recordset?.[0];
+  const genderIssue = room && checkRoomGender(loaiGioiTinhHoSo({ soNam: profile.soNam, soNu: profile.soNu }), room.gioiTinhChoPhep, room.tenPhong);
+  if (genderIssue) throw createServiceError(genderIssue, 409);
   try {
     await run('dbo.SP_ChonPhongKhachChot', [
       { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },

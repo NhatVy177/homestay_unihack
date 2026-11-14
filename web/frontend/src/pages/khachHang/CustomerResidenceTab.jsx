@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import { checkResidentsGender } from '../../utils/genderRules.js';
 import './customerResidence.css';
 
 // D-026 mục 4: khách tự khai người ở sau khi cọc xong. Hệ thống tự duyệt khi đạt hết điều kiện,
@@ -31,10 +32,11 @@ function ResidenceForm({ phieu, nguoiDaiDien, onSubmit }) {
   const [consent, setConsent] = useState(false), [saving, setSaving] = useState(false), [error, setError] = useState('');
   const maxMembers = Math.max(Number(phieu.soDongCoc) || 1, Number(phieu.soNguoiDuKienO) || 1);
   const update = (index, field, value) => setMembers((list) => list.map((m, i) => (i === index ? { ...m, [field]: value } : m)));
+  const genderIssue = checkResidentsGender(members, phieu);
   const missing = members.some((m) => !m.hoTen.trim() || !m.ngaySinh || !m.gioiTinh || !m.cccd.trim() || !m.sdt.trim() || !m.quocTich.trim());
   async function submit(event) {
     event.preventDefault();
-    if (missing || !consent || saving) return;
+    if (missing || genderIssue || !consent || saving) return;
     setSaving(true); setError('');
     try {
       await onSubmit({ maPhieuDatCoc: phieu.maPhieuDatCoc, dongYCungCapThongTin: true,
@@ -60,8 +62,9 @@ function ResidenceForm({ phieu, nguoiDaiDien, onSubmit }) {
     <label className="cres-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
       <span>Tôi xác nhận các thành viên đồng ý cung cấp thông tin để làm thủ tục thuê phòng và đăng ký tạm trú.</span></label>
     <p className="cres-note"><Icon name="badge" /> Nhân viên sẽ đối chiếu CCCD gốc của từng người khi ký hợp đồng tại quầy.</p>
+    {genderIssue && <p className="customer-viewing-error" role="alert">{genderIssue}</p>}
     {error && <p className="customer-viewing-error" role="alert">{error}</p>}
-    <div className="cres-actions"><button type="submit" className="ui-btn ui-btn--primary" disabled={missing || !consent || saving}>{saving ? 'Đang gửi...' : 'Gửi thông tin cư trú'}</button></div>
+    <div className="cres-actions"><button type="submit" className="ui-btn ui-btn--primary" disabled={missing || Boolean(genderIssue) || !consent || saving}>{saving ? 'Đang gửi...' : 'Gửi thông tin cư trú'}</button></div>
   </form>;
 }
 

@@ -2,6 +2,7 @@ import { executeQuery, sql } from '../database/connection.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as cuTruRepository from '../repositories/cuTru.repository.js';
 import { requireValidMembers } from './nhanPhong.service.js';
+import { checkResidentsGender } from './genderRules.js';
 import { notifyNhanPhong, notifyMemberInvites } from '../integrations/mail/nhanPhongNotifications.js';
 
 // D-026 mục 4: sau khi cọc xong, khách tự khai người ở trên web; hệ thống kiểm tra như D-024
@@ -17,7 +18,7 @@ export async function getCuTruCuaKhach(user, { query = executeQuery } = {}) {
   assertCustomer(user);
   const params = [{ name: 'MaKhachHang', type: sql.VarChar(6), value: user.maNguoiDung }];
   const deposits = (await query(`SELECT pdc.MaPhieuDatCoc AS maPhieuDatCoc, pdc.HinhThucThue AS hinhThucThue,
-      pdk.SoNguoiDuKienO AS soNguoiDuKienO, hs.MaHoSoCuTru AS maHoSoCuTru,
+      pdk.SoNguoiDuKienO AS soNguoiDuKienO, pdk.SoNam AS soNam, pdk.SoNu AS soNu, hs.MaHoSoCuTru AS maHoSoCuTru,
       ISNULL(hs.TrangThaiHoSo, N'Chưa cập nhật') AS trangThaiHoSo, hs.GhiChuQuanLy AS ghiChuQuanLy,
       CAST(CASE WHEN EXISTS (SELECT 1 FROM dbo.HopDongThue hd WHERE hd.MaPhieuCoc = pdc.MaPhieuDatCoc) THEN 1 ELSE 0 END AS BIT) AS coHopDong,
       (SELECT COUNT(*) FROM dbo.ChiTietDatCoc c WHERE c.MaPhieuDatCoc = pdc.MaPhieuDatCoc) AS soDongCoc,
@@ -66,7 +67,7 @@ export async function khaiCuTru(user, data = {}, {
   members.forEach((member, index) => {
     if (!member.ngaySinh || !member.sdt) throw createServiceError(`Người ở thứ ${index + 1} thiếu ngày sinh hoặc số điện thoại.`);
   });
-  const owner = (await query(`SELECT pdk.MaNhanVienSale AS maNhanVienSale
+  const owner = (await query(`SELECT pdk.MaNhanVienSale AS maNhanVienSale, pdk.SoNam AS soNam, pdk.SoNu AS soNu
     FROM dbo.PhieuDatCoc pdc JOIN dbo.PhieuDangKy pdk ON pdk.MaDangKy = pdc.MaPhieuYeuCauDangKy
     WHERE pdc.MaPhieuDatCoc = @MaPhieuDatCoc AND pdc.MaKhachHang = @MaKhachHang`, [
     { name: 'MaPhieuDatCoc', type: sql.VarChar(6), value: maPhieuDatCoc },
@@ -74,6 +75,8 @@ export async function khaiCuTru(user, data = {}, {
   ])).recordset?.[0];
   if (!owner) throw createServiceError('Không tìm thấy phiếu cọc của bạn.', 404);
   if (!owner.maNhanVienSale) throw createServiceError('Phiếu chưa có nhân viên Sale phụ trách. Vui lòng liên hệ nhân viên.', 409);
+  const genderIssue = checkResidentsGender(members, owner);
+  if (genderIssue) throw createServiceError(genderIssue, 409);
   try {
     const saved = await repo.luuHoSoCuTru({
       maPhieuDatCoc, maNhanVienSale: owner.maNhanVienSale, daDoiChieuGiayTo: false,

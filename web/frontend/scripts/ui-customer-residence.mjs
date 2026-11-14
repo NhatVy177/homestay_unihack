@@ -9,7 +9,7 @@ try {
   for (const width of [1440, 390]) {
     const user = { maNguoiDung: 'KH0001', maKhachHang: 'KH0001', hoTen: 'Nguyễn Văn A', vaiTro: 'KhachHang' };
     const state = { phieu: [
-      { maPhieuDatCoc: 'DC0003', hinhThucThue: 'Ghép giường', soNguoiDuKienO: 2, soDongCoc: 2, viTriThue: 'Phòng 101 - Giường G1, Phòng 101 - Giường G2', gioiTinhChoPhep: 'Nam', maHoSoCuTru: null, trangThaiHoSo: 'Chưa cập nhật', coHopDong: false, coTheKhai: true, thanhVien: [] },
+      { maPhieuDatCoc: 'DC0003', hinhThucThue: 'Ghép giường', soNguoiDuKienO: 2, soNam: 2, soNu: 0, soDongCoc: 2, viTriThue: 'Phòng 101 - Giường G1, Phòng 101 - Giường G2', gioiTinhChoPhep: 'Nam', maHoSoCuTru: null, trangThaiHoSo: 'Chưa cập nhật', coHopDong: false, coTheKhai: true, thanhVien: [] },
       { maPhieuDatCoc: 'DC0001', hinhThucThue: 'Nguyên phòng', soNguoiDuKienO: 1, soDongCoc: 1, viTriThue: 'Phòng 301', maHoSoCuTru: 'HS0001', trangThaiHoSo: 'Chờ duyệt cư trú', ghiChuQuanLy: 'Quốc tịch cần quản lý kiểm tra; ', coHopDong: false, coTheKhai: false,
         thanhVien: [{ hoTen: 'John', gioiTinh: 'Nam', ngaySinh: '1999-05-01', cccd: 'P1234567', trangThai: 'Chờ duyệt' }] }],
     nguoiDaiDien: { hoTen: 'Nguyễn Văn A', ngaySinh: '2001-02-03', gioiTinh: 'Nam', sdt: '0795749721', email: 'a@example.com', cccd: '012345678901', quocTich: 'Việt Nam' } };
@@ -45,6 +45,9 @@ try {
     const second = open.locator('fieldset').nth(1);
     await second.getByLabel('Họ và tên').fill('Trần Văn B');
     await second.getByLabel('Ngày sinh').fill('2002-03-04');
+    await second.getByLabel('Giới tính').selectOption('Nữ');
+    await open.getByText(/Giới tính người ở không khớp phiếu đăng ký \(2 nam, 0 nữ\)/).waitFor();
+    assert.equal(await send.isDisabled(), true, 'lệch giới tính thì không gửi được');
     await second.getByLabel('Giới tính').selectOption('Nam');
     await second.getByLabel('Số CCCD').fill('098765432109');
     await second.getByLabel('Số điện thoại').fill('0911111111');
