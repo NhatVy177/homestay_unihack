@@ -1120,3 +1120,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File frontend: `pages/khachHang/CustomerResidenceTab.jsx` + `customerResidence.css` (mới), `KhachHangPortalPage.jsx` (tab `cu-tru`, khóa khi chưa có phiếu cọc), `khachMoi.api.js`, `pages/nhanVienSale/LapHopDongTab.jsx` (ô bắt buộc "Đã đối chiếu CCCD gốc…"), `scripts/ui-customer-residence.mjs`.
 - Kiểm tra: backend 84 pass, 4 skip, 0 fail; UI PASS `ui-customer-residence`, `ui-customer-deposit-history`, `ui-customer-invoices` (fixture); chạy thử hai hàm vá trên định nghĩa SP thật lấy từ HOMEDORM4 (trong bộ nhớ): bỏ đúng hai chốt, chạy lại không đổi. `residence-self-declare-db.mjs check` trên HOMEDORM4: `ready:false` (chưa migrate).
 - Việc còn lại: **chờ Vy cho phép chạy migration** trên HOMEDORM4; trước khi chạy, khách gửi thông tin sẽ báo lỗi 50012. Chưa có test giao diện cho ô CCCD gốc ở màn lập hợp đồng.
+
+## 2026-11-15 00:56:25 +07:00 — J-C104 — Chạy migration khách tự khai cư trú lên HOMEDORM4
+- Người thực hiện: Claude, Vy cho phép ("có") sau J-C103.
+- Đã chạy `node scripts/residence-self-declare-db.mjs migrate` → `ready:true`; `check` lại → `ready:true`. Chỉ đổi định nghĩa `SP_LuuHoSoCuTru` và `SP_GuiDuyetHoSoCuTru`, không đổi dữ liệu.
+- Thử thật trong transaction rồi rollback: phiếu DC0003, lưu hồ sơ với `DaDoiChieuGiayTo=0` và một thành viên thử → gửi duyệt ra "Đã duyệt cư trú" (tự duyệt). Đã rollback, không còn dữ liệu thử.
+- Việc còn lại: khách thật khai qua giao diện để nghiệm thu; Sale tích "Đã đối chiếu CCCD gốc" khi lập hợp đồng.
