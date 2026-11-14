@@ -1017,3 +1017,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - DB: đã chạy `demo-viewing-time-db.mjs migrate` trên HOMEDORM4 (chỉ đổi định nghĩa SP, không đổi dữ liệu; không truyền tham số thì hành vi cũ). Bật cờ trong `.env` backend của `D:\HomeStayDorm-integ` rồi khởi động lại backend.
 - Vẫn bắt buộc khách xác nhận lịch (D-045) trước khi ghi kết quả. Tắt demo: đặt `DEMO_BO_QUA_GIO_HEN=0` và khởi động lại backend.
 - Kiểm tra: test đơn vị mới + viewing-status + viewing-confirmation: 9 pass. Chưa chạy lại toàn bộ UI.
+
+## 2026-11-14 21:45:00 +07:00 — J-C089 — Sửa timeline lịch hẹn: bước hiện tại là "Xác nhận lịch" khi khách chưa xác nhận
+- Người thực hiện: Claude. Lý do: Vy báo timeline Sale chấm xanh ở "Buổi xem" dù khách chưa xác nhận lịch (D-045), trông như đã qua bước xác nhận.
+- File: `web/frontend/src/pages/nhanVienSale/SaleAppointmentSummary.jsx` (`AppointmentProgress`: thêm `waitingConfirm`; "Xác nhận lịch" là `is-current` khi chờ khách, "Buổi xem" chỉ `is-current` sau khi khách xác nhận hoặc lịch đã kết thúc).
+- Kiểm tra: `ui-viewing-outcomes` và `ui-sale-calendar-layout` PASS (fixture API, không ghi DB); build vite OK. Không đổi backend/DB.

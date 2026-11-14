@@ -23,10 +23,11 @@ export function UpcomingAppointments({ schedules, loading, error, onSelect }) {
 export function AppointmentProgress({ schedule }) {
   const viewed = schedule.trangThai === 'Đã xem';
   const stopped = ['Đã hủy', 'Khách không đến'].includes(schedule.trangThai);
+  const waitingConfirm = !schedule.khachDaXacNhanLich && !viewed && !stopped;
   return <ol className="sale-appointment-progress" aria-label="Tiến trình lịch hẹn">
     <li className="is-complete"><strong>Lên lịch</strong><p>Hẹn lúc {timeLabel(schedule.thoiGianHen)} · {dateLabel(schedule.thoiGianHen)}</p>{schedule.tenNhanVienSale && <small>Sale phụ trách: {schedule.tenNhanVienSale}</small>}</li>
-    <li className={schedule.khachDaXacNhanLich?'is-complete':''}><strong>Xác nhận lịch</strong><p>{schedule.khachDaXacNhanLich?'Khách đã xác nhận':viewed||stopped?'Chưa có thông tin xác nhận':'Chờ khách xác nhận'}</p>{schedule.thoiGianKhachXacNhan&&<small>{timeLabel(schedule.thoiGianKhachXacNhan)} · {dateLabel(schedule.thoiGianKhachXacNhan)}</small>}</li>
-    <li className={viewed ? 'is-complete' : stopped ? 'is-stopped' : 'is-current'}><strong>Buổi xem</strong><p>{schedule.trangThai || 'Chưa cập nhật trạng thái'}</p></li>
+    <li className={schedule.khachDaXacNhanLich?'is-complete':waitingConfirm?'is-current':''}><strong>Xác nhận lịch</strong><p>{schedule.khachDaXacNhanLich?'Khách đã xác nhận':viewed||stopped?'Chưa có thông tin xác nhận':'Chờ khách xác nhận'}</p>{schedule.thoiGianKhachXacNhan&&<small>{timeLabel(schedule.thoiGianKhachXacNhan)} · {dateLabel(schedule.thoiGianKhachXacNhan)}</small>}</li>
+    <li className={viewed ? 'is-complete' : stopped ? 'is-stopped' : waitingConfirm ? '' : 'is-current'}><strong>Buổi xem</strong><p>{schedule.trangThai || 'Chưa cập nhật trạng thái'}</p></li>
     <li className={schedule.daGuiYeuCauDatCoc ? 'is-complete' : ''}><strong>Giữ chỗ</strong><p>{schedule.daGuiYeuCauDatCoc ? 'Đã gửi yêu cầu đặt cọc' : 'Chưa có yêu cầu giữ chỗ'}</p></li>
   </ol>;
 }
