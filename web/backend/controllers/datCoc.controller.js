@@ -82,3 +82,12 @@ export async function tienMatChoNopQuy(req, res, next) {
 export async function ghiNhanNopQuy(req, res, next) {
   try { res.json(await service.ghiNhanNopQuyCoc(req.user, req.params.id)); } catch (err) { next(err); }
 }
+
+// D-026: khách tự gửi yêu cầu giữ chỗ (kiểm tra sở hữu phiếu trong service).
+import * as khachGiuCho from '../services/khachGiuCho.service.js';
+export async function getPhongDaXemKhach(req, res, next) {
+  try { res.json(await khachGiuCho.getPhongDaXemCuaKhach(req.user, req.query.maDangKy)); } catch (err) { next(err); }
+}
+export async function khachGuiYeuCauGiuCho(req, res, next) {
+  try { res.json(await khachGiuCho.khachGuiYeuCauGiuCho(req.user, req.body)); } catch (err) { next(err); }
+}

@@ -24,6 +24,9 @@ export const datCocApi = {
   getPhongDaXem: (maDangKy) => httpClient.get('/dat-coc/phong-da-xem', { params: { maDangKy } }),
   // DC01 - Sale chốt/đổi phòng khách muốn thuê ({ maPhong: 'P102' })
   chonPhongChot: (maDangKy, data) => httpClient.put(`/dat-coc/gui-yeu-cau/${maDangKy}/phong-chot`, data),
+  // D-026 - khách tự gửi yêu cầu giữ chỗ sau khi đã xem
+  getPhongDaXemKhach: (maDangKy) => httpClient.get('/dat-coc/khach/phong-da-xem', { params: { maDangKy } }),
+  khachGuiYeuCauGiuCho: (data) => httpClient.post('/dat-coc/khach/gui-yeu-cau', data),
   getDanhSachChoGhiNhanChungTu: () => httpClient.get('/dat-coc/cho-ghi-nhan-chung-tu'),
   getDanhSachChoXacNhanThanhToan: () => httpClient.get('/dat-coc/cho-xac-nhan-thanh-toan')
 };

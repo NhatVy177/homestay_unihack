@@ -65,14 +65,14 @@ try {
     assert.equal(await page.getByRole('dialog').count(),1);
     await page.getByRole('button',{name:'Xác nhận Đã xem',exact:true}).click();
     await page.getByRole('status').filter({hasText:'Đã ghi nhận DK0001-1: Đã xem.'}).waitFor();
-    assert.equal(await page.getByRole('button',{name:'Đã xem',exact:true}).isDisabled(),true);
+    assert.equal(await page.getByRole('button',{name:'Đã xem',exact:true}).count(),0);
     await shot('viewed');
     await choose(4);await page.getByRole('button',{name:'Khách không đến',exact:true}).click();
     await page.getByRole('button',{name:'Xác nhận Khách không đến',exact:true}).click();
     await page.getByRole('status').filter({hasText:'Đã ghi nhận DK0004-1: Khách không đến.'}).waitFor();
     await page.locator('#schedule-status').selectOption('Khách không đến');
     assert.equal(await page.locator('.sale-schedule-item').count(),1);
-    assert.equal(await page.getByRole('button',{name:'Khách không đến',exact:true}).isDisabled(),true);
+    assert.equal(await page.getByRole('button',{name:'Khách không đến',exact:true}).count(),0);
     await shot('no-show');
     assert.deepEqual(writes.map(w=>w.thaoTac),['da-xem','da-xem','khach-khong-den']);
     assert.ok(writes.every(w=>Object.keys(w).sort().join(',')==='ghiChuXuLy,path,thaoTac'));

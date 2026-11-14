@@ -33,11 +33,11 @@ try{
     for(const id of ['LATER','CANCEL','VIEWED'])assert.doesNotMatch(await upcoming.innerText(),new RegExp(`Khách thử ${id}`));
     const shot=async name=>{await page.evaluate(()=>document.fonts.ready);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),width);assert.deepEqual(errors,[]);await page.screenshot({path:`${folder}/${name}-${width}.png`,fullPage:true});};
     await upcoming.getByRole('button').filter({hasText:'Khách thử NEAR'}).click();
-    await page.locator('.sale-progress-card').getByRole('heading',{name:'NEAR',exact:true}).waitFor();
+    await page.locator('.sale-progress-card .sale-progress-code',{hasText:'NEAR'}).waitFor();
     await shot('calendar-and-list');
     await page.getByRole('button',{name:'CANCEL · Khách thử CANCEL',exact:true}).click();
-    assert.equal(await page.getByRole('button',{name:'Đổi lịch',exact:true}).isDisabled(),true);
-    assert.equal(await page.getByRole('button',{name:'Hủy lịch',exact:true}).isDisabled(),true);
+    assert.equal(await page.getByRole('button',{name:'Đổi lịch',exact:true}).count(),0);
+    assert.equal(await page.getByRole('button',{name:'Hủy lịch',exact:true}).count(),0);
     assert.equal(await page.locator('.sale-appointment-progress .is-stopped').count(),1,'cancelled viewing is not shown as completed');
     await page.locator('#schedule-search').fill('Khách thử NEAR');assert.equal(await page.locator('.sale-schedule-item').count(),1);
     await page.getByRole('button',{name:'Xóa lọc',exact:true}).click();assert.equal(await page.locator('.sale-schedule-item').count(),5);

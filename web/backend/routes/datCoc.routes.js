@@ -6,6 +6,9 @@ const router = Router();
 
 router.get('/', controller.getPhieuDatCoc);
 router.post('/gui-yeu-cau', controller.guiYeuCauDatCoc);
+// D-026: khách tự gửi yêu cầu giữ chỗ sau khi đã xem phòng.
+router.get('/khach/phong-da-xem', controller.getPhongDaXemKhach);
+router.post('/khach/gui-yeu-cau', controller.khachGuiYeuCauGiuCho);
 // DC01 (A4) - Sale chỉnh sửa thông tin cá nhân/liên hệ/giấy tờ khách hàng trước khi gửi yêu cầu.
 router.put('/gui-yeu-cau/:maDangKy/thong-tin-ca-nhan', controller.capNhatThongTinCaNhan);
 // DC01 - Sale chốt phòng khách muốn thuê (trong các phòng khách đã xem).

@@ -101,3 +101,16 @@
   .customer-viewing-card-head > .ui-badge { margin-left: auto; }
   .customer-viewing-steps strong { font-size: 10px; }
 }
+
+.customer-deposit-cta { width: 100%; justify-content: center; }
+.customer-deposit-form { display: grid; gap: var(--space-4, 16px); }
+.customer-deposit-form fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
+.customer-deposit-form legend { font-weight: 700; margin-bottom: 8px; }
+.customer-deposit-option { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface); cursor: pointer; }
+.customer-deposit-option.is-selected { border-color: var(--color-primary); background: var(--color-surface-alt, var(--color-surface)); }
+.customer-deposit-option.is-disabled { opacity: .55; cursor: not-allowed; }
+.customer-deposit-option small { color: var(--color-text-muted); margin-left: auto; }
+.customer-deposit-beds { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.customer-deposit-beds label { display: inline-flex; gap: 6px; align-items: center; padding: 6px 12px; border: 1px solid var(--color-border); border-radius: 999px; background: var(--color-surface); }
+.customer-deposit-beds label.is-selected { border-color: var(--color-primary); }
+.customer-deposit-actions { display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px 24px; }

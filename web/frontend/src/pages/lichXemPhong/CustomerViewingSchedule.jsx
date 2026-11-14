@@ -5,6 +5,7 @@ import ResultModal from '../../components/common/ResultModal.jsx';
 import CustomerAppointmentCard from './CustomerAppointmentCard.jsx';
 import ViewingMonthCalendar from './ViewingMonthCalendar.jsx';
 import { RescheduleModal, CancelModal } from './ViewingRequestModals.jsx';
+import CustomerDepositRequestModal from './CustomerDepositRequestModal.jsx';
 import { endedViewing, viewingDay } from './viewingPresentation.js';
 import { lichXemPhongApi } from './lichXemPhong.api.js';
 import './customerViewingSchedule.css';
@@ -12,7 +13,7 @@ import './customerViewingSchedule.css';
 const EMPTY_SCHEDULES=[];
 export default function CustomerViewingSchedule({schedules=EMPTY_SCHEDULES,onViewRoomDetail,onReschedule,onCancel}){
   const [rows,setRows]=useState(schedules),[draft,setDraft]=useState(''),[query,setQuery]=useState(''),[group,setGroup]=useState('active'),[selectedDay,setSelectedDay]=useState('');
-  const [reschedule,setReschedule]=useState(null),[cancel,setCancel]=useState(null),[busy,setBusy]=useState(''),[loading,setLoading]=useState(false),[error,setError]=useState(''),[result,setResult]=useState(null);
+  const [reschedule,setReschedule]=useState(null),[cancel,setCancel]=useState(null),[deposit,setDeposit]=useState(null),[busy,setBusy]=useState(''),[loading,setLoading]=useState(false),[error,setError]=useState(''),[result,setResult]=useState(null);
   const confirming=useRef(false);
   useEffect(()=>{setRows(schedules);},[schedules]);
   const searched=rows.filter(row=>[row.id,row.maDangKy,row.hoTenKhach,row.sdtKhach,row.emailKhach,row.phongXem,row.danhSachPhong,row.maPhong,row.tenNhanVienSale].filter(Boolean).join(' ').toLocaleLowerCase('vi-VN').includes(query.toLocaleLowerCase('vi-VN')));
@@ -46,10 +47,11 @@ export default function CustomerViewingSchedule({schedules=EMPTY_SCHEDULES,onVie
       <div className="customer-viewing-tabs" role="group" aria-label="Nhóm lịch hẹn"><button type="button" aria-pressed={group==='active'} onClick={()=>setGroup('active')}>Sắp tới ({groups.active.length})</button><button type="button" aria-pressed={group==='past'} onClick={()=>setGroup('past')}>Đã qua ({groups.past.length})</button></div>
       {(query||selectedDay)&&<div className="customer-viewing-filter-note"><span>{visible.length} lịch hẹn phù hợp{selectedDay?` · ${selectedDay.split('-').reverse().join('/')}`:''}</span><button className="ui-btn ui-btn--ghost ui-btn--sm" type="button" onClick={()=>{setDraft('');setQuery('');setSelectedDay('');}}>Xóa lọc</button></div>}
       {!loading&&!visible.length&&<div className="ui-card customer-viewing-empty"><EmptyState message="Không có lịch hẹn trong mục này."/><p>Thử chọn mục khác, ngày khác hoặc xóa bộ lọc.</p><button className="ui-btn ui-btn--secondary" type="button" onClick={refresh}>Tải lại lịch hẹn</button></div>}
-      {visible.map(row=><CustomerAppointmentCard key={row.id} row={row} busy={busy===row.id} onConfirm={confirm} onReschedule={setReschedule} onCancel={setCancel} onViewDetail={onViewRoomDetail}/>)}
+      {visible.map(row=><CustomerAppointmentCard key={row.id} row={row} busy={busy===row.id} onConfirm={confirm} onReschedule={setReschedule} onCancel={setCancel} onViewDetail={onViewRoomDetail} onDeposit={setDeposit}/>)}
     </section><ViewingMonthCalendar schedules={searched} selectedDay={selectedDay} onDay={setSelectedDay}/></div>
     <p className="customer-viewing-hint">Nếu có thay đổi, hãy gửi yêu cầu đổi lịch trước giờ hẹn ít nhất 2 tiếng. Nhân viên sẽ kiểm tra và phản hồi.</p>
     {reschedule&&<RescheduleModal appt={reschedule} onClose={()=>setReschedule(null)} onSubmit={onReschedule}/>}
+    {deposit&&<CustomerDepositRequestModal row={deposit} onClose={()=>setDeposit(null)} onSent={()=>{setDeposit(null);refresh();setResult({type:'success',title:'Đã gửi yêu cầu giữ chỗ',message:'Quản lý chi nhánh sẽ xác nhận trong tối đa 12 giờ. Phòng chưa được giữ cho đến khi được xác nhận.'});}}/>}
     {cancel&&<CancelModal appt={cancel} onClose={()=>setCancel(null)} onSubmit={onCancel}/>}
     <ResultModal open={Boolean(result)} type={result?.type} title={result?.title} message={result?.message} confirmText="Đã hiểu" onClose={()=>setResult(null)}/>
   </div>;

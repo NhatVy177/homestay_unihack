@@ -109,8 +109,8 @@ try {
       await page.getByRole('button', { name: 'Xác nhận hủy', exact: true }).click();
       assert.equal(writes.at(-1).body.thaoTac, 'huy');
       await page.getByRole('button', { name: /LX0002.*Khách lịch ngày mai/ }).click();
-      assert.equal(await page.getByRole('button', { name: 'Đổi lịch', exact: true }).isDisabled(), true);
-      assert.equal(await page.getByRole('button', { name: 'Hủy lịch', exact: true }).isDisabled(), true);
+      assert.equal(await page.getByRole('button', { name: 'Đổi lịch', exact: true }).count(), 0);
+      assert.equal(await page.getByRole('button', { name: 'Hủy lịch', exact: true }).count(), 0);
       await page.getByRole('button', { name: 'Lập lịch hẹn', exact: true }).click();
       await page.getByRole('button', { name: /Khách thử An/ }).waitFor();
       // D-044: không còn bước tiếp nhận; phiếu "Chờ tiếp nhận" cũng hiện trong danh sách chờ xếp lịch.
