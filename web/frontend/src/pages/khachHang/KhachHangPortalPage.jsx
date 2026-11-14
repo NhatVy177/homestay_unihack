@@ -3694,6 +3694,9 @@ export default function KhachHangPortalPage() {
       const updated = { ...datCocSelected, trangThai: 'Chờ xác nhận', minhChungThanhToan: uploadForm.fileName, lyDoTuChoi: null };
       setDatCocSelected(updated);
       setDatCocList((prev) => prev.map((p) => p.maPhieuCoc === updated.maPhieuCoc ? updated : p));
+      // Gửi xong thì về danh sách hóa đơn & thanh toán, phiếu hiện "Chờ xác nhận" cho tới khi kế toán duyệt.
+      setDepositDetailOpen(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setToast('Gửi chứng từ thất bại.');
     } finally {

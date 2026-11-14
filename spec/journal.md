@@ -1077,3 +1077,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (`renderDepositPaymentLayout`, nhánh sớm `if (isWaiting)`), `khachHangPortal.css` (`.dpay-*`), `scripts/ui-customer-invoices.mjs` (kiểm tra tiêu đề, tab đang chọn, nút ví).
 - Kiểm tra: build OK; `ui-customer-invoices` PASS ở 1440/390 (fixture API, không ghi DB); đã xem ảnh màn hình 1440.
 - Việc còn lại: Vy xem trên điện thoại và trạng thái đã gửi chứng từ (bố cục cũ, chưa đổi).
+
+## 2026-11-15 10:20:00 +07:00 — J-C098 — Sau khi gửi chứng từ đặt cọc, khách về danh sách "Hóa đơn & thanh toán"
+- Người thực hiện: Claude. Lý do: Vy báo sau khi gửi chứng từ thì trang vẫn ở chi tiết phiếu; Vy muốn về danh sách lịch sử, phiếu hiện "Chờ xác nhận".
+- Thay đổi: `submitMinhChung` đóng chi tiết phiếu sau khi gửi thành công và cuộn lên đầu; ô trạng thái trong bảng không xuống dòng.
+- Chưa làm: tab "Lịch sử đặt cọc" riêng. Hiện danh sách hóa đơn và phiếu cọc gộp trong một tab, nên chưa tách. Ảnh mẫu "Hóa đơn của tôi" (mã HD-HDTT, loại "Hoàn cọc") không có trong repo này; chưa rõ đó là ứng dụng nào.
+- Kiểm tra: build OK; `ui-customer-invoices` PASS (fixture API).
