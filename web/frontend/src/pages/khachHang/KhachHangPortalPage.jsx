@@ -14,13 +14,14 @@ import { httpClient } from '../../api/httpClient.js';
 import ThuNhanPhongWalletCard from './ThuNhanPhongWalletCard.jsx';
 import CustomerInvoicesList from './CustomerInvoicesList.jsx';
 import CustomerDepositHistory from './CustomerDepositHistory.jsx';
+import CustomerResidenceTab from './CustomerResidenceTab.jsx';
 import VietQrCode from '../../components/common/VietQrCode.jsx';
 import { moTaCachTinhCoc } from '../../utils/tienCoc.js';
 import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Claude), one line agreed with Vy
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
 const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
-const PORTAL_TABS = ['kham-pha', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'hop-dong', 'tra-phong'];
+const PORTAL_TABS = ['kham-pha', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'cu-tru', 'hop-dong', 'tra-phong'];
 
 // Gốc backend để mở lại file chứng từ đã upload (DB lưu đường dẫn /uploads/chung-tu/..).
 const FILE_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
@@ -688,6 +689,7 @@ function getNavLocks(state = {}) {
     'lich-xem': false,
     'dat-coc': !hasDeposit,
     'lich-su-coc': false,
+    'cu-tru': !hasDeposit,
     'hop-dong': !hasContract,
     'tra-phong': !(hasDeposit || hasContract),
     'tai-khoan': false,
@@ -702,6 +704,7 @@ function getLockedMessage(tab) {
   const messages = {
     'lich-xem': 'Lịch xem phòng sẽ mở khi nhân viên tạo lịch xem cho hồ sơ của bạn.',
     'dat-coc': 'Hóa đơn & thanh toán sẽ mở khi hồ sơ được duyệt và có phiếu đặt cọc.',
+    'cu-tru': 'Thông tin cư trú sẽ mở khi bạn có phiếu đặt cọc.',
     'hop-dong': 'Hợp đồng sẽ mở sau khi bạn hoàn tất đặt cọc và ký hợp đồng.',
     'tra-phong': 'Chức năng trả phòng sẽ mở sau khi bạn đã đặt cọc hoặc ký hợp đồng.'
   };
@@ -1023,6 +1026,9 @@ export default function KhachHangPortalPage() {
   // Tab "Lịch sử đặt cọc": yêu cầu giữ chỗ đang chờ quản lý + các phiếu cọc.
   const [holdRequests, setHoldRequests] = useState(null);
   const [holdRequestsError, setHoldRequestsError] = useState('');
+  // Tab "Thông tin cư trú" (D-026 mục 4): khách tự khai người ở.
+  const [residence, setResidence] = useState(null);
+  const [residenceError, setResidenceError] = useState('');
   const [depositClock, setDepositClock] = useState(Date.now());
   useEffect(() => {
     if (activeTab !== 'dat-coc') return undefined;
@@ -1102,6 +1108,7 @@ export default function KhachHangPortalPage() {
     { id: 'lich-xem', icon: 'event_note', title: 'Lịch xem phòng' },
     { id: 'dat-coc', icon: 'payments', title: 'Hóa đơn & thanh toán' },
     { id: 'lich-su-coc', icon: 'receipt_long', title: 'Lịch sử đặt cọc' },
+    { id: 'cu-tru', icon: 'group', title: 'Thông tin cư trú' },
     { id: 'hop-dong', icon: 'article', title: 'Hợp đồng' },
     { id: 'tra-phong', icon: 'logout', title: 'Trả phòng' }
   ];
@@ -1152,6 +1159,7 @@ export default function KhachHangPortalPage() {
       khachMoiApi.getHoaDon().then(({ data }) => setInvoices(Array.isArray(data) ? data : []))
         .catch(() => { setInvoices([]); setInvoicesError('Chưa tải được hóa đơn các kỳ. Phiếu cọc vẫn hiển thị bình thường.'); });
     }
+    if (activeTab === 'cu-tru' && residence === null) loadResidence();
     if (activeTab === 'lich-su-coc' && holdRequests === null) {
       khachMoiApi.getYeuCauGiuCho().then(({ data }) => { setHoldRequests(Array.isArray(data) ? data : []); setHoldRequestsError(''); })
         .catch(() => { setHoldRequests([]); setHoldRequestsError('Chưa tải được yêu cầu giữ chỗ đang chờ. Các phiếu cọc vẫn hiển thị bình thường.'); });
@@ -4106,6 +4114,24 @@ export default function KhachHangPortalPage() {
     );
   }
 
+  async function loadResidence() {
+    setResidenceError('');
+    try { const { data } = await khachMoiApi.getCuTru(); setResidence(data || { phieu: [] }); }
+    catch (err) { setResidence({ phieu: [] }); setResidenceError(err?.response?.data?.message || 'Chưa tải được thông tin cư trú. Vui lòng thử lại.'); }
+  }
+
+  async function submitResidence(payload) {
+    const { data } = await khachMoiApi.khaiCuTru(payload);
+    setToast(data?.trangThaiHoSo === 'Đã duyệt cư trú'
+      ? 'Hồ sơ cư trú đã được duyệt tự động. Nhân viên Sale sẽ liên hệ lập hợp đồng.'
+      : 'Đã gửi thông tin cư trú. Quản lý chi nhánh sẽ kiểm tra.');
+    await loadResidence();
+  }
+
+  function renderResidence() {
+    return <CustomerResidenceTab data={residence} loading={residence === null} error={residenceError} onSubmit={submitResidence} />;
+  }
+
   function renderDepositHistory() {
     return <CustomerDepositHistory deposits={datCocList || []} requests={holdRequests || []}
       loading={datCocList === null || holdRequests === null} error={holdRequestsError}
@@ -4368,6 +4394,7 @@ export default function KhachHangPortalPage() {
     if (activeTab === 'lich-xem') return renderSchedules();
     if (activeTab === 'dat-coc') return renderDatCoc();
     if (activeTab === 'lich-su-coc') return renderDepositHistory();
+    if (activeTab === 'cu-tru') return locks['cu-tru'] ? renderLocked('cu-tru') : renderResidence();
     if (activeTab === 'hop-dong') return renderHopDongTab();
     if (activeTab === 'tra-phong') return renderHopDong();
     if (activeTab === 'tai-khoan') return renderAccount();

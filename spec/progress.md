@@ -1,6 +1,6 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-15 11:05:00 +07:00** (J-C099: tab "Hóa đơn của tôi" khớp mẫu nhóm; J-C093: tab khách "Hóa đơn & thanh toán" nhiều kỳ; J-C092: D-046 thư mời thành viên cư trú; trước đó J-C090: khách tự gửi giữ chỗ "Tôi muốn đặt cọc", Sale "Lập lịch xem phòng mới"; D-045 đã migrate và gộp ở `integration/d043-d045`). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-15 00:52:24 +07:00** (J-C103: tab khách "Thông tin cư trú", chờ migration; J-C099: tab "Hóa đơn của tôi" khớp mẫu nhóm; J-C093: tab khách "Hóa đơn & thanh toán" nhiều kỳ; J-C092: D-046 thư mời thành viên cư trú; trước đó J-C090: khách tự gửi giữ chỗ "Tôi muốn đặt cọc", Sale "Lập lịch xem phòng mới"; D-045 đã migrate và gộp ở `integration/d043-d045`). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
 
@@ -79,7 +79,7 @@ Nhánh tích hợp đã vào main; các nhánh cũ đã gộp có thể được
 | | Khách quan tâm phòng chờ cọc; Sale chỉ tiếp nhận hồ sơ khách gửi, bỏ phiếu khách vãng lai | D-042 | **Xong code + test local (J-C075)** trên `feat/d042-interested-rooms`: nhãn trạng thái phòng, nút mờ khi hết chỗ, chặn dưới 18 tuổi, gỡ form khách vãng lai ở Sale; backend 57 pass/3 skip, build qua, 5 smoke UI qua (dữ liệu giả). J-C076: thẻ chi tiết phòng "Tôi quan tâm phòng này" + số giường trống, phiếu nhu cầu thuê thành trang theo mẫu Vy gửi. J-C079 (D-043): một hồ sơ nhiều phòng quan tâm, nút "Thêm vào hồ sơ", Sale lập lịch chọn sẵn phòng; bảng `PhieuDangKyPhongQuanTam` đã migrate lên HOMEDORM4; J-C084 (D-044): bỏ bước tiếp nhận hồ sơ của Sale, "Lập lịch hẹn" hiện phiếu chờ xếp lịch, lập lịch cho phiếu mới = tiếp nhận (thử trên HOMEDORM4 với DK0003 rồi hoàn tác); backend 61 pass/3 skip, 5 ca SQL thật (thêm, trùng, khác chi nhánh, khách khác, hồ sơ đã lịch) đúng và đã dọn. Chưa chạy qua giao diện với SQL thật; route backend `/dang-ky-thue/khach-vang-lai` còn, chưa gỡ |
 | | Chính sách hoàn cọc trên phiếu và email cọc | D-031, D-034 | **Xong code + test (C1)**; chưa thử SMTP thật |
 | | Thẻ "Kích hoạt xác nhận điện tử" sau khi trả cọc | D-028 | Chưa làm |
-| **Để sau nếu trễ** | Khách tự khai người ở; thành viên bị loại hoàn 80%; hợp đồng "Chờ ký" | D-026, D-027 | Chưa làm |
+| **Để sau nếu trễ** | Khách tự khai người ở; thành viên bị loại hoàn 80%; hợp đồng "Chờ ký" | D-026, D-027 | Khách tự khai người ở: **có code + test (J-C103)**, chờ Vy cho chạy `residence-self-declare-db.mjs migrate`; hoàn 80% và hợp đồng "Chờ ký" chưa làm |
 | | Hóa đơn tháng qua ví; trang "Khoản dự kiến trừ" | D-029 | Chưa làm |
 | | Đổi người đại diện bằng email mời | D-026 | Giữ cách tạm |
 | **Sau bản thi** | Mốc chuỗi 3; cấp lại ví khi mất email (P-04) | D-031 | Không làm |

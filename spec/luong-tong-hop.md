@@ -108,7 +108,7 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
 
 ### 3.4 Giai đoạn 4: Khai người ở và duyệt cư trú (D-024, D-026)
 
-1. Sau khi cọc xong, **khách tự khai người ở** (họ tên, ngày sinh, giới tính, CCCD, quốc tịch…). **Sale không còn đối chiếu CCCD trước khi gửi.**
+1. *(Triển khai J-C103: tab khách "Thông tin cư trú"; Sale vẫn khai hộ được ở "Lập hợp đồng thuê".)* Sau khi cọc xong, **khách tự khai người ở** (họ tên, ngày sinh, giới tính, CCCD, quốc tịch…). **Sale không còn đối chiếu CCCD trước khi gửi.**
 2. **Hệ thống kiểm tra tự động:** đủ thông tin, giới tính khớp phòng, số người không vượt số giường đã cọc, CCCD không trùng trong hồ sơ và không trùng người đang ở hợp đồng hiệu lực khác, quốc tịch Việt Nam, đủ 18 tuổi.
 3. **Đạt hết** → tự "Đã duyệt cư trú" (đứng tên NVAUTO). **Có bất thường** → chờ quản lý duyệt tay, quản lý thấy lý do và nhận email.
 4. **Thành viên bị từ chối** (D-024, D-026):

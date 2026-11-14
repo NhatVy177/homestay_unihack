@@ -74,7 +74,7 @@ function normalizeMember(item = {}) {
   };
 }
 
-function requireValidMembers(members = []) {
+export function requireValidMembers(members = []) {
   if (!Array.isArray(members) || members.length === 0) {
     throw createServiceError('Vui lòng nhập ít nhất một người cư trú.');
   }
@@ -166,6 +166,7 @@ export async function guiDuyetHoSoCuTru(maHoSoCuTru) {
   try {
     const result = await cuTruRepository.guiDuyetHoSoCuTru(cleanId);
     if (result?.TrangThaiHoSo === 'Chờ duyệt cư trú') await notifyNhanPhong('residence-review', cleanId);
+    if (result?.TrangThaiHoSo === 'Đã duyệt cư trú') await notifyMemberInvites(cleanId);
     return result;
   } catch (error) {
     handleDatabaseError(error);

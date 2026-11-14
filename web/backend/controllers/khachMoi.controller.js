@@ -174,3 +174,12 @@ import { getYeuCauGiuChoCuaKhach } from '../services/khachGiuCho.service.js';
 export async function getYeuCauGiuCho(req, res, next) {
   try { res.json(await getYeuCauGiuChoCuaKhach(req.user)); } catch (error) { next(error); }
 }
+
+// D-026 mục 4: khách tự khai người ở (kiểm tra sở hữu phiếu trong service).
+import * as khachCuTru from '../services/khachCuTru.service.js';
+export async function getCuTru(req, res, next) {
+  try { res.json(await khachCuTru.getCuTruCuaKhach(req.user)); } catch (error) { next(error); }
+}
+export async function khaiCuTru(req, res, next) {
+  try { res.json(await khachCuTru.khaiCuTru(req.user, req.body)); } catch (error) { next(error); }
+}

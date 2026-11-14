@@ -254,3 +254,10 @@ export async function layDanhSachQuanLy() {
   );
   return result.recordset;
 }
+
+// D-026: ghi nhận Sale đã xem CCCD gốc lúc lập hợp đồng (hồ sơ do khách tự khai).
+export async function danhDauDaDoiChieuGiayTo(maPhieuDatCoc) {
+  const pool = await getPool();
+  await pool.request().input('MaPhieuDatCoc', sql.VarChar(6), maPhieuDatCoc)
+    .query('UPDATE dbo.HoSoCuTru SET DaDoiChieuGiayTo = 1 WHERE MaPhieuDatCoc = @MaPhieuDatCoc AND DaDoiChieuGiayTo = 0');
+}

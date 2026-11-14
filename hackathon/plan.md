@@ -278,6 +278,8 @@ J-X082: code D-045 và kiểm tự động/SQL tạm đã qua; chờ Vy cho ch�
 
 **D-046 (14/11, J-C092):** thành viên cùng ở không bắt buộc có tài khoản; ô email tùy chọn khi khai người ở và thư mời tạo tài khoản sau khi quản lý duyệt cư trú (`notifyMemberInvites`, link `/?dangKy=1&email=`). Chưa liên kết tài khoản thành viên với hồ sơ.
 
+**Khách tự khai người ở (D-026 mục 4, J-C103):** tab khách "Thông tin cư trú" (`GET/POST /khach-moi/cu-tru`), dùng lại SP lưu/gửi duyệt cư trú; bỏ chốt "Sale đã đối chiếu giấy tờ" ở hai SP (`scripts/residence-self-declare-db.mjs`, chờ Vy cho chạy) và thêm ô bắt buộc "Đã đối chiếu CCCD gốc" ở màn lập hợp đồng khi hồ sơ chưa đối chiếu.
+
 **Đợt Sale D-035 (11/11, J-X063):** Vy cho sửa Sale trước theo bố cục mẫu Hằng: menu 5 mục, tổng quan, lịch tháng và form lập lịch; bỏ mục kiểm tra phòng/giường và tab cư trú riêng, giữ nhập hộ trong Tra cứu khách hàng. Nghiệp vụ hồ sơ/cọc/trả phòng vẫn có lối truy cập. Nhánh `feat/ui-sale-workspace` từ `origin/main` (`dcc1a59`), worktree riêng; không tự merge/push main. Phạm vi này không làm khách tự khai cư trú hoặc thay backend/SQL/quyền/luồng D-026; phần đó tiếp tục ở đợt nghiệp vụ tương ứng.
 
 **Lịch hiện hành theo D-025 (Vy chốt 2026-11-10 00:47 +07:00): làm giao diện trước Fuji.** Lịch này thay bảng mốc cũ tại mục này và phần lịch 15 ngày của D-019; không thay scope nghiệp vụ hoặc coi kiểm thử local là kết quả Fuji. Đây là lịch nội bộ của Vy, không phải xác minh lại hạn BTC.

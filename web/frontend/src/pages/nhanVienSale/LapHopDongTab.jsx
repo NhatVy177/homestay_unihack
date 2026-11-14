@@ -66,6 +66,7 @@ export default function LapHopDongTab({ onResidence }) {
   const [soXeGuiXe, setSoXeGuiXe] = useState(1);
   const [confirmKH, setConfirmKH] = useState(false);
   const [confirmNV, setConfirmNV] = useState(false);
+  const [confirmCCCD, setConfirmCCCD] = useState(false);
 
   // UI state
   const [loading, setLoading] = useState(false);
@@ -297,6 +298,7 @@ export default function LapHopDongTab({ onResidence }) {
     setSoXeGuiXe(1);
     setConfirmKH(false);
     setConfirmNV(false);
+    setConfirmCCCD(false);
     setShowSuccessModal(false);
     setSavedHD(null);
     setShowChiTiet(false);
@@ -306,8 +308,8 @@ export default function LapHopDongTab({ onResidence }) {
   };
 
   const handleLuu = async () => {
-    if (!confirmKH || !confirmNV) {
-      alert('Vui lòng tích chọn xác nhận hợp đồng trước khi lưu.');
+    if (!confirmKH || !confirmNV || !confirmCCCD) {
+      alert('Vui lòng tích chọn xác nhận hợp đồng và đối chiếu CCCD gốc trước khi lưu.');
       return;
     }
 
@@ -326,6 +328,7 @@ export default function LapHopDongTab({ onResidence }) {
       kyThanhToan: kyTT,
       khachHangDaXacNhan: confirmKH,
       nhanVienDaXacNhan: confirmNV,
+      daDoiChieuCCCDGoc: confirmCCCD,
       danhSachThanhVien: thanhVien,
       danhSachDichVu: selectedDVs
     };
@@ -1282,10 +1285,14 @@ export default function LapHopDongTab({ onResidence }) {
                   <input type="checkbox" checked={confirmNV} onChange={e => setConfirmNV(e.target.checked)} className={["lhd-display-157"].filter(Boolean).join(" ")} />
                   <span className={["lhd-display-158"].filter(Boolean).join(" ")}>Nhân viên Sale xác nhận thông tin hợp đồng là chính xác</span>
                 </label>
+                <label className={["lhd-display-156"].filter(Boolean).join(" ")}>
+                  <input type="checkbox" checked={confirmCCCD} onChange={e => setConfirmCCCD(e.target.checked)} className={["lhd-display-157"].filter(Boolean).join(" ")} />
+                  <span className={["lhd-display-158"].filter(Boolean).join(" ")}>Đã đối chiếu CCCD gốc của tất cả người ở với thông tin đã khai</span>
+                </label>
               </div>
               <button
                 onClick={handleLuu}
-                disabled={!confirmKH || !confirmNV || loading}
+                disabled={!confirmKH || !confirmNV || !confirmCCCD || loading}
                 className={["lhd-btn lhd-btn-primary", "lhd-display-159"].filter(Boolean).join(" ")}
 
               >

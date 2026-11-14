@@ -163,6 +163,12 @@ export async function lapHopDongThue(data = {}, currentUser = {}) {
     throw createServiceError('Không xác định được quản lý đã duyệt cư trú cho hồ sơ này.', 400);
   }
 
+  // D-026: khách tự khai thì CCCD gốc được đối chiếu tại đây, lúc ký hợp đồng giấy.
+  const canDoiChieuCCCD = !residenceReview.hoSo.daDoiChieuGiayTo;
+  if (canDoiChieuCCCD && data.daDoiChieuCCCDGoc !== true) {
+    throw createServiceError('Cần đối chiếu CCCD gốc của các thành viên trước khi lập hợp đồng.', 400);
+  }
+
   // 1. Check client confirmation
   if (!data.khachHangDaXacNhan || !data.nhanVienDaXacNhan) {
     throw createServiceError('Hợp đồng chưa được xác nhận ký bởi khách hàng hoặc nhân viên sale.', 400);
@@ -218,6 +224,7 @@ export async function lapHopDongThue(data = {}, currentUser = {}) {
   }
 
   // 6. Fetch full contract details after success
+  if (canDoiChieuCCCD) await repository.danhDauDaDoiChieuGiayTo(maPhieuDatCoc);
   const detail = await layChiTietHopDongThue(dbResult.maHopDong);
   await notifyNhanPhong('contract-created', dbResult.maHopDong);
   return detail;

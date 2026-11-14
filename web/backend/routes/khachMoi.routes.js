@@ -19,6 +19,8 @@ router.put('/lich-xem/:id/yeu-cau-dieu-chinh', controller.yeuCauDieuChinhLich);
 router.get('/dat-coc', controller.getDatCoc);
 router.get('/hoa-don', controller.getHoaDon);
 router.get('/yeu-cau-giu-cho', controller.getYeuCauGiuCho);
+router.get('/cu-tru', controller.getCuTru);
+router.post('/cu-tru', controller.khaiCuTru);
 router.post('/dat-coc/:id/minh-chung', controller.uploadMinhChung);
 router.get('/hop-dong-dashboard', controller.getHopDongDashboard);
 router.post('/hop-dong-dashboard/tra-phong', controller.guiYeuCauTraPhong);
