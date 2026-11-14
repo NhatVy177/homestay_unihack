@@ -6,7 +6,9 @@ export const paymentAccount = {
   // Mã BIN ngân hàng theo NAPAS (MB Bank = 970422) để dựng VietQR.
   maNganHang: process.env.PAYMENT_BANK_BIN || '970422',
   // Chỉ hiện VietQR khi đã cấu hình tài khoản thật, tránh in mã của số tài khoản mẫu.
-  vietQr: Boolean(process.env.PAYMENT_ACCOUNT_NUMBER)
+  vietQr: Boolean(process.env.PAYMENT_ACCOUNT_NUMBER),
+  // Đặt PAYMENT_VIETQR_HIEN_SO_TIEN=false để QR không kèm số tiền: app ngân hàng/MoMo sẽ cho khách tự nhập (dùng khi demo chuyển thử số nhỏ).
+  hienSoTienQr: process.env.PAYMENT_VIETQR_HIEN_SO_TIEN !== 'false'
 };
 
 export function getPaymentAccount() {

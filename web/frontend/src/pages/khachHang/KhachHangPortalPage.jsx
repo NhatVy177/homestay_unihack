@@ -37,6 +37,7 @@ function getPaymentAccount(source = {}) {
     chuTaiKhoan: account.chuTaiKhoan || DEFAULT_PAYMENT_ACCOUNT.chuTaiKhoan,
     // VietQR chỉ khi backend báo đã cấu hình tài khoản thật (không dựng mã cho tài khoản mặc định).
     maNganHang: account.maNganHang || '',
+    hienSoTienQr: account.hienSoTienQr !== false,
     vietQr: Boolean(account.vietQr && account.soTaiKhoan)
   };
 }
