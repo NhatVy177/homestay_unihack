@@ -1145,3 +1145,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Nguyên nhân: mã 6 số ở bước "Xác nhận biên bản" do Privy gửi thẳng tới email của tài khoản (`NguoiDung.Email`), không đi qua `MAIL_REDIRECT_TO`. Email cũ `demo4@gmail.com` là địa chỉ tự đặt, Vy không nhận được, và có thể thuộc người khác. `vynhat2k5@gmail.com` đã được 3 tài khoản khách khác dùng (KH0031, KH0032, KH9102), nên dùng dạng có dấu `+` giống nhân viên (`vynhat2k5+nv0001@gmail.com`).
 - Giá trị **cũ**: `NguoiDung KH9322` Email=`demo4@gmail.com`. Giá trị **mới**: `vynhat2k5+demo4@gmail.com` (Gmail chuyển về hộp thư vynhat2k5@gmail.com). Chỉ đổi khi bảng `AvalancheWallet` chưa có ví của KH9322 (đã kiểm tra: bảng trống).
 - Việc còn lại: Vy thử "Gửi mã" lại ở tab Hợp đồng của demo4 và báo có nhận được thư từ Privy không.
+
+## 2026-11-15 12:32:46 +07:00 — J-C108 — Bật MAIL_REDIRECT_TO cho chế độ demo (tạm)
+- Người thực hiện: Claude, Vy đồng ý bật và dặn **chỉ để ở chế độ demo, tắt trước khi nộp**.
+- Lý do: thư biên bản bàn giao HD0001 gửi tới `demo4@gmail.com` (không tồn tại) bị Gmail trả lỗi 550 về hộp thư của Vy. Khi `MAIL_REDIRECT_TO` tắt, hệ thống gửi thư thật qua SMTP tới địa chỉ thật của khách và nhân viên trong DB, có thể là hộp thư của người lạ.
+- Thay đổi: bỏ dấu `#` ở dòng `MAIL_REDIRECT_TO=vynhat2k5@gmail.com` trong `web/backend/.env` (file không commit); khởi động lại backend; kiểm tra mailer ở chế độ smtp với chuyển hướng bật. `.env.example` vẫn để trống.
+- **Việc phải làm trước khi nộp:** đặt lại `#MAIL_REDIRECT_TO` (hoặc để trống) và khởi động lại backend; kiểm tra README nộp bài không ghi email cá nhân của Vy.
+- Lưu ý: mã OTP của Privy không đi qua cấu hình này; Privy gửi tới email tài khoản (`vynhat2k5+demo4@gmail.com`, J-C107).
