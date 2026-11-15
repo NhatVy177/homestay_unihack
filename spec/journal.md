@@ -1159,3 +1159,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra (chỉ đọc): RPC trả mã chuỗi 43113; hợp đồng `0x70bF…389C` có mã; số dư ví relayer 0,1 AVAX, manager ≈0,15 AVAX, accountant 0,1 AVAX.
 - Hệ quả: các bước ghi chuỗi (mốc 1 khi khách xác nhận biên bản, mốc 2) giờ ghi lên **Fuji thật** và tốn gas từ ví vận hành; mỗi giao dịch có thể tra trên Snowtrace.
 - Chưa kiểm tra: khách thật bấm xác nhận biên bản đến khi có giao dịch trên Fuji (đang chờ Vy thử).
+
+## 2026-11-15 12:57:08 +07:00 — J-C110 — Xóa hồ sơ xác nhận HD0001 gắn chuỗi cục bộ để phát hành lại trên Fuji
+- Người thực hiện: Claude, Vy đồng ý ("ok") sau khi được giải thích.
+- Nguyên nhân: sau J-C109 (chuyển sang Fuji), bước khách "Xác nhận biên bản" báo "Deployment đã đổi. Cần dùng cấu hình hồ sơ cũ để phục hồi." vì `AvalancheCase` của HD0001 lưu `deployment` = chuỗi 31337 (hợp đồng `0x5FbD…0aa3`); `service.accessible()` cố ý từ chối hồ sơ khác deployment.
+- Điều kiện kiểm trước khi xóa (trong transaction, dừng nếu sai): đúng 1 dòng cho HD0001; `deployment.chainId = 31337`; `state = review`, chưa có `versions`, `receipts`, `handover` (chưa có giao dịch nào).
+- Đã xóa 1 dòng `dbo.AvalancheCase` (Id `0x4f6a2aec…580b`, revision 2, 1 bản nháp). Nội dung đầy đủ đã sao lưu ra file ngoài repo: `AvalancheCase_HD0001_backup.json` trong thư mục scratchpad của phiên. Ví Privy của KH9322 (`AvalancheWallet`) và biên bản Web2, ảnh hợp đồng đã ký giữ nguyên.
+- Việc còn lại: quản lý phát hành lại biên bản HD0001 (hồ sơ mới gắn Fuji), rồi demo4 xác nhận; ghi lại mã giao dịch Fuji.
