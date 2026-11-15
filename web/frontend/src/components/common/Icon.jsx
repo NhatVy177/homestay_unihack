@@ -1,5 +1,16 @@
 import React from 'react';
 
+// Biểu tượng cho dịch vụ theo tên (không phân biệt hoa thường/dấu), dùng chung cho hợp đồng và quản trị.
+export function serviceIconName(name = '') {
+  const text = String(name).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/đ/g, 'd');
+  if (text.includes('dien')) return 'electric_bolt';
+  if (text.includes('nuoc')) return 'water_drop';
+  if (text.includes('wifi') || text.includes('internet')) return 'wifi';
+  if (text.includes('xe')) return 'two_wheeler';
+  if (text.includes('ve sinh') || text.includes('don dep')) return 'cleaning_services';
+  return 'room_service';
+}
+
 export function Icon({ name, className = '', style = {} }) {
   const shapes = {
     call: <path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 3.1 5.2 2 2 0 0 1 5.1 3h3a2 2 0 0 1 2 1.7l.4 2.8a2 2 0 0 1-.6 1.7L8.6 10.5a16 16 0 0 0 4.9 4.9l1.3-1.3a2 2 0 0 1 1.7-.6l2.8.4a2 2 0 0 1 1.7 2Z" />,
@@ -87,6 +98,10 @@ export function Icon({ name, className = '', style = {} }) {
     sync: <><path d="M21 12a9 9 0 0 0-15.4-6.3L3 8" /><path d="M3 3v5h5" /><path d="M3 12a9 9 0 0 0 15.4 6.3L21 16" /><path d="M21 21v-5h-5" /></>,
     tune: <><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></>,
     upload_file: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6" /><path d="M12 18v-6M9.5 14.5 12 12l2.5 2.5" /></>,
+    wifi: <><path d="M5 12.5a10 10 0 0 1 14 0" /><path d="M8.5 16a5.5 5.5 0 0 1 7 0" /><path d="M2 9a14.5 14.5 0 0 1 20 0" /><path d="M12 19.5h.01" /></>,
+    two_wheeler: <><circle cx="5.5" cy="17" r="3" /><circle cx="18.5" cy="17" r="3" /><path d="M8.5 17h5l2.5-7h-3" /><path d="M16 10l-1-3h-2" /></>,
+    cleaning_services: <><path d="M16 3v7" /><path d="M13 10h6l1 4H12l1-4Z" /><path d="M12 14l-1 7h10l-1-7" /><path d="M5 12 3 21h5l1.5-6" /></>,
+    room_service: <><path d="M3 18h18" /><path d="M4.5 18a7.5 7.5 0 0 1 15 0" /><path d="M12 7V4.5M10 4.5h4" /></>,
     lock: <><rect x="5" y="10" width="14" height="11" rx="3" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" /></>,
   };
 

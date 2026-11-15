@@ -1294,3 +1294,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Thay đổi: `cuTru.css` dùng token `--color-primary`, `--color-surface-alt`, `--color-border`, `--color-text-muted`; `Icon.jsx` thêm 7 biểu tượng của form duyệt cư trú (sticky_note_2, verified, groups, group_off, task_alt, rule, error) và 17 biểu tượng đang được dùng nhưng thiếu ở các màn khác (add, calendar_today, event_available, expand_less, feedback, list_alt, lock_open, mail, map, mode_edit, person_search, phone, restore, shield, sync, tune, upload_file).
 - Kiểm tra: build OK; đã quét mọi `<Icon name=...>` dùng Icon chung, không còn tên thiếu (trừ màn khách hàng có bộ biểu tượng riêng). Chưa chụp ảnh form.
 - Giới hạn: chưa có mẫu form của Hằng để đối chiếu bố cục; chỉ đồng bộ màu và biểu tượng.
+
+## 2026-11-16 01:05:00 +07:00 — J-C132 — Biểu tượng dịch vụ ở màn lập hợp đồng
+- Người thực hiện: Claude, theo yêu cầu của Vy (Gửi xe, Vệ sinh, Wifi hiện ngôi nhà).
+- Nguyên nhân: `LapHopDongTab.jsx` chọn biểu tượng theo tên phân biệt hoa thường ("Xe" không khớp "Gửi xe" trong DB) và dùng tên `wifi`, `room_service` chưa có trong `components/common/Icon.jsx`.
+- Thay đổi: `Icon.jsx` thêm `serviceIconName(name)` (bỏ dấu, không phân biệt hoa thường) và biểu tượng `wifi`, `two_wheeler`, `cleaning_services`, `room_service`; `LapHopDongTab.jsx` và `pages/admin/AdminPage.jsx` dùng chung hàm này.
+- Kiểm tra: build OK; chuẩn hóa tên cho 5 dịch vụ mẫu (Điện, Nước, Wifi, Gửi xe, Vệ sinh) cho ra đúng khóa. Chưa chụp ảnh.

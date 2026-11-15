@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Icon } from '../../components/common/Icon.jsx';
+import { Icon, serviceIconName } from '../../components/common/Icon.jsx';
 import { hopDongApi } from './hopDong.api.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import './lapHopDongTab.css';
@@ -348,13 +348,7 @@ export default function LapHopDongTab({ onResidence }) {
     }
   };
 
-  const getServiceIcon = (name = '') => {
-    if (name.includes('Điện')) return 'bolt';
-    if (name.includes('Nước')) return 'water_drop';
-    if (name.includes('Wifi') || name.includes('Internet')) return 'wifi';
-    if (name.includes('Xe')) return 'directions_bike';
-    return 'room_service';
-  };
+  const getServiceIcon = serviceIconName;
 
   const getPhieuStatusStyle = (p = {}) => {
     if (p.trangThaiCoc === 'Huỷ') {

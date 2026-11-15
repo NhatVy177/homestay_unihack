@@ -1,7 +1,7 @@
 import WorkspaceShell from '../../components/common/WorkspaceShell.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../auth/AuthContext.jsx';
-import { Icon } from '../../components/common/Icon.jsx';
+import { Icon, serviceIconName } from '../../components/common/Icon.jsx';
 import { getLockedRoomIds, setRoomLocked } from '../../utils/lockedRooms.js';
 import { adminApi } from './admin.api.js';
 import './admin.css';
@@ -2790,7 +2790,7 @@ function ServicesView() {
           <div className="admin-service-list">
             {services.map((item) => (
               <article className="admin-service-row" key={item.maDichVu}>
-                <span><Icon name={item.tenDichVu?.includes('Điện') ? 'electric_bolt' : item.tenDichVu?.includes('Nước') ? 'water_drop' : item.tenDichVu?.includes('Wifi') ? 'wifi' : item.tenDichVu?.includes('Vệ sinh') ? 'cleaning_services' : 'directions_bike'} /></span>
+                <span><Icon name={serviceIconName(item.tenDichVu)} /></span>
                 <div>
                   <strong>{item.tenDichVu}</strong>
                   <small>{item.donViTinh}</small>
