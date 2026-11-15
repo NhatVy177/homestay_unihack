@@ -1409,3 +1409,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Nguyên nhân: sau khi lập hóa đơn kỳ 12, kỳ mặc định lấy theo "kỳ cần lập sớm nhất" của hợp đồng (đã sang 2027-01), nên hóa đơn kỳ 12 bị ẩn khỏi danh sách và thẻ tổng quan.
 - Sửa: `web/frontend/src/pages/nhanVienKeToan/HoaDonDinhKyTab.jsx`: kỳ mặc định là kỳ sớm nhất còn hóa đơn chưa xong (chờ xác nhận, chưa trả, quá hạn), không có mới lấy kỳ cần lập; tab "Danh sách hóa đơn" có huy hiệu số hóa đơn chờ xác nhận; trong danh sách có dòng báo kỳ khác đang có hóa đơn chờ xác nhận kèm nút chuyển kỳ. `hoaDonDinhKy.css` thêm kiểu tương ứng.
 - Kiểm tra: build OK; `ui-periodic-invoices` PASS. Đọc DB (chỉ đọc): CN0003 có HO0003 kỳ 2026-12 "Chưa TT", nhóm "review" (khách đã gửi minh chứng), HO0002 đã trả.
+
+## 2026-11-16 16:10:00 +07:00 — J-C150 — Bỏ khối "Quyết toán hoàn cọc khi trả phòng" ở tab Hợp đồng của khách
+- Người thực hiện: Claude, theo yêu cầu của Vy (khối bảng bị vỡ chữ thành cột dọc, trùng thông tin với phần đối soát ở tab Trả phòng).
+- Sửa: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx`: xóa khối hiển thị `selectedHd.hoanCoc` ("Quyết toán #DS…", tiền cọc ban đầu, khấu trừ, khách phải nộp thêm). Kết quả đối soát vẫn xem và xác nhận ở tab Trả phòng.
+- Kiểm tra: build OK; không script nào kiểm khối này. Chưa chụp ảnh.
