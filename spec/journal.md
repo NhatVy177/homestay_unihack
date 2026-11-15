@@ -1343,3 +1343,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Nguyên nhân: `web/frontend/src/pages/khachMoi/khachMoi.api.js` (`guiChungTuKyDau`) không bỏ `Content-Type: application/json` mặc định của `httpClient`, nên yêu cầu không phải multipart và máy chủ không nhận được file. Các hàm upload khác đã đặt `Content-Type: undefined`; J-C138 bỏ sót.
 - Sửa: đặt `{ headers: { 'Content-Type': undefined } }`; `scripts/ui-customer-invoices.mjs` nay kiểm tra yêu cầu gửi lên là `multipart/form-data` (lần kiểm tra J-C138 bỏ sót lỗi này vì giả lập không xét kiểu nội dung). Đính chính J-C138: lúc đó chưa thử upload thật.
 - Kiểm tra: build OK; `ui-customer-invoices` PASS. Chưa thử upload thật với backend và DB.
+
+## 2026-11-16 04:15:00 +07:00 — J-C140 — Nút "Xem biên bản" không xuống dòng
+- Người thực hiện: Claude, theo phản ánh của Vy (chữ "Xem biên bản" bị rớt thành hai dòng ở danh sách hợp đồng có thể bàn giao).
+- Sửa: `web/frontend/src/pages/nhanVienQuanLy/BanGiaoPhongTab.jsx`: thêm `white-space: nowrap` cho nút "Xem biên bản" và "Bàn giao".
+- Kiểm tra: build OK; chưa chụp ảnh.
