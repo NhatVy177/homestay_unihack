@@ -57,3 +57,14 @@ test('migration removes only the two document gates and is idempotent', () => {
   assert.equal(patchSaveResidence(a), a); assert.equal(patchSubmitResidence(b), b);
   assert.throws(() => patchSaveResidence('CREATE PROCEDURE x AS THROW 50012, N\'z\', 1;'));
 });
+
+test('a customer can withdraw a submitted residence profile to edit it, but not after a contract exists', async () => {
+  const { rutLaiCuTru } = await import('../services/khachCuTru.service.js');
+  const sent = [];
+  const okQuery = async (text, params) => { sent.push({ text, params }); return { rowsAffected: [1] }; };
+  assert.deepEqual(await rutLaiCuTru({ vaiTro: 'KhachHang', maNguoiDung: 'KH0001' }, { maPhieuDatCoc: 'DC0004' }, { query: okQuery }),
+    { maPhieuDatCoc: 'DC0004', trangThaiHoSo: 'Chưa cập nhật' });
+  assert.match(sent[0].text, /NOT EXISTS \(SELECT 1 FROM dbo\.HopDongThue/);
+  await assert.rejects(rutLaiCuTru({ vaiTro: 'KhachHang', maNguoiDung: 'KH0001' }, { maPhieuDatCoc: 'DC0004' }, { query: async () => ({ rowsAffected: [0] }) }), /Không thể chỉnh sửa/);
+  await assert.rejects(rutLaiCuTru({ vaiTro: 'NhanVienSale', maNguoiDung: 'NV0001' }, { maPhieuDatCoc: 'DC0004' }, { query: okQuery }), /Chỉ khách hàng/);
+});

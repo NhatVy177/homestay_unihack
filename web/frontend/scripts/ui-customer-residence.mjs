@@ -13,7 +13,8 @@ try {
       { maPhieuDatCoc: 'DC0001', hinhThucThue: 'Nguyên phòng', soNguoiDuKienO: 1, soDongCoc: 1, viTriThue: 'Phòng 301', maHoSoCuTru: 'HS0001', trangThaiHoSo: 'Chờ duyệt cư trú', ghiChuQuanLy: 'Quốc tịch cần quản lý kiểm tra; ', coHopDong: false, coTheKhai: false,
         thanhVien: [{ hoTen: 'John', gioiTinh: 'Nam', ngaySinh: '1999-05-01', cccd: 'P1234567', trangThai: 'Chờ duyệt' }] }],
     nguoiDaiDien: { hoTen: 'Nguyễn Văn A', ngaySinh: '2001-02-03', gioiTinh: 'Nam', sdt: '0795749721', email: 'a@example.com', cccd: '012345678901', quocTich: 'Việt Nam' } };
-    const writes = [], errors = [];
+    const withdraws = [];
+const writes = [], errors = [];
     const ctx = await browser.newContext({ viewport: { width, height: 1100 }, timezoneId: 'Asia/Ho_Chi_Minh', reducedMotion: 'reduce' });
     await ctx.addInitScript((u) => localStorage.setItem('happyroom_session', JSON.stringify({ _v: 2, token: 'fixture-only', user: u })), user);
     await ctx.route('**/api/**', (route) => {
@@ -27,6 +28,11 @@ try {
         const data = req.postDataJSON(); writes.push(data);
         state.phieu[0] = { ...state.phieu[0], maHoSoCuTru: 'HS0009', trangThaiHoSo: 'Đã duyệt cư trú', coTheKhai: false, thanhVien: data.danhSachThanhVien.map((m) => ({ ...m, trangThai: 'Đủ điều kiện' })) };
         return route.fulfill({ json: { maHoSoCuTru: 'HS0009', trangThaiHoSo: 'Đã duyệt cư trú', lyDo: null } });
+      }
+      if (path === '/api/khach-moi/cu-tru/rut-lai' && req.method() === 'POST') {
+        const data = req.postDataJSON(); withdraws.push(data.maPhieuDatCoc);
+        state.phieu[0] = { ...state.phieu[0], trangThaiHoSo: 'Chưa cập nhật', coTheKhai: true };
+        return route.fulfill({ json: { maPhieuDatCoc: data.maPhieuDatCoc, trangThaiHoSo: 'Chưa cập nhật' } });
       }
       if (!['GET', 'OPTIONS'].includes(req.method())) throw new Error(`Unexpected mutation ${path}`);
       return route.fulfill({ json: [] });
@@ -63,6 +69,10 @@ try {
     assert.equal(writes.length, 1);
     assert.equal(writes[0].maPhieuDatCoc, 'DC0003'); assert.equal(writes[0].dongYCungCapThongTin, true);
     assert.deepEqual(writes[0].danhSachThanhVien.map((m) => m.cccd), ['012345678901', '098765432109']);
+    page.once('dialog', (dialog) => dialog.accept());
+    await open.getByRole('button', { name: 'Chỉnh sửa thông tin' }).click();
+    await open.getByRole('button', { name: 'Gửi thông tin cư trú' }).waitFor();
+    assert.deepEqual(withdraws, ['DC0003']);
     assert.deepEqual(errors, []);
     await ctx.close();
   }

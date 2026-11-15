@@ -4271,8 +4271,14 @@ export default function KhachHangPortalPage() {
     await loadResidence();
   }
 
+  async function withdrawResidence(maPhieuDatCoc) {
+    await khachMoiApi.rutLaiCuTru({ maPhieuDatCoc });
+    setToast('Đã mở lại hồ sơ cư trú để chỉnh sửa. Sửa xong nhớ gửi lại.');
+    await loadResidence();
+  }
+
   function renderResidence() {
-    return <CustomerResidenceTab data={residence} loading={residence === null} error={residenceError} onSubmit={submitResidence} />;
+    return <CustomerResidenceTab data={residence} loading={residence === null} error={residenceError} onSubmit={submitResidence} onWithdraw={withdrawResidence} />;
   }
 
   function renderDepositHistory() {

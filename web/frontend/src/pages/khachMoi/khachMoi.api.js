@@ -18,6 +18,7 @@ export const khachMoiApi = {
   getYeuCauGiuCho: () => httpClient.get('/khach-moi/yeu-cau-giu-cho'),
   getCuTru: () => httpClient.get('/khach-moi/cu-tru'),
   khaiCuTru: (data) => httpClient.post('/khach-moi/cu-tru', data),
+  rutLaiCuTru: (data) => httpClient.post('/khach-moi/cu-tru/rut-lai', data),
   uploadMinhChung: (id, data) => httpClient.post(`/khach-moi/dat-coc/${id}/minh-chung`, data),
   getHopDongDashboard: (params = {}) => httpClient.get('/khach-moi/hop-dong-dashboard', { params }),
   guiYeuCauTraPhong: (data) => httpClient.post('/khach-moi/hop-dong-dashboard/tra-phong', data),

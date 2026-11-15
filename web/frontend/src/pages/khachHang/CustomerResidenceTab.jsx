@@ -79,7 +79,22 @@ function ResidenceForm({ phieu, nguoiDaiDien, onSubmit }) {
   </form>;
 }
 
-export default function CustomerResidenceTab({ data, loading, error, onSubmit }) {
+function WithdrawButton({ item, onWithdraw }) {
+  const [busy, setBusy] = useState(false), [message, setMessage] = useState('');
+  async function run() {
+    if (busy || !window.confirm('Chỉnh sửa sẽ rút hồ sơ đã gửi về trạng thái chưa gửi. Sau khi sửa bạn cần gửi lại để quản lý duyệt. Tiếp tục?')) return;
+    setBusy(true); setMessage('');
+    try { await onWithdraw(item.maPhieuDatCoc); }
+    catch (e) { setMessage(e?.response?.data?.message || 'Chưa mở lại được hồ sơ để chỉnh sửa. Vui lòng thử lại.'); }
+    finally { setBusy(false); }
+  }
+  return <div className="cres-actions">
+    <button type="button" className="ui-btn ui-btn--secondary" disabled={busy} onClick={run}><Icon name="edit" /> {busy ? 'Đang mở lại...' : 'Chỉnh sửa thông tin'}</button>
+    {message && <p className="customer-viewing-error" role="alert">{message}</p>}
+  </div>;
+}
+
+export default function CustomerResidenceTab({ data, loading, error, onSubmit, onWithdraw }) {
   const phieu = data?.phieu || [];
   return <section className="cres-page" aria-label="Thông tin cư trú">
     <header className="ui-card cres-head"><h2>Thông tin cư trú</h2>
@@ -102,6 +117,8 @@ export default function CustomerResidenceTab({ data, loading, error, onSubmit })
           <strong>{m.hoTen}</strong><span>{m.gioiTinh} · {dateLabel(m.ngaySinh)} · CCCD {m.cccd}</span>
           {m.trangThai && <em className={m.trangThai === 'Bị từ chối' ? 'is-danger' : ''}>{m.trangThai}{m.lyDoTuChoi ? `: ${m.lyDoTuChoi}` : ''}</em>}
         </li>)}</ul>}
+        {!item.coTheKhai && item.coHopDong && <p className="cres-reason">Hợp đồng đã được lập. Nếu cần sửa thông tin người ở, vui lòng báo nhân viên Sale.</p>}
+        {!item.coTheKhai && !item.coHopDong && onWithdraw && ['Chờ duyệt cư trú', 'Đã duyệt cư trú'].includes(item.trangThaiHoSo) && <WithdrawButton item={item} onWithdraw={onWithdraw} />}
         {item.coTheKhai && <ResidenceForm phieu={item} nguoiDaiDien={data?.nguoiDaiDien} onSubmit={onSubmit} />}
       </article>;
     })}

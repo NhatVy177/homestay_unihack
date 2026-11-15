@@ -30,7 +30,7 @@ export async function getCuTruCuaKhach(user, { query = executeQuery } = {}) {
     FROM dbo.PhieuDatCoc pdc
     JOIN dbo.PhieuDangKy pdk ON pdk.MaDangKy = pdc.MaPhieuYeuCauDangKy
     LEFT JOIN dbo.HoSoCuTru hs ON hs.MaPhieuDatCoc = pdc.MaPhieuDatCoc
-    WHERE pdc.MaKhachHang = @MaKhachHang AND pdc.TrangThaiCoc = N'Hiệu lực' AND pdc.TrangThaiThanhToan = N'Đã TT'
+    WHERE pdc.MaKhachHang = @MaKhachHang AND pdc.TrangThaiCoc IN (N'Hiệu lực', N'Đã lập HĐ') AND pdc.TrangThaiThanhToan = N'Đã TT'
     ORDER BY pdc.MaPhieuDatCoc DESC`, params)).recordset || [];
   const members = deposits.some((item) => item.maHoSoCuTru)
     ? (await query(`SELECT tv.MaHoSoCuTru AS maHoSoCuTru, tv.HoTen AS hoTen, tv.NgaySinh AS ngaySinh, tv.GioiTinh AS gioiTinh,
@@ -53,6 +53,24 @@ export async function getCuTruCuaKhach(user, { query = executeQuery } = {}) {
       thanhVien: members.filter((member) => member.maHoSoCuTru && member.maHoSoCuTru === item.maHoSoCuTru),
     })),
   };
+}
+
+// Khách phát hiện khai sai: rút hồ sơ đã gửi (chờ duyệt hoặc đã duyệt) về "Chưa cập nhật" để sửa và gửi lại.
+// Chỉ được khi phiếu cọc còn hiệu lực và chưa lập hợp đồng; sau khi có hợp đồng, Sale chỉnh ở bước lập hợp đồng.
+export async function rutLaiCuTru(user, data = {}, { query = executeQuery } = {}) {
+  assertCustomer(user);
+  const maPhieuDatCoc = String(data.maPhieuDatCoc || '').trim();
+  if (!/^[A-Za-z0-9]{1,6}$/.test(maPhieuDatCoc)) throw createServiceError('Phiếu đặt cọc không hợp lệ.');
+  const result = await query(`UPDATE hs SET hs.TrangThaiHoSo = N'Chưa cập nhật', hs.GhiChuQuanLy = NULL
+    FROM dbo.HoSoCuTru hs JOIN dbo.PhieuDatCoc pdc ON pdc.MaPhieuDatCoc = hs.MaPhieuDatCoc
+    WHERE hs.MaPhieuDatCoc = @MaPhieuDatCoc AND pdc.MaKhachHang = @MaKhachHang AND pdc.TrangThaiCoc = N'Hiệu lực'
+      AND hs.TrangThaiHoSo IN (N'Chờ duyệt cư trú', N'Đã duyệt cư trú')
+      AND NOT EXISTS (SELECT 1 FROM dbo.HopDongThue hd WHERE hd.MaPhieuCoc = pdc.MaPhieuDatCoc)`, [
+    { name: 'MaPhieuDatCoc', type: sql.VarChar(6), value: maPhieuDatCoc },
+    { name: 'MaKhachHang', type: sql.VarChar(6), value: user.maNguoiDung },
+  ]);
+  if (!result.rowsAffected?.[0]) throw createServiceError('Không thể chỉnh sửa: hồ sơ chưa gửi, đã lập hợp đồng hoặc không thuộc về bạn. Nếu đã lập hợp đồng, hãy nhờ nhân viên Sale chỉnh.', 409);
+  return { maPhieuDatCoc, trangThaiHoSo: 'Chưa cập nhật' };
 }
 
 export async function khaiCuTru(user, data = {}, {
