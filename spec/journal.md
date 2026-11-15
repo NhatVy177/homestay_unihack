@@ -1152,3 +1152,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Thay đổi: bỏ dấu `#` ở dòng `MAIL_REDIRECT_TO=vynhat2k5@gmail.com` trong `web/backend/.env` (file không commit); khởi động lại backend; kiểm tra mailer ở chế độ smtp với chuyển hướng bật. `.env.example` vẫn để trống.
 - **Việc phải làm trước khi nộp:** đặt lại `#MAIL_REDIRECT_TO` (hoặc để trống) và khởi động lại backend; kiểm tra README nộp bài không ghi email cá nhân của Vy.
 - Lưu ý: mã OTP của Privy không đi qua cấu hình này; Privy gửi tới email tài khoản (`vynhat2k5+demo4@gmail.com`, J-C107).
+
+## 2026-11-15 12:39:22 +07:00 — J-C109 — Chuyển bản đang chạy từ chuỗi cục bộ sang Fuji
+- Người thực hiện: Claude. Lý do: bước khách "Xác nhận biên bản" báo `HTTP request failed. URL: http://127.0.0.1:8545/ ... eth_chainId`: `web/backend/.env` và `web/frontend/.env` của worktree `D:\HomeStayDorm-integ` còn cấu hình chuỗi cục bộ (mã chuỗi 31337, cổng 8545) mà nút chuỗi không bật.
+- Thay đổi (chỉ file `.env` cục bộ, không commit, không in khóa): `AVALANCHE_CHAIN_ID=43113`, `AVALANCHE_RPC_URL`, `AVALANCHE_CONTRACT_ADDRESS=0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C` và ba khóa vận hành lấy từ `D:\HomeStayDorm-fuji-deploy\web\backend\.env`; `VITE_AVALANCHE_*` tương ứng ở frontend. Bản sao lưu cấu hình cũ để ngoài repo (thư mục scratchpad của phiên). Đã khởi động lại backend (cổng 5000) và frontend (5173).
+- Kiểm tra (chỉ đọc): RPC trả mã chuỗi 43113; hợp đồng `0x70bF…389C` có mã; số dư ví relayer 0,1 AVAX, manager ≈0,15 AVAX, accountant 0,1 AVAX.
+- Hệ quả: các bước ghi chuỗi (mốc 1 khi khách xác nhận biên bản, mốc 2) giờ ghi lên **Fuji thật** và tốn gas từ ví vận hành; mỗi giao dịch có thể tra trên Snowtrace.
+- Chưa kiểm tra: khách thật bấm xác nhận biên bản đến khi có giao dịch trên Fuji (đang chờ Vy thử).
