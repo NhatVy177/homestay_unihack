@@ -3441,7 +3441,14 @@ export default function KhachHangPortalPage() {
                   <strong>{formatSettlementMoney(doiSoatFinalAmount)}</strong>
                 </div>
 
-                {doiSoatCanRespond ? (
+                {/* D-030: hợp đồng thuê đồng ý đối soát bằng ví (mốc 2 trên chuỗi) ngay tại tab Trả phòng; nút đồng ý Web2 cũ chỉ còn cho phiếu cọc chưa có hợp đồng. */}
+                {currentHopDongId && (
+                  <Suspense fallback={null}>
+                    <HopDongXacNhanSection contractId={currentHopDongId} emptyText="Kế toán chưa gửi bảng đối soát lên hệ thống xác nhận. Khi có, bạn đồng ý hoặc phản hồi ngay tại đây bằng ví." />
+                  </Suspense>
+                )}
+
+                {doiSoatCanRespond && !currentHopDongId ? (
                   <>
                     <div className="hd-settlement-actions">
                       <button

@@ -1187,3 +1187,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Đã chạy `node scripts/checkout-lifecycle-db.mjs migrate`: cài lại schema C4 và 6 thủ tục (3 tài chính, 2 legacy, danh sách hoàn cọc), "businessRowsChanged: false". Kiểm tra sau: định nghĩa danh sách hoàn cọc không còn điều kiện thanh lý cũ và có dấu `C4_REFUND_BEFORE_CLOSE`.
 - Dữ liệu giữ nguyên: HD0001 "Hiệu lực"; DS0001 "Chờ hoàn cọc" (hoàn 500.000đ, đã chọn nhận qua MB Bank ở màn cũ); TP0001 "Chờ ký biên bản".
 - Việc còn lại: để kế toán thấy phiếu cần mốc 2 (TP0001 chuyển "Chờ hoàn cọc" khi khách đồng ý bảng đối soát trên chuỗi): kế toán NV0008 gửi DS0001 ở tab "Khách xác nhận đối soát", khách demo4 đồng ý ở tab Hợp đồng; sau đó chi hoàn cọc kèm chứng từ.
+
+## 2026-11-15 14:14:13 +07:00 — J-C114 — Đồng ý bảng đối soát ngay tại tab "Trả phòng" (mốc 2), bỏ nút đồng ý Web2 cũ cho hợp đồng thuê
+- Người thực hiện: Claude. Vy phản ánh: khách phản hồi đối soát ở tab Trả phòng (bước 2 "Kết quả đối soát"), tự nhiên bị bảo sang tab Hợp đồng mới đúng luồng.
+- Nguyên nhân: tab Trả phòng còn nút "Đồng ý kết quả"/"Không đồng ý" của luồng Web2 cũ (`phanHoiDoiSoatTraPhong`), chỉ ghi DB, không lên chuỗi; phần ký bằng ví (`HopDongXacNhanSection`) chỉ nằm ở tab Hợp đồng. Vy bấm nút cũ nên `DS0001` đã "Chờ hoàn cọc" mà không có mốc 2.
+- Sửa: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (hàm `renderHopDong`, tab Trả phòng): hiện `HopDongXacNhanSection` ngay dưới tóm tắt quyết toán cho hợp đồng thuê (đồng ý/phản hồi bằng ví, mốc 2); nút Web2 cũ chỉ còn khi chưa có hợp đồng. Tab Hợp đồng giữ nguyên.
+- Kiểm tra: build OK. Chưa có test giao diện cho tab Trả phòng (cần dữ liệu hợp đồng giả lớn); chưa bấm thử thật.
+- Việc còn lại: kế toán NV0008 gửi DS0001 ở tab "Khách xác nhận đối soát", khách demo4 đồng ý ở tab Trả phòng; ghi mã giao dịch mốc 2.
