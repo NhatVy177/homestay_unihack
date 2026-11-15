@@ -22,6 +22,8 @@ try {
       if (path.endsWith('/auth/toi')) return route.fulfill({ json: manager });
       if (path.endsWith('/avalanche/config')) return route.fulfill({ json: { enabled: false } });
       if (path === '/api/hop-dong/quan-ly-chi-nhanh') return route.fulfill({ json: rows });
+      if (path === '/api/checkout-lifecycle') return route.fulfill({ json: [{ contractId: 'HD9002', settlementId: 'DS9002', hasReturn: true, closed: true, mode: 'accepted', mailStatus: 'sent',
+        keysReturnedAt: null, canReturnKeys: true, money: { ready: true, missing: [] }, response: { overdue: false }, exception: { allowed: false } }] });
       if (req.method() === 'GET') return route.fulfill({ json: [] });
       throw new Error(`Unexpected ${req.method()} ${path}`);
     });
@@ -46,6 +48,11 @@ try {
     await page.getByRole('button', { name: 'Đóng' }).first().click();
     await body.filter({ hasText: 'HD9002' }).getByRole('button', { name: 'Kết thúc hợp đồng' }).click();
     await page.getByRole('heading', { name: 'Kết thúc hợp đồng · HD9002' }).waitFor();
+    const focus = page.locator('.checkout-focus');
+    await focus.getByRole('button', { name: 'Đã thu chìa khóa' }).waitFor();
+    assert.equal(await focus.locator('table').count(), 0, 'thẻ gọn, không bảng');
+    assert.match(await focus.innerText(), /DS9002[\s\S]*Đã thanh lý[\s\S]*Chưa thu chìa khóa/);
+    await page.screenshot({ path: `${folder}/ket-thuc-${width}.png` });
     assert.deepEqual(errors, []);
     await ctx.close();
   }

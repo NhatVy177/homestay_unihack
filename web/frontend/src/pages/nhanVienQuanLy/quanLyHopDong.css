@@ -19,3 +19,4 @@
 @media (max-width: 640px) { .qlhd-toolbar { padding: var(--space-3); } .qlhd-modal-body { padding: var(--space-3); } }
 .qlhd-table .ui-status-badge, .qlhd-table [class*="status-badge"] { white-space: nowrap; }
 .qlhd-toolbar .ui-list-toolbar { margin: 0; padding: 0; border: none; box-shadow: none; background: transparent; }
+.qlhd-modal.ktp-modal.is-compact { width: min(720px, calc(100vw - 32px)); }

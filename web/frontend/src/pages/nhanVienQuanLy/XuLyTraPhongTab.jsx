@@ -94,7 +94,7 @@ export default function XuLyTraPhongTab() {
     </section>
 
     {open && <div className="ktp-modal-overlay qlhd-overlay" onClick={close}>
-      <div className="ktp-modal qlhd-modal" role="dialog" aria-modal="true" aria-labelledby="qlhd-modal-title" onClick={(e) => e.stopPropagation()}>
+      <div className={`ktp-modal qlhd-modal${open.viecCanLam === 'ket-thuc' ? ' is-compact' : ''}`} role="dialog" aria-modal="true" aria-labelledby="qlhd-modal-title" onClick={(e) => e.stopPropagation()}>
         <div className="ktp-modal-header"><div><h3 id="qlhd-modal-title">{ACTIONS[open.viecCanLam]} · {open.maHopDong}</h3><p>{open.hoTen} · {open.tenPhong}</p></div>
           <button type="button" className="ktp-modal-close" aria-label="Đóng" onClick={close}><Icon name="close" /></button></div>
         <div className="qlhd-modal-body">
