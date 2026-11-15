@@ -1414,3 +1414,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo yêu cầu của Vy (khối bảng bị vỡ chữ thành cột dọc, trùng thông tin với phần đối soát ở tab Trả phòng).
 - Sửa: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx`: xóa khối hiển thị `selectedHd.hoanCoc` ("Quyết toán #DS…", tiền cọc ban đầu, khấu trừ, khách phải nộp thêm). Kết quả đối soát vẫn xem và xác nhận ở tab Trả phòng.
 - Kiểm tra: build OK; không script nào kiểm khối này. Chưa chụp ảnh.
+
+## 2026-11-16 16:40:00 +07:00 — J-C151 — Tách biên bản bàn giao (tab Hợp đồng) và đối soát (tab Trả phòng)
+- Người thực hiện: Claude, theo câu hỏi của Vy (đã có tab Trả phòng thì tab Hợp đồng còn cần phần đối soát không).
+- Quyết định áp dụng: tab Hợp đồng chỉ hiện biên bản bàn giao (mốc 1: xác nhận, tải bản lưu, PDF, kiểm tra); tab Trả phòng chỉ hiện đối soát tiền cọc (mốc 2: đồng ý/phản hồi, bản lưu). Trước đây tab Hợp đồng hiện cả hai nên trùng nút "Đồng ý đối soát".
+- Sửa: `web/frontend/src/components/xacNhan/HopDongXacNhanSection.jsx` (tham số `show`: 'all' | 'handover' | 'settlement'; chế độ 'settlement' chỉ liệt kê hồ sơ đã có bảng đối soát), `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (tab Hợp đồng `show="handover"`, tab Trả phòng `show="settlement"`). Trang `/xac-nhan` riêng (AvalanchePortal) vẫn hiện đủ.
+- Kiểm tra: build OK; `ui-evidence-print` PASS. Chưa chụp ảnh hai tab với dữ liệu thật.

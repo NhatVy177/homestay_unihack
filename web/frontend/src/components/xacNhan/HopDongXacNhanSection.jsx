@@ -18,12 +18,13 @@ const recordedAt = receipt => {
 };
 const withoutTenant = ({ tenant, ...rest }) => canonicalize(rest);
 /** D-012: section inside "Hợp đồng" (customer portal). Renders nothing when the feature is off. */
-export default function HopDongXacNhanSection({ contractId, emptyText }) {
+// show: 'all' | 'handover' (tab Hợp đồng) | 'settlement' (tab Trả phòng) để mỗi việc chỉ hiện ở một nơi.
+export default function HopDongXacNhanSection({ contractId, emptyText, show = 'all' }) {
   const { user } = useAuth();
   const [config, setConfig] = useState(null);
   useEffect(() => { avalancheApi.get('/config').then(setConfig).catch(() => setConfig({ enabled: false })); }, []);
   if (!config?.enabled || user?.vaiTro !== 'KhachHang') return emptyText && config ? <p className="xn-muted">{emptyText}</p> : null;
-  const body = <TenantCases contractId={contractId} emptyText={emptyText} />;
+  const body = <TenantCases contractId={contractId} emptyText={emptyText} show={show} />;
   if (!AccountSignerProvider) return body;
   return <Suspense fallback={body}>
     <AccountSignerProvider appId={privyAppId} mode={config.walletAuth === 'jwt' ? 'jwt' : 'email'} accountEmail={user.email}>{body}</AccountSignerProvider>
@@ -55,7 +56,7 @@ function EmailCodeGate({ signer, onCancel }) {
     {error && <div className="xn-alert error">{error}</div>}
   </div>;
 }
-function TenantCases({ contractId, emptyText }) {
+function TenantCases({ contractId, emptyText, show }) {
   const signer = useSigner();
   const [cases, setCases] = useState(null), [error, setError] = useState('');
   const load = useCallback(async () => {
@@ -66,10 +67,11 @@ function TenantCases({ contractId, emptyText }) {
   }, [contractId]);
   useEffect(() => { load().catch(e => setError(errorMessage(e))); }, [load]);
   if (!cases) return error ? <div className="xn-alert error">{error}</div> : null;
-  if (!cases.length) return emptyText ? <p className="xn-muted">{emptyText}</p> : null;
-  return cases.map(c => <TenantCase key={c.id} c={c} signer={signer} reload={load} />);
+  const shown = show === 'settlement' ? cases.filter(c => c.versions?.length) : cases;
+  if (!shown.length) return emptyText ? <p className="xn-muted">{emptyText}</p> : null;
+  return shown.map(c => <TenantCase key={c.id} c={c} signer={signer} reload={load} show={show} />);
 }
-function TenantCase({ c, signer, reload }) {
+function TenantCase({ c, signer, reload, show = 'all' }) {
   const [busy, setBusy] = useState(''), [error, setError] = useState(''), [notice, setNotice] = useState('');
   const [changeOpen, setChangeOpen] = useState(false), [reason, setReason] = useState('');
   const [disputeOpen, setDisputeOpen] = useState(false), [disputeReason, setDisputeReason] = useState('');
@@ -120,6 +122,7 @@ function TenantCase({ c, signer, reload }) {
       : signer.status === 'error' ? signer.error : signer.status === 'preparing' && pending ? 'Đang chuẩn bị xác nhận cho tài khoản của bạn…' : '';
   const handoverLabel = c.state === 'change-requested' ? ['Đã gửi yêu cầu chỉnh sửa', 'info'] : waitingHandover ? ['Chờ bạn xác nhận', 'warn'] : ['Đã xác nhận', 'done'];
   return <article className="xn-card">
+    {show !== 'settlement' && <>
     <div className="xn-head">
       <div><h3>Biên bản bàn giao phòng</h3><p>Hợp đồng {c.contractId} · bản số {revision} · phát hành {dateTime(draft?.publishedAt)}</p></div>
       <Pill label={handoverLabel} />
@@ -148,7 +151,8 @@ function TenantCase({ c, signer, reload }) {
         <a href="/kiem-chung-avalanche" target="_blank" rel="noreferrer">Kiểm tra biên bản</a></div>
       <span className="xn-muted">Tải file bản lưu lên để tự kiểm tra biên bản chưa bị sửa.</span>
     </div>}
-    {latest && <section className="xn-doc">
+    </>}
+    {show !== 'handover' && latest && <section className="xn-doc">
       <div className="xn-head"><div><h3>Đối soát tiền cọc</h3><p>Phiên bản {latest.bundle.version}</p></div>
         <Pill label={latest.accepted ? ['Đã đồng ý', 'done'] : latest.dispute ? ['Đã gửi phản hồi', 'info'] : ['Chờ bạn xem', 'warn']} /></div>
       <SettlementView bundle={latest.bundle} />
@@ -182,7 +186,7 @@ function TenantCase({ c, signer, reload }) {
     {pending && signer?.status === 'preparing' && <div className="xn-alert info">Đang chuẩn bị xác nhận cho tài khoản của bạn…</div>}
     {error && <div className="xn-alert error" role="alert">{error}</div>}
     {notice && <div className="xn-alert ok" role="status">{notice}</div>}
-    {c.drafts?.length > 1 && <details className="xn-history"><summary>Lịch sử chỉnh sửa biên bản ({c.drafts.length} bản)</summary>
+    {show !== 'settlement' && c.drafts?.length > 1 && <details className="xn-history"><summary>Lịch sử chỉnh sửa biên bản ({c.drafts.length} bản)</summary>
       <ol>{c.drafts.map(d => <li key={d.revision}>Bản {d.revision} ({dateTime(d.publishedAt)}){d.resolution ? ` — điều chỉnh: ${d.resolution}` : ''}{d.changeRequest ? ` — bạn yêu cầu: “${d.changeRequest.reason}”` : ''}</li>)}</ol>
     </details>}
   </article>;
