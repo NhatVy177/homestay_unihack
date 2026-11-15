@@ -1139,3 +1139,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Giá trị **cũ** (để hoàn lại): `PhieuDangKy DK0007` SoNam=1, SoNu=0; `Phong P205` GioiTinhChoPhep=N'Nam'; `HoSoCuTru CT0001` TrangThaiHoSo=N'Chờ duyệt cư trú' (ghi chú quản lý "Giới tính không khớp quy định phòng", thành viên TV0001 demo4 Nữ).
 - Giá trị **mới**: DK0007 SoNam=0, SoNu=1; P205 GioiTinhChoPhep=N'Nữ'; CT0001 TrangThaiHoSo=N'Chưa cập nhật' (xóa ghi chú/ngày gửi duyệt/quản lý duyệt). Phiếu cọc DC0003 giữ nguyên (Đã TT, Hiệu lực), giường G01 vẫn đã cọc.
 - Lý do: dữ liệu thử ghi nhầm 1 nam cho khách nữ nên luật D-047 chặn khai lại. Chỉ là sửa dữ liệu thử, không đổi code.
+
+## 2026-11-15 12:28:30 +07:00 — J-C107 — Đổi email tài khoản demo4 để nhận mã OTP Privy
+- Người thực hiện: Claude, theo yêu cầu của Vy (muốn tài khoản vẫn là demo4 nhưng mã gửi về hộp thư của Vy).
+- Nguyên nhân: mã 6 số ở bước "Xác nhận biên bản" do Privy gửi thẳng tới email của tài khoản (`NguoiDung.Email`), không đi qua `MAIL_REDIRECT_TO`. Email cũ `demo4@gmail.com` là địa chỉ tự đặt, Vy không nhận được, và có thể thuộc người khác. `vynhat2k5@gmail.com` đã được 3 tài khoản khách khác dùng (KH0031, KH0032, KH9102), nên dùng dạng có dấu `+` giống nhân viên (`vynhat2k5+nv0001@gmail.com`).
+- Giá trị **cũ**: `NguoiDung KH9322` Email=`demo4@gmail.com`. Giá trị **mới**: `vynhat2k5+demo4@gmail.com` (Gmail chuyển về hộp thư vynhat2k5@gmail.com). Chỉ đổi khi bảng `AvalancheWallet` chưa có ví của KH9322 (đã kiểm tra: bảng trống).
+- Việc còn lại: Vy thử "Gửi mã" lại ở tab Hợp đồng của demo4 và báo có nhận được thư từ Privy không.
