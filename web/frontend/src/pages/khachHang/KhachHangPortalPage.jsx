@@ -1052,6 +1052,7 @@ export default function KhachHangPortalPage() {
   const [residence, setResidence] = useState(null);
   const [residenceError, setResidenceError] = useState('');
   const [depositClock, setDepositClock] = useState(Date.now());
+  const [walletTab, setWalletTab] = useState(false);
   useEffect(() => {
     if (activeTab !== 'dat-coc') return undefined;
     const timer = setInterval(() => setDepositClock(Date.now()), 30000);
@@ -3845,10 +3846,15 @@ export default function KhachHangPortalPage() {
             <section className="dc-section-card dpay-card">
               <h3 className="dc-section-title">Phương thức thanh toán</h3>
               <div className="dpay-tabs" role="group" aria-label="Chọn phương thức thanh toán">
-                <button type="button" aria-pressed={isTransfer} className={`dpay-tab${isTransfer ? ' is-active' : ''}`} onClick={() => { if (!isTransfer) chonPhuongThucCoc('Chuyển khoản'); }}><Icon name="invoice" /> QR chuyển khoản</button>
-                <button type="button" aria-pressed={isCash} className={`dpay-tab${isCash ? ' is-active' : ''}`} onClick={() => { if (!isCash) chonPhuongThucCoc('Tiền mặt'); }}><Icon name="profile" /> Tiền mặt tại quầy</button>
+                <button type="button" aria-pressed={isTransfer && !walletTab} className={`dpay-tab${isTransfer && !walletTab ? ' is-active' : ''}`} onClick={() => { setWalletTab(false); if (!isTransfer) chonPhuongThucCoc('Chuyển khoản'); }}><Icon name="invoice" /> QR chuyển khoản</button>
+                <button type="button" aria-pressed={isCash && !walletTab} className={`dpay-tab${isCash && !walletTab ? ' is-active' : ''}`} onClick={() => { setWalletTab(false); if (!isCash) chonPhuongThucCoc('Tiền mặt'); }}><Icon name="profile" /> Tiền mặt tại quầy</button>
+                <button type="button" aria-pressed={walletTab} className={`dpay-tab${walletTab ? ' is-active' : ''}`} onClick={() => setWalletTab(true)}><Icon name="payment" /> Ví điện tử (mô phỏng)</button>
               </div>
-              {isTransfer && <div className="dpay-transfer">
+              {walletTab && <div className="dpay-wallet-panel">
+                <p className="dc-bank-note">Thanh toán nhanh qua cổng ví mô phỏng, không cần tải chứng từ. Ví mô phỏng chỉ dùng để thử luồng, không trừ tiền thật.</p>
+                <button type="button" className="kp-btn kp-btn-soft kp-full dpay-wallet" onClick={thanhToanViMoPhong}><Icon name="payment" /> Mở cổng ví điện tử</button>
+              </div>}
+              {!walletTab && isTransfer && <div className="dpay-transfer">
                 <VietQrCode account={account} amount={amount} content={transferContent} />
                 <div className="dc-bank-info dpay-bank">
                   <div><span>Ngân hàng</span><strong>{account.nganHang}</strong></div>
@@ -3857,11 +3863,9 @@ export default function KhachHangPortalPage() {
                   <div><span>Nội dung chuyển khoản</span><strong>{transferContent}</strong><button type="button" onClick={() => navigator.clipboard.writeText(transferContent)}>Sao chép</button></div>
                 </div>
               </div>}
-              {isCash && <p className="dc-bank-note">Bạn đến quầy {phieu.tenChiNhanh || 'của cơ sở'} để nộp {amount.toLocaleString('vi-VN')} VNĐ bằng tiền mặt. Nhân viên sẽ lập giấy biên nhận đặt cọc để hai bên cùng ký.</p>}
-              <button type="button" className="kp-btn kp-btn-soft kp-full dpay-wallet" onClick={thanhToanViMoPhong}><Icon name="payment" /> Thanh toán bằng ví điện tử (mô phỏng)</button>
-              <p className="dc-bank-note">Ví mô phỏng chỉ dùng để thử luồng, không trừ tiền thật.</p>
+              {!walletTab && isCash && <p className="dc-bank-note">Bạn đến quầy {phieu.tenChiNhanh || 'của cơ sở'} để nộp {amount.toLocaleString('vi-VN')} VNĐ bằng tiền mặt. Nhân viên sẽ lập giấy biên nhận đặt cọc để hai bên cùng ký.</p>}
             </section>
-            {isTransfer && <section className="dc-section-card dpay-card">
+            {!walletTab && isTransfer && <section className="dc-section-card dpay-card">
               <h3 className="dc-section-title"><Icon name="profile" />Minh chứng thanh toán</h3>
               <p className="dc-bank-note">Vui lòng tải lên ảnh chụp biên lai hoặc màn hình giao dịch thành công.</p>
               <form onSubmit={submitMinhChung} className="dc-upload-form">

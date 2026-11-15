@@ -1258,3 +1258,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo yêu cầu của Vy.
 - Thay đổi: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx`: bỏ banner "Còn n giờ n phút để thanh toán" ở trang thanh toán cọc; thẻ số tiền hiện "Còn lại HH:MM:SS" đếm ngược mỗi giây (`DepositCountdown`); thêm biểu tượng đồng hồ `schedule` cho `Icon` cục bộ (trước đó thiếu nên hiện hình ngôi nhà). `khachHangPortal.css`: `.dpay-countdown`.
 - Kiểm tra: build OK; `ui-customer-deposit-history` và `ui-customer-invoices` PASS. Chưa chụp ảnh.
+
+## 2026-11-15 23:10:00 +07:00 — J-C126 — Ví điện tử thành tab cạnh "Tiền mặt tại quầy"
+- Người thực hiện: Claude, theo yêu cầu của Vy.
+- Thay đổi: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (trang thanh toán cọc có ba tab: QR chuyển khoản, Tiền mặt tại quầy, Ví điện tử (mô phỏng); tab ví chỉ là trạng thái giao diện `walletTab`, không đổi phương thức đã lưu trên phiếu; nút "Mở cổng ví điện tử" vẫn đi tới cổng mô phỏng như cũ), `khachHangPortal.css` (`.dpay-wallet-panel`), `web/frontend/scripts/ui-customer-invoices.mjs` (kiểm tra tab ví).
+- Kiểm tra: build OK; `ui-customer-invoices`, `ui-customer-deposit-history`, `ui-customer-deposit-request` PASS. Chưa chụp ảnh.
