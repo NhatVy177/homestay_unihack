@@ -146,3 +146,34 @@ export const sqlTopUps = {
     }
   },
 };
+
+// J-C147: hóa đơn tháng trả qua ví mô phỏng. markPaid đổi hóa đơn sang "Đã TT" (phương thức Ví điện tử)
+// và đánh dấu đơn Paid trong cùng một giao dịch; chỉ khi số tiền đơn đúng bằng tổng hóa đơn.
+export const sqlInvoices = {
+  async get(maHoaDon) {
+    if (!/^[A-Za-z0-9]{1,6}$/.test(maHoaDon)) return null;
+    const r = (await executeQuery(`SELECT h.MaKhachHang, hd.TrangThai, hd.TongTien FROM dbo.HoaDon hd
+      JOIN dbo.HopDongThue h ON h.MaHopDong = hd.MaHopDong WHERE hd.MaHoaDon=@id`, [v('id', sql.VarChar(6), maHoaDon)])).recordset[0];
+    return r && { customerId: r.MaKhachHang, status: r.TrangThai, amountVnd: Number(r.TongTien) };
+  },
+  async markPaid(order, receipt, transId) {
+    const transaction = new sql.Transaction(await getPool());
+    await transaction.begin();
+    try {
+      const paid = await new sql.Request(transaction)
+        .input('id', sql.VarChar(6), order.refId).input('amount', sql.Decimal(15, 2), order.amountVnd)
+        .query(`UPDATE dbo.HoaDon SET TrangThai=N'Đã TT', NgayThanhToan=CAST(GETDATE() AS DATE), PhuongThucThanhToan=N'Ví điện tử'
+          WHERE MaHoaDon=@id AND TrangThai IN (N'Chưa TT', N'Nợ') AND TongTien=@amount`);
+      if (paid.rowsAffected[0] !== 1) throw Object.assign(new Error('Hóa đơn đã được thanh toán hoặc số tiền đã thay đổi.'), { statusCode: 409 });
+      const updated = await new sql.Request(transaction)
+        .input('id', sql.VarChar(32), order.id).input('invoice', sql.VarChar(6), order.refId).input('transId', sql.VarChar(40), transId)
+        .query(`UPDATE dbo.PaymentSimOrder SET Status='Paid', MaHoaDon=@invoice, GatewayTransId=@transId, PaidAt=SYSUTCDATETIME(), LastError=NULL
+          WHERE Id=@id AND Status='Processing'`);
+      if (updated.rowsAffected[0] !== 1) throw Object.assign(new Error('Đơn thanh toán không còn ở trạng thái xử lý.'), { statusCode: 409 });
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback().catch(() => {});
+      throw error;
+    }
+  },
+};

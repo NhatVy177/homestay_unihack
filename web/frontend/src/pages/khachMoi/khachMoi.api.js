@@ -20,6 +20,8 @@ export const khachMoiApi = {
   khaiCuTru: (data) => httpClient.post('/khach-moi/cu-tru', data),
   getChungTuKyDau: (maHopDong) => httpClient.get(`/khach-moi/ky-dau/${maHopDong}/minh-chung`),
   guiChungTuKyDau: (maHopDong, formData) => httpClient.put(`/khach-moi/ky-dau/${maHopDong}/minh-chung`, formData, { headers: { 'Content-Type': undefined } }),
+  getChungTuHoaDon: (maHoaDon) => httpClient.get(`/khach-moi/hoa-don/${maHoaDon}/minh-chung`),
+  guiChungTuHoaDon: (maHoaDon, formData) => httpClient.put(`/khach-moi/hoa-don/${maHoaDon}/minh-chung`, formData, { headers: { 'Content-Type': undefined } }),
   rutLaiCuTru: (data) => httpClient.post('/khach-moi/cu-tru/rut-lai', data),
   uploadMinhChung: (id, data) => httpClient.post(`/khach-moi/dat-coc/${id}/minh-chung`, data),
   getHopDongDashboard: (params = {}) => httpClient.get('/khach-moi/hop-dong-dashboard', { params }),

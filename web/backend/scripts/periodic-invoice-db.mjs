@@ -17,6 +17,28 @@ BEGIN
     NgayTao DATETIME2 NOT NULL CONSTRAINT DF_PhiPhatSinh_NgayTao DEFAULT SYSDATETIME()
   );
   CREATE INDEX IX_PhiPhatSinh_HopDong ON dbo.PhiPhatSinh(MaHopDong, TrangThai);
+END;
+-- Khách tự thanh toán hóa đơn tháng (J-C147): minh chứng chuyển khoản theo hóa đơn.
+IF OBJECT_ID(N'dbo.ChungTuHoaDon', N'U') IS NULL
+  CREATE TABLE dbo.ChungTuHoaDon (
+    MaHoaDon VARCHAR(6) NOT NULL CONSTRAINT PK_ChungTuHoaDon PRIMARY KEY CONSTRAINT FK_ChungTuHoaDon_HoaDon REFERENCES dbo.HoaDon(MaHoaDon),
+    DuongDan NVARCHAR(300) NOT NULL,
+    TenTep NVARCHAR(200) NOT NULL,
+    NgayGui DATETIME2 NOT NULL CONSTRAINT DF_ChungTuHoaDon_NgayGui DEFAULT SYSDATETIME()
+  );
+-- Ví mô phỏng nhận thêm loại đơn 'hoa-don' (giữ các loại cũ).
+IF OBJECT_ID(N'dbo.PaymentSimOrder', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM sys.check_constraints
+  WHERE parent_object_id = OBJECT_ID('dbo.PaymentSimOrder') AND definition LIKE '%hoa-don%')
+BEGIN
+  DECLARE @purposeCheck sysname = (SELECT TOP (1) name FROM sys.check_constraints
+    WHERE parent_object_id = OBJECT_ID('dbo.PaymentSimOrder') AND definition LIKE '%Purpose%');
+  IF @purposeCheck IS NOT NULL
+  BEGIN
+    DECLARE @dropSql nvarchar(max) = N'ALTER TABLE dbo.PaymentSimOrder DROP CONSTRAINT ' + QUOTENAME(@purposeCheck);
+    EXEC sys.sp_executesql @dropSql;
+  END;
+  ALTER TABLE dbo.PaymentSimOrder ADD CONSTRAINT CK_PaymentSimOrder_Purpose
+    CHECK (Purpose IN ('dat-coc', 'thu-nhan-phong', 'thu-them-doi-soat', 'hoa-don'));
 END`;
 
 async function main() {
@@ -27,7 +49,9 @@ async function main() {
   const db = (await pool.request().query('SELECT DB_NAME() AS n')).recordset[0]?.n;
   if (!/^(HOMEDORM4|HOMEDORM_CONFIRM_TEST_\d+)$/.test(db)) throw new Error('Unexpected migration database.');
   if (mode === 'migrate') await pool.request().batch(CREATE_TABLE);
-  const ready = Boolean((await pool.request().query("SELECT OBJECT_ID(N'dbo.PhiPhatSinh', N'U') AS id")).recordset[0]?.id);
+  const row = (await pool.request().query(`SELECT OBJECT_ID(N'dbo.PhiPhatSinh', N'U') AS fees, OBJECT_ID(N'dbo.ChungTuHoaDon', N'U') AS proofs,
+    (SELECT COUNT(*) FROM sys.check_constraints WHERE parent_object_id = OBJECT_ID('dbo.PaymentSimOrder') AND definition LIKE '%hoa-don%') AS walletPurpose`)).recordset[0];
+  const ready = Boolean(row?.fees && row?.proofs && row?.walletPurpose);
   console.log(JSON.stringify({ mode, databaseName: db, ready }));
   if (!ready) process.exitCode = 1;
   await pool.close();

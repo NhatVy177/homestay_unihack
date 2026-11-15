@@ -16,8 +16,9 @@ const STANDARD_FEES = [
   { value: 'giuong_nem', label: 'Đền bù hư hỏng giường đơn + nệm', code: 'CPPS-9901', amount: 200000 },
   { value: 'other', label: 'Khác (Tự nhập chi tiết)', code: 'CPPS', amount: 0 },
 ];
-const STATUS_LABEL = { paid: 'Đã thu', pending: 'Chờ TT', overdue: 'Quá hạn' };
-const STATUS_FULL = { paid: 'Đã thanh toán', pending: 'Chờ thanh toán', overdue: 'Quá hạn' };
+const STATUS_LABEL = { paid: 'Đã thu', pending: 'Chờ TT', overdue: 'Quá hạn', review: 'Chờ xác nhận' };
+const STATUS_FULL = { paid: 'Đã thanh toán', pending: 'Chờ thanh toán', overdue: 'Quá hạn', review: 'Khách đã gửi minh chứng' };
+const FILE_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
 
 const money = (v) => `${Math.round(Number(v) || 0).toLocaleString('vi-VN')} đ`;
 const plain = (v) => Math.round(Number(v) || 0).toLocaleString('vi-VN');
@@ -53,7 +54,7 @@ export default function HoaDonDinhKyTab() {
   const [selectedId, setSelectedId] = useState(''), [detail, setDetail] = useState(null), [detailError, setDetailError] = useState('');
   const [elecOld, setElecOld] = useState(0), [elecNew, setElecNew] = useState(0), [waterOld, setWaterOld] = useState(0), [waterNew, setWaterNew] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [drawer, setDrawer] = useState(null), [payMethod, setPayMethod] = useState('Chuyển khoản');
+  const [drawer, setDrawer] = useState(null);
   const [feeModal, setFeeModal] = useState(null);
 
   const load = useCallback(async () => {
@@ -147,7 +148,7 @@ export default function HoaDonDinhKyTab() {
       setFeeModal(null); await loadDetail(selectedId, false);
     });
   };
-  const openDrawer = (inv) => { setPayMethod('Chuyển khoản'); setDrawer({ ...inv, loading: true }); hoaDonDinhKyApi.chiTietHoaDon(inv.maHoaDon).then(({ data }) => setDrawer(data)).catch(() => setDrawer({ ...inv, loading: false })); };
+  const openDrawer = (inv) => { setDrawer({ ...inv, loading: true }); hoaDonDinhKyApi.chiTietHoaDon(inv.maHoaDon).then(({ data }) => setDrawer(data)).catch(() => setDrawer({ ...inv, loading: false })); };
   const collect = (inv, method) => run(async () => {
     await hoaDonDinhKyApi.thuTien(inv.maHoaDon, method);
     await load();
@@ -160,7 +161,7 @@ export default function HoaDonDinhKyTab() {
       <div className="hdk-filters">
         <select aria-label="Kỳ thanh toán" value={period} onChange={(e) => setPeriod(e.target.value)}>{periodOptions.map((p) => <option key={p} value={p}>Tháng {showPeriod(p)}</option>)}</select>
         <select aria-label="Chi nhánh" value={branch} onChange={(e) => setBranch(e.target.value)}><option value="all">Tất cả chi nhánh</option>{branchOptions.map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select>
-        <select aria-label="Trạng thái" value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">Tất cả trạng thái</option><option value="paid">Đã thanh toán</option><option value="pending">Chờ thanh toán</option><option value="overdue">Quá hạn</option></select>
+        <select aria-label="Trạng thái" value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">Tất cả trạng thái</option><option value="paid">Đã thanh toán</option><option value="review">Chờ xác nhận</option><option value="pending">Chờ thanh toán</option><option value="overdue">Quá hạn</option></select>
       </div>
     </header>
     {loadError && <p className="hdk-alert is-error" role="alert">{loadError}</p>}
@@ -287,7 +288,7 @@ export default function HoaDonDinhKyTab() {
               <td className="num is-bold">{plain(inv.tongTien)}</td>
               <td className="center"><span className={`hdk-status is-${inv.nhom}`}>{STATUS_LABEL[inv.nhom]}</span></td>
               <td className="num" onClick={(e) => e.stopPropagation()}><div className="hdk-row-actions">
-                {inv.nhom !== 'paid' && <button type="button" className="hdk-pay-btn" disabled={busy} onClick={() => collect(inv, 'Chuyển khoản')}>Thu tiền</button>}
+                {inv.nhom === 'review' && <button type="button" className="hdk-pay-btn" disabled={busy} onClick={() => collect(inv, 'Chuyển khoản')}>Xác nhận</button>}
                 <button type="button" className="hdk-icon-btn" aria-label={`Xem ${inv.maHoaDon}`} onClick={() => openDrawer(inv)}><Icon name="visibility" /></button></div></td>
             </tr>)}
             {!filteredInvoices.length && <tr><td colSpan={9} className="hdk-empty-cell">Không tìm thấy hóa đơn định kỳ nào trong kỳ này.</td></tr>}
@@ -315,12 +316,15 @@ export default function HoaDonDinhKyTab() {
             </div>
           </div>
           <div className="hdk-drawer-total"><span>Tổng cộng:</span><b>{plain(drawer.tongTien)} VND</b></div>
-          {drawer.nhom !== 'paid' && <label className="hdk-pay-method"><span>Phương thức thu</span>
-            <select value={payMethod} onChange={(e) => setPayMethod(e.target.value)}><option>Chuyển khoản</option><option>Tiền mặt</option></select></label>}
+          {drawer.chungTu && <div className="hdk-proof"><span className="hdk-label">Minh chứng khách gửi</span>
+            <a href={`${FILE_BASE}${drawer.chungTu.duongDan}`} target="_blank" rel="noreferrer">{drawer.chungTu.tenTep}</a>
+            <small>Đối chiếu sao kê ngân hàng trước khi xác nhận đã nhận tiền.</small></div>}
+          {drawer.nhom !== 'paid' && !drawer.chungTu && <p className="hdk-hint">Khách thanh toán trong tài khoản của họ (chuyển khoản kèm minh chứng hoặc ví). Chỉ ghi nhận tại đây khi khách nộp tiền mặt tại quầy.</p>}
         </div>
         <div className="hdk-drawer-foot">
           <button type="button" className="hdk-btn-outline" disabled={drawer.loading} onClick={() => printInvoice(drawer)}><Icon name="print" /> In PDF</button>
-          {drawer.nhom !== 'paid' && <button type="button" className="hdk-btn" disabled={busy} onClick={() => collect(drawer, payMethod)}><Icon name="check" /> Ghi nhận TT</button>}
+          {drawer.nhom === 'review' && <button type="button" className="hdk-btn" disabled={busy} onClick={() => collect(drawer, 'Chuyển khoản')}><Icon name="check" /> Xác nhận đã nhận tiền</button>}
+          {drawer.nhom !== 'paid' && drawer.nhom !== 'review' && <button type="button" className="hdk-btn" disabled={busy} onClick={() => collect(drawer, 'Tiền mặt')}><Icon name="check" /> Thu tiền mặt tại quầy</button>}
         </div>
       </aside>
     </>}

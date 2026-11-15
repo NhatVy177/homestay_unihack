@@ -48,6 +48,7 @@ export function periodToBill(lastPeriod, startDate) {
 
 export function statusGroup(row, today = toDateOnly(new Date())) {
   if (row.trangThai === 'Đã TT') return 'paid';
+  if (row.chungTuDuongDan) return 'review'; // khách đã gửi minh chứng, chờ kế toán xác nhận
   const due = row.ngayHanTT ? String(row.ngayHanTT instanceof Date ? row.ngayHanTT.toISOString() : row.ngayHanTT).slice(0, 10) : '';
   if (row.trangThai === 'Nợ' || (due && due < today)) return 'overdue';
   return 'pending';
@@ -250,13 +251,15 @@ export async function danhSachHoaDon(user, { query = executeQuery } = {}) {
       nd.HoTen AS hoTen, nd.SDT AS sdt, ph.TenPhong AS tenPhong, ph.MaChiNhanh AS maChiNhanh, cn.TenChiNhanh AS tenChiNhanh,
       ${sum("ct.DonViTinh = 'kWh'")} AS tienDien, ${sum("ct.DonViTinh = 'm3'")} AS tienNuoc,
       ${sum("ct.DonViTinh NOT IN ('kWh', 'm3')")} AS tienDichVu,
-      (SELECT SUM(ps.SoTien) FROM dbo.PhiPhatSinh ps WHERE ps.MaHoaDon = hd.MaHoaDon) AS tienPhatSinh
+      (SELECT SUM(ps.SoTien) FROM dbo.PhiPhatSinh ps WHERE ps.MaHoaDon = hd.MaHoaDon) AS tienPhatSinh,
+      ctk.DuongDan AS chungTuDuongDan, ctk.TenTep AS chungTuTenTep, ctk.NgayGui AS chungTuNgayGui
     FROM dbo.HoaDon hd
     JOIN dbo.HopDongThue h ON h.MaHopDong = hd.MaHopDong
     JOIN dbo.NguoiDung nd ON nd.MaNguoiDung = h.MaKhachHang
     CROSS APPLY (SELECT TOP 1 c.MaPhong FROM dbo.ChiTietDatCoc c WHERE c.MaPhieuDatCoc = h.MaPhieuCoc ORDER BY c.MaPhong) r
     JOIN dbo.Phong ph ON ph.MaPhong = r.MaPhong
     JOIN dbo.ChiNhanh cn ON cn.MaChiNhanh = ph.MaChiNhanh
+    LEFT JOIN dbo.ChungTuHoaDon ctk ON ctk.MaHoaDon = hd.MaHoaDon
     WHERE hd.TrangThai <> N'Tạm tính' AND ph.MaChiNhanh = @MaChiNhanh
     ORDER BY hd.KyThanhToan DESC, hd.MaHoaDon DESC`, [branchParam(user)]);
   const today = toDateOnly(new Date());
@@ -268,6 +271,7 @@ export async function danhSachHoaDon(user, { query = executeQuery } = {}) {
     tienDichVu: Number(row.tienDichVu) || 0, tienPhatSinh: Number(row.tienPhatSinh) || 0, tongTien: Number(row.tongTien) || 0,
     ngayLap: row.ngayLap, ngayHanTT: row.ngayHanTT, ngayThanhToan: row.ngayThanhToan, phuongThuc: row.phuongThuc,
     trangThai: row.trangThai, nhom: statusGroup(row, today),
+    chungTu: row.chungTuDuongDan ? { duongDan: row.chungTuDuongDan, tenTep: row.chungTuTenTep, ngayGui: row.chungTuNgayGui } : null,
   }));
 }
 

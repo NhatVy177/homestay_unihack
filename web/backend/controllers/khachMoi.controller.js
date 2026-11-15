@@ -93,6 +93,14 @@ export async function luuChungTuKyDau(req, res, next) {
   try { res.json(await kyDauChungTu.luuChungTuKyDau(req.user, req.params.id, req.file)); } catch (error) { next(error); }
 }
 
+export async function layChungTuHoaDon(req, res, next) {
+  try { res.json(await kyDauChungTu.layChungTuHoaDonCuaKhach(req.user, req.params.id)); } catch (error) { next(error); }
+}
+
+export async function luuChungTuHoaDon(req, res, next) {
+  try { res.json(await kyDauChungTu.luuChungTuHoaDon(req.user, req.params.id, req.file)); } catch (error) { next(error); }
+}
+
 export async function uploadMinhChung(req, res, next) {
   try {
     res.json(await service.uploadMinhChungKhachHang(req.user, req.params.id, req.body));

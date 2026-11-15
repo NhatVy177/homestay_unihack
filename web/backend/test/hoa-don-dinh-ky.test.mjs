@@ -81,3 +81,8 @@ test('collecting payment and fee changes report when nothing matched', async () 
   await assert.rejects(xoaPhiPhatSinh(keToan, 'PS1', { query: async () => ({ rowsAffected: [0] }) }), /đã được tính/);
   await assert.rejects(themPhiPhatSinh(keToan, { maHopDong: 'HD0002', tenPhi: 'Mất thẻ', soTien: -5 }, { query: detailQuery().query }), /số nguyên dương/);
 });
+
+test('an invoice with a customer proof waits for accountant confirmation', () => {
+  assert.equal(statusGroup({ trangThai: 'Chưa TT', ngayHanTT: '2026-11-01', chungTuDuongDan: '/uploads/chung-tu/x.png' }, '2026-11-16'), 'review');
+  assert.equal(statusGroup({ trangThai: 'Đã TT', chungTuDuongDan: '/uploads/chung-tu/x.png' }, '2026-11-16'), 'paid');
+});

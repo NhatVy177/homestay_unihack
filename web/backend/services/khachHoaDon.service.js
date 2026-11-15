@@ -12,7 +12,8 @@ export async function getHoaDonCuaKhach(user, query = executeQuery) {
   if (!user || user.vaiTro !== 'KhachHang' || !user.maNguoiDung) throw createServiceError('Chức năng này chỉ dành cho khách hàng.', 403);
   const result = await query(`SELECT hd.MaHoaDon AS maHoaDon, hd.MaHopDong AS maHopDong, hd.KyThanhToan AS kyThanhToan,
       hd.NgayLap AS ngayLap, hd.NgayHanTT AS ngayHanTT, hd.TongTien AS tongTien, hd.TrangThai AS trangThai,
-      hd.NgayThanhToan AS ngayThanhToan, h.NgayBatDau AS ngayBatDau
+      hd.NgayThanhToan AS ngayThanhToan, h.NgayBatDau AS ngayBatDau,
+      CAST(CASE WHEN EXISTS (SELECT 1 FROM dbo.ChungTuHoaDon c WHERE c.MaHoaDon = hd.MaHoaDon) THEN 1 ELSE 0 END AS BIT) AS daGuiMinhChung
     FROM dbo.HoaDon hd JOIN dbo.HopDongThue h ON h.MaHopDong = hd.MaHopDong
     WHERE h.MaKhachHang = @MaKhachHang AND hd.TrangThai <> N'Tạm tính'
     ORDER BY hd.KyThanhToan DESC, hd.MaHoaDon DESC`, [{ name: 'MaKhachHang', type: sql.VarChar(6), value: user.maNguoiDung }]);

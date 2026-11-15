@@ -3933,9 +3933,10 @@ export default function KhachHangPortalPage() {
     if (fcBusy) return;
     setFcBusy(true);
     try {
-      const { data: order } = await httpClient.post(`/thanh-toan-mo-phong/thu-nhan-phong/${quote.refId}`);
+      const isInvoice = quote.kind === 'hoaDon';
+      const { data: order } = await httpClient.post(`/thanh-toan-mo-phong/${isInvoice ? 'hoa-don' : 'thu-nhan-phong'}/${quote.refId}`);
       await httpClient.post(`/thanh-toan-mo-phong/${order.id}/thanh-toan`);
-      setToast('Thanh toán khoản thu kỳ đầu bằng ví thành công (mô phỏng).');
+      setToast(isInvoice ? `Thanh toán hóa đơn ${quote.refId} bằng ví thành công (mô phỏng).` : 'Thanh toán khoản thu kỳ đầu bằng ví thành công (mô phỏng).');
       setFirstChargePay(null); setInvoices(null);
       httpClient.get('/thanh-toan-mo-phong/thu-nhan-phong').then(({ data }) => setFirstCharges(Array.isArray(data) ? data : [])).catch(() => {});
       khachMoiApi.getHoaDon().then(({ data }) => setInvoices(Array.isArray(data) ? data : [])).catch(() => setInvoices([]));
@@ -3951,8 +3952,9 @@ export default function KhachHangPortalPage() {
     try {
       const body = new FormData();
       body.append('file', fcFile);
-      const { data } = await khachMoiApi.guiChungTuKyDau(quote.refId, body);
+      const { data } = quote.kind === 'hoaDon' ? await khachMoiApi.guiChungTuHoaDon(quote.refId, body) : await khachMoiApi.guiChungTuKyDau(quote.refId, body);
       setFcProof(data || null); setFcFile(null);
+      if (quote.kind === 'hoaDon') khachMoiApi.getHoaDon().then(({ data: list }) => setInvoices(Array.isArray(list) ? list : [])).catch(() => {});
       setToast('Đã gửi chứng từ. Kế toán sẽ kiểm tra và ghi nhận khoản thu.');
     } catch (error) {
       setToast(error?.response?.data?.message || 'Gửi chứng từ thất bại.');
@@ -3968,22 +3970,24 @@ export default function KhachHangPortalPage() {
     const steps = [
       { label: 'Đang chờ thanh toán', desc: fcMethod === 'cash' ? 'Đến quầy nộp tiền mặt theo hướng dẫn bên dưới' : 'Chuyển khoản hoặc thanh toán qua ví', state: fcProof ? 'done' : 'current' },
       { label: fcProof ? 'Đã nộp minh chứng' : 'Nộp minh chứng', desc: fcProof ? 'Kế toán đang kiểm tra và ghi nhận đã nhận tiền' : 'Tải ảnh chuyển khoản lên để kế toán đối chiếu (ví mô phỏng được ghi nhận ngay)', state: fcProof ? 'current' : 'todo' },
-      { label: 'Hoàn tất', desc: 'Khoản thu kỳ đầu đã thanh toán', state: 'todo' }
+      { label: 'Hoàn tất', desc: quote.kind === 'hoaDon' ? 'Hóa đơn đã thanh toán' : 'Khoản thu kỳ đầu đã thanh toán', state: 'todo' }
     ];
     return (
       <>
         <button type="button" className="ui-btn ui-btn--secondary cinv-back" onClick={() => setFirstChargePay(null)}><Icon name="arrow_back" /> Quay lại danh sách</button>
         <section className="dc-detail dpay">
           <header className="dpay-head">
-            <h2>Thanh toán khoản thu khi nhận phòng</h2>
-            <p>Khoản thu kỳ đầu của hợp đồng {quote.refId}: tiền thuê kỳ đầu và dịch vụ, đã trừ tiền cọc đang giữ.</p>
+            <h2>{quote.kind === 'hoaDon' ? `Thanh toán hóa đơn tháng ${String(quote.kyThanhToan || '').slice(5, 7)}/${String(quote.kyThanhToan || '').slice(0, 4)}` : 'Thanh toán khoản thu khi nhận phòng'}</h2>
+            <p>{quote.kind === 'hoaDon'
+              ? `Hóa đơn ${quote.refId} của hợp đồng ${quote.maHopDong}: tiền phòng, điện nước, dịch vụ và phí phát sinh trong kỳ.${quote.ngayHanTT ? ` Hạn thanh toán ${formatDate(quote.ngayHanTT)}.` : ''}`
+              : `Khoản thu kỳ đầu của hợp đồng ${quote.refId}: tiền thuê kỳ đầu và dịch vụ, đã trừ tiền cọc đang giữ.`}</p>
           </header>
           <div className="dpay-grid">
             <div className="dpay-main">
               <section className="dpay-amount">
                 <span>Số tiền cần thanh toán</span>
                 <strong>{amount.toLocaleString('vi-VN')} VNĐ</strong>
-                <p className="dpay-formula">Hợp đồng {quote.refId}</p>
+                <p className="dpay-formula">{quote.kind === 'hoaDon' ? `Hóa đơn ${quote.refId} · hợp đồng ${quote.maHopDong}` : `Hợp đồng ${quote.refId}`}</p>
               </section>
               <section className="dc-section-card dpay-card">
                 <h3 className="dc-section-title">Phương thức thanh toán</h3>
@@ -4004,7 +4008,7 @@ export default function KhachHangPortalPage() {
                 {fcMethod === 'cash' && <p className="dc-bank-note">Bạn đến quầy để nộp {amount.toLocaleString('vi-VN')} VNĐ bằng tiền mặt. Kế toán sẽ ghi nhận khoản thu và lập biên nhận.</p>}
                 {fcMethod === 'wallet' && <div className="dpay-wallet-panel">
                   <div className="dc-bank-info dpay-bank">
-                    <div><span>Nội dung</span><strong>Khoản thu kỳ đầu – hợp đồng {quote.refId}</strong></div>
+                    <div><span>Nội dung</span><strong>{quote.kind === 'hoaDon' ? `Hóa đơn ${quote.refId}` : `Khoản thu kỳ đầu – hợp đồng ${quote.refId}`}</strong></div>
                     <div><span>Số tiền</span><strong>{amount.toLocaleString('vi-VN')} VNĐ</strong></div>
                   </div>
                   <p className="dc-bank-note">Đây là ví mô phỏng để thử luồng nên không có mã QR thật và không trừ tiền thật. Muốn quét mã thật hãy dùng tab QR chuyển khoản.</p>
@@ -4326,6 +4330,12 @@ export default function KhachHangPortalPage() {
     </>;
     if (firstChargePay) return renderFirstChargePayment(firstChargePay);
     return <CustomerInvoicesList deposits={datCocList || []} invoices={invoices || []} firstCharges={firstCharges}
+      onPayInvoice={(inv) => {
+        const quote = { kind: 'hoaDon', refId: inv.maHoaDon, amountVnd: Number(inv.tongTien) || 0, maHopDong: inv.maHopDong, kyThanhToan: inv.kyThanhToan, ngayHanTT: inv.ngayHanTT };
+        setFcMethod('transfer'); setFcProof(null); setFcFile(null); setFirstChargePay(quote);
+        khachMoiApi.getChungTuHoaDon(inv.maHoaDon).then(({ data }) => setFcProof(data || null)).catch(() => setFcProof(null));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }}
       onPayFirstCharge={(maHopDong) => { const quote = firstCharges.find((item) => item.refId === maHopDong); if (quote) { setFcMethod('transfer'); setFcProof(null); setFcFile(null); setFirstChargePay(quote); khachMoiApi.getChungTuKyDau(maHopDong).then(({ data }) => setFcProof(data || null)).catch(() => setFcProof(null)); window.scrollTo({ top: 0, behavior: 'smooth' }); } }}
       loading={datCocLoading || invoices === null || datCocList === null}
       error={invoicesError}

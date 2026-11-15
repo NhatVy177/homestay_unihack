@@ -6,9 +6,9 @@ const fail = (message, statusCode = 400) => { throw Object.assign(new Error(mess
 const FIELDS = ['orderId', 'amountVnd', 'resultCode', 'transId', 'responseTime'];
 export const ipnString = body => FIELDS.map(key => `${key}=${body[key]}`).join('&');
 export class PaymentSimulator {
-  constructor({ store, deposits, firstCharges, topUps, secret, clock = () => Date.now(), notifyDepositPaid = async () => {}, notifyFirstChargePaid = async () => {}, beforeTopUpPaid=async()=>{}, afterTopUpPaid=async()=>{} }) {
+  constructor({ store, deposits, firstCharges, topUps, invoices, secret, clock = () => Date.now(), notifyDepositPaid = async () => {}, notifyFirstChargePaid = async () => {}, beforeTopUpPaid=async()=>{}, afterTopUpPaid=async()=>{} }) {
     if (!secret || secret.length < 16) throw new Error('PAYMENT_SIM_SECRET must be at least 16 characters.');
-    Object.assign(this, { store, deposits, firstCharges, topUps, secret, clock, notifyDepositPaid, notifyFirstChargePaid, beforeTopUpPaid, afterTopUpPaid });
+    Object.assign(this, { store, deposits, firstCharges, topUps, invoices, secret, clock, notifyDepositPaid, notifyFirstChargePaid, beforeTopUpPaid, afterTopUpPaid });
   }
   sign(body) { return createHmac('sha256', this.secret).update(ipnString(body)).digest('hex'); }
   verify(body) {
@@ -105,6 +105,21 @@ export class PaymentSimulator {
     await this.store.create(order);
     return order;
   }
+  // J-C147: khách trả hóa đơn tháng (HoaDon "Chưa TT"/"Nợ") qua ví mô phỏng; refId là mã hóa đơn.
+  async createInvoiceOrder(user, maHoaDon) {
+    this.customer(user);
+    const id = String(maHoaDon || '').trim();
+    const invoice = this.invoices && await this.invoices.get(id);
+    if (!invoice || invoice.customerId !== user.maNguoiDung) fail('Không tìm thấy hóa đơn của bạn.', 404);
+    if (!['Chưa TT', 'Nợ'].includes(invoice.status)) fail('Hóa đơn không ở trạng thái chờ thanh toán.', 409);
+    if (!Number.isFinite(invoice.amountVnd) || invoice.amountVnd <= 0) fail('Số tiền hóa đơn không hợp lệ.', 409);
+    const existing = await this.store.findPending('hoa-don', id, user.maNguoiDung);
+    if (existing && existing.amountVnd === invoice.amountVnd) return existing;
+    const order = { id: 'SIM' + randomBytes(12).toString('hex').toUpperCase(), purpose: 'hoa-don', refId: id,
+      customerId: user.maNguoiDung, amountVnd: invoice.amountVnd, status: 'Pending' };
+    await this.store.create(order);
+    return order;
+  }
   async getOrder(user, id) { return this.owned(user, id); }
   async cancel(user, id) {
     const order = await this.owned(user, id);
@@ -151,6 +166,10 @@ export class PaymentSimulator {
         await this.beforeTopUpPaid(order.refId);
         await this.topUps.markPaid(order, receipt, String(body.transId));
         try {await this.afterTopUpPaid(order.refId);} catch { /* receipt is committed; reconciliation can retry */ }
+      }
+      else if (order.purpose === 'hoa-don') {
+        // The SQL adapter marks the invoice paid and the order Paid in one transaction.
+        await this.invoices.markPaid(order, receipt, String(body.transId));
       }
       else fail('Loại đơn thanh toán không hợp lệ.', 409);
     } catch (error) {

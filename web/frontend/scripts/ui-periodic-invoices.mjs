@@ -89,14 +89,15 @@ try {
     await page.getByRole('heading', { name: /Danh sách hóa đơn tháng 12\/2026/ }).waitFor();
     const row = page.locator('.hdk-table tbody tr', { hasText: 'HO9003' });
     assert.match(await row.innerText(), /8\.298\.000[\s\S]*Chờ TT/i);
+    assert.equal(await row.getByRole('button', { name: 'Xác nhận' }).count(), 0, 'kế toán không tự thu khi khách chưa gửi minh chứng');
     assert.match(await page.locator('.hdk-cards').innerText(), /DỰ KIẾN THÁNG\s*8\.298\.000 đ/i);
     await row.getByRole('button', { name: 'Xem HO9003' }).click();
     const drawer = page.getByRole('dialog', { name: 'Chi tiết hóa đơn' });
     await drawer.getByText('Điện (85 kWh x 4.000):', { exact: false }).waitFor();
     await drawer.getByText('Đền bù làm mất thẻ từ/chìa khóa', { exact: false }).waitFor();
     await page.screenshot({ path: `${folder}/drawer-${width}.png`, fullPage: false });
-    await drawer.locator('select').selectOption('Tiền mặt');
-    await drawer.getByRole('button', { name: 'Ghi nhận TT' }).click();
+    assert.equal(await drawer.getByRole('button', { name: 'Xác nhận đã nhận tiền' }).count(), 0, 'chưa có minh chứng thì không có nút xác nhận chuyển khoản');
+    await drawer.getByRole('button', { name: 'Thu tiền mặt tại quầy' }).click();
     await drawer.getByText('Đã thanh toán', { exact: true }).waitFor();
     assert.deepEqual(posts.find((p) => p[0] === 'collect')[1], { phuongThuc: 'Tiền mặt' });
     assert.deepEqual(errors, []);

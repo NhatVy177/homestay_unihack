@@ -32,7 +32,8 @@ export function buildInvoiceRows({ deposits = [], invoices = [], firstCharges = 
     const late = !paid && (item.trangThai === 'Nợ' || (dayOf(item.ngayHanTT) && dayOf(item.ngayHanTT) < today));
     return { key: `hd-${item.maHoaDon}`, kind: 'invoice', id: item.maHoaDon, period: item.kyThanhToan,
       loai: item.loai === 'Kỳ đầu' ? 'Nhận phòng' : 'Định kỳ',
-      amount: item.tongTien, due: dayOf(item.ngayHanTT), group: paid ? 'paid' : late ? 'overdue' : 'unpaid', source: item, canPay: !paid };
+      // Đã gửi minh chứng thì chờ kế toán xác nhận (vẫn cho mở để gửi lại chứng từ khác).
+      amount: item.tongTien, due: dayOf(item.ngayHanTT), group: paid ? 'paid' : item.daGuiMinhChung ? 'pending' : late ? 'overdue' : 'unpaid', source: item, canPay: !paid };
   });
   // Khoản thu kỳ đầu khi nhận phòng (tính lúc nhận phòng, trả bằng ví mô phỏng). Đã có hóa đơn kỳ đầu thì không thêm dòng trùng.
   const hasFirstInvoice = (contractId) => invoices.some((item) => item.maHopDong === contractId && item.loai === 'Kỳ đầu');
@@ -47,7 +48,7 @@ function StatusPill({ group, status }) {
   return <span className={`cinv-status cinv-status--${group}`}>{label}</span>;
 }
 
-export default function CustomerInvoicesList({ deposits, invoices, firstCharges = [], loading, error, onOpenDeposit, onOpenContract, onPayFirstCharge }) {
+export default function CustomerInvoicesList({ deposits, invoices, firstCharges = [], loading, error, onOpenDeposit, onOpenContract, onPayFirstCharge, onPayInvoice }) {
   const rows = useMemo(() => buildInvoiceRows({ deposits, invoices, firstCharges }), [deposits, invoices, firstCharges]);
   const [group, setGroup] = useState('all'), [month, setMonth] = useState('Tất cả'), [year, setYear] = useState('Tất cả'), [loai, setLoai] = useState('Tất cả loại');
   const years = [...new Set(rows.map((row) => String(row.period).slice(0, 4)).filter(Boolean))].sort().reverse();
@@ -69,7 +70,8 @@ export default function CustomerInvoicesList({ deposits, invoices, firstCharges 
     return true;
   });
   const openRow = (row) => (row.kind === 'deposit' ? onOpenDeposit(row.source) : row.kind === 'firstCharge' ? onOpenContract(row.source.refId) : onOpenContract(row.source.maHopDong));
-  const payRow = (row) => (row.kind === 'firstCharge' && onPayFirstCharge ? onPayFirstCharge(row.source.refId) : openRow(row));
+  const payRow = (row) => (row.kind === 'firstCharge' && onPayFirstCharge ? onPayFirstCharge(row.source.refId)
+    : row.kind === 'invoice' && onPayInvoice ? onPayInvoice(row.source) : openRow(row));
 
   return <section className="cinv-page" aria-label="Hóa đơn của tôi">
     <header className="cinv-head"><h2>Hóa đơn của tôi</h2><p>Tra cứu thông tin chi phí định kỳ và thực hiện thanh toán trực tuyến nhanh chóng.</p></header>
