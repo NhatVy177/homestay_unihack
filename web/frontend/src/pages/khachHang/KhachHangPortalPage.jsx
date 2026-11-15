@@ -3500,6 +3500,14 @@ export default function KhachHangPortalPage() {
                       <h3>{laHoanCocDoiSoat ? 'Thông tin hoàn cọc' : 'Thông tin thanh toán'}</h3>
                     </div>
 
+                    {laThuThemDoiSoat && (
+                      <div className="hd-qr-card">
+                        <strong>Quét mã để chuyển khoản số tiền thu thêm: {formatSettlementMoney(doiSoatTraPhong.soTienKhachPhaiTT)}</strong>
+                        <VietQrCode account={taiKhoanThanhToan} amount={doiSoatTraPhong.soTienKhachPhaiTT} content={[doiSoatTraPhong.maDoiSoat, user?.soDienThoai].filter(Boolean).join(' ')} />
+                        <small>Nội dung chuyển khoản: <b>{[doiSoatTraPhong.maDoiSoat, user?.soDienThoai].filter(Boolean).join(' ')}</b>. Chuyển xong, tải ảnh minh chứng ở bước bên dưới.</small>
+                      </div>
+                    )}
+
                     {canUploadThuThemProofAgain ? (
                       <div className="hd-settlement-note">
                         <Icon name="info" />

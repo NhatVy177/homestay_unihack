@@ -1194,3 +1194,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Sửa: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (hàm `renderHopDong`, tab Trả phòng): hiện `HopDongXacNhanSection` ngay dưới tóm tắt quyết toán cho hợp đồng thuê (đồng ý/phản hồi bằng ví, mốc 2); nút Web2 cũ chỉ còn khi chưa có hợp đồng. Tab Hợp đồng giữ nguyên.
 - Kiểm tra: build OK. Chưa có test giao diện cho tab Trả phòng (cần dữ liệu hợp đồng giả lớn); chưa bấm thử thật.
 - Việc còn lại: kế toán NV0008 gửi DS0001 ở tab "Khách xác nhận đối soát", khách demo4 đồng ý ở tab Trả phòng; ghi mã giao dịch mốc 2.
+
+## 2026-11-15 14:16:37 +07:00 — J-C115 — Hiện mã VietQR ngay khi khách cần thanh toán thu thêm lúc trả phòng
+- Người thực hiện: Claude, theo yêu cầu của Vy ("nếu thu thêm thì sau khi xác nhận hiện mã cho khách chuyển luôn").
+- Thay đổi: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (tab Trả phòng, bước thanh toán): khi đối soát ở trạng thái "Chờ thanh toán thêm", đầu khung thanh toán hiện thẻ "Quét mã để chuyển khoản số tiền thu thêm" với VietQR (tài khoản nhận từ `.env`, số tiền = `SoTienKhachPhaiTT`, nội dung = mã đối soát + số điện thoại), kèm hướng dẫn tải minh chứng; `khachHangPortal.css` (`.hd-qr-card`). Dùng lại `VietQrCode` (J-C094); khi `PAYMENT_VIETQR_HIEN_SO_TIEN=false` (chế độ demo, J-C095) mã không kèm số tiền, khách tự nhập.
+- Kiểm tra: build OK. Chưa thử với bản đối soát thu thêm thật hoặc fixture UI (HD0001 hiện là hoàn cọc 500.000đ, không phải thu thêm).
+- Giới hạn: chỉ áp dụng thu thêm; hoàn cọc không cần QR vì tiền đi từ công ty ra khách.
