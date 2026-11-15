@@ -47,6 +47,12 @@ export const sqlDeposits = {
 };
 
 export const sqlFirstCharges = {
+  // Hợp đồng đang hiệu lực của khách, để liệt kê khoản thu kỳ đầu trong "Hóa đơn & thanh toán".
+  async listForCustomer(customerId) {
+    const result = await executeQuery(`SELECT MaHopDong, NgayBatDau FROM dbo.HopDongThue
+      WHERE MaKhachHang=@id AND TrangThai=N'Hiệu lực' ORDER BY MaHopDong`, [v('id', sql.VarChar(6), customerId)]);
+    return result.recordset.map((row) => ({ id: row.MaHopDong, startDate: row.NgayBatDau }));
+  },
   async get(id) {
     if (!/^[A-Za-z0-9]{1,6}$/.test(id)) return null;
     const result = await executeQuery(`SELECT hd.MaHopDong, hd.MaKhachHang, hd.TrangThai,

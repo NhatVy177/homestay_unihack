@@ -26,6 +26,7 @@ try {
       if (path.endsWith('/khach-moi/tong-quan')) return route.fulfill({ json: { trangThai: { soLichXem: 1, soHoSo: 1, soPhieuCoc: 1 }, hoSo: [], lichXem: [], phongGoiY: [] } });
       if (path === '/api/khach-moi/dat-coc') return route.fulfill({ json: deposits });
       if (path === '/api/khach-moi/hoa-don') return route.fulfill({ json: invoices });
+      if (path === '/api/thanh-toan-mo-phong/thu-nhan-phong') return route.fulfill({ json: [{ purpose: 'thu-nhan-phong', refId: 'HD9001', status: 'Pending', amountVnd: 8100000, startDate: '2026-12-01' }] });
       if (!['GET', 'OPTIONS'].includes(req.method())) throw new Error(`Unexpected mutation ${path}`);
       return route.fulfill({ json: [] });
     });
@@ -34,8 +35,9 @@ try {
     await page.getByRole('heading', { name: 'Hóa đơn của tôi', level: 2 }).waitFor();
     const rows = page.locator('.cinv-table tbody tr');
     await rows.first().waitFor();
-    assert.equal(await rows.count(), 4, 'phiếu cọc + 3 hóa đơn các kỳ');
-    assert.match(await page.locator('.cinv-cards').innerText(), /03\s*Hóa đơn/, 'chưa trả = cọc + kỳ đầu + kỳ nợ');
+    assert.equal(await rows.count(), 5, 'phiếu cọc + 3 hóa đơn các kỳ + khoản thu kỳ đầu khi nhận phòng');
+    assert.match(await rows.filter({ hasText: 'KD-HD9001' }).first().innerText(), /Nhận phòng[\s\S]*8\.100\.000/);
+    assert.match(await page.locator('.cinv-cards').innerText(), /04\s*Hóa đơn/, 'chưa trả = cọc + kỳ đầu + kỳ nợ + khoản thu nhận phòng');
     await page.screenshot({ path: `${folder}/list-${width}.png`, fullPage: true });
     await page.getByRole('button', { name: 'Quá hạn', exact: true }).click();
     assert.equal(await rows.count(), 1); assert.match(await rows.first().innerText(), /HD0003/);

@@ -27,6 +27,7 @@ function fixture(deposit = {}, charge = {}) {
   const firstCharges = {
     async get(id) { return id === chargeState.id ? { ...chargeState } : null; },
     async amount() { return chargeState.amountVnd; },
+    async listForCustomer(id) { return id === chargeState.customerId ? [{ id: chargeState.id, startDate: '2026-12-01' }] : []; },
     async markPaid(order, receipt, transId) {
       if (chargeState.paid) throw Object.assign(new Error('Hóa đơn kỳ đầu đã được thanh toán bằng cách khác.'), { statusCode: 409, maLoi: -3 });
       if (order.amountVnd < chargeState.amountVnd) throw new Error('Số tiền không còn đủ để thanh toán kỳ đầu.');
@@ -38,6 +39,12 @@ function fixture(deposit = {}, charge = {}) {
     notifyFirstChargePaid: async id => calls.push(['charge-email', id]) }), orders, calls, state, chargeState };
 }
 describe('Cổng ví điện tử mô phỏng (D-013)', () => {
+  it('lists the customer first-charge quotes for the invoices tab', async () => {
+    const f = fixture();
+    assert.deepEqual(await f.sim.firstChargeQuotes(customer), [{ purpose: 'thu-nhan-phong', refId: 'HD0001', status: 'Pending', amountVnd: 2500000, startDate: '2026-12-01' }]);
+    f.chargeState.paid = true;
+    assert.equal((await f.sim.firstChargeQuotes(customer))[0].status, 'Paid');
+  });
   it('creates one order per deposit, pays it once and confirms the deposit through Web2', async () => {
     const f = fixture();
     const order = await f.sim.createDepositOrder(customer, 'PC0001');

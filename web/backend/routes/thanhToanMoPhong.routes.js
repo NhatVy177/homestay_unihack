@@ -25,6 +25,7 @@ const route = fn => async (req, res, next) => { try { res.json(await fn(getSimul
 router.post('/ipn', route((s, r) => s.handleIpn(r.body || {})));
 router.use(requireAuth);
 router.post('/dat-coc/:maPhieuCoc', route((s, r) => s.createDepositOrder(r.user, r.params.maPhieuCoc)));
+router.get('/thu-nhan-phong', route((s, r) => s.firstChargeQuotes(r.user)));
 router.get('/thu-nhan-phong/:maHopDong', route((s, r) => s.firstChargeQuote(r.user, r.params.maHopDong)));
 router.post('/thu-nhan-phong/:maHopDong', route((s, r) => s.createFirstChargeOrder(r.user, r.params.maHopDong)));
 router.get('/thu-them/:maHopDong', route((s, r) => s.topUpQuote(r.user, r.params.maHopDong)));

@@ -57,6 +57,19 @@ export class PaymentSimulator {
     if (Math.round(amountVnd * 100) / 100 !== amountVnd) fail('Số tiền kỳ đầu không hợp lệ, vui lòng liên hệ kế toán.', 409);
     return { ...base, status: 'Pending', amountVnd };
   }
+  // Các khoản thu kỳ đầu của khách (mỗi hợp đồng hiệu lực một khoản); bỏ qua hợp đồng không tính được.
+  async firstChargeQuotes(user) {
+    this.customer(user);
+    const contracts = await this.firstCharges.listForCustomer(user.maNguoiDung);
+    const quotes = [];
+    for (const contract of contracts) {
+      try {
+        const quote = await this.firstChargeQuote(user, contract.id);
+        if (['Pending', 'Paid'].includes(quote.status)) quotes.push({ ...quote, startDate: contract.startDate });
+      } catch { /* khoản này chưa tính được, không chặn danh sách */ }
+    }
+    return quotes;
+  }
   async createFirstChargeOrder(user, maHopDong) {
     const quote = await this.firstChargeQuote(user, maHopDong);
     if (quote.status === 'Paid') fail('Hóa đơn kỳ đầu đã được thanh toán.', 409);

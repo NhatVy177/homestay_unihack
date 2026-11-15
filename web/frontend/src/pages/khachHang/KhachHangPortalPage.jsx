@@ -1052,6 +1052,7 @@ export default function KhachHangPortalPage() {
   const [residence, setResidence] = useState(null);
   const [residenceError, setResidenceError] = useState('');
   const [depositClock, setDepositClock] = useState(Date.now());
+  const [firstCharges, setFirstCharges] = useState([]);
   const [walletTab, setWalletTab] = useState(false), [walletBusy, setWalletBusy] = useState(false);
   useEffect(() => {
     if (activeTab !== 'dat-coc') return undefined;
@@ -1183,6 +1184,7 @@ export default function KhachHangPortalPage() {
     if (activeTab === 'dat-coc' && invoices === null) {
       khachMoiApi.getHoaDon().then(({ data }) => setInvoices(Array.isArray(data) ? data : []))
         .catch(() => { setInvoices([]); setInvoicesError('Chưa tải được hóa đơn các kỳ. Phiếu cọc vẫn hiển thị bình thường.'); });
+      httpClient.get('/thanh-toan-mo-phong/thu-nhan-phong').then(({ data }) => setFirstCharges(Array.isArray(data) ? data : [])).catch(() => setFirstCharges([]));
     }
     if (activeTab === 'cu-tru' && residence === null) loadResidence();
     if (activeTab === 'lich-su-coc' && holdRequests === null) {
@@ -4201,7 +4203,14 @@ export default function KhachHangPortalPage() {
       <button type="button" className="ui-btn ui-btn--secondary cinv-back" onClick={() => setDepositDetailOpen(false)}><Icon name="arrow_back" /> Quay lại danh sách</button>
       {renderDatCocDetail(datCocSelected)}
     </>;
-    return <CustomerInvoicesList deposits={datCocList || []} invoices={invoices || []} loading={datCocLoading || invoices === null || datCocList === null}
+    return <CustomerInvoicesList deposits={datCocList || []} invoices={invoices || []} firstCharges={firstCharges}
+      onPayFirstCharge={async (maHopDong) => {
+        try {
+          const { data } = await httpClient.post(`/thanh-toan-mo-phong/thu-nhan-phong/${maHopDong}`);
+          navigate(`/thanh-toan-mo-phong/${data.id}`);
+        } catch (error) { setToast(error?.response?.data?.message || 'Không mở được cổng thanh toán mô phỏng.'); }
+      }}
+      loading={datCocLoading || invoices === null || datCocList === null}
       error={invoicesError}
       onOpenDeposit={(phieu) => { setDatCocSelected(phieu); setDepositDetailOpen(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
       onOpenContract={(maHopDong) => { goTo('hop-dong'); window.history.replaceState(null, '', `?tab=hop-dong&hopDong=${encodeURIComponent(maHopDong)}`); }} />;
