@@ -120,6 +120,7 @@ Nguyên tắc: mỗi file chỉ một người sửa. Chi tiết và prompt: [vi
 - HOMEDORM4: đã có hai bảng mới của C1 (`DepositPolicySnapshot`, `SignedContractEvidence`); 2 phiếu cọc, 0 hợp đồng. Dữ liệu giao dịch đã dọn ngày 06/11 (J-030).
 - Thư mục làm việc: `D:\HomeStayDorm` (`feat/ui-refresh-1`), `-audit` (nhánh tích hợp), `-fuji` (bộ khóa A1), `-fuji-deploy` (A2), `-handover`, `-sale`, `-t22`, `-ui` (AI khác). Không nhập thay đổi giữa các worktree ngoài quy trình review.
 
+- 2026-11-16: thêm tab Hóa đơn định kỳ cho kế toán (J-C145): backend + bảng `PhiPhatSinh` đã migrate trên HOMEDORM4; test giao diện bằng fixture PASS; chưa lập hóa đơn thật trên DB (cần Vy thử với kế toán chi nhánh của HD0001/HD0002).
 ## Câu hỏi còn mở
 
 Q-06 (hạn và cổng nộp), Q-07 (ghi công nhóm cũ), Q-08 (email demo), Q-10 (Privy JWT) trong [decisions.md](decisions.md). Q-01 đã chốt ở D-034/D-038; Q-02 đã đóng ở D-038.

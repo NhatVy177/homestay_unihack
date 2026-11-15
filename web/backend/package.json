@@ -8,6 +8,8 @@
     "dev": "nodemon index.js",
     "start": "node index.js",
     "avalanche:db:check": "node scripts/avalanche-db.mjs check",
+    "periodic-invoice:db:check": "node scripts/periodic-invoice-db.mjs check",
+    "periodic-invoice:db:migrate": "node scripts/periodic-invoice-db.mjs migrate",
     "first-charge-proof:db:check": "node scripts/first-charge-proof-db.mjs check",
     "first-charge-proof:db:migrate": "node scripts/first-charge-proof-db.mjs migrate",
     "avalanche:db:migrate": "node scripts/avalanche-db.mjs migrate",

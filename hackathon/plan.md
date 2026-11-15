@@ -198,6 +198,7 @@ BTC đã chấp nhận solo và dùng dự án cũ trong phạm vi cuộc thi. G
 
 Nếu một phần không được phép dùng, thay phần đó hoặc tách contract/Verify thành demo độc lập với dữ liệu giả. Phương án này là dự phòng, không phải nhánh phát triển song song.
 
+- Bổ sung 2026-11-16 (J-C145): tab "Hóa đơn định kỳ" của kế toán dựng theo màn của nhóm Hằng (chốt điện nước, dịch vụ, phí phát sinh, danh sách, thu tiền). Không thuộc mốc chain.
 ## 6. Phản hồi BTC và những gì còn cần xác minh
 
 Ảnh ngày 04/11 đã trả lời: được solo/nhiều project; README cần hướng dẫn chạy và công nghệ; được dùng project cũ; hướng Web2 → Web3 hợp lý được khuyến khích. Ảnh sau gợi ý ví nhúng, point/ưu đãi và thanh toán mô phỏng.

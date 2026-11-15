@@ -127,3 +127,5 @@ Vy chọn `D:\Nam4\Contest\Homestay-Dorm` làm mẫu cho cách trình bày, khô
 Không đưa CCCD, địa chỉ, tài khoản ngân hàng, ảnh hoặc nội dung biên bản lên chain. Chain chỉ giữ ID khó đoán, ví, commitment, version/state và số tiền tối thiểu cần thiết. Không khẳng định hash/salt bảo đảm ẩn danh hoặc chữ ký tự chứng minh hiệu lực pháp lý.
 
 Kiểm thử cần phủ sai quyền/chữ ký, replay/hết hạn/sai domain, sai version/hash, tổng tiền và làm tròn, sửa file/thiếu salt/ảnh, relayer timeout/gas, SQL lệch chain và khôi phục ví. Ghi kết quả thực tế ở nhật ký; chưa có kết quả cho bộ yêu cầu này trong repo hiện hành.
+
+Hóa đơn định kỳ (J-C145, 2026-11-16): kế toán có tab "Hóa đơn định kỳ" theo màn của nhóm Hằng: chọn hợp đồng hiệu lực trong chi nhánh, chốt chỉ số điện nước theo phòng (ghép giường chia theo số giường thuê), cộng tiền phòng, dịch vụ đã đăng ký và phí phát sinh đã xác nhận (bảng mới `PhiPhatSinh`) thành hóa đơn tháng; danh sách theo kỳ, ngăn chi tiết, thu tiền (tiền mặt/chuyển khoản), in. Hạn thanh toán ngày 10 tháng sau kỳ, tối thiểu 7 ngày từ lúc lập. Ngoài chain.

@@ -6,6 +6,7 @@ import './nhanVienKeToanPortal.css'; // Use specific styles for content
 import XacNhanThanhToanTab from '../nhanVienQuanLy/XacNhanThanhToanTab.jsx';
 import TienMatChoNopQuyTab from './TienMatChoNopQuyTab.jsx';
 import ThuNhanPhongTab from './ThuNhanPhongTab.jsx';
+import HoaDonDinhKyTab from './HoaDonDinhKyTab.jsx';
 import QuyetToanTraPhongTab from './QuyetToanTraPhongTab.jsx';
 import SaleCustomerWorkspace from '../nhanVienSale/SaleCustomerWorkspace.jsx';
 import SaleProfile from '../nhanVienSale/SaleProfile.jsx';
@@ -16,6 +17,7 @@ const navItems = [
   // Names and order follow Hang's accountant menu; tab ids stay the same.
   { id: 'xac-nhan-tien-ve', label: 'Hóa đơn đặt cọc', icon: 'payments' },
   { id: 'thu-nhan-phong', label: 'Hóa đơn nhận phòng', icon: 'login' },
+  { id: 'hoa-don-dinh-ky', label: 'Hóa đơn định kỳ', icon: 'payments' },
   { id: 'nop-quy', label: 'Tiền mặt chờ nộp quỹ', icon: 'account_balance' },
   { id: 'quyet-toan', label: 'Đối soát hoàn cọc', icon: 'account_balance_wallet' },
   { id: 'chi-tien-thanh-ly', label: 'Chi tiền thanh lý', icon: 'price_check' },
@@ -35,6 +37,7 @@ export default function NhanVienKeToanPage() {
       {activeTab === 'xac-nhan-tien-ve' && <XacNhanThanhToanTab />}
       {activeTab === 'nop-quy' && <TienMatChoNopQuyTab />}
       {activeTab === 'thu-nhan-phong' && <ThuNhanPhongTab />}
+      {activeTab === 'hoa-don-dinh-ky' && <HoaDonDinhKyTab />}
       {activeTab === 'quyet-toan' && <QuyetToanTraPhongTab key="doi-soat" group="doi-soat" />}
       {activeTab === 'chi-tien-thanh-ly' && <QuyetToanTraPhongTab key="chi-tien" group="chi-tien" />}
       {activeTab === 'xac-nhan-doi-soat' && <Suspense fallback={null}><KeToanXacNhanTab /></Suspense>}

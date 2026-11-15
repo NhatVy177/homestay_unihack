@@ -29,6 +29,7 @@ import { startHoaDonQuaHanScheduler } from './services/hoaDonQuaHan.service.js';
 import { startDatCocHetHanScheduler } from './services/datCocHetHan.service.js';
 import { startYeuCauCocQuaHanScheduler } from './services/yeuCauCocQuaHan.service.js';
 import { startNhacThuDauKyScheduler } from './services/nhacThuDauKy.service.js';
+import hoaDonDinhKyRoutes from './routes/hoaDonDinhKy.routes.js';
 import hopDongRoutes from './routes/hopDong.routes.js';
 import avalancheRoutes from './routes/avalanche.routes.js';
 import thanhToanMoPhongRoutes from './routes/thanhToanMoPhong.routes.js';
@@ -87,6 +88,7 @@ app.use('/api/sua-chua-bao-tri', requireAuth, auditMutations({ chucNang: 'Sửa 
 app.use('/api/khach-moi', requireAuth, auditMutations({ chucNang: 'Portal khách hàng', doiTuong: 'KhachHang' }), khachMoiRoutes);
 app.use('/api/admin', requireAuth, adminRoutes);
 app.use('/api/accountant/doi-soat', requireAuth, auditMutations({ chucNang: 'Đối soát và thanh toán', doiTuong: 'DoiSoat' }), doiSoatRoutes);
+app.use('/api/ke-toan/hoa-don-dinh-ky', requireAuth, auditMutations({ chucNang: 'Hóa đơn định kỳ', doiTuong: 'HoaDon' }), hoaDonDinhKyRoutes);
 app.use('/api/hop-dong', requireAuth, auditMutations({ chucNang: 'Hợp đồng thuê', doiTuong: 'HopDongThue' }), hopDongRoutes);
 
 app.use(notFound);
