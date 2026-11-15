@@ -1,0 +1,79 @@
+{
+  "schema": "homestaydorm.evidence.v1",
+  "kind": "handover",
+  "deployment": {
+    "chainId": 43113,
+    "address": "0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C"
+  },
+  "agreementId": "0xf9953eb39267b06f7b0d7c9abb53b88545daa83cf7caa16afd09f839c05ae891",
+  "documents": {
+    "policy": {
+      "payload": {
+        "schema": "homestaydorm.policy.v1",
+        "text": "Chính sách hoàn cọc HomeStayDorm áp dụng cho hợp đồng này:\n- Đã đặt cọc nhưng chưa ký hợp đồng: hoàn 80% tiền cọc.\n- Đã ký hợp đồng, chưa hết hạn, lưu trú dưới 6 tháng: hoàn 50% tiền cọc.\n- Đã ký hợp đồng, chưa hết hạn, lưu trú từ 6 tháng trở lên: hoàn 70% tiền cọc.\n- Hết hạn thuê theo hợp đồng: hoàn 100% tiền cọc.\n- Các khoản tiền thuê/dịch vụ còn nợ, chi phí sửa chữa hư hỏng do khách gây ra và tiền phạt (nếu có) được trừ vào tiền cọc khi đối soát trả phòng.\n- Hư hỏng đã ghi trong biên bản bàn giao lúc nhận phòng không được tính cho khách khi trả phòng.",
+        "version": "b2e13a98"
+      },
+      "salt": "0x9399a8c52a3ec339b1160188ab5b626d92ee8c0c5dd53edf62358e1305d4274e"
+    },
+    "handover": {
+      "payload": {
+        "schema": "homestaydorm.handover.v2",
+        "agreementId": "0xf9953eb39267b06f7b0d7c9abb53b88545daa83cf7caa16afd09f839c05ae891",
+        "revision": 1,
+        "depositHeldVnd": "2800000",
+        "inventory": [
+          {
+            "item": "Giường",
+            "quantity": 1,
+            "condition": "Không có ghi chú"
+          },
+          {
+            "item": "Nệm",
+            "quantity": 1,
+            "condition": "Không có ghi chú"
+          },
+          {
+            "item": "Tủ cá nhân",
+            "quantity": 1,
+            "condition": "Không có ghi chú"
+          },
+          {
+            "item": "Chìa khóa",
+            "quantity": 1,
+            "condition": "Không có ghi chú"
+          }
+        ],
+        "notes": "",
+        "attachments": [],
+        "contractTerms": {
+          "contractId": "HD0001",
+          "rentVnd": "1400000",
+          "startDate": "2026-11-14",
+          "endDate": "2027-11-14",
+          "paymentCycle": "Hàng tháng",
+          "depositVnd": "2800000"
+        },
+        "signedContract": {
+          "name": "hop-dong-HD0001-c53239de-b872-4c88-bfb1-35e44bd58711.pdf",
+          "sha256": "30baa93545b051addc5f31b5f36736b74d433401d1bd351b1ce1c7de8f9a881c"
+        },
+        "policyVersion": "b2e13a98",
+        "tenant": "0x0000000000000000000000000000000000000001"
+      },
+      "salt": "0x80fea9cb600d4c1c14af9f4a68495cf2584ca0d6af0fab332bca0c21a2fd8b28"
+    }
+  },
+  "revision": 1,
+  "receipt": {
+    "hash": "0x45760412ccb075464c993f46372016a86d66d10f1365be90c4b3c6d30d704aaf",
+    "blockNumber": "61101056",
+    "logIndex": 0,
+    "at": "2026-11-15T06:06:24.086Z"
+  },
+  "confirmationReceipt": {
+    "hash": "0xcd729cedadcebe1f3d1f2cc7b53600f17336b9425d05f9e9935aff9585ee6fc3",
+    "blockNumber": "61101062",
+    "logIndex": 2,
+    "at": "2026-11-15T06:06:36.679Z"
+  }
+}

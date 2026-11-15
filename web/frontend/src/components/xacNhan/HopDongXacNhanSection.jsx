@@ -7,6 +7,7 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 import { useSigner } from './signerContext.js';
 import { HandoverView, SettlementView, Pill } from './DocumentView.jsx';
 import { checkSnapshot, downloadEvidence } from '../../lib/avalanche/evidence.js';
+import { printHandoverEvidence } from '../../lib/avalanche/evidencePrint.js';
 import { avalancheApi, dateTime, errorMessage, privyAppId, rpcUrl, trustedDeployment } from '../../lib/avalanche/api.js';
 import { emailNotice, receiptTime } from './receiptDisplay.js';
 import './xacNhan.css';
@@ -143,6 +144,7 @@ function TenantCase({ c, signer, reload }) {
     {c.handover?.confirmationReceipt && <div className="xn-alert ok xn-saved">
       <strong>✅ Bạn đã xác nhận biên bản{recordedAt(c.handover.confirmationReceipt)}. Biên bản đã được lưu và không thể chỉnh sửa.</strong>
       <div className="xn-actions"><button type="button" className="xn-link" onClick={() => downloadEvidence(c.handover, `ban-giao-${c.contractId}.json`)}>Tải bản lưu biên bản</button>
+        <button type="button" className="xn-link" onClick={() => { if (!printHandoverEvidence(c.handover)) setError('Trình duyệt đang chặn cửa sổ in. Vui lòng cho phép cửa sổ bật lên rồi thử lại.'); }}>Tải bản PDF dễ đọc</button>
         <a href="/kiem-chung-avalanche" target="_blank" rel="noreferrer">Kiểm tra biên bản</a></div>
       <span className="xn-muted">Tải file bản lưu lên để tự kiểm tra biên bản chưa bị sửa.</span>
     </div>}
