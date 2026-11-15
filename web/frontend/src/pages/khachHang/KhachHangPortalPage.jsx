@@ -75,6 +75,8 @@ const VIEWING_SLOTS = ['Linh hoạt theo Sale', 'Buổi sáng (7:00–11:30)', '
 const AMENITY_OPTIONS = ['Máy lạnh', 'Wifi mạnh', 'WC riêng', 'Bếp chung', 'Máy giặt'];
 
 // Thời gian xem và tiện ích chưa có cột riêng: gộp vào ghi chú của hồ sơ để Sale đọc khi tiếp nhận.
+const EMPTY_GROUP_MEMBER = { hoTen: '', gioiTinh: '', cccd: '', soDienThoai: '', email: '' };
+
 function composeRentNote(form = {}) {
   const lines = [];
   const viewing = [form.ngayXemMongMuon ? `ngày ${form.ngayXemMongMuon.split('-').reverse().join('/')}` : '', form.khungGioRanh || '']
@@ -82,6 +84,10 @@ function composeRentNote(form = {}) {
   if (viewing) lines.push(`Thời gian xem mong muốn: ${viewing}${form.ghiChuThoiGian ? ` (${form.ghiChuThoiGian.trim()})` : ''}.`);
   else if (form.ghiChuThoiGian) lines.push(`Thời gian xem mong muốn: ${form.ghiChuThoiGian.trim()}.`);
   if (form.tienIchMongMuon?.length) lines.push(`Tiện ích mong muốn: ${form.tienIchMongMuon.join(', ')}.`);
+  if (form.thanhVienNhom?.length) {
+    const people = [{ hoTen: form.hoTen, gioiTinh: form.gioiTinh, soDienThoai: form.soDienThoai, cccd: form.cccd, daiDien: true }, ...form.thanhVienNhom];
+    lines.push(`Nhóm ${people.length} người: ${people.map((p, i) => `${i + 1}) ${p.hoTen} (${[p.gioiTinh, p.soDienThoai, p.cccd ? `CCCD ${p.cccd}` : ''].filter(Boolean).join(', ')})${p.daiDien ? ' - người đại diện' : ''}`).join('; ')}.`);
+  }
   if (form.ghiChu?.trim()) lines.push(form.ghiChu.trim());
   return lines.join('\n');
 }
@@ -288,6 +294,7 @@ function Icon({ name, className = '' }) {
   const shapes = {
     home: <><path d="M3.5 11.2 12 4l8.5 7.2" /><path d="M5.5 10.4V20h13v-9.6" /><path d="M9.5 20v-5.8h5V20" /></>,
     arrow_back: <><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></>,
+    close: <><path d="M18 6 6 18M6 6l12 12" /></>,
     explore: <><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2.4 5.1-5.1 2.4 2.4-5.1 5.1-2.4Z" /></>,
     search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4 4" /></>,
     profile: <><path d="M7 4h7l3 3v13H7z" /><path d="M14 4v4h4M10 13h4M10 17h4" /></>,
@@ -1006,6 +1013,9 @@ export default function KhachHangPortalPage() {
   const [rentModal, setRentModal] = useState(false);
   const [profileBusy, setProfileBusy] = useState(false);
   const [rentGroupMode, setRentGroupMode] = useState(false);
+  // Form đăng ký nhóm 3 bước (J-C118): 1 thành viên nhóm, 2 thuê phòng, 3 xác nhận.
+  const [groupStep, setGroupStep] = useState(1);
+  const [groupMembers, setGroupMembers] = useState([]);
   const [rentForm, setRentForm] = useState(rentInitial);
   const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(true);
@@ -1371,6 +1381,8 @@ export default function KhachHangPortalPage() {
       ...(options.group ? { soNguoiO: String(Math.min(2, Number(firstRoom.sucChua) || 2)) } : {})
     });
     setRentGroupMode(Boolean(options.group));
+    setGroupStep(1);
+    setGroupMembers(options.group ? [{ ...EMPTY_GROUP_MEMBER }] : []);
     setRentModal(true);
   }
 
@@ -4183,7 +4195,322 @@ export default function KhachHangPortalPage() {
       onOpenContract={(maHopDong) => { goTo('hop-dong'); window.history.replaceState(null, '', `?tab=hop-dong&hopDong=${encodeURIComponent(maHopDong)}`); }} />;
   }
 
+  // Các khối của phiếu nhu cầu thuê, dùng chung cho phiếu thường và form nhóm 3 bước (J-C118).
+  function renderNeedsSection(groupMode) {
+    return (
+      <>
+  {groupMode ? (
+                <section className="kh-register-section">
+                  <h3><Icon name="home" />Nhu cầu thuê</h3>
+                  <div className="kh-register-grid kh-balanced-grid">
+                    <label className="is-half">
+                      <span>Khu vực mong muốn*</span>
+                      <input
+                        className={getAreaError(rentForm.khuVucMongMuon) ? 'is-invalid' : ''}
+                        type="text"
+                        list="kh-rent-area-options"
+                        value={rentForm.khuVucMongMuon}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          event.target.setCustomValidity(getAreaError(value));
+                          setRentForm({ ...rentForm, khuVucMongMuon: value });
+                        }}
+                        placeholder="VD: Quận 1, quan 3, Thu Duc..."
+                        required
+                      />
+                      <datalist id="kh-rent-area-options">
+                        {ALLOWED_RENT_AREAS.map((area) => <option key={area} value={area} />)}
+                      </datalist>
+                      {getAreaError(rentForm.khuVucMongMuon) && <small className="kh-field-error">{getAreaError(rentForm.khuVucMongMuon)}</small>}
+                    </label>
+                    <label className="is-half kh-room-type-field">
+                      <span>Loại phòng mong muốn*</span>
+                      <select
+                        value={rentForm.loaiPhongYeuCau}
+                        onChange={(event) => setRentForm({ ...rentForm, loaiPhongYeuCau: event.target.value })}
+                        required
+                      >
+                        <option value="">Chọn một loại phòng</option>
+                        {filterOptions.loaiPhong.filter(Boolean).map((option) => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
+                      </select>
+                      {getRoomTypeCapacity(rentForm.loaiPhongYeuCau) && (
+                        <small className="kh-field-hint">Tối đa {getRoomTypeCapacity(rentForm.loaiPhongYeuCau)} người.</small>
+                      )}
+                    </label>
+                    <label><span>Mức giá tối đa (đ/tháng)*</span><input type="number" min="0" value={rentForm.mucGiaToiDa} onChange={(event) => setRentForm({ ...rentForm, mucGiaToiDa: event.target.value })} placeholder="VD: 3.000.000" required /></label>
+                    <label className="is-half"><span>Thời gian dự kiến dọn vào*</span><input type="date" value={rentForm.ngayDuKienVaoO} onChange={(event) => setRentForm({ ...rentForm, ngayDuKienVaoO: event.target.value })} required /></label>
+                    <label className="is-half"><span>Thời hạn thuê (tháng)*</span><input type="number" min="1" value={rentForm.thoiHanThue} onChange={(event) => setRentForm({ ...rentForm, thoiHanThue: event.target.value })} placeholder="Ví dụ: 6" required /></label>
+                  </div>
+                </section>
+  ) : (
+                <section className="kh-register-section">
+                  <h3><Icon name="home" />Nhu cầu thuê</h3>
+                  <div className="kh-register-grid kh-balanced-grid">
+                    <label><span>Số lượng người ở*</span><input type="number" min="1" max={getRoomTypeCapacity(rentForm.loaiPhongYeuCau) || undefined} value={rentForm.soNguoiO} onChange={(event) => setRentForm({ ...rentForm, soNguoiO: event.target.value })} required /></label>
+                    <label><span>Giới tính thuê*</span><select value={rentForm.gioiTinhThue} onChange={(event) => setRentForm({ ...rentForm, gioiTinhThue: event.target.value })} required><option value="" disabled>Chọn giới tính</option><option value="Nam">Nam</option><option value="Nữ">Nữ</option><option value="Khác">Khác</option></select></label>
+                    {rentGenderIssues.length > 0 && <p className="kh-rent-gender-warning is-half" role="alert">{rentGenderIssues[0]}</p>}
+                    {rentForm.gioiTinhThue === 'Khác' && (
+                      <div className="is-half kh-register-pair">
+                        <label><span>Số lượng nam*</span><input type="number" min="0" value={rentForm.soNam ?? ''} onChange={(event) => setRentForm({ ...rentForm, soNam: event.target.value })} required /></label>
+                        <label><span>Số lượng nữ*</span><input type="number" min="0" value={rentForm.soNu ?? ''} onChange={(event) => setRentForm({ ...rentForm, soNu: event.target.value })} required /></label>
+                      </div>
+                    )}
+                    <label className="is-half">
+                      <span>Khu vực mong muốn*</span>
+                      <input
+                        className={getAreaError(rentForm.khuVucMongMuon) ? 'is-invalid' : ''}
+                        type="text"
+                        list="kh-rent-area-options"
+                        value={rentForm.khuVucMongMuon}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          event.target.setCustomValidity(getAreaError(value));
+                          setRentForm({ ...rentForm, khuVucMongMuon: value });
+                        }}
+                        placeholder="VD: Quận 1, quan 3, Thu Duc..."
+                        required
+                      />
+                      <datalist id="kh-rent-area-options">
+                        {ALLOWED_RENT_AREAS.map((area) => <option key={area} value={area} />)}
+                      </datalist>
+                      {getAreaError(rentForm.khuVucMongMuon) && <small className="kh-field-error">{getAreaError(rentForm.khuVucMongMuon)}</small>}
+                    </label>
+                    <label className="is-half kh-room-type-field">
+                      <span>Loại phòng mong muốn*</span>
+                      <select
+                        value={rentForm.loaiPhongYeuCau}
+                        onChange={(event) => setRentForm({ ...rentForm, loaiPhongYeuCau: event.target.value })}
+                        required
+                      >
+                        <option value="">Chọn một loại phòng</option>
+                        {filterOptions.loaiPhong.filter(Boolean).map((option) => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
+                      </select>
+                      {getRoomTypeCapacity(rentForm.loaiPhongYeuCau) && (
+                        <small className="kh-field-hint">Tối đa {getRoomTypeCapacity(rentForm.loaiPhongYeuCau)} người.</small>
+                      )}
+                    </label>
+                    <label><span>Mức giá tối đa (đ/tháng)*</span><input type="number" min="0" value={rentForm.mucGiaToiDa} onChange={(event) => setRentForm({ ...rentForm, mucGiaToiDa: event.target.value })} placeholder="VD: 3.000.000" required /></label>
+                    <label className="is-half"><span>Thời gian dự kiến dọn vào*</span><input type="date" value={rentForm.ngayDuKienVaoO} onChange={(event) => setRentForm({ ...rentForm, ngayDuKienVaoO: event.target.value })} required /></label>
+                    <label className="is-half"><span>Thời hạn thuê (tháng)*</span><input type="number" min="1" value={rentForm.thoiHanThue} onChange={(event) => setRentForm({ ...rentForm, thoiHanThue: event.target.value })} placeholder="Ví dụ: 6" required /></label>
+                  </div>
+                </section>
+  )}
+      </>
+    );
+  }
+
+  function renderViewingSection() {
+    return (
+              <section className="kh-register-section">
+                <h3><Icon name="calendar" />Thời gian xem phòng mong muốn</h3>
+                <div className="kh-register-grid kh-balanced-grid">
+                  <label className="is-half">
+                    <span>Ngày có thể đến xem</span>
+                    <input type="date" min={getTomorrowInputValue()} value={rentForm.ngayXemMongMuon || ''} onChange={(event) => setRentForm({ ...rentForm, ngayXemMongMuon: event.target.value })} />
+                  </label>
+                  <label className="is-half">
+                    <span>Khung giờ rảnh</span>
+                    <select value={rentForm.khungGioRanh || VIEWING_SLOTS[0]} onChange={(event) => setRentForm({ ...rentForm, khungGioRanh: event.target.value })}>
+                      {VIEWING_SLOTS.map((slot) => <option key={slot} value={slot}>{slot}</option>)}
+                    </select>
+                  </label>
+                  <label className="is-wide">
+                    <span>Ghi chú thời gian</span>
+                    <input value={rentForm.ghiChuThoiGian || ''} onChange={(event) => setRentForm({ ...rentForm, ghiChuThoiGian: event.target.value })} placeholder="Ví dụ: chỉ rảnh sau 16:00 hoặc cuối tuần" />
+                  </label>
+                </div>
+              </section>
+    );
+  }
+
+  function renderAmenitySection() {
+    return (
+              <section className="kh-register-section">
+                <h3><Icon name="sparkle" />Tiện ích và ghi chú</h3>
+                <div className="kh-register-grid kh-balanced-grid">
+                  <div className="is-wide kh-register-stack">
+                    <span className="kh-register-field-title">Tiện ích mong muốn</span>
+                    <div className="kh-amenity-chips" role="group" aria-label="Tiện ích mong muốn">
+                      {AMENITY_OPTIONS.map((item) => {
+                        const chosen = rentForm.tienIchMongMuon || [];
+                        const active = chosen.includes(item);
+                        return (
+                          <button
+                            key={item}
+                            type="button"
+                            className={`kh-amenity-chip ${active ? 'is-active' : ''}`}
+                            aria-pressed={active}
+                            onClick={() => setRentForm({
+                              ...rentForm,
+                              tienIchMongMuon: active ? chosen.filter((value) => value !== item) : [...chosen, item]
+                            })}
+                          >
+                            {item}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="is-wide kh-register-stack">
+                    <span className="kh-register-field-title">Ghi chú thêm</span>
+                    <label>
+                      <textarea value={rentForm.ghiChu} onChange={(event) => setRentForm({ ...rentForm, ghiChu: event.target.value })} placeholder="Ví dụ: muốn ở gần trường, cần chỗ để xe, ưu tiên phòng yên tĩnh..." />
+                    </label>
+                  </div>
+                </div>
+              </section>
+    );
+  }
+
+  function groupSummary(extra = groupMembers) {
+    const people = [{ hoTen: rentForm.hoTen, gioiTinh: rentForm.gioiTinh, cccd: rentForm.cccd, soDienThoai: rentForm.soDienThoai }, ...extra];
+    const soNam = people.filter((p) => p.gioiTinh === 'Nam').length;
+    const soNu = people.filter((p) => p.gioiTinh === 'Nữ').length;
+    return { people, soNam, soNu, gioiTinhThue: soNam && soNu ? 'Khác' : soNam ? 'Nam' : 'Nữ' };
+  }
+
+  // Số chỗ tối đa của nhóm: ít nhất trong các phòng đã chọn, theo giường còn trống.
+  function groupCapacity() {
+    const caps = selectedRooms.map((room) => Number(room.soGiuongTrong) || Number(room.sucChua) || 0).filter(Boolean);
+    return caps.length ? Math.min(...caps) : 6;
+  }
+
+  function validateGroupMembers() {
+    const { people, soNam, soNu } = groupSummary();
+    const max = groupCapacity();
+    if (people.length < 2) return 'Nhóm cần ít nhất 2 người, gồm cả người đại diện.';
+    if (people.length > max) return `Số thành viên (${people.length}) vượt quá số giường trống (${max}) của phòng đã chọn.`;
+    for (const [index, person] of people.entries()) {
+      const label = index === 0 ? 'Người đại diện' : `Thành viên ${index + 1}`;
+      if (!String(person.hoTen || '').trim()) return `${label}: vui lòng nhập họ và tên.`;
+      if (!['Nam', 'Nữ'].includes(person.gioiTinh)) return `${label}: vui lòng chọn giới tính.`;
+      const cccdError = getCccdError(person.cccd);
+      if (cccdError || !person.cccd) return `${label}: ${cccdError || 'vui lòng nhập CCCD 12 số.'}`;
+      const phoneError = getPhoneError(person.soDienThoai);
+      if (phoneError || !person.soDienThoai) return `${label}: ${phoneError || 'vui lòng nhập số điện thoại 10 số.'}`;
+      if (person.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(person.email)) return `${label}: email không đúng định dạng.`;
+    }
+    const repBirth = getBirthDateError(rentForm.ngaySinh);
+    if (!rentForm.ngaySinh || repBirth) return `Người đại diện: ${repBirth || 'vui lòng nhập ngày sinh.'}`;
+    if (new Set(people.map((p) => p.cccd)).size !== people.length) return 'Có CCCD trùng nhau giữa các thành viên. Vui lòng kiểm tra lại.';
+    if (new Set(people.map((p) => p.soDienThoai)).size !== people.length) return 'Có số điện thoại trùng nhau giữa các thành viên. Vui lòng kiểm tra lại.';
+    const profileGender = loaiGioiTinhHoSo({ soNam, soNu });
+    const roomIssue = selectedRooms.map((room) => lyDoPhongKhongHopGioiTinh(profileGender, room.gioiTinhChoPhep, room.tenPhong || 'Phòng này')).find(Boolean);
+    return roomIssue || '';
+  }
+
+  function goGroupStep2() {
+    const error = validateGroupMembers();
+    if (error) { setToast(error); return; }
+    const { people, soNam, soNu, gioiTinhThue } = groupSummary();
+    setRentForm({ ...rentForm, soNguoiO: String(people.length), soNam: String(soNam), soNu: String(soNu), gioiTinhThue, thanhVienNhom: groupMembers });
+    setGroupStep(2);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goGroupStep3(event) {
+    event.preventDefault();
+    const validationError = validateContactAndArea(rentForm);
+    if (validationError) { setToast(validationError); return; }
+    setGroupStep(3);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  const updateGroupMember = (index, field, value) => setGroupMembers((list) => list.map((m, i) => (i === index ? { ...m, [field]: value } : m)));
+
+  function renderGroupRentPage() {
+    const max = groupCapacity();
+    const total = 1 + groupMembers.length;
+    const first = selectedRooms[0] || {};
+    const steps = ['Thành viên nhóm', 'Thuê phòng', 'Xác nhận'];
+    const goBack = () => { if (groupStep === 1) { setRentModal(false); window.scrollTo({ top: 0, behavior: 'smooth' }); } else setGroupStep(groupStep - 1); };
+    const summary = groupSummary();
+    return (
+      <section className="kh-grp-page">
+        <button type="button" className="ui-btn ui-btn--secondary kh-rent-back" onClick={goBack}><Icon name="arrow_back" /> Quay lại</button>
+        <header className="kh-grp-head">
+          <h1>Đăng ký thuê phòng (Nhóm)</h1>
+          <p>Phòng đã chọn: <strong>{selectedRooms.map((room) => room.tenPhong).join(', ')}</strong>
+            <span className="kh-grp-chip">Trống: {Number(first.soGiuongTrong) || 0}/{Number(first.sucChua) || '—'} giường</span></p>
+        </header>
+        <ol className="kh-grp-steps" aria-label="Các bước đăng ký nhóm">
+          {steps.map((title, index) => <li key={title} className={groupStep === index + 1 ? 'is-current' : groupStep > index + 1 ? 'is-done' : ''}>
+            <span>{index + 1}</span><strong>{title}</strong></li>)}
+        </ol>
+
+        {groupStep === 1 && <div className="kh-grp-card">
+          <div className="kh-grp-card-head"><h2>Thông tin các thành viên</h2><span className="kh-grp-count">Số lượng: <b>{total}</b> / {max}</span></div>
+          <div className="kh-grp-info">
+            <p>Thành viên đầu tiên là <strong>người đại diện nhóm</strong> (tài khoản đang đăng nhập) để ký hợp đồng, thanh toán và nhận hóa đơn.</p>
+            <p>Các thành viên khác <strong>không cần có tài khoản</strong>. Nếu nhập email, hệ thống sẽ mời tạo tài khoản (không bắt buộc) sau khi hồ sơ cư trú được duyệt.</p>
+          </div>
+          <article className="kh-grp-member is-rep">
+            <span className="kh-grp-badge">Người đại diện</span>
+            <h3><Icon name="people" /> Thành viên 1</h3>
+            <div className="kh-grp-grid">
+              <label><span>Họ và tên</span><input value={rentForm.hoTen} onChange={(e) => setRentForm({ ...rentForm, hoTen: e.target.value })} /></label>
+              <label><span>Giới tính</span><select value={rentForm.gioiTinh} onChange={(e) => setRentForm({ ...rentForm, gioiTinh: e.target.value })}><option value="">Chọn</option><option value="Nam">Nam</option><option value="Nữ">Nữ</option></select></label>
+              <label><span>Ngày sinh</span><input type="date" max={getMaxBirthDate()} value={rentForm.ngaySinh} onChange={(e) => setRentForm({ ...rentForm, ngaySinh: e.target.value })} /></label>
+              <label><span>Số CCCD</span><input inputMode="numeric" maxLength={12} value={rentForm.cccd} onChange={(e) => setRentForm({ ...rentForm, cccd: e.target.value.replace(/\D/g, '').slice(0, 12) })} /></label>
+              <label><span>Số điện thoại</span><input inputMode="numeric" maxLength={10} value={rentForm.soDienThoai} onChange={(e) => setRentForm({ ...rentForm, soDienThoai: e.target.value.replace(/\D/g, '').slice(0, 10) })} /></label>
+              <label><span>Quốc tịch</span><input value={rentForm.quocTich} onChange={(e) => setRentForm({ ...rentForm, quocTich: e.target.value })} /></label>
+              <label className="is-wide"><span>Email (không bắt buộc)</span><input type="email" value={rentForm.email} onChange={(e) => setRentForm({ ...rentForm, email: e.target.value })} /></label>
+            </div>
+          </article>
+          {groupMembers.map((member, index) => <article key={index} className="kh-grp-member">
+            <button type="button" className="kh-grp-remove" aria-label={`Xóa thành viên ${index + 2}`} onClick={() => setGroupMembers((list) => list.filter((_, i) => i !== index))}><Icon name="close" /></button>
+            <h3><Icon name="people" /> Thành viên {index + 2}</h3>
+            <div className="kh-grp-grid">
+              <label><span>Họ và tên</span><input value={member.hoTen} onChange={(e) => updateGroupMember(index, 'hoTen', e.target.value)} /></label>
+              <label><span>Giới tính</span><select value={member.gioiTinh} onChange={(e) => updateGroupMember(index, 'gioiTinh', e.target.value)}><option value="">Chọn</option><option value="Nam">Nam</option><option value="Nữ">Nữ</option></select></label>
+              <label><span>Số CCCD</span><input inputMode="numeric" maxLength={12} value={member.cccd} onChange={(e) => updateGroupMember(index, 'cccd', e.target.value.replace(/\D/g, '').slice(0, 12))} /></label>
+              <label><span>Số điện thoại</span><input inputMode="numeric" maxLength={10} value={member.soDienThoai} onChange={(e) => updateGroupMember(index, 'soDienThoai', e.target.value.replace(/\D/g, '').slice(0, 10))} /></label>
+              <label className="is-wide"><span>Email (không bắt buộc)</span><input type="email" value={member.email} onChange={(e) => updateGroupMember(index, 'email', e.target.value)} /></label>
+            </div>
+          </article>)}
+          {total < max && <button type="button" className="kh-grp-add" onClick={() => setGroupMembers((list) => [...list, { ...EMPTY_GROUP_MEMBER }])}>+ Thêm thành viên</button>}
+          <div className="kh-grp-actions"><button type="button" className="kp-btn kp-btn-soft" onClick={goBack}>Hủy</button>
+            <button type="button" className="kp-btn kp-btn-primary" onClick={goGroupStep2}>Tiếp tục</button></div>
+        </div>}
+
+        {groupStep === 2 && <form className="kh-grp-card kh-register-modal" onSubmit={goGroupStep3}>
+          <div className="kh-grp-card-head"><h2>Thông tin thuê phòng</h2><span className="kh-grp-count">{summary.people.length} người · {summary.soNam} nam, {summary.soNu} nữ</span></div>
+          <div className="kh-register-scroll">
+            {renderNeedsSection(true)}
+            {renderViewingSection()}
+            {renderAmenitySection()}
+          </div>
+          <div className="kh-grp-actions"><button type="button" className="kp-btn kp-btn-soft" onClick={goBack}>Quay lại</button>
+            <button type="submit" className="kp-btn kp-btn-primary">Tiếp tục</button></div>
+        </form>}
+
+        {groupStep === 3 && <div className="kh-grp-card">
+          <div className="kh-grp-card-head"><h2>Xác nhận thông tin nhóm</h2></div>
+          <dl className="kh-grp-summary">
+            <div><dt>Phòng quan tâm</dt><dd>{selectedRooms.map((room) => room.tenPhong).join(', ')}</dd></div>
+            <div><dt>Số người</dt><dd>{summary.people.length} người ({summary.soNam} nam, {summary.soNu} nữ)</dd></div>
+            <div><dt>Khu vực · loại phòng</dt><dd>{[rentForm.khuVucMongMuon, rentForm.loaiPhongYeuCau].filter(Boolean).join(' · ') || '—'}</dd></div>
+            <div><dt>Mức giá tối đa</dt><dd>{rentForm.mucGiaToiDa ? `${Number(rentForm.mucGiaToiDa).toLocaleString('vi-VN')}đ/tháng` : '—'}</dd></div>
+            <div><dt>Dọn vào · thời hạn</dt><dd>{rentForm.ngayDuKienVaoO ? rentForm.ngayDuKienVaoO.split('-').reverse().join('/') : '—'} · {rentForm.thoiHanThue || '—'} tháng</dd></div>
+            <div><dt>Thời gian xem phòng</dt><dd>{[rentForm.ngayXemMongMuon ? rentForm.ngayXemMongMuon.split('-').reverse().join('/') : '', rentForm.khungGioRanh].filter(Boolean).join(', ') || 'Linh hoạt theo Sale'}</dd></div>
+          </dl>
+          <ul className="kh-grp-people">{summary.people.map((person, index) => <li key={`${person.cccd}-${index}`}>
+            <strong>{index + 1}. {person.hoTen}</strong>{index === 0 && <span className="kh-grp-badge-inline">Người đại diện</span>}
+            <small>{person.gioiTinh} · {person.soDienThoai} · CCCD {person.cccd}</small></li>)}</ul>
+          <div className="kh-grp-actions"><button type="button" className="kp-btn kp-btn-soft" onClick={goBack}>Quay lại</button>
+            <button type="button" className="kp-btn kp-btn-primary" disabled={submitting} onClick={() => submitRent({ preventDefault() {} })}>
+              {submitting ? 'Đang gửi...' : 'Xác nhận đăng ký nhóm'}</button></div>
+        </div>}
+      </section>
+    );
+  }
+
   function renderRentRequestPage() {
+    if (rentGroupMode) return renderGroupRentPage();
     const interested = selectedRooms[0];
     return (
       <section className="kh-rent-page">
@@ -4270,114 +4597,13 @@ export default function KhachHangPortalPage() {
                 </div>
               </section>
 
-              <section className="kh-register-section">
-                <h3><Icon name="home" />Nhu cầu thuê</h3>
-                <div className="kh-register-grid kh-balanced-grid">
-                  <label><span>Số lượng người ở*</span><input type="number" min="1" max={getRoomTypeCapacity(rentForm.loaiPhongYeuCau) || undefined} value={rentForm.soNguoiO} onChange={(event) => setRentForm({ ...rentForm, soNguoiO: event.target.value })} required /></label>
-                  <label><span>Giới tính thuê*</span><select value={rentForm.gioiTinhThue} onChange={(event) => setRentForm({ ...rentForm, gioiTinhThue: event.target.value })} required><option value="" disabled>Chọn giới tính</option><option value="Nam">Nam</option><option value="Nữ">Nữ</option><option value="Khác">Khác</option></select></label>
-                  {rentGenderIssues.length > 0 && <p className="kh-rent-gender-warning is-half" role="alert">{rentGenderIssues[0]}</p>}
-                  {rentForm.gioiTinhThue === 'Khác' && (
-                    <div className="is-half kh-register-pair">
-                      <label><span>Số lượng nam*</span><input type="number" min="0" value={rentForm.soNam ?? ''} onChange={(event) => setRentForm({ ...rentForm, soNam: event.target.value })} required /></label>
-                      <label><span>Số lượng nữ*</span><input type="number" min="0" value={rentForm.soNu ?? ''} onChange={(event) => setRentForm({ ...rentForm, soNu: event.target.value })} required /></label>
-                    </div>
-                  )}
-                  <label className="is-half">
-                    <span>Khu vực mong muốn*</span>
-                    <input
-                      className={getAreaError(rentForm.khuVucMongMuon) ? 'is-invalid' : ''}
-                      type="text"
-                      list="kh-rent-area-options"
-                      value={rentForm.khuVucMongMuon}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        event.target.setCustomValidity(getAreaError(value));
-                        setRentForm({ ...rentForm, khuVucMongMuon: value });
-                      }}
-                      placeholder="VD: Quận 1, quan 3, Thu Duc..."
-                      required
-                    />
-                    <datalist id="kh-rent-area-options">
-                      {ALLOWED_RENT_AREAS.map((area) => <option key={area} value={area} />)}
-                    </datalist>
-                    {getAreaError(rentForm.khuVucMongMuon) && <small className="kh-field-error">{getAreaError(rentForm.khuVucMongMuon)}</small>}
-                  </label>
-                  <label className="is-half kh-room-type-field">
-                    <span>Loại phòng mong muốn*</span>
-                    <select
-                      value={rentForm.loaiPhongYeuCau}
-                      onChange={(event) => setRentForm({ ...rentForm, loaiPhongYeuCau: event.target.value })}
-                      required
-                    >
-                      <option value="">Chọn một loại phòng</option>
-                      {filterOptions.loaiPhong.filter(Boolean).map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                      ))}
-                    </select>
-                    {getRoomTypeCapacity(rentForm.loaiPhongYeuCau) && (
-                      <small className="kh-field-hint">Tối đa {getRoomTypeCapacity(rentForm.loaiPhongYeuCau)} người.</small>
-                    )}
-                  </label>
-                  <label><span>Mức giá tối đa (đ/tháng)*</span><input type="number" min="0" value={rentForm.mucGiaToiDa} onChange={(event) => setRentForm({ ...rentForm, mucGiaToiDa: event.target.value })} placeholder="VD: 3.000.000" required /></label>
-                  <label className="is-half"><span>Thời gian dự kiến dọn vào*</span><input type="date" value={rentForm.ngayDuKienVaoO} onChange={(event) => setRentForm({ ...rentForm, ngayDuKienVaoO: event.target.value })} required /></label>
-                  <label className="is-half"><span>Thời hạn thuê (tháng)*</span><input type="number" min="1" value={rentForm.thoiHanThue} onChange={(event) => setRentForm({ ...rentForm, thoiHanThue: event.target.value })} placeholder="Ví dụ: 6" required /></label>
-                </div>
-              </section>
+              {renderNeedsSection(false)}
 
-              <section className="kh-register-section">
-                <h3><Icon name="calendar" />Thời gian xem phòng mong muốn</h3>
-                <div className="kh-register-grid kh-balanced-grid">
-                  <label className="is-half">
-                    <span>Ngày có thể đến xem</span>
-                    <input type="date" min={getTomorrowInputValue()} value={rentForm.ngayXemMongMuon || ''} onChange={(event) => setRentForm({ ...rentForm, ngayXemMongMuon: event.target.value })} />
-                  </label>
-                  <label className="is-half">
-                    <span>Khung giờ rảnh</span>
-                    <select value={rentForm.khungGioRanh || VIEWING_SLOTS[0]} onChange={(event) => setRentForm({ ...rentForm, khungGioRanh: event.target.value })}>
-                      {VIEWING_SLOTS.map((slot) => <option key={slot} value={slot}>{slot}</option>)}
-                    </select>
-                  </label>
-                  <label className="is-wide">
-                    <span>Ghi chú thời gian</span>
-                    <input value={rentForm.ghiChuThoiGian || ''} onChange={(event) => setRentForm({ ...rentForm, ghiChuThoiGian: event.target.value })} placeholder="Ví dụ: chỉ rảnh sau 16:00 hoặc cuối tuần" />
-                  </label>
-                </div>
-              </section>
 
-              <section className="kh-register-section">
-                <h3><Icon name="sparkle" />Tiện ích và ghi chú</h3>
-                <div className="kh-register-grid kh-balanced-grid">
-                  <div className="is-wide kh-register-stack">
-                    <span className="kh-register-field-title">Tiện ích mong muốn</span>
-                    <div className="kh-amenity-chips" role="group" aria-label="Tiện ích mong muốn">
-                      {AMENITY_OPTIONS.map((item) => {
-                        const chosen = rentForm.tienIchMongMuon || [];
-                        const active = chosen.includes(item);
-                        return (
-                          <button
-                            key={item}
-                            type="button"
-                            className={`kh-amenity-chip ${active ? 'is-active' : ''}`}
-                            aria-pressed={active}
-                            onClick={() => setRentForm({
-                              ...rentForm,
-                              tienIchMongMuon: active ? chosen.filter((value) => value !== item) : [...chosen, item]
-                            })}
-                          >
-                            {item}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="is-wide kh-register-stack">
-                    <span className="kh-register-field-title">Ghi chú thêm</span>
-                    <label>
-                      <textarea value={rentForm.ghiChu} onChange={(event) => setRentForm({ ...rentForm, ghiChu: event.target.value })} placeholder="Ví dụ: muốn ở gần trường, cần chỗ để xe, ưu tiên phòng yên tĩnh..." />
-                    </label>
-                  </div>
-                </div>
-              </section>
+              {renderViewingSection()}
+
+
+              {renderAmenitySection()}
           </div>
 
           <div className="kh-rent-footer">

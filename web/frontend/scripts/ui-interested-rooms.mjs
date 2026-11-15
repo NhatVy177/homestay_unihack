@@ -46,7 +46,7 @@ const results = [];
 try {
   for (const width of [1440, 390]) {
     // --- cổng khách
-    const { context, page, errors, writes } = await newPage(width, customer);
+    const { context, page, errors, writes, bodies } = await newPage(width, customer);
     await page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
     await page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
 
@@ -103,14 +103,53 @@ try {
     await modal.getByPlaceholder('Ví dụ: Việt Nam').fill('Việt Nam');
     assert.doesNotMatch(await modal.innerText(), /quản lý chi nhánh sẽ xem xét thêm/);
 
-    // Đăng ký thuê theo nhóm: mở cùng phiếu, tiêu đề nhóm, số người mặc định 2
+    // Đăng ký thuê theo nhóm (J-C118): form 3 bước, danh sách thành viên, gửi một phiếu duy nhất
     await modal.getByRole('button', { name: 'Hủy' }).click();
     await page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết' }).click();
     await page.getByRole('button', { name: 'Đăng ký thuê theo nhóm' }).click();
-    await page.getByRole('heading', { name: 'Đăng ký thuê theo nhóm' }).waitFor();
-    assert.match(await page.locator('.kh-rent-group-note').innerText(), /người đại diện/);
-    assert.equal(await page.locator('.kh-register-modal input[type="number"]').first().inputValue(), '2');
-    await page.screenshot({ path: `.ui-screens/interested-rooms/form-nhom-${width}.png` });
+    await page.getByRole('heading', { name: 'Đăng ký thuê phòng (Nhóm)' }).waitFor();
+    assert.equal(await page.locator('.kh-grp-steps li').count(), 3);
+    assert.match(await page.locator('.kh-grp-info').innerText(), /không cần có tài khoản/);
+    assert.match(await page.locator('.kh-grp-count').innerText(), /2.*\/ 4/, 'mặc định 2 người, tối đa theo giường trống');
+    await page.screenshot({ path: `.ui-screens/interested-rooms/form-nhom-buoc1-${width}.png`, fullPage: true });
+    const rep = page.locator('.kh-grp-member.is-rep');
+    await rep.getByLabel('Họ và tên').fill('Nguyễn Văn A');
+    await rep.getByLabel('Giới tính').selectOption('Nam');
+    await rep.getByLabel('Ngày sinh').fill('2000-01-01');
+    await rep.getByLabel('Số CCCD').fill('012345678901');
+    await rep.getByLabel('Số điện thoại').fill('0901234567');
+    await page.getByRole('button', { name: 'Tiếp tục' }).click();
+    assert.equal(await page.locator('.kh-grp-steps li.is-current strong').innerText(), 'Thành viên nhóm', 'thành viên 2 còn trống thì chưa sang bước 2');
+    const member2 = page.locator('.kh-grp-member').nth(1);
+    await member2.getByLabel('Họ và tên').fill('Trần Thị B');
+    await member2.getByLabel('Giới tính').selectOption('Nữ');
+    await member2.getByLabel('Số CCCD').fill('098765432109');
+    await member2.getByLabel('Số điện thoại').fill('0911111111');
+    await page.getByRole('button', { name: '+ Thêm thành viên' }).click();
+    assert.match(await page.locator('.kh-grp-count').innerText(), /3.*\/ 4/);
+    await page.getByRole('button', { name: 'Xóa thành viên 3' }).click();
+    await page.getByRole('button', { name: 'Tiếp tục' }).click();
+    await page.locator('.kh-grp-steps li.is-current strong', { hasText: 'Thuê phòng' }).waitFor();
+    assert.equal(await page.locator('.kh-register-modal input[type="number"]').first().inputValue() !== '', true);
+    const stepTwo = page.locator('.kh-grp-card.kh-register-modal');
+    const need = (text) => stepTwo.locator('label', { hasText: text }).locator('input, select, textarea').first();
+    await need('Khu vực mong muốn').fill('Quận 1');
+    await need('Mức giá tối đa').fill('1400000');
+    await need('Thời gian dự kiến dọn vào').fill('2026-12-20');
+    await need('Thời hạn thuê').fill('6');
+    await page.screenshot({ path: `.ui-screens/interested-rooms/form-nhom-buoc2-${width}.png`, fullPage: true });
+    await stepTwo.getByRole('button', { name: 'Tiếp tục' }).click();
+    await page.getByRole('heading', { name: 'Xác nhận thông tin nhóm' }).waitFor();
+    assert.match(await page.locator('.kh-grp-summary').innerText(), /2 người \(1 nam, 1 nữ\)/);
+    await page.screenshot({ path: `.ui-screens/interested-rooms/form-nhom-buoc3-${width}.png`, fullPage: true });
+    await page.getByRole('button', { name: 'Xác nhận đăng ký nhóm' }).click();
+    await page.waitForTimeout(800);
+    const groupSent = bodies.find((item) => item.path.endsWith('/khach-moi/ho-so'));
+    assert.ok(groupSent, 'đã gửi phiếu nhóm');
+    assert.equal(groupSent.body.soNguoiO, '2'); assert.equal(groupSent.body.soNam, '1'); assert.equal(groupSent.body.soNu, '1');
+    assert.equal(groupSent.body.gioiTinhThue, 'Khác');
+    assert.match(groupSent.body.ghiChu, /Nhóm 2 người: 1\) Nguyễn Văn A .* - người đại diện; 2\) Trần Thị B/);
+    writes.length = 0; bodies.length = 0;
 
     assert.equal(errors.length, 0, `browser errors: ${errors.join('; ')}`);
     assert.equal(writes.length, 0, 'không gửi thao tác ghi nào');
