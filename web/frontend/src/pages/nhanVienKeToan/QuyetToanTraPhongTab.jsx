@@ -907,7 +907,8 @@ function GhiNhanThanhToanPanel({ type }) {
       }
       setLocalMessage(`Đã ghi nhận ${isThuThem ? 'thu thêm' : 'hoàn cọc'} cho phiếu ${selectedRefund.maDoiSoat}.`);
       setSelectedRefund(null);
-      await loadRows();
+      // Ghi nhận đã thành công; lỗi khi tải lại danh sách không được hiện thành "không ghi nhận được".
+      loadRows().catch(() => setLocalError('Đã ghi nhận nhưng chưa tải lại được danh sách. Vui lòng bấm Làm mới.'));
     } catch (err) {
       setModalError(err.response?.data?.message || `Không ghi nhận được ${isThuThem ? 'thu thêm' : 'hoàn cọc'}.`);
     } finally {
