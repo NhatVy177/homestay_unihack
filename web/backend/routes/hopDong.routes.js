@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as controller from '../controllers/hopDong.controller.js';
 import * as evidence from '../controllers/contractEvidence.controller.js';
+import { danhSachHopDongQuanLy } from '../services/quanLyHopDong.service.js';
 
 const router = Router();
 
@@ -16,6 +17,7 @@ router.get('/phieu-coc/:id/kiem-tra', controller.kiemTraDieuKienLapHopDong);
 router.get('/phieu-coc/:id/cu-tru-duyet', controller.layHoSoCuTruDaDuyetTheoPhieuCoc);
 router.get('/dich-vu', controller.layDanhSachDichVu);
 router.get('/quan-ly', controller.layDanhSachQuanLy);
+router.get('/quan-ly-chi-nhanh', async (req, res, next) => { try { res.json(await danhSachHopDongQuanLy(req.user)); } catch (error) { next(error); } });
 router.post('/phieu-coc/:id/thanh-vien/kiem-tra', controller.kiemTraThanhVienHopDongTam);
 router.post('/', controller.lapHopDongThue);
 router.get('/phieu-coc/:id/hop-dong', controller.layChiTietHopDongTheoPhieuCoc);

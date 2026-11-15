@@ -232,7 +232,7 @@ function buildFinanceGroups(chiTiet, chiTietKhauTru) {
 
 
 
-export default function XacNhanPhanHoi() {
+export default function XacNhanPhanHoi({ focusPhieuTra = null } = {}) {
   const [ds, setDs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQ, setSearchQ] = useState('');
@@ -323,7 +323,7 @@ export default function XacNhanPhanHoi() {
   const countChoPhanHoi = ds.filter((r) => r.trangThaiDoiSoat === 'Chờ phản hồi').length;
   const countDaPhanHoi = ds.filter((r) => r.trangThaiDoiSoat !== 'Chờ phản hồi').length;
 
-  const filtered = ds.filter((r) => {
+  const filtered = ds.filter((r) => !focusPhieuTra || r.maPhieuTra === focusPhieuTra).filter((r) => {
     if (filterStatus === 'Chờ phản hồi') return r.trangThaiDoiSoat === 'Chờ phản hồi';
     if (filterStatus === 'Đã phản hồi') return r.trangThaiDoiSoat !== 'Chờ phản hồi';
     return true;

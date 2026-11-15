@@ -6,7 +6,7 @@ import StatusBadge from '../common/StatusBadge.jsx';
 import { actOnClosure, closureError, downloadClosure, listClosures, uploadContactEvidence } from './checkoutClosure.api.js';
 import './checkoutClosure.css';
 
-export default function CheckoutLifecyclePanel() {
+export default function CheckoutLifecyclePanel({ focusContractId = null } = {}) {
   const [rows, setRows] = useState([]), [loading, setLoading] = useState(true), [error, setError] = useState('');
   const [query, setQuery] = useState(''), [page, setPage] = useState(1), [busy, setBusy] = useState(false);
   const [selected, setSelected] = useState(null), [reason, setReason] = useState(''), [file, setFile] = useState(null);
@@ -20,7 +20,7 @@ export default function CheckoutLifecyclePanel() {
     setBusy(true); setError('');
     try { await action(); await load(); } catch (e) { setError(closureError(e)); } finally { setBusy(false); }
   }
-  const filtered = rows.filter(row => `${row.contractId} ${row.settlementId || ''}`.toLowerCase().includes(query.toLowerCase()));
+  const filtered = rows.filter(row => !focusContractId || row.contractId === focusContractId).filter(row => `${row.contractId} ${row.settlementId || ''}`.toLowerCase().includes(query.toLowerCase()));
   const current = Math.min(page, Math.max(1, Math.ceil(filtered.length / 10)));
   return <section className="checkout-lifecycle">
     <div className="checkout-heading"><div><h2>Kết thúc hợp đồng</h2><p>Hệ thống tự thanh lý khi khách đã đồng ý trên chuỗi và đủ thu/hoàn, chứng từ. Thu chìa khóa được ghi nhận riêng.</p></div><button className="ui-btn ui-btn--secondary" disabled={busy || loading} onClick={load}>Tải lại</button></div>

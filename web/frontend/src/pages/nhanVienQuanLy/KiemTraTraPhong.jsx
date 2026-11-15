@@ -258,12 +258,13 @@ function CheckoutPhotos({ maPhieuTra, taiSan, readOnly, onToast }) {
   );
 }
 
-export default function KiemTraTraPhong() {
+// focusPhieuTra: mở từ trang Quản lý hợp đồng, chỉ hiện phiếu trả của hợp đồng đó.
+export default function KiemTraTraPhong({ focusPhieuTra = null } = {}) {
   const [dsPhieu, setDsPhieu] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState('Chờ xử lý');
+  const [filterStatus, setFilterStatus] = useState(focusPhieuTra ? 'Tất cả' : 'Chờ xử lý');
   const [toast, setToast] = useState('');
   const [successToast, setSuccessToast] = useState('');
 
@@ -428,6 +429,7 @@ export default function KiemTraTraPhong() {
   const filterCounts = { 'Tất cả': countTatCa, 'Chờ xử lý': countChoXuLy, 'Đã xử lý': countDaXuLy };
 
   const filteredItems = dsPhieu.filter(p => {
+    if (focusPhieuTra && p.maPhieuTra !== focusPhieuTra) return false;
     const q = searchQuery.toLowerCase();
     const matchSearch = !q || p.hoTenKhach?.toLowerCase().includes(q) || p.sdtKhach?.includes(q) || p.maPhieuTra?.toLowerCase().includes(q);
     if (!matchSearch) return false;
