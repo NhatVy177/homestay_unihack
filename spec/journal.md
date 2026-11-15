@@ -1241,3 +1241,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo phản ánh của Vy (form nhỏ, hai cột chen chúc).
 - Thay đổi: `web/frontend/src/styles/saleAppointmentLayout.css`: hộp thoại rộng tối đa 1240px (trước 1040px); cột phải tối thiểu 340px, không dính trên (sticky) trong hộp thoại; dưới 1100px xếp một cột để phần thông tin phiếu và form lập lịch đều có đủ chiều ngang.
 - Kiểm tra: build OK. Chưa có script giao diện riêng cho hộp thoại này nên chưa chụp ảnh sau khi sửa.
+
+## 2026-11-15 22:40:00 +07:00 — J-C123 — Form "Lập lịch xem phòng mới" dùng bố cục như màn lập lịch
+- Người thực hiện: Claude, theo phản ánh của Vy (J-C122 chưa đủ rộng).
+- Nguyên nhân: điều kiện chuyển một cột dựa vào chiều rộng cửa sổ, trong khi vùng chứa là hộp thoại hẹp hơn cửa sổ.
+- Sửa: `web/frontend/src/styles/saleAppointmentLayout.css`: hộp thoại rộng tối đa 1440px; thân hộp thoại là vùng chứa (`container-type: inline-size`), hai cột (1.7fr / 1fr) như màn lập lịch, chỉ xếp một cột khi chiều rộng vùng chứa dưới 860px.
+- Kiểm tra: build OK; chưa chụp ảnh giao diện.
