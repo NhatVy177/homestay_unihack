@@ -1337,3 +1337,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Backend: `services/kyDauChungTu.service.js` (khách lưu/đọc chứng từ: đúng chủ hợp đồng, hợp đồng Hiệu lực, chưa thu kỳ đầu; kế toán đọc theo mã hợp đồng), `routes/khachMoi.routes.js` (`GET|PUT /khach-moi/ky-dau/:id/minh-chung`, dùng `uploadChungTu`: ảnh hoặc PDF tối đa 5MB), `routes/nhanPhong.routes.js` (`GET /nhan-phong/chung-tu-ky-dau/:maHopDong`), hai controller, `test/ky-dau-chung-tu.test.mjs`.
 - Frontend: `KhachHangPortalPage.jsx` (tab QR chuyển khoản của trang thanh toán kỳ đầu có khung "Minh chứng thanh toán", cho gửi lại; tiến trình chuyển sang "Đã nộp minh chứng"; tab ví không hiện khung này), `khachMoi.api.js`, `nhanVienKeToan/ThuNhanPhongTab.jsx` + `thuNhanPhong.api.js` (hộp thoại ghi nhận thu kỳ đầu hiện liên kết "Chứng từ khách đã gửi").
 - Kiểm tra: backend 101 pass; build OK; `ui-customer-invoices` PASS (tải file, 1 lần PUT, trạng thái "Đã nộp minh chứng", tab ví không có khung). Chưa thử upload thật qua trình duyệt với backend và DB; cần khởi động lại backend để nhận route mới.
+
+## 2026-11-16 04:00:00 +07:00 — J-C139 — Sửa lỗi tải minh chứng kỳ đầu báo "chưa chọn file"
+- Người thực hiện: Claude, theo phản ánh của Vy (đã chọn ảnh nhưng vẫn báo "Vui lòng chọn ảnh hoặc PDF chứng từ thanh toán").
+- Nguyên nhân: `web/frontend/src/pages/khachMoi/khachMoi.api.js` (`guiChungTuKyDau`) không bỏ `Content-Type: application/json` mặc định của `httpClient`, nên yêu cầu không phải multipart và máy chủ không nhận được file. Các hàm upload khác đã đặt `Content-Type: undefined`; J-C138 bỏ sót.
+- Sửa: đặt `{ headers: { 'Content-Type': undefined } }`; `scripts/ui-customer-invoices.mjs` nay kiểm tra yêu cầu gửi lên là `multipart/form-data` (lần kiểm tra J-C138 bỏ sót lỗi này vì giả lập không xét kiểu nội dung). Đính chính J-C138: lúc đó chưa thử upload thật.
+- Kiểm tra: build OK; `ui-customer-invoices` PASS. Chưa thử upload thật với backend và DB.

@@ -28,7 +28,7 @@ try {
       if (path === '/api/khach-moi/dat-coc') return route.fulfill({ json: deposits });
       if (path === '/api/khach-moi/hoa-don') return route.fulfill({ json: invoices });
       if (path === '/api/khach-moi/ky-dau/HD9001/minh-chung') {
-        if (req.method() === 'PUT') { proofUploads += 1; proof = { maHopDong: 'HD9001', duongDan: '/uploads/chung-tu/HD9001-1.png', tenTep: 'ck.png', ngayGui: '2026-11-16T01:00:00' }; }
+        if (req.method() === 'PUT') { assert.match(req.headers()['content-type'] || '', /^multipart\/form-data/); proofUploads += 1; proof = { maHopDong: 'HD9001', duongDan: '/uploads/chung-tu/HD9001-1.png', tenTep: 'ck.png', ngayGui: '2026-11-16T01:00:00' }; }
         return route.fulfill({ json: proof });
       }
       if (path === '/api/thanh-toan-mo-phong/thu-nhan-phong') return route.fulfill({ json: [{ purpose: 'thu-nhan-phong', refId: 'HD9001', status: 'Pending', amountVnd: 8100000, startDate: '2026-12-01' }] });
