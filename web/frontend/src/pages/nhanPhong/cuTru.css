@@ -1,8 +1,8 @@
 .residence-page {
-  --residence-primary: #00666d;
-  --residence-soft: #eef8f8;
-  --residence-line: #d7e4e5;
-  --residence-muted: #647273;
+  --residence-primary: var(--color-primary);
+  --residence-soft: var(--color-surface-alt);
+  --residence-line: var(--color-border);
+  --residence-muted: var(--color-text-muted);
 }
 
 .residence-notice {
@@ -28,7 +28,7 @@
 
 .residence-hero {
   align-items: center;
-  background: linear-gradient(135deg, #eef8f8 0%, #ffffff 58%);
+  background: linear-gradient(135deg, var(--color-surface-alt) 0%, var(--color-surface, #ffffff) 58%);
   border: 1px solid var(--residence-line);
   border-radius: 12px;
   display: flex;
@@ -163,8 +163,8 @@
 }
 
 .residence-badge.is-primary {
-  background: #e7f6f7;
-  border: 1px solid #a8d8dc;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
   color: var(--residence-primary);
 }
 
@@ -380,7 +380,7 @@
 }
 
 .residence-sale-note strong {
-  color: #0d5559;
+  color: var(--color-primary);
   display: block;
   font-size: 14px;
   margin-bottom: 4px;
@@ -780,9 +780,9 @@
 
 .ktp-btn-action-outline {
   background: #ffffff;
-  border: 1.5px solid #00666d;
+  border: 1.5px solid var(--color-primary);
   border-radius: 8px;
-  color: #00666d;
+  color: var(--color-primary);
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
@@ -791,7 +791,7 @@
 }
 
 .ktp-btn-action-outline:hover {
-  background: #eef8f8;
+  background: var(--color-surface-alt);
 }
 
 .ktp-btn-action-outline:disabled {

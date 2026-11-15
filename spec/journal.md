@@ -1287,3 +1287,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Thay đổi: `KhachHangPortalPage.jsx` (ô "Ngày sinh" cho từng thành viên ở bước 1, bắt buộc và kiểm tra tuổi; ghi vào ghi chú dạng "sinh dd/mm/yyyy"), `web/backend/services/groupMembers.js` (đọc lại ngày sinh), `CustomerResidenceTab.jsx` (điền sẵn ngày sinh), `web/backend/test/group-members.test.mjs`, `scripts/ui-interested-rooms.mjs`.
 - Kiểm tra: backend 96 pass; build OK; `ui-interested-rooms` PASS (thiếu ngày sinh thì không sang bước 2, phiếu gửi có "sinh 20/05/2003"); `ui-customer-residence` chạy lại.
 - Giới hạn: phiếu nhóm đã gửi trước đây (như demo5) không có ngày sinh, vẫn phải nhập tay ở tab Thông tin cư trú.
+
+## 2026-11-16 00:45:00 +07:00 — J-C131 — Form duyệt cư trú theo màu theme; bổ sung biểu tượng còn thiếu
+- Người thực hiện: Claude, theo yêu cầu của Vy (form duyệt hồ sơ cư trú của quản lý còn màu cũ, nhiều biểu tượng hiện thành ngôi nhà).
+- Nguyên nhân: `web/frontend/src/pages/nhanPhong/cuTru.css` ghi cứng màu xanh ngọc (#00666d, #eef8f8, #d7e4e5, #647273...) nên không đổi theo tone mới; `components/common/Icon.jsx` thiếu nhiều tên biểu tượng nên rơi về hình ngôi nhà.
+- Thay đổi: `cuTru.css` dùng token `--color-primary`, `--color-surface-alt`, `--color-border`, `--color-text-muted`; `Icon.jsx` thêm 7 biểu tượng của form duyệt cư trú (sticky_note_2, verified, groups, group_off, task_alt, rule, error) và 17 biểu tượng đang được dùng nhưng thiếu ở các màn khác (add, calendar_today, event_available, expand_less, feedback, list_alt, lock_open, mail, map, mode_edit, person_search, phone, restore, shield, sync, tune, upload_file).
+- Kiểm tra: build OK; đã quét mọi `<Icon name=...>` dùng Icon chung, không còn tên thiếu (trừ màn khách hàng có bộ biểu tượng riêng). Chưa chụp ảnh form.
+- Giới hạn: chưa có mẫu form của Hằng để đối chiếu bố cục; chỉ đồng bộ màu và biểu tượng.
