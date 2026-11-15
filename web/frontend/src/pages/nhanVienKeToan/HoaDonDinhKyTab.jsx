@@ -62,7 +62,9 @@ export default function HoaDonDinhKyTab() {
     try {
       const [c, i] = await Promise.all([hoaDonDinhKyApi.danhSachHopDong(), hoaDonDinhKyApi.danhSachHoaDon()]);
       setContracts(c.data || []); setInvoices(i.data || []);
-      setPeriod((p) => p || (c.data || []).map((x) => x.kyCanLap).sort()[0] || currentPeriod());
+      // Kỳ mặc định: kỳ sớm nhất còn hóa đơn cần xử lý (chờ xác nhận, chưa trả, quá hạn); không có thì kỳ cần lập sớm nhất.
+      const open = (i.data || []).filter((x) => x.nhom !== 'paid').map((x) => x.kyThanhToan).sort()[0];
+      setPeriod((p) => p || open || (c.data || []).map((x) => x.kyCanLap).sort()[0] || currentPeriod());
     } catch (e) { setLoadError(errorOf(e, 'Chưa tải được dữ liệu hóa đơn định kỳ.')); }
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -92,6 +94,8 @@ export default function HoaDonDinhKyTab() {
     && (!q || [i.hoTen, i.tenPhong, i.maHoaDon].join(' ').toLocaleLowerCase('vi-VN').includes(q)));
   const filteredContracts = contracts.filter((c) => inBranch(c) && c.kyCanLap <= period
     && (!cq || [c.hoTen, c.tenPhong, c.maHopDong].join(' ').toLocaleLowerCase('vi-VN').includes(cq)));
+  const reviewCount = invoices.filter((i) => i.nhom === 'review').length;
+  const reviewPeriods = [...new Set(invoices.filter((i) => i.nhom === 'review').map((i) => i.kyThanhToan))].filter((p) => p !== period);
   const expected = filteredInvoices.reduce((s, i) => s + i.tongTien, 0);
   const paid = filteredInvoices.filter((i) => i.nhom === 'paid').reduce((s, i) => s + i.tongTien, 0);
   const rate = expected > 0 ? ((paid / expected) * 100).toFixed(1) : '0';
@@ -177,7 +181,7 @@ export default function HoaDonDinhKyTab() {
     <section className="hdk-panel">
       <div className="hdk-tabs" role="tablist">
         <button type="button" role="tab" aria-selected={activeTab === 'input'} className={activeTab === 'input' ? 'is-active' : ''} onClick={() => setActiveTab('input')}>Lập hóa đơn định kỳ</button>
-        <button type="button" role="tab" aria-selected={activeTab === 'list'} className={activeTab === 'list' ? 'is-active' : ''} onClick={() => setActiveTab('list')}>Danh sách hóa đơn</button>
+        <button type="button" role="tab" aria-selected={activeTab === 'list'} className={activeTab === 'list' ? 'is-active' : ''} onClick={() => setActiveTab('list')}>Danh sách hóa đơn{reviewCount > 0 && <span className="hdk-tab-badge" title="Hóa đơn khách đã gửi minh chứng, chờ xác nhận">{reviewCount}</span>}</button>
       </div>
 
       {activeTab === 'input' && <div className="hdk-input">
@@ -277,6 +281,8 @@ export default function HoaDonDinhKyTab() {
       </div>}
 
       {activeTab === 'list' && <div className="hdk-list">
+        {reviewPeriods.length > 0 && <p className="hdk-alert is-info" role="status">Có hóa đơn khách đã gửi minh chứng ở kỳ {reviewPeriods.map(showPeriod).join(', ')}.{' '}
+          <button type="button" className="hdk-link-btn" onClick={() => setPeriod(reviewPeriods[0])}>Xem kỳ {showPeriod(reviewPeriods[0])}</button></p>}
         <div className="hdk-list-head"><h3>Danh sách hóa đơn tháng {showPeriod(period)}</h3>
           <label className="hdk-search is-small"><Icon name="search" /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tìm khách hàng, phòng..." aria-label="Tìm hóa đơn" /></label></div>
         <div className="hdk-table-wrap"><table className="hdk-table">

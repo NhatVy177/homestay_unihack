@@ -195,3 +195,6 @@
 .hdk-proof { display: grid; gap: 4px; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-info-soft); }
 .hdk-proof a { color: var(--color-primary); font-weight: 600; word-break: break-all; }
 .hdk-proof small { color: var(--color-text-muted); font-size: 12px; }
+.hdk-alert.is-info { background: var(--color-info-soft); color: var(--color-info); }
+.hdk-page .hdk-link-btn { padding: 0; border: none; background: none; font: inherit; font-weight: 700; color: var(--color-primary); text-decoration: underline; cursor: pointer; }
+.hdk-tab-badge { display: inline-grid; place-items: center; min-width: 20px; height: 20px; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--color-info); color: #fff; font-size: 11px; font-weight: 700; }

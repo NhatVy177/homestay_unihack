@@ -1403,3 +1403,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Dữ liệu cũ (đã xem trước khi xóa): `HoaDon HO0003` (HD0002, kỳ 2026-12, 8.290.000đ, "Đã TT", Chuyển khoản, lập 2026-11-16) với 5 dòng `ChiTietHoaDon` CH0004–CH0008; `PhieuGhiChiSo PG0001` (phòng P303, kỳ 2026-12, điện 20→40, nước 30→40, chỉ HO0003 dùng); phí `CPPS-1104-3606` "Phạt vi phạm nội quy vệ sinh" 200.000đ đang "Đã tính" vào HO0003. Không có minh chứng hay đơn ví mô phỏng nào gắn với HO0003.
 - Đã làm (một giao dịch): đưa phí CPPS-1104-3606 về "Đã xác nhận", bỏ liên kết hóa đơn; xóa 5 dòng chi tiết, hóa đơn HO0003 và phiếu ghi PG0001. Còn lại cho HD0002: HO0002 (kỳ đầu 2026-11, "Đã TT"). Chỉ đổi dữ liệu DB.
 - Việc còn lại: Vy lập lại hóa đơn tháng 12 cho HD0002 và thử luồng khách thanh toán; phí 200.000đ vẫn còn trong danh sách phí phát sinh (xóa trong tab nếu không cần).
+
+## 2026-11-16 15:40:00 +07:00 — J-C149 — Tab Hóa đơn định kỳ mặc định về kỳ còn hóa đơn cần xử lý
+- Người thực hiện: Claude, theo phản ánh của Vy (khách đã chuyển khoản HO0003 nhưng màn kế toán đang ở kỳ 01/2027 nên danh sách trống).
+- Nguyên nhân: sau khi lập hóa đơn kỳ 12, kỳ mặc định lấy theo "kỳ cần lập sớm nhất" của hợp đồng (đã sang 2027-01), nên hóa đơn kỳ 12 bị ẩn khỏi danh sách và thẻ tổng quan.
+- Sửa: `web/frontend/src/pages/nhanVienKeToan/HoaDonDinhKyTab.jsx`: kỳ mặc định là kỳ sớm nhất còn hóa đơn chưa xong (chờ xác nhận, chưa trả, quá hạn), không có mới lấy kỳ cần lập; tab "Danh sách hóa đơn" có huy hiệu số hóa đơn chờ xác nhận; trong danh sách có dòng báo kỳ khác đang có hóa đơn chờ xác nhận kèm nút chuyển kỳ. `hoaDonDinhKy.css` thêm kiểu tương ứng.
+- Kiểm tra: build OK; `ui-periodic-invoices` PASS. Đọc DB (chỉ đọc): CN0003 có HO0003 kỳ 2026-12 "Chưa TT", nhóm "review" (khách đã gửi minh chứng), HO0002 đã trả.
