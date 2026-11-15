@@ -1300,3 +1300,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Nguyên nhân: `LapHopDongTab.jsx` chọn biểu tượng theo tên phân biệt hoa thường ("Xe" không khớp "Gửi xe" trong DB) và dùng tên `wifi`, `room_service` chưa có trong `components/common/Icon.jsx`.
 - Thay đổi: `Icon.jsx` thêm `serviceIconName(name)` (bỏ dấu, không phân biệt hoa thường) và biểu tượng `wifi`, `two_wheeler`, `cleaning_services`, `room_service`; `LapHopDongTab.jsx` và `pages/admin/AdminPage.jsx` dùng chung hàm này.
 - Kiểm tra: build OK; chuẩn hóa tên cho 5 dịch vụ mẫu (Điện, Nước, Wifi, Gửi xe, Vệ sinh) cho ra đúng khóa. Chưa chụp ảnh.
+
+## 2026-11-16 01:30:00 +07:00 — J-C133 — Sửa in hợp đồng bị chồng chữ từ trang 2
+- Người thực hiện: Claude, theo phản ánh của Vy (trang 1 đúng, trang 2 chữ chồng lên nhau).
+- Nguyên nhân: khi in, lớp phủ và hộp thoại xem hợp đồng vẫn là `position: fixed` / có cuộn riêng nên trình duyệt lặp lại phần trên cùng ở mọi trang và cắt nội dung dài.
+- Thay đổi: `web/frontend/src/pages/nhanVienSale/lapHopDongTab.css` (trong `@media print`: đưa `.ktp-modal-overlay`, `.ktp-modal`, `.lhd-print-overlay` về `position: static`, bỏ cuộn/chiều cao cố định; bảng, dòng bảng và tiêu đề Điều không bị cắt giữa chừng).
+- Kiểm tra: dựng trang mô phỏng cùng cấu trúc (lớp phủ cố định, hộp thoại cuộn, bài dài 70 dòng) và xuất PDF bằng Chrome: bản cũ chỉ in được 36/70 dòng trên 1 trang, bản mới in đủ 70/70 dòng trên 2 trang. Chưa in thử hợp đồng thật trên giao diện.
