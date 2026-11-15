@@ -1053,6 +1053,7 @@ export default function KhachHangPortalPage() {
   const [residenceError, setResidenceError] = useState('');
   const [depositClock, setDepositClock] = useState(Date.now());
   const [firstCharges, setFirstCharges] = useState([]);
+  const [firstChargePay, setFirstChargePay] = useState(null), [fcMethod, setFcMethod] = useState('transfer'), [fcBusy, setFcBusy] = useState(false);
   const [walletTab, setWalletTab] = useState(false), [walletBusy, setWalletBusy] = useState(false);
   useEffect(() => {
     if (activeTab !== 'dat-coc') return undefined;
@@ -3926,6 +3927,90 @@ export default function KhachHangPortalPage() {
     );
   }
 
+  // Thanh toán khoản thu kỳ đầu khi nhận phòng: cùng bố cục trang thanh toán đặt cọc (QR chuyển khoản, tiền mặt, ví mô phỏng).
+  async function thanhToanKyDauViTaiCho(quote) {
+    if (fcBusy) return;
+    setFcBusy(true);
+    try {
+      const { data: order } = await httpClient.post(`/thanh-toan-mo-phong/thu-nhan-phong/${quote.refId}`);
+      await httpClient.post(`/thanh-toan-mo-phong/${order.id}/thanh-toan`);
+      setToast('Thanh toán khoản thu kỳ đầu bằng ví thành công (mô phỏng).');
+      setFirstChargePay(null); setInvoices(null);
+      httpClient.get('/thanh-toan-mo-phong/thu-nhan-phong').then(({ data }) => setFirstCharges(Array.isArray(data) ? data : [])).catch(() => {});
+      khachMoiApi.getHoaDon().then(({ data }) => setInvoices(Array.isArray(data) ? data : [])).catch(() => setInvoices([]));
+    } catch (error) {
+      setToast(error?.response?.data?.message || 'Thanh toán bằng ví mô phỏng không thành công.');
+    } finally { setFcBusy(false); }
+  }
+
+  function renderFirstChargePayment(quote) {
+    const source = (datCocList || []).find((item) => item.taiKhoanThanhToan) || {};
+    const account = getPaymentAccount(source);
+    const sdt = (datCocList || []).find((item) => item.sdtKhachHang)?.sdtKhachHang || '';
+    const transferContent = `${quote.refId} ${sdt}`.trim();
+    const amount = Number(quote.amountVnd) || 0;
+    const steps = [
+      { label: 'Đang chờ thanh toán', desc: fcMethod === 'cash' ? 'Đến quầy nộp tiền mặt theo hướng dẫn bên dưới' : 'Chuyển khoản hoặc thanh toán qua ví', state: 'current' },
+      { label: 'Kế toán xác nhận', desc: 'Kế toán kiểm tra và ghi nhận đã nhận tiền (ví mô phỏng được ghi nhận ngay)', state: 'todo' },
+      { label: 'Hoàn tất', desc: 'Khoản thu kỳ đầu đã thanh toán', state: 'todo' }
+    ];
+    return (
+      <>
+        <button type="button" className="ui-btn ui-btn--secondary cinv-back" onClick={() => setFirstChargePay(null)}><Icon name="arrow_back" /> Quay lại danh sách</button>
+        <section className="dc-detail dpay">
+          <header className="dpay-head">
+            <h2>Thanh toán khoản thu khi nhận phòng</h2>
+            <p>Khoản thu kỳ đầu của hợp đồng {quote.refId}: tiền thuê kỳ đầu và dịch vụ, đã trừ tiền cọc đang giữ.</p>
+          </header>
+          <div className="dpay-grid">
+            <div className="dpay-main">
+              <section className="dpay-amount">
+                <span>Số tiền cần thanh toán</span>
+                <strong>{amount.toLocaleString('vi-VN')} VNĐ</strong>
+                <p className="dpay-formula">Hợp đồng {quote.refId}</p>
+              </section>
+              <section className="dc-section-card dpay-card">
+                <h3 className="dc-section-title">Phương thức thanh toán</h3>
+                <div className="dpay-tabs" role="group" aria-label="Chọn phương thức thanh toán">
+                  <button type="button" aria-pressed={fcMethod === 'transfer'} className={`dpay-tab${fcMethod === 'transfer' ? ' is-active' : ''}`} onClick={() => setFcMethod('transfer')}><Icon name="invoice" /> QR chuyển khoản</button>
+                  <button type="button" aria-pressed={fcMethod === 'cash'} className={`dpay-tab${fcMethod === 'cash' ? ' is-active' : ''}`} onClick={() => setFcMethod('cash')}><Icon name="profile" /> Tiền mặt tại quầy</button>
+                  <button type="button" aria-pressed={fcMethod === 'wallet'} className={`dpay-tab${fcMethod === 'wallet' ? ' is-active' : ''}`} onClick={() => setFcMethod('wallet')}><Icon name="payment" /> Ví điện tử (mô phỏng)</button>
+                </div>
+                {fcMethod === 'transfer' && <div className="dpay-transfer">
+                  <VietQrCode account={account} amount={amount} content={transferContent} />
+                  <div className="dc-bank-info dpay-bank">
+                    <div><span>Ngân hàng</span><strong>{account.nganHang}</strong></div>
+                    <div><span>Số tài khoản</span><strong>{account.soTaiKhoan}</strong><button type="button" onClick={() => navigator.clipboard.writeText(account.soTaiKhoan)}>Sao chép</button></div>
+                    <div><span>Chủ tài khoản</span><strong>{account.chuTaiKhoan}</strong></div>
+                    <div><span>Nội dung chuyển khoản</span><strong>{transferContent}</strong><button type="button" onClick={() => navigator.clipboard.writeText(transferContent)}>Sao chép</button></div>
+                  </div>
+                </div>}
+                {fcMethod === 'cash' && <p className="dc-bank-note">Bạn đến quầy để nộp {amount.toLocaleString('vi-VN')} VNĐ bằng tiền mặt. Kế toán sẽ ghi nhận khoản thu và lập biên nhận.</p>}
+                {fcMethod === 'wallet' && <div className="dpay-wallet-panel">
+                  <div className="dc-bank-info dpay-bank">
+                    <div><span>Nội dung</span><strong>Khoản thu kỳ đầu – hợp đồng {quote.refId}</strong></div>
+                    <div><span>Số tiền</span><strong>{amount.toLocaleString('vi-VN')} VNĐ</strong></div>
+                  </div>
+                  <p className="dc-bank-note">Đây là ví mô phỏng để thử luồng nên không có mã QR thật và không trừ tiền thật. Muốn quét mã thật hãy dùng tab QR chuyển khoản.</p>
+                  <button type="button" className="kp-btn kp-btn-primary kp-full" disabled={fcBusy} onClick={() => thanhToanKyDauViTaiCho(quote)}>{fcBusy ? 'Đang xử lý…' : 'Xác nhận thanh toán (mô phỏng)'}</button>
+                </div>}
+                {fcMethod !== 'wallet' && <p className="dc-bank-note">Sau khi chuyển khoản hoặc nộp tiền, kế toán sẽ xác nhận. Khoản này sẽ chuyển sang "Đã thanh toán" khi được ghi nhận.</p>}
+              </section>
+            </div>
+            <aside className="dpay-side">
+              <section className="dc-section-card">
+                <h3 className="dc-section-title">Trạng thái thanh toán</h3>
+                <ol className="dpay-steps" aria-label="Tiến trình thanh toán">
+                  {steps.map((step) => <li key={step.label} className={`is-${step.state}`}><strong>{step.label}</strong><span>{step.desc}</span></li>)}
+                </ol>
+              </section>
+            </aside>
+          </div>
+        </section>
+      </>
+    );
+  }
+
   function renderDatCocDetail(phieu) {
     // minhChungThanhToan giờ là ĐƯỜNG DẪN file (vd /uploads/chung-tu/..); vẫn đỡ được dữ liệu JSON cũ.
     const minhChung = (() => {
@@ -4203,13 +4288,9 @@ export default function KhachHangPortalPage() {
       <button type="button" className="ui-btn ui-btn--secondary cinv-back" onClick={() => setDepositDetailOpen(false)}><Icon name="arrow_back" /> Quay lại danh sách</button>
       {renderDatCocDetail(datCocSelected)}
     </>;
+    if (firstChargePay) return renderFirstChargePayment(firstChargePay);
     return <CustomerInvoicesList deposits={datCocList || []} invoices={invoices || []} firstCharges={firstCharges}
-      onPayFirstCharge={async (maHopDong) => {
-        try {
-          const { data } = await httpClient.post(`/thanh-toan-mo-phong/thu-nhan-phong/${maHopDong}`);
-          navigate(`/thanh-toan-mo-phong/${data.id}`);
-        } catch (error) { setToast(error?.response?.data?.message || 'Không mở được cổng thanh toán mô phỏng.'); }
-      }}
+      onPayFirstCharge={(maHopDong) => { const quote = firstCharges.find((item) => item.refId === maHopDong); if (quote) { setFcMethod('transfer'); setFirstChargePay(quote); window.scrollTo({ top: 0, behavior: 'smooth' }); } }}
       loading={datCocLoading || invoices === null || datCocList === null}
       error={invoicesError}
       onOpenDeposit={(phieu) => { setDatCocSelected(phieu); setDepositDetailOpen(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}

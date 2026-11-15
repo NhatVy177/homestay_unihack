@@ -39,6 +39,15 @@ try {
     assert.match(await rows.filter({ hasText: 'KD-HD9001' }).first().innerText(), /Nhận phòng[\s\S]*8\.100\.000/);
     assert.match(await page.locator('.cinv-cards').innerText(), /04\s*Hóa đơn/, 'chưa trả = cọc + kỳ đầu + kỳ nợ + khoản thu nhận phòng');
     await page.screenshot({ path: `${folder}/list-${width}.png`, fullPage: true });
+    await rows.filter({ hasText: 'KD-HD9001' }).getByRole('button', { name: 'Thanh toán' }).click();
+    await page.getByRole('heading', { name: 'Thanh toán khoản thu khi nhận phòng', level: 2 }).waitFor();
+    assert.equal(await page.getByRole('button', { name: 'QR chuyển khoản', exact: true }).getAttribute('aria-pressed'), 'true');
+    await page.getByRole('button', { name: 'Ví điện tử (mô phỏng)' }).click();
+    await page.getByRole('button', { name: 'Xác nhận thanh toán (mô phỏng)' }).waitFor();
+    await page.getByRole('button', { name: 'Tiền mặt tại quầy' }).click();
+    await page.getByText('nộp 8.100.000 VNĐ bằng tiền mặt', { exact: false }).waitFor();
+    await page.getByRole('button', { name: /Quay lại danh sách/ }).click();
+    await page.getByRole('heading', { name: 'Hóa đơn của tôi', level: 2 }).waitFor();
     await page.getByRole('button', { name: 'Quá hạn', exact: true }).click();
     assert.equal(await rows.count(), 1); assert.match(await rows.first().innerText(), /HD0003/);
     await page.getByRole('button', { name: 'Tất cả', exact: true }).click();
