@@ -5156,3 +5156,28 @@
   .kh-grp-grid { grid-template-columns: minmax(0, 1fr); }
   .kh-grp-head h1 { font-size: 24px; }
 }
+
+/* Bước 2 của form nhóm dùng lại khối nhập liệu của phiếu thường nhưng là trang cuộn ngoài, không phải hộp thoại có cuộn trong. */
+.kh-grp-card.kh-register-modal { display: grid; max-height: none; max-width: none; overflow: visible; padding: 28px; border-radius: 28px; }
+.kh-grp-card .kh-register-scroll { overflow: visible; padding: 0; }
+@media (max-width: 800px) { .kh-grp-card.kh-register-modal { padding: 18px; border-radius: 20px; } }
+
+/* Nút tiện ích trong form nhóm giống form thường */
+.kh-grp-card .kh-amenity-chip {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+  min-height: 40px;
+  padding: 8px 16px;
+}
+.kh-grp-card .kh-amenity-chip:hover {
+  border-color: var(--color-primary);
+}
+.kh-grp-card .kh-amenity-chip.is-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-surface);
+}

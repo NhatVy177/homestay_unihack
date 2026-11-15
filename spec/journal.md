@@ -1225,3 +1225,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Thay đổi: `web/backend/services/groupMembers.js` (mới: `parseGroupMembers` đọc dòng "Nhóm n người: 1) Tên (giới tính, SĐT, CCCD x) - người đại diện; …" trong `PhieuDangKy.YeuCauKhac`; sai định dạng thì trả mảng rỗng), `services/khachCuTru.service.js` (mỗi phiếu cọc trả `thanhVienDangKy`, không trả nguyên ghi chú), `test/group-members.test.mjs`; `web/frontend/src/pages/khachHang/CustomerResidenceTab.jsx` (thành viên khác người đại diện được điền sẵn họ tên, giới tính, CCCD, SĐT; khách chỉ bổ sung ngày sinh, quốc tịch), `scripts/ui-customer-residence.mjs`.
 - Kiểm tra: backend 95 pass, 4 skip, 0 fail; `ui-customer-residence` PASS (có kiểm tra điền sẵn); truy vấn mới chạy được trên HOMEDORM4 (DC0003 đã "Đã lập HĐ" nên không còn trong danh sách cần khai, đúng thiết kế).
 - Giới hạn: dựa vào định dạng dòng ghi chú do `composeRentNote` tạo ra; chưa có bảng lưu thành viên nhóm có cấu trúc (nếu cần sẽ làm migration sau).
+
+## 2026-11-15 15:02:56 +07:00 — J-C120 — Sửa bước 2 form nhóm: bỏ cuộn trong, canh đúng lề
+- Người thực hiện: Claude, theo phản ánh của Vy (form lệch trái, có thanh cuộn riêng trong form, muốn cuộn ngoài như bên Hằng).
+- Nguyên nhân: bước 2 dùng lại lớp `kh-register-modal` của hộp thoại cũ (chiều cao tối đa 842px, rộng tối đa 826px, ẩn phần tràn) và `kh-register-scroll` (cuộn riêng), nên thẻ bị hẹp, lệch trái và có cuộn trong.
+- Sửa: `web/frontend/src/pages/khachHang/khachHangPortal.css`: ghi đè `.kh-grp-card.kh-register-modal` và `.kh-grp-card .kh-register-scroll` (không giới hạn kích thước, không cuộn trong, đệm theo thẻ nhóm); sao các luật nút tiện ích sang `.kh-grp-card .kh-amenity-chip` để đúng dạng viên thuốc.
+- Kiểm tra: build OK; `ui-interested-rooms` PASS; đã xem ảnh bước 2 ở 1440 và 390.
