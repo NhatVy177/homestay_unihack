@@ -77,7 +77,7 @@ ${payload.attachments?.length ? `<p class="muted">Đính kèm: ${payload.attachm
 </table>
 
 <div class="note"><strong>Bản này chỉ để đọc và lưu trữ.</strong> Để kiểm chứng biên bản chưa bị sửa, hãy dùng file <strong>ban-giao-${esc(contractId)}.json</strong>
-  (nút "Tải bản lưu biên bản") và đưa vào trang "Kiểm tra biên bản" của HomeStayDorm. In lúc ${esc(dateTime(new Date()))}.</div>
+  (nút "File kiểm chứng (.json)") và đưa vào trang "Kiểm tra biên bản" của HomeStayDorm. In lúc ${esc(dateTime(new Date()))}.</div>
 </body></html>`;
 }
 
@@ -90,6 +90,54 @@ export function printHandoverEvidence(bundle) {
   win.document.write(html);
   win.document.close();
   win.focus();
+  setTimeout(() => win.print(), 300);
+  return true;
+}
+
+// Bản dễ đọc của bảng đối soát tiền cọc (mốc 2) để khách lưu PDF. File JSON vẫn là bản dùng để kiểm chứng.
+export function buildSettlementEvidenceHtml(bundle, contractId = '') {
+  const p = bundle?.documents?.statement?.payload;
+  if (!p) throw new Error('Chưa có bảng đối soát để in.');
+  const network = NETWORKS[bundle.deployment?.chainId] || { name: `Chuỗi ${bundle.deployment?.chainId}`, explorer: '' };
+  const tx = (label, receipt) => receipt?.hash ? `<tr><th>${esc(label)}</th><td>${esc(dateTime(receipt.at))}<br>
+      ${network.explorer ? `<a href="${esc(network.explorer)}/tx/${esc(receipt.hash)}">${esc(short(receipt.hash))}</a>` : esc(short(receipt.hash))}</td></tr>` : '';
+  const rows = (p.items || []).map((item, i) => `<tr><td>${i + 1}</td><td>${esc(item.description)}</td><td class="num">${esc(money(item.amountVnd))}</td></tr>`).join('');
+  const topUp = Number(p.topUpDueVnd) > 0;
+  return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>doi-soat-${esc(contractId)}</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #1f2a24; font-size: 13px; line-height: 1.5; margin: 0; }
+  h1 { font-size: 22px; margin: 0 0 4px; color: #3a5a45; }
+  h2 { font-size: 15px; margin: 22px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #d7ddd2; color: #3a5a45; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 6px 8px; border: 1px solid #d7ddd2; vertical-align: top; }
+  th { background: #f1f3ee; font-weight: 600; }
+  .num { text-align: right; white-space: nowrap; }
+  .muted { color: #5d6b62; font-size: 12px; }
+  .total td { font-weight: 700; font-size: 15px; color: #3a5a45; }
+  a { color: #1d5a8a; word-break: break-all; }
+</style></head><body>
+<h1>Bảng đối soát tiền cọc khi trả phòng</h1>
+<p class="muted">Hợp đồng ${esc(contractId)} · phiên bản ${esc(bundle.version ?? '')} · HomeStayDorm</p>
+<h2>Các khoản trừ vào tiền cọc</h2>
+<table><thead><tr><th style="width:36px">#</th><th>Khoản</th><th class="num">Số tiền</th></tr></thead><tbody>${rows || '<tr><td colspan="3">Không có khoản trừ.</td></tr>'}</tbody></table>
+<h2>Kết quả</h2>
+<table>
+  <tr><td>Tiền cọc đang giữ</td><td class="num">${esc(money(p.depositHeldVnd))}</td></tr>
+  <tr><td>Tổng khấu trừ</td><td class="num">${esc(money(p.deductionsVnd))}</td></tr>
+  <tr class="total"><td>${topUp ? 'Khách cần thanh toán thêm' : 'Khách được hoàn lại'}</td><td class="num">${esc(money(topUp ? p.topUpDueVnd : p.refundDueVnd))}</td></tr>
+</table>
+<h2>Xác nhận điện tử</h2>
+<table><tr><th>Mạng</th><td>${esc(network.name)}</td></tr>${tx('Kế toán gửi bảng đối soát', bundle.receipt)}${tx('Khách đồng ý bảng đối soát', bundle.confirmationReceipt)}</table>
+<p class="muted">Đồng ý đối soát không có nghĩa là đã nhận tiền; việc hoàn/thu tiền thực hiện theo quy trình thanh toán của HomeStayDorm. In lúc ${esc(dateTime(new Date()))}.</p>
+</body></html>`;
+}
+
+export function printSettlementEvidence(bundle, contractId) {
+  const html = buildSettlementEvidenceHtml(bundle, contractId);
+  const win = window.open('', '_blank');
+  if (!win) return false;
+  win.document.open(); win.document.write(html); win.document.close(); win.focus();
   setTimeout(() => win.print(), 300);
   return true;
 }

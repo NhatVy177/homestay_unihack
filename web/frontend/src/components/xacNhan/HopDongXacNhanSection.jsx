@@ -7,7 +7,7 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 import { useSigner } from './signerContext.js';
 import { HandoverView, SettlementView, Pill } from './DocumentView.jsx';
 import { checkSnapshot, downloadEvidence } from '../../lib/avalanche/evidence.js';
-import { printHandoverEvidence } from '../../lib/avalanche/evidencePrint.js';
+import { printHandoverEvidence, printSettlementEvidence } from '../../lib/avalanche/evidencePrint.js';
 import { avalancheApi, dateTime, errorMessage, privyAppId, rpcUrl, trustedDeployment } from '../../lib/avalanche/api.js';
 import { emailNotice, receiptTime } from './receiptDisplay.js';
 import './xacNhan.css';
@@ -19,12 +19,12 @@ const recordedAt = receipt => {
 const withoutTenant = ({ tenant, ...rest }) => canonicalize(rest);
 /** D-012: section inside "Hợp đồng" (customer portal). Renders nothing when the feature is off. */
 // show: 'all' | 'handover' (tab Hợp đồng) | 'settlement' (tab Trả phòng) để mỗi việc chỉ hiện ở một nơi.
-export default function HopDongXacNhanSection({ contractId, emptyText, show = 'all' }) {
+export default function HopDongXacNhanSection({ contractId, emptyText, show = 'all', onChanged }) {
   const { user } = useAuth();
   const [config, setConfig] = useState(null);
   useEffect(() => { avalancheApi.get('/config').then(setConfig).catch(() => setConfig({ enabled: false })); }, []);
   if (!config?.enabled || user?.vaiTro !== 'KhachHang') return emptyText && config ? <p className="xn-muted">{emptyText}</p> : null;
-  const body = <TenantCases contractId={contractId} emptyText={emptyText} show={show} />;
+  const body = <TenantCases contractId={contractId} emptyText={emptyText} show={show} onChanged={onChanged} />;
   if (!AccountSignerProvider) return body;
   return <Suspense fallback={body}>
     <AccountSignerProvider appId={privyAppId} mode={config.walletAuth === 'jwt' ? 'jwt' : 'email'} accountEmail={user.email}>{body}</AccountSignerProvider>
@@ -56,7 +56,7 @@ function EmailCodeGate({ signer, onCancel }) {
     {error && <div className="xn-alert error">{error}</div>}
   </div>;
 }
-function TenantCases({ contractId, emptyText, show }) {
+function TenantCases({ contractId, emptyText, show, onChanged }) {
   const signer = useSigner();
   const [cases, setCases] = useState(null), [error, setError] = useState('');
   const load = useCallback(async () => {
@@ -69,9 +69,9 @@ function TenantCases({ contractId, emptyText, show }) {
   if (!cases) return error ? <div className="xn-alert error">{error}</div> : null;
   const shown = show === 'settlement' ? cases.filter(c => c.versions?.length) : cases;
   if (!shown.length) return emptyText ? <p className="xn-muted">{emptyText}</p> : null;
-  return shown.map(c => <TenantCase key={c.id} c={c} signer={signer} reload={load} show={show} />);
+  return shown.map(c => <TenantCase key={c.id} c={c} signer={signer} reload={load} show={show} onChanged={onChanged} />);
 }
-function TenantCase({ c, signer, reload, show = 'all' }) {
+function TenantCase({ c, signer, reload, show = 'all', onChanged }) {
   const [busy, setBusy] = useState(''), [error, setError] = useState(''), [notice, setNotice] = useState('');
   const [changeOpen, setChangeOpen] = useState(false), [reason, setReason] = useState('');
   const [disputeOpen, setDisputeOpen] = useState(false), [disputeReason, setDisputeReason] = useState('');
@@ -86,6 +86,8 @@ function TenantCase({ c, signer, reload, show = 'all' }) {
       await fn();
       const updated = await reload().catch(() => []);
       setNotice(typeof done === 'function' ? done(updated.find(item => item.id === c.id)) : done);
+      // Báo trang cha tải lại hồ sơ Web2 (vd. đồng ý đối soát xong thì tab Trả phòng sang bước thanh toán).
+      if (onChanged) await Promise.resolve(onChanged()).catch(() => {});
     } catch (e) { setError(errorMessage(e)); await reload().catch(() => {}); } finally { setBusy(''); }
   };
   // D-015: if the email code is still needed, remember the action and resume it once ready.
@@ -146,7 +148,7 @@ function TenantCase({ c, signer, reload, show = 'all' }) {
     </>}
     {c.handover?.confirmationReceipt && <div className="xn-alert ok xn-saved">
       <strong>✅ Bạn đã xác nhận biên bản{recordedAt(c.handover.confirmationReceipt)}. Biên bản đã được lưu và không thể chỉnh sửa.</strong>
-      <div className="xn-actions"><button type="button" className="xn-link" onClick={() => downloadEvidence(c.handover, `ban-giao-${c.contractId}.json`)}>Tải bản lưu biên bản</button>
+      <div className="xn-actions"><button type="button" className="xn-link" onClick={() => downloadEvidence(c.handover, `ban-giao-${c.contractId}.json`)}>File kiểm chứng (.json)</button>
         <button type="button" className="xn-link" onClick={() => { if (!printHandoverEvidence(c.handover)) setError('Trình duyệt đang chặn cửa sổ in. Vui lòng cho phép cửa sổ bật lên rồi thử lại.'); }}>Tải bản PDF dễ đọc</button>
         <a href="/kiem-chung-avalanche" target="_blank" rel="noreferrer">Kiểm tra biên bản</a></div>
       <span className="xn-muted">Tải file bản lưu lên để tự kiểm tra biên bản chưa bị sửa.</span>
@@ -174,12 +176,14 @@ function TenantCase({ c, signer, reload, show = 'all' }) {
       </>}
       {(latest.bundle.confirmationReceipt || latest.disputeReceipt) && <div className="xn-alert ok xn-saved">
         <strong>✅ {latest.bundle.confirmationReceipt ? 'Bạn đã đồng ý bảng đối soát' : 'Bạn đã gửi phản hồi cho bảng đối soát'} phiên bản {latest.bundle.version}{recordedAt(latest.bundle.confirmationReceipt || latest.disputeReceipt)}. Bản lưu đã được ghi nhận.</strong>
-        <div className="xn-actions"><button type="button" className="xn-link" onClick={() => downloadEvidence({ ...latest.bundle, dispute: latest.dispute, disputeReceipt: latest.disputeReceipt }, `doi-soat-${c.contractId}-v${latest.bundle.version}.json`)}>Tải bản lưu đối soát</button>
+        <div className="xn-actions"><button type="button" className="xn-link" onClick={() => { if (!printSettlementEvidence(latest.bundle, c.contractId)) setError('Trình duyệt đang chặn cửa sổ in. Hãy cho phép cửa sổ bật lên rồi thử lại.'); }}>Tải bản PDF đối soát</button>
+          <button type="button" className="xn-link" onClick={() => downloadEvidence({ ...latest.bundle, dispute: latest.dispute, disputeReceipt: latest.disputeReceipt }, `doi-soat-${c.contractId}-v${latest.bundle.version}.json`)}>File kiểm chứng (.json)</button>
           <a href="/kiem-chung-avalanche" target="_blank" rel="noreferrer">Kiểm tra đối soát</a></div>
         <span className="xn-muted">Tải file bản lưu lên để tự kiểm tra đối soát chưa bị sửa.</span>
       </div>}
       {show !== 'settlement' && <p className="xn-muted">Đồng ý đối soát không có nghĩa là đã nhận tiền; việc hoàn/thu tiền thực hiện theo quy trình thanh toán của HomeStayDorm.</p>}
-      {!latest.bundle.confirmationReceipt && !latest.disputeReceipt && <div className="xn-actions"><button type="button" className="xn-link" onClick={() => downloadEvidence({ ...latest.bundle, dispute: latest.dispute, disputeReceipt: latest.disputeReceipt }, `doi-soat-${c.contractId}-v${latest.bundle.version}.json`)}>Tải bản lưu đối soát</button></div>}
+      {!latest.bundle.confirmationReceipt && !latest.disputeReceipt && <div className="xn-actions"><button type="button" className="xn-link" onClick={() => { if (!printSettlementEvidence(latest.bundle, c.contractId)) setError('Trình duyệt đang chặn cửa sổ in. Hãy cho phép cửa sổ bật lên rồi thử lại.'); }}>Tải bản PDF đối soát</button>
+          <button type="button" className="xn-link" onClick={() => downloadEvidence({ ...latest.bundle, dispute: latest.dispute, disputeReceipt: latest.disputeReceipt }, `doi-soat-${c.contractId}-v${latest.bundle.version}.json`)}>File kiểm chứng (.json)</button></div>}
       {c.versions.length > 1 && <details className="xn-history"><summary>Các phiên bản trước ({c.versions.length - 1})</summary>
         <ol>{c.versions.slice(0, -1).map(v => <li key={v.bundle.version}>Phiên bản {v.bundle.version}{v.dispute ? ` — bạn phản hồi: “${v.dispute.payload.reason}”` : ''} — đã được thay bằng phiên bản mới.</li>)}</ol>
       </details>}

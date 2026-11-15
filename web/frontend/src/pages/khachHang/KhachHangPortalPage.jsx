@@ -3422,7 +3422,7 @@ export default function KhachHangPortalPage() {
                 {/* D-030: hợp đồng thuê đồng ý đối soát bằng ví (mốc 2 trên chuỗi) ngay tại tab Trả phòng; nút đồng ý Web2 cũ chỉ còn cho phiếu cọc chưa có hợp đồng. */}
                 {currentHopDongId && (
                   <Suspense fallback={null}>
-                    <HopDongXacNhanSection contractId={currentHopDongId} show="settlement" emptyText="Kế toán chưa gửi bảng đối soát lên hệ thống xác nhận. Khi có, bạn đồng ý hoặc phản hồi ngay tại đây bằng ví." />
+                    <HopDongXacNhanSection contractId={currentHopDongId} show="settlement" onChanged={() => { setTraPhongStepOverride(null); return loadHopDongDashboard(currentHopDongId); }} emptyText="Kế toán chưa gửi bảng đối soát lên hệ thống xác nhận. Khi có, bạn đồng ý hoặc phản hồi ngay tại đây bằng ví." />
                   </Suspense>
                 )}
 

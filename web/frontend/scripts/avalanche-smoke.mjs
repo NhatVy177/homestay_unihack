@@ -106,7 +106,7 @@ try {
   };
   await openAs(uiUser);
   await page.getByText('Bạn đã xác nhận biên bản lúc 09:30, 06/11/2026', { exact: false }).waitFor();
-  await page.getByRole('button', { name: 'Tải bản lưu biên bản' }).waitFor();
+  await page.getByRole('button', { name: 'File kiểm chứng (.json)' }).waitFor();
   assert.equal(await page.locator('.xn-tech').count(), 0);
   assert.equal((await page.locator('.xn-card').textContent()).includes('0x'), false);
   await capture('03-khach-da-xac-nhan.png');

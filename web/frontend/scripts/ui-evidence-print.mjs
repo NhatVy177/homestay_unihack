@@ -9,7 +9,7 @@ const bundle = JSON.parse(await readFile(process.env.EVIDENCE_JSON || new URL('.
 const html = buildHandoverEvidenceHtml(bundle);
 assert.match(html, /Biên bản bàn giao phòng/); assert.match(html, /HD0001/); assert.match(html, /2\.800\.000 VNĐ/);
 assert.match(html, /testnet\.snowtrace\.io\/tx\/0x/, 'có link giao dịch trên Snowtrace');
-assert.match(html, /nút "Tải bản lưu biên bản"|Tải bản lưu biên bản/, 'nói rõ JSON mới là bản kiểm chứng');
+assert.ok(html.includes('File kiểm chứng (.json)'), 'nói rõ JSON mới là bản kiểm chứng');
 assert.throws(() => buildHandoverEvidenceHtml({ kind: 'settlement' }), /Chỉ in được biên bản bàn giao/);
 assert.doesNotMatch(buildHandoverEvidenceHtml({ ...bundle, documents: { ...bundle.documents, handover: { ...bundle.documents.handover, payload: { ...bundle.documents.handover.payload, notes: '<script>alert(1)</script>' } } } }), /<script>alert/, 'thoát ký tự HTML');
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
