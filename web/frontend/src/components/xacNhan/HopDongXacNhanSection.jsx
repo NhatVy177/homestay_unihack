@@ -153,9 +153,12 @@ function TenantCase({ c, signer, reload, show = 'all' }) {
     </div>}
     </>}
     {show !== 'handover' && latest && <section className="xn-doc">
-      <div className="xn-head"><div><h3>Đối soát tiền cọc</h3><p>Phiên bản {latest.bundle.version}</p></div>
+      <div className="xn-head"><div><h3>{show === 'settlement' ? 'Xác nhận đối soát' : 'Đối soát tiền cọc'}</h3><p>Phiên bản {latest.bundle.version}</p></div>
         <Pill label={latest.accepted ? ['Đã đồng ý', 'done'] : latest.dispute ? ['Đã gửi phản hồi', 'info'] : ['Chờ bạn xem', 'warn']} /></div>
-      <SettlementView bundle={latest.bundle} />
+      {/* Tab Trả phòng đã có "Chi tiết đối soát" và "Tóm tắt quyết toán" ở trên nên không lặp lại bảng, chỉ giữ thao tác xác nhận. */}
+      {show === 'settlement'
+        ? !latest.accepted && !latest.dispute && <p className="xn-muted">Kiểm tra chi tiết đối soát và tóm tắt quyết toán ở trên. Nếu đúng, bấm "Đồng ý đối soát" và xác nhận bằng mã gửi về email; nếu chưa đúng, gửi phản hồi cho kế toán.</p>
+        : <SettlementView bundle={latest.bundle} />}
       {latest.dispute && <div className="xn-alert info">Bạn đã phản hồi: “{latest.dispute.payload.reason}”. Kế toán sẽ xem xét và gửi phiên bản mới nếu có điều chỉnh.</div>}
       {c.state === 'settlement-pending' && !c.pending && <>
         <div className="xn-actions">

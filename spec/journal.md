@@ -1420,3 +1420,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Quyết định áp dụng: tab Hợp đồng chỉ hiện biên bản bàn giao (mốc 1: xác nhận, tải bản lưu, PDF, kiểm tra); tab Trả phòng chỉ hiện đối soát tiền cọc (mốc 2: đồng ý/phản hồi, bản lưu). Trước đây tab Hợp đồng hiện cả hai nên trùng nút "Đồng ý đối soát".
 - Sửa: `web/frontend/src/components/xacNhan/HopDongXacNhanSection.jsx` (tham số `show`: 'all' | 'handover' | 'settlement'; chế độ 'settlement' chỉ liệt kê hồ sơ đã có bảng đối soát), `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (tab Hợp đồng `show="handover"`, tab Trả phòng `show="settlement"`). Trang `/xac-nhan` riêng (AvalanchePortal) vẫn hiện đủ.
 - Kiểm tra: build OK; `ui-evidence-print` PASS. Chưa chụp ảnh hai tab với dữ liệu thật.
+
+## 2026-11-16 17:00:00 +07:00 — J-C152 — Tab Trả phòng: bỏ bảng đối soát lặp lại, chỉ giữ thao tác xác nhận
+- Người thực hiện: Claude, theo phản ánh của Vy (khối "Đối soát tiền cọc" lặp lại thông tin đã có ở "Chi tiết đối soát" và "Tóm tắt quyết toán").
+- Sửa: `web/frontend/src/components/xacNhan/HopDongXacNhanSection.jsx`: ở chế độ `show="settlement"` (tab Trả phòng) khối đổi tên "Xác nhận đối soát", không hiện lại bảng khoản trừ và số tiền, chỉ còn trạng thái, lời nhắc, nút "Đồng ý đối soát" / "Không đồng ý / phản hồi" và tải bản lưu. Giữ khối vì đây là nơi khách ký xác nhận mốc 2 lên Fuji; trình duyệt vẫn so nội dung ký với bảng đối soát trước khi ký. Trang `/xac-nhan` vẫn hiện bảng đầy đủ.
+- Kiểm tra: build OK; chưa chụp ảnh.
