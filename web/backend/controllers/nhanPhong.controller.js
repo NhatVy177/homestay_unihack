@@ -1,5 +1,6 @@
 import * as service from '../services/nhanPhong.service.js';
 import { onWeb2HandoverCreated } from '../integrations/avalanche/index.js';
+import * as kyDauChungTu from '../services/kyDauChungTu.service.js';
 
 export async function getDanhSachChoNhanPhong(req, res, next) {
   try { res.json(await service.getDanhSachChoNhanPhong(req.user.maNguoiDung)); } catch (err) { next(err); }
@@ -65,6 +66,9 @@ export async function getDanhSachHDChoThuDauKy(req, res, next) {
 }
 export async function ghiNhanThuDauKy(req, res, next) {
   try { res.status(201).json(await service.ghiNhanThuDauKy({ ...req.body, maNhanVienKeToan: req.user.maNguoiDung })); } catch (err) { next(err); }
+}
+export async function layChungTuKyDau(req, res, next) {
+  try { res.json(await kyDauChungTu.layChungTuKyDau(req.params.maHopDong)); } catch (err) { next(err); }
 }
 export async function tinhKhoanThuNhanPhong(req, res, next) {
   try {

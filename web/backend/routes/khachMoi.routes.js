@@ -23,6 +23,8 @@ router.get('/cu-tru', controller.getCuTru);
 router.post('/cu-tru', controller.khaiCuTru);
 router.post('/cu-tru/rut-lai', controller.rutLaiCuTru);
 router.post('/dat-coc/:id/minh-chung', controller.uploadMinhChung);
+router.get('/ky-dau/:id/minh-chung', controller.layChungTuKyDau);
+router.put('/ky-dau/:id/minh-chung', uploadChungTu.single('file'), controller.luuChungTuKyDau);
 router.get('/hop-dong-dashboard', controller.getHopDongDashboard);
 router.post('/hop-dong-dashboard/tra-phong', controller.guiYeuCauTraPhong);
 router.delete('/hop-dong-dashboard/tra-phong/:id', controller.huyYeuCauTraPhong);

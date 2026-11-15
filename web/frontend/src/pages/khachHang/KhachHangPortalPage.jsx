@@ -1054,6 +1054,7 @@ export default function KhachHangPortalPage() {
   const [depositClock, setDepositClock] = useState(Date.now());
   const [firstCharges, setFirstCharges] = useState([]);
   const [firstChargePay, setFirstChargePay] = useState(null), [fcMethod, setFcMethod] = useState('transfer'), [fcBusy, setFcBusy] = useState(false);
+  const [fcProof, setFcProof] = useState(null), [fcFile, setFcFile] = useState(null), [fcUploading, setFcUploading] = useState(false);
   const [walletTab, setWalletTab] = useState(false), [walletBusy, setWalletBusy] = useState(false);
   useEffect(() => {
     if (activeTab !== 'dat-coc') return undefined;
@@ -3943,6 +3944,21 @@ export default function KhachHangPortalPage() {
     } finally { setFcBusy(false); }
   }
 
+  async function guiChungTuKyDau(event, quote) {
+    event.preventDefault();
+    if (!fcFile) { setToast('Vui lòng chọn ảnh hoặc PDF chứng từ thanh toán.'); return; }
+    setFcUploading(true);
+    try {
+      const body = new FormData();
+      body.append('file', fcFile);
+      const { data } = await khachMoiApi.guiChungTuKyDau(quote.refId, body);
+      setFcProof(data || null); setFcFile(null);
+      setToast('Đã gửi chứng từ. Kế toán sẽ kiểm tra và ghi nhận khoản thu.');
+    } catch (error) {
+      setToast(error?.response?.data?.message || 'Gửi chứng từ thất bại.');
+    } finally { setFcUploading(false); }
+  }
+
   function renderFirstChargePayment(quote) {
     const source = (datCocList || []).find((item) => item.taiKhoanThanhToan) || {};
     const account = getPaymentAccount(source);
@@ -3950,8 +3966,8 @@ export default function KhachHangPortalPage() {
     const transferContent = `${quote.refId} ${sdt}`.trim();
     const amount = Number(quote.amountVnd) || 0;
     const steps = [
-      { label: 'Đang chờ thanh toán', desc: fcMethod === 'cash' ? 'Đến quầy nộp tiền mặt theo hướng dẫn bên dưới' : 'Chuyển khoản hoặc thanh toán qua ví', state: 'current' },
-      { label: 'Kế toán xác nhận', desc: 'Kế toán kiểm tra và ghi nhận đã nhận tiền (ví mô phỏng được ghi nhận ngay)', state: 'todo' },
+      { label: 'Đang chờ thanh toán', desc: fcMethod === 'cash' ? 'Đến quầy nộp tiền mặt theo hướng dẫn bên dưới' : 'Chuyển khoản hoặc thanh toán qua ví', state: fcProof ? 'done' : 'current' },
+      { label: fcProof ? 'Đã nộp minh chứng' : 'Nộp minh chứng', desc: fcProof ? 'Kế toán đang kiểm tra và ghi nhận đã nhận tiền' : 'Tải ảnh chuyển khoản lên để kế toán đối chiếu (ví mô phỏng được ghi nhận ngay)', state: fcProof ? 'current' : 'todo' },
       { label: 'Hoàn tất', desc: 'Khoản thu kỳ đầu đã thanh toán', state: 'todo' }
     ];
     return (
@@ -3996,6 +4012,20 @@ export default function KhachHangPortalPage() {
                 </div>}
                 {fcMethod !== 'wallet' && <p className="dc-bank-note">Sau khi chuyển khoản hoặc nộp tiền, kế toán sẽ xác nhận. Khoản này sẽ chuyển sang "Đã thanh toán" khi được ghi nhận.</p>}
               </section>
+              {fcMethod === 'transfer' && <section className="dc-section-card dpay-card">
+                <h3 className="dc-section-title"><Icon name="profile" />Minh chứng thanh toán</h3>
+                <p className="dc-bank-note">Vui lòng tải lên ảnh chụp biên lai hoặc màn hình giao dịch thành công.</p>
+                {fcProof && <p className="dc-bank-note" role="status">Đã gửi chứng từ <a href={`${FILE_BASE}${fcProof.duongDan}`} target="_blank" rel="noreferrer">{fcProof.tenTep}</a>. Bạn có thể gửi lại nếu cần thay.</p>}
+                <form onSubmit={(event) => guiChungTuKyDau(event, quote)} className="dc-upload-form">
+                  <label className="dc-file-drop">
+                    <input type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={(event) => setFcFile(event.target.files?.[0] || null)} />
+                    {fcFile
+                      ? <span className="dc-file-name">📎 {fcFile.name}</span>
+                      : <><Icon name="profile" /><span>Kéo thả file vào đây hoặc <u>Chọn từ máy tính</u></span><small>Định dạng hỗ trợ: JPG, PNG, PDF (Tối đa 5MB)</small></>}
+                  </label>
+                  <button className="kp-btn kp-btn-primary kp-full" type="submit" disabled={fcUploading}>{fcUploading ? 'Đang gửi...' : 'Gửi chứng từ thanh toán'}</button>
+                </form>
+              </section>}
             </div>
             <aside className="dpay-side">
               <section className="dc-section-card">
@@ -4296,7 +4326,7 @@ export default function KhachHangPortalPage() {
     </>;
     if (firstChargePay) return renderFirstChargePayment(firstChargePay);
     return <CustomerInvoicesList deposits={datCocList || []} invoices={invoices || []} firstCharges={firstCharges}
-      onPayFirstCharge={(maHopDong) => { const quote = firstCharges.find((item) => item.refId === maHopDong); if (quote) { setFcMethod('transfer'); setFirstChargePay(quote); window.scrollTo({ top: 0, behavior: 'smooth' }); } }}
+      onPayFirstCharge={(maHopDong) => { const quote = firstCharges.find((item) => item.refId === maHopDong); if (quote) { setFcMethod('transfer'); setFcProof(null); setFcFile(null); setFirstChargePay(quote); khachMoiApi.getChungTuKyDau(maHopDong).then(({ data }) => setFcProof(data || null)).catch(() => setFcProof(null)); window.scrollTo({ top: 0, behavior: 'smooth' }); } }}
       loading={datCocLoading || invoices === null || datCocList === null}
       error={invoicesError}
       onOpenDeposit={(phieu) => { setDatCocSelected(phieu); setDepositDetailOpen(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}

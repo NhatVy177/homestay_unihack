@@ -33,6 +33,7 @@ export default function ThuNhanPhongTab() {
   // Form inputs for recording payment
   const [soTienThucNop, setSoTienThucNop] = useState('');
   const [phuongThucTT, setPhuongThucTT] = useState('Chuyển khoản');
+  const [chungTuKhach, setChungTuKhach] = useState(null);
   const [ghiChu, setGhiChu] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -73,6 +74,8 @@ export default function ThuNhanPhongTab() {
       setSoTienThucNop(Math.abs(netDiff));
       setPhuongThucTT('Chuyển khoản');
       setGhiChu('');
+      setChungTuKhach(null);
+      thuNhanPhongApi.layChungTuKyDau(maHopDong).then((r) => setChungTuKhach(r.data || null)).catch(() => setChungTuKhach(null));
       setModalType('tnp-create');
     } catch (err) {
       console.error(err);
@@ -469,6 +472,12 @@ export default function ThuNhanPhongTab() {
                           </div>
                         );
                       })()}
+                      <div style={{ fontSize: '13px', padding: '10px 12px', borderRadius: '8px', background: 'var(--color-surface-alt)' }}>
+                        <strong>Chứng từ khách đã gửi: </strong>
+                        {chungTuKhach
+                          ? <a href={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '')}${chungTuKhach.duongDan}`} target="_blank" rel="noreferrer">{chungTuKhach.tenTep}</a>
+                          : <span>chưa có</span>}
+                      </div>
                       <div>
                         <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#3f494a' }}>Phương thức thanh toán *</label>
                         <select 

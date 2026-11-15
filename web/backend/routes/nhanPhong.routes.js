@@ -17,6 +17,7 @@ router.get('/cho-thu-dau-ky', controller.getDanhSachHDChoThuDauKy);
 router.post('/ghi-nhan-thu-dau-ky', controller.ghiNhanThuDauKy);
 router.get('/tinh-khoan-thu/:maHopDong', controller.tinhKhoanThuNhanPhong);
 router.get('/chi-tiet-thu/:maHopDong', controller.layChiTietThuNhanPhong);
+router.get('/chung-tu-ky-dau/:maHopDong', controller.layChungTuKyDau);
 router.get('/kiem-tra-ban-giao/:maHopDong', controller.kiemTraDieuKienBanGiaoSauThuTien);
 router.get('/ban-giao/ket-qua/:maBienBan', controller.layKetQuaLapBienBanBanGiao);
 router.get('/ban-giao/chi-tiet/:maBienBan', controller.layChiTietBienBanBanGiao);

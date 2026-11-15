@@ -11,6 +11,7 @@ try {
     const deposits = [{ maPhieuCoc: 'DC0003', trangThai: 'Chờ thanh toán', soTienCoc: 2800000, thoiHanThanhToan: '2026-11-15T10:00:00.000Z', ngayLapPhieu: '2026-11-14', tenPhong: 'Phòng 101', hinhThucThue: 'Nguyên phòng', phuongThucThanhToan: 'Chuyển khoản', sdtKhachHang: '0900000000',
       cachTinhCoc: { soThang: 2, dong: [{ donGia: 1400000, soLuong: 1, donVi: 'giường' }], motThang: 1400000, tong: 2800000 },
       taiKhoanThanhToan: { nganHang: 'MB Bank', maNganHang: '970422', soTaiKhoan: '0000000000', chuTaiKhoan: 'TAI KHOAN KIEM THU', vietQr: true } }];
+    let proof = null, proofUploads = 0;
     const invoices = [
       { maHoaDon: 'HD0001', maHopDong: 'HD0001', kyThanhToan: '2026-11', ngayHanTT: '2026-11-20', tongTien: 3000000, trangThai: 'Chưa TT', ngayBatDau: '2026-11-15', loai: 'Kỳ đầu' },
       { maHoaDon: 'HD0002', maHopDong: 'HD0001', kyThanhToan: '2026-10', ngayHanTT: '2026-10-10', tongTien: 2900000, trangThai: 'Đã TT', ngayBatDau: '2026-09-15', loai: 'Hàng tháng' },
@@ -26,6 +27,10 @@ try {
       if (path.endsWith('/khach-moi/tong-quan')) return route.fulfill({ json: { trangThai: { soLichXem: 1, soHoSo: 1, soPhieuCoc: 1 }, hoSo: [], lichXem: [], phongGoiY: [] } });
       if (path === '/api/khach-moi/dat-coc') return route.fulfill({ json: deposits });
       if (path === '/api/khach-moi/hoa-don') return route.fulfill({ json: invoices });
+      if (path === '/api/khach-moi/ky-dau/HD9001/minh-chung') {
+        if (req.method() === 'PUT') { proofUploads += 1; proof = { maHopDong: 'HD9001', duongDan: '/uploads/chung-tu/HD9001-1.png', tenTep: 'ck.png', ngayGui: '2026-11-16T01:00:00' }; }
+        return route.fulfill({ json: proof });
+      }
       if (path === '/api/thanh-toan-mo-phong/thu-nhan-phong') return route.fulfill({ json: [{ purpose: 'thu-nhan-phong', refId: 'HD9001', status: 'Pending', amountVnd: 8100000, startDate: '2026-12-01' }] });
       if (!['GET', 'OPTIONS'].includes(req.method())) throw new Error(`Unexpected mutation ${path}`);
       return route.fulfill({ json: [] });
@@ -42,8 +47,15 @@ try {
     await rows.filter({ hasText: 'KD-HD9001' }).getByRole('button', { name: 'Thanh toán' }).click();
     await page.getByRole('heading', { name: 'Thanh toán khoản thu khi nhận phòng', level: 2 }).waitFor();
     assert.equal(await page.getByRole('button', { name: 'QR chuyển khoản', exact: true }).getAttribute('aria-pressed'), 'true');
+    await page.getByRole('heading', { name: 'Minh chứng thanh toán' }).waitFor();
+    await page.locator('.dc-file-drop input[type="file"]').setInputFiles({ name: 'ck.png', mimeType: 'image/png', buffer: Buffer.from('89504e470d0a1a0a', 'hex') });
+    await page.getByRole('button', { name: 'Gửi chứng từ thanh toán' }).click();
+    await page.getByText('Đã gửi chứng từ', { exact: false }).first().waitFor();
+    assert.equal(proofUploads, 1);
+    await page.getByText('Đã nộp minh chứng', { exact: true }).waitFor();
     await page.getByRole('button', { name: 'Ví điện tử (mô phỏng)' }).click();
     await page.getByRole('button', { name: 'Xác nhận thanh toán (mô phỏng)' }).waitFor();
+    assert.equal(await page.getByRole('heading', { name: 'Minh chứng thanh toán' }).count(), 0);
     await page.getByRole('button', { name: 'Tiền mặt tại quầy' }).click();
     await page.getByText('nộp 8.100.000 VNĐ bằng tiền mặt', { exact: false }).waitFor();
     await page.getByRole('button', { name: /Quay lại danh sách/ }).click();

@@ -85,6 +85,14 @@ export async function getDatCoc(req, res, next) {
   }
 }
 
+export async function layChungTuKyDau(req, res, next) {
+  try { res.json(await kyDauChungTu.layChungTuKyDauCuaKhach(req.user, req.params.id)); } catch (error) { next(error); }
+}
+
+export async function luuChungTuKyDau(req, res, next) {
+  try { res.json(await kyDauChungTu.luuChungTuKyDau(req.user, req.params.id, req.file)); } catch (error) { next(error); }
+}
+
 export async function uploadMinhChung(req, res, next) {
   try {
     res.json(await service.uploadMinhChungKhachHang(req.user, req.params.id, req.body));
@@ -176,6 +184,7 @@ export async function getYeuCauGiuCho(req, res, next) {
 }
 
 // D-026 mục 4: khách tự khai người ở (kiểm tra sở hữu phiếu trong service).
+import * as kyDauChungTu from '../services/kyDauChungTu.service.js';
 import * as khachCuTru from '../services/khachCuTru.service.js';
 export async function getCuTru(req, res, next) {
   try { res.json(await khachCuTru.getCuTruCuaKhach(req.user)); } catch (error) { next(error); }

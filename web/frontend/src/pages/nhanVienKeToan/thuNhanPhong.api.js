@@ -16,6 +16,9 @@ export const thuNhanPhongApi = {
   layChiTietThuNhanPhong: (maHopDong) =>
     httpClient.get(`/nhan-phong/chi-tiet-thu/${maHopDong}`),
 
+  layChungTuKyDau: (maHopDong) =>
+    httpClient.get(`/nhan-phong/chung-tu-ky-dau/${maHopDong}`),
+
   ghiNhanThuDauKy: (payload) =>
     httpClient.post('/nhan-phong/ghi-nhan-thu-dau-ky', payload),
 
