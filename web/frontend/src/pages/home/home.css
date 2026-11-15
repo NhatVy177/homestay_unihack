@@ -16,8 +16,8 @@
   --hero-end: var(--color-bg);
   --hero-glow: rgba(47, 183, 164, 0.16);
   --hero-glow-2: rgba(232, 111, 81, 0.13);
-  --footer-bg: #203f3b;
-  --shadow: 0 14px 35px rgba(22, 121, 111, 0.1);
+  --footer-bg: var(--color-primary-hover);
+  --shadow: 0 14px 35px rgba(74, 101, 73, 0.1);
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
@@ -201,7 +201,7 @@
 .home-nav a.active {
   background: var(--surface);
   border-color: var(--line);
-  box-shadow: 0 10px 24px rgba(22, 121, 111, 0.08);
+  box-shadow: 0 10px 24px rgba(74, 101, 73, 0.08);
   color: var(--green-dark);
 }
 

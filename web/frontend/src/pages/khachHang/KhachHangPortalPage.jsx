@@ -2687,7 +2687,7 @@ export default function KhachHangPortalPage() {
 
         {doiSoatTraPhongCoc && traPhongActiveStep === 3 && !showDoiSoatPaymentCoc && (
           <div className="hd-card" style={{ padding: 30, textAlign: 'center' }}>
-            <div className="hd-success-icon" style={{ fontSize: 48, color: '#0d9488', marginBottom: 15 }}>
+            <div className="hd-success-icon" style={{ fontSize: 48, color: '#4A6549', marginBottom: 15 }}>
               <Icon name="check" />
             </div>
             <h3 style={{ margin: 0, marginBottom: 10, fontSize: 20 }}>{doiSoatCompletionTitle}</h3>
@@ -3043,7 +3043,7 @@ export default function KhachHangPortalPage() {
                         {selectedHd.quyDinhHoanCoc.map((qd) => (
                           <tr key={qd.MaQuyDinhHoanCoc}>
                             <td>{qd.TenQuyDinh}</td>
-                            <td style={{ textAlign: 'right', fontWeight: 'bold', color: '#0d9488' }}>
+                            <td style={{ textAlign: 'right', fontWeight: 'bold', color: '#4A6549' }}>
                               {qd.TyLeHoanCoc}%
                             </td>
                           </tr>

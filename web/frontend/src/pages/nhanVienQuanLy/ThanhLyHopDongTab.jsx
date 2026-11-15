@@ -80,7 +80,7 @@ export default function ThanhLyHopDongTab() {
       {modalType === 'thanh-ly' && (
         <div className="ktp-modal-overlay" onClick={() => setModalType(null)}>
           <div className="ktp-modal" style={{ maxWidth: '1000px', width: '95%', padding: '0', backgroundColor: '#ffffff', borderRadius: '12px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="ktp-modal-header" style={{ padding: '16px 24px', backgroundColor: '#3b8280', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '12px 12px 0 0' }}>
+            <div className="ktp-modal-header" style={{ padding: '16px 24px', backgroundColor: '#4A6549', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '12px 12px 0 0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <h3 style={{ fontSize: '20px', margin: 0, color: '#ffffff', fontWeight: '700' }}>Thanh lý hợp đồng thuê</h3>
                 <span style={{ backgroundColor: '#ffffff', color: '#a43c12', padding: '4px 12px', borderRadius: '16px', fontSize: '13px', fontWeight: '600' }}>Chờ thanh lý</span>
@@ -93,7 +93,7 @@ export default function ThanhLyHopDongTab() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
                 {/* Card 1 */}
                 <div style={{ backgroundColor: '#ffffff', border: '1px solid #e1e3e4', borderRadius: '8px', padding: '16px' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#3b8280', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Icon name="person" /> Khách thuê</h4>
+                  <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#4A6549', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Icon name="person" /> Khách thuê</h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '13px', color: '#6f797a' }}>Họ tên:</span><span style={{ fontSize: '14px', fontWeight: '500', color: '#191c1d' }}>Nguyễn Minh Anh</span></div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '13px', color: '#6f797a' }}>SĐT:</span><span style={{ fontSize: '14px', fontWeight: '500', color: '#191c1d' }}>0901234567</span></div>
@@ -103,17 +103,17 @@ export default function ThanhLyHopDongTab() {
                 </div>
                 {/* Card 2 */}
                 <div style={{ backgroundColor: '#ffffff', border: '1px solid #e1e3e4', borderRadius: '8px', padding: '16px' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#3b8280', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Icon name="description" /> Hợp đồng</h4>
+                  <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#4A6549', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Icon name="description" /> Hợp đồng</h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '13px', color: '#6f797a' }}>Mã HĐ:</span><span style={{ fontSize: '14px', fontWeight: '500', color: '#191c1d' }}>HDT001</span></div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '13px', color: '#6f797a' }}>Thời hạn:</span><span style={{ fontSize: '14px', fontWeight: '500', color: '#191c1d' }}>10/01/26 - 10/07/26</span></div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: '#6f797a' }}>Trạng thái HĐ:</span><span style={{ fontSize: '11px', fontWeight: '600', backgroundColor: '#e6f4ea', color: '#137333', padding: '2px 8px', borderRadius: '4px' }}>Hiệu lực</span></div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: '#6f797a' }}>Phiếu đối soát:</span><span style={{ fontSize: '14px', fontWeight: '600', color: '#3b8280' }}>Đã hoàn tất</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><span style={{ fontSize: '13px', color: '#6f797a' }}>Phiếu đối soát:</span><span style={{ fontSize: '14px', fontWeight: '600', color: '#4A6549' }}>Đã hoàn tất</span></div>
                   </div>
                 </div>
                 {/* Card 3 */}
                 <div style={{ backgroundColor: '#ffffff', border: '1px solid #e1e3e4', borderRadius: '8px', padding: '16px' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#3b8280', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Icon name="bed" /> Phòng/Giường</h4>
+                  <h4 style={{ fontSize: '14px', fontWeight: '700', color: '#4A6549', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}><Icon name="bed" /> Phòng/Giường</h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '13px', color: '#6f797a' }}>Khu vực:</span><span style={{ fontSize: '14px', fontWeight: '500', color: '#191c1d' }}>Bình Thạnh</span></div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ fontSize: '13px', color: '#6f797a' }}>Mã phòng:</span><span style={{ fontSize: '14px', fontWeight: '500', color: '#191c1d' }}>P.203</span></div>
@@ -228,8 +228,8 @@ export default function ThanhLyHopDongTab() {
             <div className="ktp-modal-footer" style={{ padding: '16px 24px', borderTop: '1px solid #e1e3e4', display: 'flex', justifyContent: 'flex-end', backgroundColor: '#ffffff', borderRadius: '0 0 12px 12px' }}>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <button onClick={() => setModalType(null)} style={{ background: 'none', border: 'none', color: '#3f494a', padding: '10px 16px', fontWeight: '600', cursor: 'pointer' }}>Đóng</button>
-                <button onClick={() => setModalType(null)} style={{ backgroundColor: '#ffffff', border: '1px solid #3b8280', color: '#3b8280', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>Lưu nháp</button>
-                <button className="ktp-btn-action-fill" onClick={() => setModalType(null)} style={{ padding: '10px 24px', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#3b8280' }}>
+                <button onClick={() => setModalType(null)} style={{ backgroundColor: '#ffffff', border: '1px solid #4A6549', color: '#4A6549', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>Lưu nháp</button>
+                <button className="ktp-btn-action-fill" onClick={() => setModalType(null)} style={{ padding: '10px 24px', display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#4A6549' }}>
                   <Icon name="check_circle" /> Xác nhận hoàn tất thanh lý
                 </button>
               </div>

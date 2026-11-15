@@ -280,7 +280,7 @@ export default function ThuNhanPhongTab() {
                 type="button"
                 className="ktp-btn-submit"
                 onClick={() => setPaymentSuccessDialog(null)}
-                style={{ backgroundColor: '#00818a', color: '#fff', border: 'none' }}
+                style={{ backgroundColor: '#4A6549', color: '#fff', border: 'none' }}
               >
                 Đóng
               </button>
@@ -378,10 +378,10 @@ export default function ThuNhanPhongTab() {
               <>
                 <div className="ktp-modal-header-primary-container">
                   <div>
-                    <h3 style={{ fontSize: '20px', margin: 0, color: '#f5feff' }}>Ghi nhận khoản thu nhận phòng</h3>
+                    <h3 style={{ fontSize: '20px', margin: 0, color: '#F1F4F0' }}>Ghi nhận khoản thu nhận phòng</h3>
                     <p style={{ fontSize: '14px', margin: '4px 0 0 0', opacity: 0.9 }}>Hoàn tất thu tiền để kích hoạt thẻ phòng cho khách</p>
                   </div>
-                  <button className="ktp-modal-close" onClick={() => setModalType(null)} style={{ color: '#f5feff' }}>
+                  <button className="ktp-modal-close" onClick={() => setModalType(null)} style={{ color: '#F1F4F0' }}>
                     <Icon name="close" />
                   </button>
                 </div>
@@ -391,11 +391,11 @@ export default function ThuNhanPhongTab() {
                     <div className="ktp-info-box" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
                       <div><p className="ktp-mini-label">Khách hàng</p><p style={{ margin: 0, fontWeight: '600' }}>{activeCalculation.summary?.HoTenKhachHang}</p></div>
                       <div><p className="ktp-mini-label">Phòng / Giường</p><p style={{ margin: 0, fontWeight: '600' }}>{activeCalculation.summary?.PhongGiuong}</p></div>
-                      <div style={{ gridColumn: '1 / -1' }}><p className="ktp-mini-label">Mã hợp đồng</p><p style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#00666d' }}>{activeCalculation.summary?.MaHopDong}</p></div>
+                      <div style={{ gridColumn: '1 / -1' }}><p className="ktp-mini-label">Mã hợp đồng</p><p style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#4A6549' }}>{activeCalculation.summary?.MaHopDong}</p></div>
                     </div>
 
                     <div style={{ marginBottom: '20px' }}>
-                      <h4 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px', color: '#00666d' }}>
+                      <h4 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px', color: '#4A6549' }}>
                         <Icon name="calculate" /> Chi tiết tính toán khoản thu kỳ đầu
                       </h4>
                       <div className="ktp-info-box-outline" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -414,7 +414,7 @@ export default function ThuNhanPhongTab() {
                         <div style={{ height: '1px', backgroundColor: '#c1c6d5', margin: '4px 0' }}></div>
                         <div className="ktp-flex-between">
                           <strong style={{ color: '#191c1d', fontSize: '15px' }}>Tổng cộng cần thu</strong>
-                          <span style={{ fontSize: '18px', fontWeight: '700', color: '#00666d' }}>
+                          <span style={{ fontSize: '18px', fontWeight: '700', color: '#4A6549' }}>
                             {formatCurrency(activeCalculation.summary?.TongCongCanThu)}
                           </span>
                         </div>
@@ -509,7 +509,7 @@ export default function ThuNhanPhongTab() {
                     <button 
                       type="submit" 
                       className="ktp-btn-submit" 
-                      style={{ backgroundColor: '#00818a', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
+                      style={{ backgroundColor: '#4A6549', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
                       disabled={submitting}
                     >
                       <Icon name="check_circle" /> {submitting ? 'Đang xử lý...' : 'Xác nhận & Hoàn tất'}
@@ -523,11 +523,11 @@ export default function ThuNhanPhongTab() {
             {modalType === 'tnp-detail' && activeDetail && (() => {
               const s = activeDetail.summary || {};
               const isPaid = s.TrangThaiThuTien === 'Đã thanh toán';
-              const badgeCfg = TNP_STATUS_CONFIG[s.TrangThaiThuTien] || { badgeLabel: s.TrangThaiThuTien, badge: { bg: '#eef2f3', fg: '#3f494a' } };
+              const badgeCfg = TNP_STATUS_CONFIG[s.TrangThaiThuTien] || { badgeLabel: s.TrangThaiThuTien, badge: { bg: '#F1F4F0', fg: '#3f494a' } };
               return (
                 <>
                   {/* ── Header ── */}
-                  <div style={{ background: 'linear-gradient(135deg, #00666d 0%, #004d52 100%)', padding: '28px 28px 24px', color: '#fff', position: 'relative' }}>
+                  <div style={{ background: 'linear-gradient(135deg, #4A6549 0%, #3D553C 100%)', padding: '28px 28px 24px', color: '#fff', position: 'relative' }}>
                     <button className="ktp-modal-close" onClick={() => setModalType(null)} style={{ color: '#fff', position: 'absolute', top: 16, right: 16 }}>
                       <Icon name="close" />
                     </button>
@@ -561,50 +561,50 @@ export default function ThuNhanPhongTab() {
                     {/* ── Customer & Room info ── */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '22px' }}>
                       {/* Customer card */}
-                      <div style={{ background: '#f8fafb', border: '1px solid #e2e8ea', borderRadius: '12px', padding: '16px' }}>
+                      <div style={{ background: '#f8fafb', border: '1px solid #E8EDE7', borderRadius: '12px', padding: '16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
-                          <div style={{ width: 42, height: 42, borderRadius: '12px', background: 'linear-gradient(135deg, #00666d, #008b8b)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '15px', flexShrink: 0 }}>
+                          <div style={{ width: 42, height: 42, borderRadius: '12px', background: 'linear-gradient(135deg, #4A6549, #4A6549)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '15px', flexShrink: 0 }}>
                             {getInitials(s.HoTenKhachHang)}
                           </div>
                           <div>
-                            <strong style={{ color: '#111819', fontSize: '15px', display: 'block' }}>{s.HoTenKhachHang}</strong>
+                            <strong style={{ color: '#191C1A', fontSize: '15px', display: 'block' }}>{s.HoTenKhachHang}</strong>
                             <span style={{ color: '#6f797a', fontSize: '12px' }}>Khách hàng</span>
                           </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Icon name="phone" style={{ fontSize: '16px', color: '#00666d' }} />
+                            <Icon name="phone" style={{ fontSize: '16px', color: '#4A6549' }} />
                             <span style={{ fontSize: '13px', color: '#3f494a' }}>{s.SDT || '—'}</span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Icon name="mail" style={{ fontSize: '16px', color: '#00666d' }} />
+                            <Icon name="mail" style={{ fontSize: '16px', color: '#4A6549' }} />
                             <span style={{ fontSize: '13px', color: '#3f494a' }}>{s.Email || '—'}</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Room card */}
-                      <div style={{ background: '#f8fafb', border: '1px solid #e2e8ea', borderRadius: '12px', padding: '16px' }}>
+                      <div style={{ background: '#f8fafb', border: '1px solid #E8EDE7', borderRadius: '12px', padding: '16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-                          <span style={{ width: 42, height: 42, borderRadius: '12px', background: '#edf7f7', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <Icon name="meeting_room" style={{ fontSize: '22px', color: '#00666d' }} />
+                          <span style={{ width: 42, height: 42, borderRadius: '12px', background: '#F1F4F0', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <Icon name="meeting_room" style={{ fontSize: '22px', color: '#4A6549' }} />
                           </span>
                           <div>
-                            <strong style={{ color: '#111819', fontSize: '15px', display: 'block' }}>{s.PhongGiuong}</strong>
+                            <strong style={{ color: '#191C1A', fontSize: '15px', display: 'block' }}>{s.PhongGiuong}</strong>
                             <span style={{ color: '#6f797a', fontSize: '12px' }}>Vị trí thuê</span>
                           </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Icon name="calendar_today" style={{ fontSize: '16px', color: '#00666d' }} />
+                            <Icon name="calendar_today" style={{ fontSize: '16px', color: '#4A6549' }} />
                             <span style={{ fontSize: '13px', color: '#3f494a' }}>Bắt đầu: <strong>{formatDate(s.NgayBatDau)}</strong></span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Icon name="payments" style={{ fontSize: '16px', color: '#00666d' }} />
+                            <Icon name="payments" style={{ fontSize: '16px', color: '#4A6549' }} />
                             <span style={{ fontSize: '13px', color: '#3f494a' }}>Thanh toán: <strong>{s.PhuongThucThanhToan === 'Ví điện tử' ? 'Ví điện tử (mô phỏng)' : s.PhuongThucThanhToan || 'Chưa ghi nhận'}</strong></span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Icon name="person" style={{ fontSize: '16px', color: '#00666d' }} />
+                            <Icon name="person" style={{ fontSize: '16px', color: '#4A6549' }} />
                             <span style={{ fontSize: '13px', color: '#3f494a' }}>Người thu: <strong>{s.NguoiThu || 'Chưa ghi nhận'}</strong></span>
                           </div>
                         </div>
@@ -612,21 +612,21 @@ export default function ThuNhanPhongTab() {
                     </div>
 
                     {/* ── Financial summary ── */}
-                    <div style={{ background: '#ffffff', border: '1px solid #e2e8ea', borderRadius: '12px', overflow: 'hidden', marginBottom: '22px' }}>
-                      <div style={{ padding: '14px 18px', borderBottom: '1px solid #e2e8ea', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Icon name="receipt_long" style={{ fontSize: '18px', color: '#00666d' }} />
-                        <strong style={{ fontSize: '14px', color: '#111819' }}>Tổng hợp tài chính</strong>
+                    <div style={{ background: '#ffffff', border: '1px solid #E8EDE7', borderRadius: '12px', overflow: 'hidden', marginBottom: '22px' }}>
+                      <div style={{ padding: '14px 18px', borderBottom: '1px solid #E8EDE7', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Icon name="receipt_long" style={{ fontSize: '18px', color: '#4A6549' }} />
+                        <strong style={{ fontSize: '14px', color: '#191C1A' }}>Tổng hợp tài chính</strong>
                       </div>
                       <div style={{ padding: '18px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                           <span style={{ color: '#6f797a', fontSize: '13px' }}>Tổng khoản thu kỳ đầu</span>
-                          <strong style={{ fontSize: '15px', color: '#111819' }}>{formatCurrency(s.TongKhoanThu)}</strong>
+                          <strong style={{ fontSize: '15px', color: '#191C1A' }}>{formatCurrency(s.TongKhoanThu)}</strong>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                           <span style={{ color: '#6f797a', fontSize: '13px' }}>Đã thanh toán</span>
                           <strong style={{ fontSize: '15px', color: '#15803d' }}>{formatCurrency(s.DaThanhToan)}</strong>
                         </div>
-                        <div style={{ height: '1px', background: '#e2e8ea', margin: '0 0 14px' }}></div>
+                        <div style={{ height: '1px', background: '#E8EDE7', margin: '0 0 14px' }}></div>
                         <div style={{ background: isPaid ? '#f0faf4' : '#fff8ec', borderRadius: '10px', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
                             <span style={{ fontSize: '12px', fontWeight: 700, color: isPaid ? '#15803d' : '#b45309', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -640,7 +640,7 @@ export default function ThuNhanPhongTab() {
                         
                         {s.TienHoanCoc > 0 && (
                           <>
-                            <div style={{ height: '1px', background: '#e2e8ea', margin: '14px 0 12px' }}></div>
+                            <div style={{ height: '1px', background: '#E8EDE7', margin: '14px 0 12px' }}></div>
                             <div style={{ 
                               display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', 
                               background: '#fffbeb', border: '1px solid #fbbf24', borderRadius: '10px', padding: '12px 14px' 
@@ -664,10 +664,10 @@ export default function ThuNhanPhongTab() {
 
                     {/* ── Fee breakdown ── */}
                     {(activeDetail.details || []).length > 0 && (
-                      <div style={{ background: '#ffffff', border: '1px solid #e2e8ea', borderRadius: '12px', overflow: 'hidden' }}>
-                        <div style={{ padding: '14px 18px', borderBottom: '1px solid #e2e8ea', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <Icon name="list_alt" style={{ fontSize: '18px', color: '#00666d' }} />
-                          <strong style={{ fontSize: '14px', color: '#111819' }}>Chi tiết các khoản phí</strong>
+                      <div style={{ background: '#ffffff', border: '1px solid #E8EDE7', borderRadius: '12px', overflow: 'hidden' }}>
+                        <div style={{ padding: '14px 18px', borderBottom: '1px solid #E8EDE7', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Icon name="list_alt" style={{ fontSize: '18px', color: '#4A6549' }} />
+                          <strong style={{ fontSize: '14px', color: '#191C1A' }}>Chi tiết các khoản phí</strong>
                         </div>
                         <div style={{ padding: '4px 0' }}>
                           {(activeDetail.details || []).map((item, idx) => (
@@ -680,7 +680,7 @@ export default function ThuNhanPhongTab() {
                               }}
                             >
                               <div>
-                                <span style={{ fontSize: '13px', color: '#111819', fontWeight: 600 }}>{item.NoiDung}</span>
+                                <span style={{ fontSize: '13px', color: '#191C1A', fontWeight: 600 }}>{item.NoiDung}</span>
                                 <span style={{ fontSize: '12px', color: '#6f797a', marginLeft: '6px' }}>
                                   {item.NoiDung?.toLowerCase().includes('xe') ? (
                                     `× ${Math.round(Number(item.SoLuong))} xe / 1 ${item.DonViTinh}`
@@ -689,7 +689,7 @@ export default function ThuNhanPhongTab() {
                                   )}
                                 </span>
                               </div>
-                              <strong style={{ fontSize: '14px', color: '#111819' }}>{formatCurrency(item.ThanhTien)}</strong>
+                              <strong style={{ fontSize: '14px', color: '#191C1A' }}>{formatCurrency(item.ThanhTien)}</strong>
                             </div>
                           ))}
                         </div>
@@ -697,11 +697,11 @@ export default function ThuNhanPhongTab() {
                     )}
                   </div>
 
-                  <div className="ktp-modal-footer" style={{ padding: '16px 28px', borderTop: '1px solid #e2e8ea' }}>
+                  <div className="ktp-modal-footer" style={{ padding: '16px 28px', borderTop: '1px solid #E8EDE7' }}>
                     <button
                       type="button"
                       onClick={() => setModalType(null)}
-                      style={{ background: '#2f6765', color: '#fff', border: 'none', padding: '10px 28px', borderRadius: '10px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                      style={{ background: '#4A6549', color: '#fff', border: 'none', padding: '10px 28px', borderRadius: '10px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                     >
                       <Icon name="close" style={{ fontSize: '18px' }} /> Đóng
                     </button>

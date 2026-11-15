@@ -2,7 +2,7 @@
 
 .customer-page {
   --km-green: #2fb7a4;
-  --km-green-dark: #16796f;
+  --km-green-dark: var(--color-primary);
   --km-green-soft: #eaf7f5;
   --km-brick: #e86f51;
   --km-brick-dark: #bf4c32;

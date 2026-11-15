@@ -488,7 +488,7 @@
 
 .ll-room-mode.is-whole {
   background: #e4f4f1;
-  color: #145f5a;
+  color: var(--color-primary);
 }
 
 .ll-room-mode.is-shared {
@@ -887,19 +887,19 @@
 .ktp-btn-cancel:hover { background-color: var(--color-surface-alt); }
 
 /* Thu Nhan Phong specific classes */
-.ktp-stat-card { background-color: rgba(0, 129, 138, 0.1); padding: 20px; border-radius: 16px; border: 1px solid rgba(74, 101, 73, 0.1); }
+.ktp-stat-card { background-color: rgba(74, 101, 73, 0.1); padding: 20px; border-radius: 16px; border: 1px solid rgba(74, 101, 73, 0.1); }
 .ktp-stat-title { font-size: 14px; color: #414753; font-weight: 500; margin: 12px 0 4px 0; }
 .ktp-stat-value { font-size: 24px; font-family: var(--font-heading); font-weight: 700; color: var(--color-primary); margin: 0; }
 
 .ktp-avatar-sm { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; }
 .ktp-avatar-secondary { background-color: rgba(254, 126, 79, 0.2); color: var(--color-accent); }
-.ktp-avatar-primary { background-color: rgba(0, 129, 138, 0.2); color: var(--color-primary); }
+.ktp-avatar-primary { background-color: rgba(74, 101, 73, 0.2); color: var(--color-primary); }
 .ktp-avatar-tertiary { background-color: rgba(109, 118, 119, 0.2); color: var(--color-text-muted); }
 
 .ktp-badge-chua-thanh-toan { background-color: var(--color-accent-soft); color: var(--color-accent); display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; }
 .ktp-badge-chua-thanh-toan::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background-color: var(--color-accent); }
 
-.ktp-badge-da-thanh-toan { background-color: var(--color-border); color: #151d1e; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; }
+.ktp-badge-da-thanh-toan { background-color: var(--color-border); color: var(--color-text); display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; }
 .ktp-badge-da-thanh-toan::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background-color: var(--color-text-muted); }
 
 .ktp-btn-primary-container { background-color: var(--color-primary); color: var(--color-bg); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
@@ -951,7 +951,7 @@
 
 .qt-subtab-btn:focus-visible {
   color: var(--color-primary);
-  outline: 2px solid rgba(47, 103, 101, 0.24);
+  outline: 2px solid rgba(74, 101, 73, 0.24);
   outline-offset: -4px;
 }
 
@@ -1139,7 +1139,7 @@
 
 .qt-icon-btn {
   align-items: center;
-  background: #f4f8f8;
+  background: var(--color-surface-alt);
   border: 1px solid #c9d6d7;
   border-radius: 8px;
   color: var(--color-primary);
@@ -1333,9 +1333,9 @@
 .qt-settlement-summary-chip {
   align-items: center;
   background: var(--color-primary-soft);
-  border: 1px solid #c7dddd;
+  border: 1px solid var(--color-border);
   border-radius: 999px;
-  color: #245f5c;
+  color: var(--color-primary);
   display: inline-flex;
   flex: 0 0 auto;
   font-size: 14px;
@@ -1441,9 +1441,9 @@
 
 .qt-refund-account-card {
   background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-primary-soft) 100%);
-  border: 1px solid #c4d7d7;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
-  color: #1d2b2d;
+  color: var(--color-primary-hover);
   display: grid;
   gap: 12px;
   padding: 12px;
@@ -1464,7 +1464,7 @@
 
 .qt-refund-account-head > span {
   align-items: center;
-  background: #dfeceb;
+  background: var(--color-primary-soft);
   border-radius: 8px;
   color: var(--color-primary);
   display: inline-flex;
@@ -1480,7 +1480,7 @@
 }
 
 .qt-refund-account-head strong {
-  color: #174e4d;
+  color: var(--color-primary-hover);
   display: block;
   font-size: 14px;
   font-weight: 850;
@@ -1517,7 +1517,7 @@
 }
 
 .qt-refund-account-grid strong {
-  color: #172426;
+  color: var(--color-text);
   font-size: 14px;
   font-weight: 850;
   overflow-wrap: anywhere;
@@ -1574,7 +1574,7 @@
 .qt-proof-upload {
   align-items: stretch;
   background: var(--color-bg);
-  border: 1.5px dashed #8fb9b7;
+  border: 1.5px dashed var(--color-border);
   border-radius: 8px;
   color: var(--color-text-muted);
   display: flex;
@@ -1584,7 +1584,7 @@
 }
 
 .qt-proof-upload:hover {
-  background: #f1faf9;
+  background: var(--color-surface-alt);
   border-color: var(--color-primary);
 }
 
@@ -2105,7 +2105,7 @@
 .tnp-page .ktp-badge-da-thanh-toan {
   background: #d9efea;
   border: 1px solid #9ccdc4;
-  color: #005a52;
+  color: var(--color-primary-hover);
 }
 
 .tnp-state {
@@ -2342,11 +2342,11 @@
 
 .kp-radio-card.is-selected {
   border-color: var(--color-primary);
-  background-color: rgba(59, 130, 128, 0.08);
+  background-color: rgba(74, 101, 73, 0.08);
 }
 
 .kp-radio-card.is-selected .kp-radio-card-icon {
-  background-color: rgba(59, 130, 128, 0.2);
+  background-color: rgba(74, 101, 73, 0.2);
   color: var(--color-primary);
 }
 
@@ -2418,7 +2418,7 @@
 
 .kp-bed-card.is-selected {
   border-color: var(--color-primary);
-  background-color: rgba(59, 130, 128, 0.08);
+  background-color: rgba(74, 101, 73, 0.08);
 }
 
 .kp-bed-card.is-selected .kp-bed-icon,

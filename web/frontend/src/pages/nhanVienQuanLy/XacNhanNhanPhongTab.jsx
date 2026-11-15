@@ -246,7 +246,7 @@ export default function XacNhanNhanPhongTab() {
         <div className="ktp-modal-overlay" onClick={() => !submitting && setSelected(null)}>
           <div className="ktp-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
 
-            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#3b8280', color: '#ffffff', borderBottom: 'none', padding: '16px 24px' }}>
+            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#4A6549', color: '#ffffff', borderBottom: 'none', padding: '16px 24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <h3 style={{ fontSize: '18px', margin: 0, color: '#ffffff', fontWeight: '700' }}>Chi tiết phiếu đăng ký #{selected.maDangKy}</h3>
               </div>
@@ -290,7 +290,7 @@ export default function XacNhanNhanPhongTab() {
                     <div style={{ flex: 1, borderTop: '1px solid #e1e3e4' }}></div>
                   </div>
 
-                  <div style={{ borderRadius: '8px', border: `2px solid ${selected.coTheNhanCoc === true ? '#86d3da' : (selected.coTheNhanCoc === false ? '#f1b0b0' : '#e1e3e4')}`, backgroundColor: selected.coTheNhanCoc === true ? '#f5feff' : (selected.coTheNhanCoc === false ? '#fdecec' : '#f8f9fa'), padding: '16px' }}>
+                  <div style={{ borderRadius: '8px', border: `2px solid ${selected.coTheNhanCoc === true ? '#E0E3DF' : (selected.coTheNhanCoc === false ? '#f1b0b0' : '#e1e3e4')}`, backgroundColor: selected.coTheNhanCoc === true ? '#F1F4F0' : (selected.coTheNhanCoc === false ? '#fdecec' : '#f8f9fa'), padding: '16px' }}>
                     <div style={{ display: 'flex', flexDirection: 'row', gap: '16px', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
@@ -314,7 +314,7 @@ export default function XacNhanNhanPhongTab() {
 
                       {/* Không dùng icon: màu viền + chữ đã đủ phân biệt */}
                       {selected.coTheNhanCoc != null && (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 20px', borderRadius: '8px', backgroundColor: '#ffffff', border: `1px solid ${selected.coTheNhanCoc === true ? '#86d3da' : '#f1b0b0'}`, color: selected.coTheNhanCoc === true ? '#00666d' : '#b3261e' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 20px', borderRadius: '8px', backgroundColor: '#ffffff', border: `1px solid ${selected.coTheNhanCoc === true ? '#E0E3DF' : '#f1b0b0'}`, color: selected.coTheNhanCoc === true ? '#4A6549' : '#b3261e' }}>
                           <span style={{ fontWeight: '700', textAlign: 'center', fontSize: '13px', whiteSpace: 'nowrap' }}>
                             {selected.coTheNhanCoc === true ? 'ĐỦ ĐIỀU KIỆN NHẬN CỌC' : 'KHÔNG ĐỦ ĐIỀU KIỆN'}
                           </span>
@@ -359,21 +359,21 @@ export default function XacNhanNhanPhongTab() {
                     <div className="ktp-grid-2" style={{ gap: '12px', marginBottom: '16px' }}>
                       <div
                         onClick={() => { if (selected.coTheNhanCoc !== false) setDecision('xac-nhan'); }}
-                        style={{ padding: '16px', borderRadius: '8px', border: decision === 'xac-nhan' ? '2px solid #00666d' : '1px solid #bec8c9', display: 'flex', alignItems: 'center', gap: '12px', cursor: selected.coTheNhanCoc === false ? 'not-allowed' : 'pointer', backgroundColor: decision === 'xac-nhan' ? '#f5feff' : (selected.coTheNhanCoc === false ? '#f4f7f7' : '#ffffff'), opacity: selected.coTheNhanCoc === false ? 0.6 : 1 }}
+                        style={{ padding: '16px', borderRadius: '8px', border: decision === 'xac-nhan' ? '2px solid #4A6549' : '1px solid #bec8c9', display: 'flex', alignItems: 'center', gap: '12px', cursor: selected.coTheNhanCoc === false ? 'not-allowed' : 'pointer', backgroundColor: decision === 'xac-nhan' ? '#F1F4F0' : (selected.coTheNhanCoc === false ? '#F1F4F0' : '#ffffff'), opacity: selected.coTheNhanCoc === false ? 0.6 : 1 }}
                       >
                         {/* boxSizing tường minh: không có nó, 20px + border 6px cho ra kích thước
                             khác nhau tùy ngữ cảnh CSS -> hai màn hình ra hai kiểu radio khác nhau. */}
-                        <div style={{ width: '20px', height: '20px', boxSizing: 'border-box', borderRadius: '50%', border: decision === 'xac-nhan' ? '2px solid #00666d' : '2px solid #bec8c9', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          {decision === 'xac-nhan' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#00666d' }}></div>}
+                        <div style={{ width: '20px', height: '20px', boxSizing: 'border-box', borderRadius: '50%', border: decision === 'xac-nhan' ? '2px solid #4A6549' : '2px solid #bec8c9', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {decision === 'xac-nhan' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#4A6549' }}></div>}
                         </div>
                         <span style={{ fontWeight: '700', color: '#191c1d', fontSize: '14px' }}>Xác nhận nhận cọc</span>
                       </div>
                       <div
                         onClick={() => setDecision('tu-choi')}
-                        style={{ padding: '16px', borderRadius: '8px', border: decision === 'tu-choi' ? '2px solid #00666d' : '1px solid #bec8c9', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', backgroundColor: decision === 'tu-choi' ? '#f5feff' : '#ffffff' }}
+                        style={{ padding: '16px', borderRadius: '8px', border: decision === 'tu-choi' ? '2px solid #4A6549' : '1px solid #bec8c9', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', backgroundColor: decision === 'tu-choi' ? '#F1F4F0' : '#ffffff' }}
                       >
-                        <div style={{ width: '20px', height: '20px', boxSizing: 'border-box', borderRadius: '50%', border: decision === 'tu-choi' ? '2px solid #00666d' : '2px solid #bec8c9', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          {decision === 'tu-choi' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#00666d' }}></div>}
+                        <div style={{ width: '20px', height: '20px', boxSizing: 'border-box', borderRadius: '50%', border: decision === 'tu-choi' ? '2px solid #4A6549' : '2px solid #bec8c9', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {decision === 'tu-choi' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#4A6549' }}></div>}
                         </div>
                         <span style={{ fontWeight: '700', color: '#191c1d', fontSize: '14px' }}>Từ chối phòng này</span>
                       </div>
@@ -402,7 +402,7 @@ export default function XacNhanNhanPhongTab() {
             <div className="ktp-modal-footer" style={{ borderTop: '1px solid #e1e3e4', backgroundColor: '#f8f9fa', padding: '16px 24px', display: 'flex', gap: '12px', justifyContent: 'flex-end', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
               <button className="ktp-btn-cancel" onClick={() => setSelected(null)} disabled={submitting} style={{ border: '1px solid #bec8c9', padding: '10px 24px', backgroundColor: '#ffffff', borderRadius: '8px', fontWeight: '600' }}>Đóng</button>
               {!readOnly && (
-                <button className="ktp-btn-submit" onClick={handleSubmit} disabled={submitting || ((decision === 'tu-choi' || canApproveLater) && !lyDo.trim())} style={{ padding: '10px 24px', backgroundColor: '#3b8280', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: '600', opacity: (submitting || ((decision === 'tu-choi' || canApproveLater) && !lyDo.trim())) ? 0.6 : 1, cursor: (submitting || ((decision === 'tu-choi' || canApproveLater) && !lyDo.trim())) ? 'not-allowed' : 'pointer' }}>
+                <button className="ktp-btn-submit" onClick={handleSubmit} disabled={submitting || ((decision === 'tu-choi' || canApproveLater) && !lyDo.trim())} style={{ padding: '10px 24px', backgroundColor: '#4A6549', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: '600', opacity: (submitting || ((decision === 'tu-choi' || canApproveLater) && !lyDo.trim())) ? 0.6 : 1, cursor: (submitting || ((decision === 'tu-choi' || canApproveLater) && !lyDo.trim())) ? 'not-allowed' : 'pointer' }}>
                   {submitting ? 'Đang xử lý...' : 'Xác nhận'}
                 </button>
               )}

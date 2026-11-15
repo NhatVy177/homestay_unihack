@@ -1,5 +1,5 @@
 /* Xác nhận điện tử biên bản/đối soát (D-010, D-012). Màu theo giao diện HomeStayDorm. */
-.xn-card { background: #fff; border: 1px solid #e0ebed; border-radius: 12px; padding: 18px 20px; margin: 16px 0; display: flex; flex-direction: column; gap: 12px; }
+.xn-card { background: #fff; border: 1px solid var(--color-primary-soft); border-radius: 12px; padding: 18px 20px; margin: 16px 0; display: flex; flex-direction: column; gap: 12px; }
 .xn-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .xn-head h3 { margin: 0; font-size: 16px; color: #191c1d; }
 .xn-head p { margin: 4px 0 0; color: #6f797a; font-size: 13px; }
@@ -10,44 +10,44 @@
 .xn-danger { background: #fde8e8; color: #b42318; }
 .xn-doc { display: flex; flex-direction: column; gap: 10px; }
 .xn-row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; color: #3f494a; }
-.xn-total { border-top: 1px dashed #bec8c9; padding-top: 8px; font-size: 15px; color: #00666d; }
+.xn-total { border-top: 1px dashed #bec8c9; padding-top: 8px; font-size: 15px; color: var(--color-primary); }
 .xn-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.xn-table th, .xn-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eef2f3; vertical-align: top; }
-.xn-table th { background: #f5fbfb; color: #3f494a; font-weight: 700; }
+.xn-table th, .xn-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--color-surface-alt); vertical-align: top; }
+.xn-table th { background: var(--color-surface-alt); color: #3f494a; font-weight: 700; }
 .xn-table input, .xn-form textarea, .xn-form input[type='text'] { width: 100%; box-sizing: border-box; border: 1px solid #bec8c9; border-radius: 8px; padding: 8px 10px; font: inherit; }
 .xn-num { text-align: right !important; white-space: nowrap; }
-.xn-note { margin: 0; font-size: 13px; color: #3f494a; background: #f5fbfb; border-left: 4px solid #00666d; padding: 10px 14px; border-radius: 0 8px 8px 0; }
+.xn-note { margin: 0; font-size: 13px; color: #3f494a; background: var(--color-surface-alt); border-left: 4px solid var(--color-primary); padding: 10px 14px; border-radius: 0 8px 8px 0; }
 .xn-files { display: flex; flex-wrap: wrap; gap: 12px; }
 .xn-files figure { margin: 0; display: flex; flex-direction: column; gap: 6px; max-width: 220px; }
-.xn-files img { max-width: 220px; max-height: 160px; object-fit: cover; border-radius: 8px; border: 1px solid #e0ebed; }
-.xn-policy summary, .xn-tech summary, .xn-history summary { cursor: pointer; color: #00666d; font-weight: 600; font-size: 13px; }
+.xn-files img { max-width: 220px; max-height: 160px; object-fit: cover; border-radius: 8px; border: 1px solid var(--color-primary-soft); }
+.xn-policy summary, .xn-tech summary, .xn-history summary { cursor: pointer; color: var(--color-primary); font-weight: 600; font-size: 13px; }
 .xn-policy p { white-space: pre-line; font-size: 13px; color: #3f494a; margin: 8px 0 0; }
 .xn-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.xn-btn { border: 1px solid #00666d; background: #00666d; color: #fff; border-radius: 8px; padding: 9px 18px; font-weight: 700; cursor: pointer; font: inherit; }
-.xn-btn.secondary { background: #fff; color: #00666d; }
+.xn-btn { border: 1px solid var(--color-primary); background: var(--color-primary); color: #fff; border-radius: 8px; padding: 9px 18px; font-weight: 700; cursor: pointer; font: inherit; }
+.xn-btn.secondary { background: #fff; color: var(--color-primary); }
 .xn-btn:disabled { opacity: .55; cursor: not-allowed; }
-.xn-link { background: none; border: 0; color: #00666d; text-decoration: underline; cursor: pointer; padding: 0; font: inherit; font-size: 13px; text-align: left; }
+.xn-link { background: none; border: 0; color: var(--color-primary); text-decoration: underline; cursor: pointer; padding: 0; font: inherit; font-size: 13px; text-align: left; }
 .xn-form { display: flex; flex-direction: column; gap: 8px; }
 .xn-form label { font-size: 13px; font-weight: 600; color: #3f494a; display: flex; flex-direction: column; gap: 6px; }
 .xn-alert { border-radius: 8px; padding: 10px 14px; font-size: 13px; }
 .xn-alert.error { background: #fde8e8; color: #7f1d1d; }
 .xn-alert.ok { background: #e6f6ec; color: #14532d; }
-.xn-alert.info { background: #f5fbfb; color: #3f494a; }
-.xn-tech { font-size: 12px; color: #6f797a; border-top: 1px solid #eef2f3; padding-top: 10px; }
+.xn-alert.info { background: var(--color-surface-alt); color: #3f494a; }
+.xn-tech { font-size: 12px; color: #6f797a; border-top: 1px solid var(--color-surface-alt); padding-top: 10px; }
 .xn-tech ul { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; word-break: break-all; }
 .xn-tech li { line-height: 1.6; }
 .xn-tech code { font-size: 12px; color: #3f494a; }
-.xn-tech a, .xn-saved a { color: #00666d; font-size: 13px; }
+.xn-tech a, .xn-saved a { color: var(--color-primary); font-size: 13px; }
 .xn-saved { display: flex; flex-direction: column; gap: 8px; }
 .xn-saved .xn-muted { color: #3f494a; }
 .xn-history ol { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: #3f494a; display: flex; flex-direction: column; gap: 6px; }
 .xn-list { display: flex; flex-direction: column; gap: 8px; }
-.xn-list-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid #e0ebed; border-radius: 10px; background: #fff; flex-wrap: wrap; }
-.xn-list-item.is-active { border-color: #00666d; box-shadow: 0 0 0 2px #00666d22; }
+.xn-list-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--color-primary-soft); border-radius: 10px; background: #fff; flex-wrap: wrap; }
+.xn-list-item.is-active { border-color: var(--color-primary); box-shadow: 0 0 0 2px #00666d22; }
 .xn-muted { color: #6f797a; font-size: 13px; }
 .xn-section-title { font-size: 15px; font-weight: 800; color: #191c1d; margin: 18px 0 8px; }
 @media (max-width: 640px) { .xn-card { padding: 14px; } .xn-table th, .xn-table td { padding: 6px; } }
-.xn-gate { border: 1px solid #86d3da; background: #f6feff; border-radius: 10px; padding: 14px; }
+.xn-gate { border: 1px solid var(--color-border); background: var(--color-surface-alt); border-radius: 10px; padding: 14px; }
 
 /* B4: statement choice in the accountant tab */
 .xn-form label.xn-radio-option { flex-direction: row; align-items: center; font-weight: 400; }

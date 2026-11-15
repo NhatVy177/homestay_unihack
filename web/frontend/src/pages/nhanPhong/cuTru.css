@@ -48,7 +48,7 @@
 }
 
 .residence-hero h2 {
-  color: #111819;
+  color: var(--color-text);
   font-size: 27px;
   line-height: 1.25;
   margin: 0 0 8px;
@@ -85,7 +85,7 @@
 }
 
 .residence-kpi strong {
-  color: #111819;
+  color: var(--color-text);
   display: block;
   font-size: 30px;
   line-height: 1;
@@ -130,7 +130,7 @@
 }
 
 .residence-table-head h3 {
-  color: #111819;
+  color: var(--color-text);
   font-size: 20px;
   font-weight: 800;
   margin: 0 0 4px;
@@ -326,7 +326,7 @@
 }
 
 .residence-summary {
-  background: #f7fbfb;
+  background: var(--color-surface-alt);
   border: 1px solid var(--residence-line);
   border-radius: 12px;
   display: grid;
@@ -350,14 +350,14 @@
 }
 
 .residence-summary strong {
-  color: #111819;
+  color: var(--color-text);
   font-size: 14px;
 }
 
 .residence-sale-note {
   align-items: flex-start;
-  background: #f3fbfb;
-  border: 1px solid #b9dfe1;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
   border-left: 4px solid var(--residence-primary);
   border-radius: 12px;
   display: flex;
@@ -368,7 +368,7 @@
 
 .residence-sale-note-icon {
   align-items: center;
-  background: #e6f5f5;
+  background: var(--color-primary-soft);
   border-radius: 10px;
   color: var(--residence-primary);
   display: inline-flex;
@@ -394,7 +394,7 @@
 }
 
 .residence-approval-strip {
-  background: linear-gradient(135deg, #edfafa 0%, #ffffff 100%);
+  background: linear-gradient(135deg, var(--color-surface-alt) 0%, #ffffff 100%);
   border: 1px solid var(--residence-line);
   border-radius: 12px;
   display: grid;
@@ -432,7 +432,7 @@
 }
 
 .residence-condition-panel h4 {
-  color: #111819;
+  color: var(--color-text);
   font-size: 17px;
   margin: 0;
 }
@@ -459,7 +459,7 @@
 
 .residence-condition-card .material-icons {
   align-items: center;
-  background: #edfafa;
+  background: var(--color-surface-alt);
   border-radius: 10px;
   color: var(--residence-primary);
   display: inline-flex;
@@ -471,7 +471,7 @@
 }
 
 .residence-condition-card strong {
-  color: #111819;
+  color: var(--color-text);
   display: block;
   font-size: 14px;
   margin-bottom: 3px;
@@ -507,7 +507,7 @@
 .residence-checkline {
   align-items: flex-start;
   background: #ffffff;
-  border: 1px dashed #9fcfd1;
+  border: 1px dashed var(--color-border);
   border-radius: 12px;
   display: flex;
   gap: 12px;
@@ -540,7 +540,7 @@
 }
 
 .residence-member-head h4 {
-  color: #111819;
+  color: var(--color-text);
   font-size: 17px;
   margin: 0;
 }
@@ -576,7 +576,7 @@
 
 .residence-member-review-note {
   align-items: center;
-  background: #f7fbfb;
+  background: var(--color-surface-alt);
   border: 1px solid var(--residence-line);
   border-radius: 10px;
   display: flex;
@@ -671,7 +671,7 @@
 
 .residence-review-avatar {
   align-items: center;
-  background: #e5f5f5;
+  background: var(--color-primary-soft);
   border-radius: 12px;
   color: var(--residence-primary);
   display: inline-flex;
@@ -685,7 +685,7 @@
 }
 
 .residence-review-card strong {
-  color: #111819;
+  color: var(--color-text);
   display: block;
 }
 
@@ -717,7 +717,7 @@
 }
 
 .residence-decision-panel {
-  background: #f7fbfb;
+  background: var(--color-surface-alt);
   border: 1px solid var(--residence-line);
   border-radius: 12px;
   margin-top: 18px;
@@ -733,7 +733,7 @@
 }
 
 .residence-decision-copy strong {
-  color: #111819;
+  color: var(--color-text);
   font-size: 16px;
 }
 
@@ -884,8 +884,8 @@
 }
 
 .residence-success-details {
-  background: #f7fbfb;
-  border: 1px solid #d7e4e5;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-primary-soft);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -917,7 +917,7 @@
 }
 
 .residence-success-btn {
-  background: #2f6765;
+  background: var(--color-primary);
   border: none;
   border-radius: 8px;
   color: #fff;
@@ -930,6 +930,6 @@
 }
 
 .residence-success-btn:hover {
-  background: #24514f;
+  background: var(--color-primary);
 }
 

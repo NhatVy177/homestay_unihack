@@ -2,7 +2,7 @@
 
 .renter-page {
   --rt-green: #2fb7a4;
-  --rt-green-dark: #16796f;
+  --rt-green-dark: var(--color-primary);
   --rt-green-soft: #eaf7f5;
   --rt-brick: #e86f51;
   --rt-brick-dark: #bf4c32;

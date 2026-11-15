@@ -322,7 +322,7 @@ function RestoreCommandModal({ backup, command, error, isSubmitting, onClose, on
       <section className="admin-modal" role="dialog" aria-modal="true" aria-labelledby="restore-command-title" onMouseDown={(event) => event.stopPropagation()}>
         <header className="admin-modal-head">
           <div className="admin-modal-title">
-            <span className="admin-modal-avatar" style={{ background: hasCommand ? 'rgba(0, 102, 109, 0.1)' : 'rgba(164, 60, 18, 0.12)', color: hasCommand ? 'var(--admin-primary)' : 'var(--admin-secondary-dark)' }}>
+            <span className="admin-modal-avatar" style={{ background: hasCommand ? 'rgba(74, 101, 73, 0.1)' : 'rgba(164, 60, 18, 0.12)', color: hasCommand ? 'var(--admin-primary)' : 'var(--admin-secondary-dark)' }}>
               <Icon name={hasCommand ? 'check_circle' : 'restore'} />
             </span>
             <div>
@@ -1294,7 +1294,7 @@ function BranchDetailModal({ branch, isBusy, onClose, onToggleStatus, onEdit, on
           <section className="admin-modal" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}>
             <header className="admin-modal-head">
               <div className="admin-modal-title">
-                <span className="admin-modal-avatar" style={{ background: isInactive ? 'rgba(0, 102, 109, 0.1)' : 'var(--color-danger-soft)', color: isInactive ? 'var(--admin-primary)' : 'var(--color-danger)' }}><Icon name={isInactive ? 'check_circle' : 'warning'} /></span>
+                <span className="admin-modal-avatar" style={{ background: isInactive ? 'rgba(74, 101, 73, 0.1)' : 'var(--color-danger-soft)', color: isInactive ? 'var(--admin-primary)' : 'var(--color-danger)' }}><Icon name={isInactive ? 'check_circle' : 'warning'} /></span>
                 <div>
                   <span className="admin-eyebrow">Xác nhận thao tác</span>
                   <h3>{isInactive ? 'Mở hoạt động lại chi nhánh' : 'Ngừng hoạt động chi nhánh'}</h3>
@@ -2406,7 +2406,7 @@ function PropertyView() {
             <section className="admin-modal" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}>
               <header className="admin-modal-head">
                 <div className="admin-modal-title">
-                  <span className="admin-modal-avatar" style={{ background: isMaintenance ? 'rgba(0, 102, 109, 0.1)' : 'var(--color-danger-soft)', color: isMaintenance ? 'var(--admin-primary)' : 'var(--color-danger)' }}>
+                  <span className="admin-modal-avatar" style={{ background: isMaintenance ? 'rgba(74, 101, 73, 0.1)' : 'var(--color-danger-soft)', color: isMaintenance ? 'var(--admin-primary)' : 'var(--color-danger)' }}>
                     <Icon name={isMaintenance ? 'lock_open' : 'lock'} />
                   </span>
                   <div>

@@ -48,13 +48,13 @@ function InfoRow({ label, value, badge }) {
       <span style={{ color: '#6f797a', fontSize: '13px' }}>{label}</span>
       {badge ? (
         <span style={{
-          backgroundColor: badge === 'success' ? '#f6feff' : '#fff8e1',
-          color: badge === 'success' ? '#004c52' : '#6b4f00',
+          backgroundColor: badge === 'success' ? '#F1F4F0' : '#fff8e1',
+          color: badge === 'success' ? '#3D553C' : '#6b4f00',
           padding: '2px 8px',
           borderRadius: '4px',
           fontSize: '10px',
           fontWeight: '700',
-          border: badge === 'success' ? '1px solid #86d3da' : '1px solid #f2d47c',
+          border: badge === 'success' ? '1px solid #E0E3DF' : '1px solid #f2d47c',
           whiteSpace: 'nowrap'
         }}>
           {value || '-'}
@@ -66,7 +66,7 @@ function InfoRow({ label, value, badge }) {
   );
 }
 
-function SummaryCard({ icon, title, children, accentColor = '#00666d' }) {
+function SummaryCard({ icon, title, children, accentColor = '#4A6549' }) {
   return (
     <div className="ktp-section handover-summary-card" style={{ '--handover-accent': accentColor }}>
       <h4 style={{
@@ -319,8 +319,8 @@ export default function BanGiaoPhongTab() {
 
   const FlatSummaryCard = ({ icon, title, children, accentColor }) => (
     <div style={{
-      backgroundColor: '#f5fbfb',
-      border: '1px solid #e0ebed',
+      backgroundColor: '#F1F4F0',
+      border: '1px solid #E8EDE7',
       borderRadius: '12px',
       padding: '18px 20px',
       display: 'flex',
@@ -335,7 +335,7 @@ export default function BanGiaoPhongTab() {
         fontWeight: '700',
         color: accentColor,
         margin: 0,
-        borderBottom: '1px solid #e0ebed',
+        borderBottom: '1px solid #E8EDE7',
         paddingBottom: '10px'
       }}>
         <Icon name={icon} /> {title}
@@ -376,13 +376,13 @@ export default function BanGiaoPhongTab() {
             boxShadow: '0 18px 48px rgba(0, 0, 0, 0.22)',
             overflow: 'hidden'
           }}>
-            <div style={{ padding: '22px 24px', backgroundColor: '#00666d', color: '#ffffff' }}>
+            <div style={{ padding: '22px 24px', backgroundColor: '#4A6549', color: '#ffffff' }}>
               <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 700 }}>{successDialog.title}</h3>
             </div>
             <div style={{ padding: '24px' }}>
               <p style={{ margin: 0, color: '#191c1d', fontSize: '15px', lineHeight: 1.6 }}>{successDialog.message}</p>
               {successDialog.maBienBan && (
-                <div style={{ marginTop: '16px', padding: '12px 14px', backgroundColor: '#f6feff', border: '1px solid #86d3da', borderRadius: '6px', color: '#00666d', fontWeight: 700 }}>
+                <div style={{ marginTop: '16px', padding: '12px 14px', backgroundColor: '#F1F4F0', border: '1px solid #E0E3DF', borderRadius: '6px', color: '#4A6549', fontWeight: 700 }}>
                   Mã biên bản: {successDialog.maBienBan}
                 </div>
               )}
@@ -473,7 +473,7 @@ export default function BanGiaoPhongTab() {
             </div>
             <button
               type="button"
-              style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid #bec8c9', backgroundColor: '#ffffff', color: '#00666d', fontWeight: 700, cursor: 'pointer' }}
+              style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid #bec8c9', backgroundColor: '#ffffff', color: '#4A6549', fontWeight: 700, cursor: 'pointer' }}
               onClick={fetchDanhSachChoBanGiao}
               disabled={loadingDanhSach}
             >
@@ -507,14 +507,14 @@ export default function BanGiaoPhongTab() {
                   </tr>
                 ) : filteredList.map((item) => (
                   <tr key={`${item.maHopDong}-${item.maPhong}-${item.maGiuong || 'phong'}`}>
-                    <td style={{ fontWeight: 700, color: '#00666d' }}>{item.maHopDong}</td>
+                    <td style={{ fontWeight: 700, color: '#4A6549' }}>{item.maHopDong}</td>
                     <td>
                       <div style={{ fontWeight: 600, color: '#191c1d' }}>{item.hoTen}</div>
                       <div style={{ fontSize: '12px', color: '#6f797a' }}>{item.soDienThoai || item.cccd || '-'}</div>
                     </td>
                     <td>
                       <div style={{ fontWeight: 600, color: '#191c1d' }}>{item.tenPhong || item.maPhong}</div>
-                      <div style={{ fontSize: '12px', color: isWholeRoomValue(item.maGiuong) ? '#00666d' : '#6f797a', fontWeight: isWholeRoomValue(item.maGiuong) ? 700 : 500 }}>
+                      <div style={{ fontSize: '12px', color: isWholeRoomValue(item.maGiuong) ? '#4A6549' : '#6f797a', fontWeight: isWholeRoomValue(item.maGiuong) ? 700 : 500 }}>
                         {isWholeRoomValue(item.maGiuong) ? 'Nguyên phòng' : `Giường ${item.maGiuong}`}
                       </div>
                     </td>
@@ -522,8 +522,8 @@ export default function BanGiaoPhongTab() {
                     <td className="text-center">
                       {item.daBanGiao ? (
                         <span style={{
-                          backgroundColor: '#e8f4f4',
-                          color: '#00666d',
+                          backgroundColor: '#E8EDE7',
+                          color: '#4A6549',
                           padding: '4px 12px',
                           borderRadius: '999px',
                           fontSize: '12px',
@@ -607,14 +607,14 @@ export default function BanGiaoPhongTab() {
       {/* POPUP XEM BIÊN BẢN (READ-ONLY) */}
       {hopDong && isReadOnlyHandover && (
         <div className="ktp-modal-overlay" onClick={resetForm} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(25, 28, 29, 0.55)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, backdropFilter: 'blur(3px)' }}>
-          <div className="ktp-modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '880px', maxWidth: '95%', maxHeight: '85vh', backgroundColor: '#ffffff', overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: '16px', boxShadow: '0 24px 64px rgba(0, 50, 54, 0.12)', border: '1px solid #e0ebed', animation: 'fadeIn 0.2s forwards' }}>
+          <div className="ktp-modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '880px', maxWidth: '95%', maxHeight: '85vh', backgroundColor: '#ffffff', overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: '16px', boxShadow: '0 24px 64px rgba(0, 50, 54, 0.12)', border: '1px solid #E8EDE7', animation: 'fadeIn 0.2s forwards' }}>
             
             {/* Header */}
-            <div style={{ padding: '20px 28px', backgroundColor: '#ffffff', color: '#00666d', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10, borderBottom: '1px solid #eef2f2' }}>
+            <div style={{ padding: '20px 28px', backgroundColor: '#ffffff', color: '#4A6549', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10, borderBottom: '1px solid #eef2f2' }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800' }}>Biên bản bàn giao vào: {hopDong.maHopDong}</h3>
               </div>
-              <button onClick={resetForm} style={{ background: 'none', border: 'none', color: '#6f797a', cursor: 'pointer', display: 'flex', fontSize: '24px', transition: 'color 0.15s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00666d'} onMouseLeave={(e) => e.currentTarget.style.color = '#6f797a'}>
+              <button onClick={resetForm} style={{ background: 'none', border: 'none', color: '#6f797a', cursor: 'pointer', display: 'flex', fontSize: '24px', transition: 'color 0.15s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#4A6549'} onMouseLeave={(e) => e.currentTarget.style.color = '#6f797a'}>
                 <Icon name="close" />
               </button>
             </div>
@@ -624,21 +624,21 @@ export default function BanGiaoPhongTab() {
               
               {/* Flat cards grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
-                <FlatSummaryCard icon="description" title="Thông tin hợp đồng" accentColor="#00666d">
+                <FlatSummaryCard icon="description" title="Thông tin hợp đồng" accentColor="#4A6549">
                   <InfoRow label="Mã HĐ:" value={hopDong.maHopDong} />
                   <InfoRow label="Trạng thái:" value={hopDong.trangThaiHopDong} badge={hopDong.trangThaiHopDong === 'Hiệu lực' ? 'success' : 'warning'} />
                   <InfoRow label="Ngày bắt đầu:" value={formatDate(hopDong.ngayBatDau)} />
                   <InfoRow label="Thời hạn:" value={`${hopDong.thoiHanThue || 0} tháng`} />
                 </FlatSummaryCard>
 
-                <FlatSummaryCard icon="person" title="Thông tin khách thuê" accentColor="#2f6765">
+                <FlatSummaryCard icon="person" title="Thông tin khách thuê" accentColor="#4A6549">
                   <InfoRow label="Họ tên:" value={hopDong.hoTenKhachHang} />
                   <InfoRow label="SĐT:" value={hopDong.sdt} />
                   <InfoRow label="Số người ở:" value={`${Math.max(Number(hopDong.soNguoiO) || 0, 1)} người`} />
                   <InfoRow label="Hóa đơn kỳ đầu:" value={hopDong.trangThaiHoaDonKyDau} badge={hopDong.trangThaiHoaDonKyDau === 'Đã TT' ? 'success' : 'warning'} />
                 </FlatSummaryCard>
 
-                <FlatSummaryCard icon="bed" title="Thông tin phòng/giường" accentColor="#4d777c">
+                <FlatSummaryCard icon="bed" title="Thông tin phòng/giường" accentColor="#4A6549">
                   <InfoRow label="Chi nhánh:" value={hopDong.tenChiNhanh} />
                   <InfoRow label="Hình thức:" value={getScopeLabel(hopDong.danhSachGiuong)} badge="success" />
                   <InfoRow label="Phòng:" value={hopDong.tenPhong || hopDong.maPhong} />
@@ -649,7 +649,7 @@ export default function BanGiaoPhongTab() {
 
               {/* Workspace flat borderless container */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid #00666d', paddingBottom: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid #4A6549', paddingBottom: '12px' }}>
                   <div>
                     <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#191c1d', margin: 0 }}>
                       Thông tin biên bản bàn giao
@@ -659,11 +659,11 @@ export default function BanGiaoPhongTab() {
                     </p>
                   </div>
                   <div className="handover-pills">
-                    <span className="handover-pill" style={{ backgroundColor: '#f0f7f7', color: '#00666d' }}>
+                    <span className="handover-pill" style={{ backgroundColor: '#F1F4F0', color: '#4A6549' }}>
                       <Icon name={isWholeRoomValue(hopDong.danhSachGiuong) ? 'home' : 'bed'} />
                       {getScopeLabel(hopDong.danhSachGiuong)}
                     </span>
-                    <span className={`handover-pill ${assetNoteCount > 0 ? 'is-warning' : ''}`} style={{ backgroundColor: assetNoteCount > 0 ? '#fff8e1' : '#f0f7f7', color: assetNoteCount > 0 ? '#b93c00' : '#00666d' }}>
+                    <span className={`handover-pill ${assetNoteCount > 0 ? 'is-warning' : ''}`} style={{ backgroundColor: assetNoteCount > 0 ? '#fff8e1' : '#F1F4F0', color: assetNoteCount > 0 ? '#b93c00' : '#4A6549' }}>
                       <Icon name="edit_note" />
                       {assetNoteCount > 0 ? `${assetNoteCount} tài sản cần ghi chú` : 'Chưa có chênh lệch'}
                     </span>
@@ -672,13 +672,13 @@ export default function BanGiaoPhongTab() {
 
                 <div className="handover-table-scroll">
                   <table className="ktp-table" style={{ tableLayout: 'fixed', minWidth: '800px' }}>
-                    <thead style={{ backgroundColor: '#f5fbfb' }}>
+                    <thead style={{ backgroundColor: '#F1F4F0' }}>
                       <tr>
-                        <th style={{ width: '110px', color: '#00666d' }}>Mã tài sản</th>
-                        <th style={{ width: '240px', color: '#00666d' }}>Tên tài sản</th>
-                        <th style={{ width: '170px', color: '#00666d' }}>Phạm vi</th>
-                        <th style={{ width: '210px', color: '#00666d' }}>Kiểm kê</th>
-                        <th style={{ width: '320px', color: '#00666d' }}>Ghi chú khi chênh lệch</th>
+                        <th style={{ width: '110px', color: '#4A6549' }}>Mã tài sản</th>
+                        <th style={{ width: '240px', color: '#4A6549' }}>Tên tài sản</th>
+                        <th style={{ width: '170px', color: '#4A6549' }}>Phạm vi</th>
+                        <th style={{ width: '210px', color: '#4A6549' }}>Kiểm kê</th>
+                        <th style={{ width: '320px', color: '#4A6549' }}>Ghi chú khi chênh lệch</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -692,7 +692,7 @@ export default function BanGiaoPhongTab() {
                         const hasDifference = Number(item.soLuongThucTe) !== Number(item.soLuongHeThong);
                         return (
                           <tr key={`${item.maPhong}-${item.maTaiSan}-${index}`} style={{ backgroundColor: hasDifference ? '#fffaf3' : '#ffffff' }}>
-                            <td style={{ fontWeight: 700, color: '#00666d', verticalAlign: 'middle' }}>{item.maTaiSan}</td>
+                            <td style={{ fontWeight: 700, color: '#4A6549', verticalAlign: 'middle' }}>{item.maTaiSan}</td>
                             <td style={{ fontWeight: 700, color: '#191c1d', verticalAlign: 'middle' }}>{item.tenTaiSan}</td>
                             <td style={{ verticalAlign: 'middle' }}>
                               <div style={{ fontWeight: 600, color: '#191c1d' }}>{item.tenPhong || item.maPhong}</div>
@@ -744,8 +744,8 @@ export default function BanGiaoPhongTab() {
                   <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#191c1d', margin: 0 }}>Xác nhận & Chữ ký</h3>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                    <div style={{ border: '1px solid #e0ebed', backgroundColor: '#f5fbfb', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#00666d', fontWeight: 800, fontSize: '14px' }}>
+                    <div style={{ border: '1px solid #E8EDE7', backgroundColor: '#F1F4F0', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#4A6549', fontWeight: 800, fontSize: '14px' }}>
                         <Icon name="check_circle" /> Xác nhận từ Quản lý
                       </div>
                       <span style={{ color: '#15803d', display: 'inline-flex', alignItems: 'center', gap: '8px', fontWeight: 600, fontSize: '13px', backgroundColor: '#e6f6ec', padding: '6px 12px', borderRadius: '8px', width: 'fit-content' }}>
@@ -753,15 +753,15 @@ export default function BanGiaoPhongTab() {
                       </span>
                     </div>
 
-                    <div style={{ border: '1px solid #e0ebed', backgroundColor: '#f5fbfb', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#2f6765', fontWeight: 800, fontSize: '14px' }}>
+                    <div style={{ border: '1px solid #E8EDE7', backgroundColor: '#F1F4F0', borderRadius: '12px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#4A6549', fontWeight: 800, fontSize: '14px' }}>
                         <Icon name="person" /> Xác nhận từ Khách thuê
                       </div>
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <span style={{ color: khachCoMat ? '#15803d' : '#b93c00', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '13px', backgroundColor: khachCoMat ? '#e6f6ec' : '#fff0e6', padding: '6px 12px', borderRadius: '8px' }}>
                           <Icon name={khachCoMat ? "check" : "close"} style={{ fontSize: '16px' }} /> Khách hàng {khachCoMat ? "có mặt" : "vắng mặt"}
                         </span>
-                        <span style={{ color: '#2f6765', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '13px', backgroundColor: '#eef6f6', padding: '6px 12px', borderRadius: '8px' }}>
+                        <span style={{ color: '#4A6549', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '13px', backgroundColor: '#F1F4F0', padding: '6px 12px', borderRadius: '8px' }}>
                           <Icon name="assignment_turned_in" style={{ fontSize: '16px' }} /> {hopDong?.daKyBienBan ? 'Đã ký giấy (biên bản trước khi có xác nhận điện tử)' : 'Khách xác nhận điện tử — xem tab "Khách xác nhận biên bản"'}
                         </span>
                       </div>
@@ -772,8 +772,8 @@ export default function BanGiaoPhongTab() {
                     <label className="ktp-label" style={{ fontWeight: 800, color: '#191c1d', marginBottom: '8px', display: 'block' }}>Ghi chú chung của biên bản</label>
                     <div style={{
                       padding: '14px 18px',
-                      borderLeft: '4px solid #00666d',
-                      backgroundColor: '#f5fbfb',
+                      borderLeft: '4px solid #4A6549',
+                      backgroundColor: '#F1F4F0',
                       borderRadius: '0 12px 12px 0',
                       fontSize: '13px',
                       color: ghiChuChung ? '#191c1d' : '#6f797a',
@@ -808,12 +808,12 @@ export default function BanGiaoPhongTab() {
       {hopDong && !isReadOnlyHandover && (
         <>
           <div className="handover-current-banner">
-            <div style={{ color: '#00666d', fontWeight: 700 }}>
+            <div style={{ color: '#4A6549', fontWeight: 700 }}>
               Đang lập biên bản cho hợp đồng {hopDong.maHopDong}
             </div>
             <button
               type="button"
-              style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid #bec8c9', backgroundColor: '#ffffff', color: '#00666d', fontWeight: 700, cursor: 'pointer' }}
+              style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid #bec8c9', backgroundColor: '#ffffff', color: '#4A6549', fontWeight: 700, cursor: 'pointer' }}
               onClick={resetForm}
             >
               Chọn hợp đồng khác
@@ -821,21 +821,21 @@ export default function BanGiaoPhongTab() {
           </div>
 
           <div className="ktp-grid-3 handover-summary-grid">
-            <SummaryCard icon="description" title="Thông tin hợp đồng" accentColor="#00666d">
+            <SummaryCard icon="description" title="Thông tin hợp đồng" accentColor="#4A6549">
               <InfoRow label="Mã HĐ:" value={hopDong.maHopDong} />
               <InfoRow label="Trạng thái:" value={hopDong.trangThaiHopDong} badge={hopDong.trangThaiHopDong === 'Hiệu lực' ? 'success' : 'warning'} />
               <InfoRow label="Ngày bắt đầu:" value={formatDate(hopDong.ngayBatDau)} />
               <InfoRow label="Thời hạn:" value={`${hopDong.thoiHanThue || 0} tháng`} />
             </SummaryCard>
 
-            <SummaryCard icon="person" title="Thông tin khách thuê" accentColor="#2f6765">
+            <SummaryCard icon="person" title="Thông tin khách thuê" accentColor="#4A6549">
               <InfoRow label="Họ tên:" value={hopDong.hoTenKhachHang} />
               <InfoRow label="SĐT:" value={hopDong.sdt} />
               <InfoRow label="Số người ở:" value={`${Math.max(Number(hopDong.soNguoiO) || 0, 1)} người`} />
               <InfoRow label="Hóa đơn kỳ đầu:" value={hopDong.trangThaiHoaDonKyDau} badge={hopDong.trangThaiHoaDonKyDau === 'Đã TT' ? 'success' : 'warning'} />
             </SummaryCard>
 
-            <SummaryCard icon="bed" title="Thông tin phòng/giường" accentColor="#4d777c">
+            <SummaryCard icon="bed" title="Thông tin phòng/giường" accentColor="#4A6549">
               <InfoRow label="Chi nhánh:" value={hopDong.tenChiNhanh} />
               <InfoRow label="Hình thức:" value={getScopeLabel(hopDong.danhSachGiuong)} badge="success" />
               <InfoRow label="Phòng:" value={hopDong.tenPhong || hopDong.maPhong} />
@@ -897,7 +897,7 @@ export default function BanGiaoPhongTab() {
                     const missingNote = hasDifference && !String(item.ghiChu || '').trim();
                     return (
                       <tr key={`${item.maPhong}-${item.maTaiSan}-${index}`} style={{ backgroundColor: hasDifference ? '#fffaf3' : '#ffffff' }}>
-                        <td style={{ fontWeight: 700, color: '#00666d', verticalAlign: 'middle' }}>{item.maTaiSan}</td>
+                        <td style={{ fontWeight: 700, color: '#4A6549', verticalAlign: 'middle' }}>{item.maTaiSan}</td>
                         <td>
                           <div style={{ fontWeight: '700', color: '#191c1d' }}>{item.tenTaiSan}</div>
                           {hasDifference && (
@@ -969,8 +969,8 @@ export default function BanGiaoPhongTab() {
             <div style={{ padding: '22px 24px', backgroundColor: '#ffffff', borderTop: '1px solid #e1e3e4' }}>
               <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#191c1d', margin: '0 0 16px 0' }}>Xác nhận bàn giao</h3>
               <div className="ktp-grid-2" style={{ gap: '16px', marginBottom: '18px' }}>
-                <div style={{ border: '1px solid #d7e5e7', backgroundColor: '#f6feff', borderRadius: '8px', padding: '16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#00666d', fontWeight: 700 }}>
+                <div style={{ border: '1px solid #E8EDE7', backgroundColor: '#F1F4F0', borderRadius: '8px', padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#4A6549', fontWeight: 700 }}>
                     <Icon name="check_circle" /> Quản lý xác nhận
                   </div>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
@@ -978,7 +978,7 @@ export default function BanGiaoPhongTab() {
                       type="checkbox"
                       checked={quanLyXacNhan}
                       onChange={(event) => setQuanLyXacNhan(event.target.checked)}
-                      style={{ width: '20px', height: '20px', accentColor: '#00666d' }}
+                      style={{ width: '20px', height: '20px', accentColor: '#4A6549' }}
                     />
                     <span style={{ fontSize: '14px', color: '#191c1d' }}>Đã kiểm kê tài sản và thông tin bàn giao</span>
                   </label>
@@ -994,7 +994,7 @@ export default function BanGiaoPhongTab() {
                         type="checkbox"
                         checked={khachCoMat}
                         onChange={(event) => setKhachCoMat(event.target.checked)}
-                        style={{ width: '20px', height: '20px', accentColor: '#00666d' }}
+                        style={{ width: '20px', height: '20px', accentColor: '#4A6549' }}
                       />
                       <span style={{ fontSize: '14px', color: '#191c1d' }}>Khách hàng có mặt tại thời điểm bàn giao</span>
                     </label>

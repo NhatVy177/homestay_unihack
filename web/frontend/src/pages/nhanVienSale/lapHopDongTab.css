@@ -4,9 +4,9 @@
 */
 
 :root {
-  --lhd-primary: #00666d;
-  --lhd-primary-hover: #004f55;
-  --lhd-primary-soft: #edfafa;
+  --lhd-primary: var(--color-primary);
+  --lhd-primary-hover: var(--color-primary-hover);
+  --lhd-primary-soft: var(--color-surface-alt);
   --lhd-secondary: #a43c12;
   --lhd-secondary-hover: #8b3009;
   --lhd-secondary-soft: #fff5f0;
@@ -39,9 +39,9 @@
 }
 
 @keyframes lhd-pulse-glow {
-  0% { box-shadow: 0 0 0 0 rgba(0, 102, 109, 0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(0, 102, 109, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 102, 109, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(74, 101, 73, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(74, 101, 73, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 101, 73, 0); }
 }
 
 @keyframes lhd-spin {
@@ -107,7 +107,7 @@
   background-color: var(--lhd-primary);
   border-color: var(--lhd-primary);
   color: var(--lhd-white);
-  box-shadow: 0 0 0 4px rgba(0, 102, 109, 0.15);
+  box-shadow: 0 0 0 4px rgba(74, 101, 73, 0.15);
   transform: scale(1.08);
 }
 
@@ -188,7 +188,7 @@
 }
 
 .lhd-card:hover {
-  box-shadow: 0 8px 32px rgba(0, 102, 109, 0.06);
+  box-shadow: 0 8px 32px rgba(74, 101, 73, 0.06);
 }
 
 .lhd-card-header {
@@ -264,7 +264,7 @@
 
 .lhd-input:focus {
   border-color: var(--lhd-primary);
-  box-shadow: 0 0 0 3px rgba(0, 102, 109, 0.12);
+  box-shadow: 0 0 0 3px rgba(74, 101, 73, 0.12);
   background-color: var(--lhd-white);
 }
 
@@ -298,7 +298,7 @@
 .lhd-btn-primary:hover {
   background-color: var(--lhd-primary-hover);
   transform: translateY(-1.5px);
-  box-shadow: 0 4px 12px rgba(0, 102, 109, 0.2);
+  box-shadow: 0 4px 12px rgba(74, 101, 73, 0.2);
 }
 
 .lhd-btn-primary:active {
@@ -413,7 +413,7 @@
 }
 
 .lhd-table tbody tr:hover {
-  background-color: #f7fafb;
+  background-color: var(--color-surface-alt);
 }
 
 .text-center {
@@ -442,14 +442,14 @@
 
 .service-select-card:hover {
   border-color: var(--lhd-primary);
-  box-shadow: 0 4px 12px rgba(0, 102, 109, 0.05);
+  box-shadow: 0 4px 12px rgba(74, 101, 73, 0.05);
   transform: translateY(-1px);
 }
 
 .service-select-card.selected {
   border-color: var(--lhd-primary);
   background-color: var(--lhd-primary-soft);
-  box-shadow: 0 4px 12px rgba(0, 102, 109, 0.08);
+  box-shadow: 0 4px 12px rgba(74, 101, 73, 0.08);
 }
 
 .service-select-card.compulsory {
@@ -628,7 +628,7 @@
 
 /* Print View PDF Preview Styles */
 .lhd-print-overlay {
-  background: #eef2f3;
+  background: var(--color-surface-alt);
   border-radius: 0 0 12px 12px;
   padding: 28px 24px 40px;
   overflow-y: auto;
@@ -644,7 +644,7 @@
   min-height: auto;
   box-sizing: border-box;
   background: #ffffff;
-  color: #111819;
+  color: var(--color-text);
   padding: 60px 72px;
   border: 1px solid #cbd2d4;
   box-shadow: 0 18px 44px rgba(17, 24, 25, 0.12);
@@ -838,11 +838,11 @@
 }
 
 .lhd-capacity-card {
-  background: linear-gradient(135deg, var(--lhd-primary) 0%, #004d52 100%);
+  background: linear-gradient(135deg, var(--lhd-primary) 0%, var(--color-primary-hover) 100%);
   border-radius: 16px;
   padding: 24px;
   color: var(--lhd-white);
-  box-shadow: 0 8px 24px rgba(0, 102, 109, 0.12);
+  box-shadow: 0 8px 24px rgba(74, 101, 73, 0.12);
   position: relative;
   overflow: hidden;
 }

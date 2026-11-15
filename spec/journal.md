@@ -1366,3 +1366,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Giá trị **cũ**: `NguoiDung KH9323` (demo5) Email=`demo5@gmail.com`. Giá trị **mới**: `vynhat2k5+demo5@gmail.com`. Chỉ đổi khi bảng `AvalancheWallet` chưa có ví của KH9323 (đã kiểm tra: 0 dòng) và email mới chưa trùng (đã kiểm tra: 0). Đã cập nhật đúng 1 dòng.
 - Hoàn lại nếu cần: `UPDATE dbo.NguoiDung SET Email=N'demo5@gmail.com' WHERE MaNguoiDung=N'KH9323'` (khi chưa có ví).
 - Việc còn lại: Vy đăng xuất demo5, đăng nhập lại (token cũ còn mang email cũ), rồi bấm "Gửi mã" ở tab Hợp đồng. Chỉ đổi dữ liệu DB, không có file mã nguồn nào đổi.
+
+## 2026-11-16 10:20:00 +07:00 — J-C144 — Đổi toàn bộ màu xanh ngọc cũ sang màu theme
+- Người thực hiện: Claude, theo yêu cầu của Vy (quét cả dự án, chỗ nào còn màu xanh ngọc cũ thì đổi sang màu xanh của nhóm Hằng, tức màu theme hiện tại trong `web/frontend/src/styles/tokens.css`).
+- Cách làm: quét mọi `.css/.jsx/.js` trong `web/frontend/src`, nhận dạng màu hex và rgba thuộc dải xanh ngọc (sắc độ 172-196, độ bão hòa ≥ 0.15) rồi đổi theo độ sáng: tối → `--color-primary` hoặc `--color-primary-hover`; trung bình sáng → `--color-border`; nền rất nhạt → `--color-primary-soft` hoặc `--color-surface-alt`; gần đen → `--color-text`. Trong CSS dùng biến, trong JS/JSX dùng mã hex tương ứng (thuộc tính SVG và style cần giá trị cố định). Thêm đổi riêng `#1a6e60` (nút xanh ở tab đăng ký trả phòng, thông báo) và `#eaf7f5` (employeeAccount.css).
+- Kết quả: 35 file, khoảng 395 chỗ đổi (nhiều nhất: `BanGiaoPhongTab.jsx`, `ThuNhanPhongTab.jsx`, `DatCocTab.jsx`, `dangKyTraPhongTab.css`, `cuTru.css`, `lichXemPhong.css`, `xacNhan.css`).
+- Cố ý giữ: màu xanh dương thông tin (#1565c0, #e3f2fd...), màu xanh lá trạng thái thành công, xám trung tính, và hai trang cũ `khachMoi.css`, `khachDangThue.css` (biến `--km-green`, `--rt-green`, không còn là màn chính).
+- Kiểm tra: build OK; `ui-customer-invoices`, `ui-customer-residence`, `ui-customer-deposit-history` PASS. Chưa chụp ảnh từng màn nên chưa xác nhận bằng mắt.

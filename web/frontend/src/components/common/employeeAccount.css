@@ -48,7 +48,7 @@
 }
 
 .employee-account-text small {
-  color: #16796f;
+  color: var(--color-primary);
   font-size: 11.5px;
   font-weight: 800;
 }
@@ -107,7 +107,7 @@
 }
 
 .employee-account-info:hover {
-  background: #eaf7f5;
+  background: var(--color-surface-alt);
 }
 
 .employee-account-logout {
@@ -136,9 +136,9 @@
 }
 
 .employee-account-view-head > span {
-  background: #eaf7f5;
+  background: var(--color-surface-alt);
   border-radius: 18px;
-  color: #16796f;
+  color: var(--color-primary);
   display: grid;
   height: 54px;
   place-items: center;

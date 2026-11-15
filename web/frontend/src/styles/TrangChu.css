@@ -312,7 +312,7 @@
 
 .tc-search-dropdown-menu {
   background: var(--color-surface);
-  border: 1px solid #e1eaea;
+  border: 1px solid var(--color-primary-soft);
   border-radius: 16px;
   box-shadow: var(--tc-shadow-lg);
   display: grid;

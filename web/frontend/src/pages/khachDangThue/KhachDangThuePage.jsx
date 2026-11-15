@@ -60,12 +60,12 @@ function initials(name = '') {
 function Brand() {
   return (
     <span className="rt-brand" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00666d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4A6549" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 9.5L12 3l9 6.5V21H3V9.5z"/><path d="M9 21V12h6v9"/>
       </svg>
       <span style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <span style={{ fontSize: '19px', fontFamily: '"Montserrat", "Inter", sans-serif', fontWeight: '700', letterSpacing: '0', lineHeight: '1.2' }}>
-          <span style={{ color: '#00666d' }}>Homestay</span><span style={{ color: '#a43c12' }}>Dorm</span>
+          <span style={{ color: '#4A6549' }}>Homestay</span><span style={{ color: '#a43c12' }}>Dorm</span>
         </span>
         <small style={{ fontSize: '12px', color: '#6f797a', fontWeight: '600' }}>Cổng khách hàng</small>
       </span>

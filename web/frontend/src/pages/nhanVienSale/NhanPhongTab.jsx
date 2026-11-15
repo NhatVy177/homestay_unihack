@@ -178,7 +178,7 @@ const RESIDENCE_STATUS_ORDER = ['Chưa cập nhật', 'Chờ duyệt cư trú', 
 function StatusBadge({ value }) {
   const label = value || 'Chưa cập nhật';
   const cfg = RESIDENCE_STATUS_CONFIG[label];
-  const s = cfg ? cfg.badge : { bg: '#eef2f3', fg: '#3f494a' };
+  const s = cfg ? cfg.badge : { bg: '#F1F4F0', fg: '#3f494a' };
   return (
     <span style={{ background: s.bg, color: s.fg, padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', display: 'inline-block', textAlign: 'center' }}>
       {cfg ? cfg.badgeLabel : label}

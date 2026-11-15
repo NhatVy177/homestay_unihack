@@ -93,6 +93,6 @@ export default function AccountSignerProvider({ appId, mode = 'email', accountEm
     embeddedWallets: { ethereum: { createOnLogin: 'off' }, showWalletUIs: false },
     defaultChain: trustedDeployment.chainId === 31337 ? hardhat : avalancheFuji,
     supportedChains: [avalancheFuji, hardhat],
-    appearance: { theme: 'light', accentColor: '#00666d' },
+    appearance: { theme: 'light', accentColor: '#4A6549' },
   }}><Bridge mode={mode} accountEmail={accountEmail}>{children}</Bridge></PrivyProvider>;
 }

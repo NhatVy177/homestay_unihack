@@ -450,7 +450,7 @@ export default function DangKyTraPhongTab() {
             id="dktp-cb-da-tiep-nhan"
             checked={locDaTiepNhan}
             onChange={(e) => setLocDaTiepNhan(e.target.checked)}
-            style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#1a6e60' }}
+            style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#4A6549' }}
           />
           <label htmlFor="dktp-cb-da-tiep-nhan" style={{ fontSize: 13, color: '#3f494a', cursor: 'pointer', fontWeight: 500, userSelect: 'none' }}>
             Chỉ hiện khách hàng đã tiếp nhận đăng ký trả phòng

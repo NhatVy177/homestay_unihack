@@ -152,7 +152,7 @@ export default function XacNhanKetQua() {
                 p.maPhieuTra?.toLowerCase().includes(activeSearch.toLowerCase())
               ).map((row) => (
                 <tr key={row.maDoiSoat}>
-                  <td style={{ fontWeight: 600, color: '#2f6765' }}>{row.maDoiSoat}</td>
+                  <td style={{ fontWeight: 600, color: '#4A6549' }}>{row.maDoiSoat}</td>
                   <td>
                     <div style={{ fontWeight: 600 }}>{row.hoTenKhach}</div>
                   </td>
@@ -187,7 +187,7 @@ export default function XacNhanKetQua() {
       {modalOpen && (
         <div className="ktp-modal-overlay" onClick={() => setModalOpen(false)}>
           <div className="ktp-modal" style={{ maxWidth: '700px', width: '90%', padding: '0', backgroundColor: '#ffffff', borderRadius: '12px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="ktp-modal-header" style={{ padding: '16px 24px', backgroundColor: '#3b8280', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '12px 12px 0 0' }}>
+            <div className="ktp-modal-header" style={{ padding: '16px 24px', backgroundColor: '#4A6549', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '12px 12px 0 0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <h3 style={{ fontSize: '20px', margin: 0, color: '#ffffff', fontWeight: '700' }}>Xác nhận kết quả đối soát</h3>
               </div>
@@ -204,7 +204,7 @@ export default function XacNhanKetQua() {
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><strong style={{ color: '#6f797a' }}>Hồ sơ: </strong><span style={{ fontWeight: 500 }}>{chiTiet.maHopDong ? `Hợp đồng` : `Phiếu đặt cọc`}</span></div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}><strong style={{ color: '#6f797a' }}>Phòng: </strong><span style={{ fontWeight: 500 }}>{chiTiet.tenPhong}</span></div>
                     {chiTiet.maGiuong && <div style={{ display: 'flex', justifyContent: 'space-between' }}><strong style={{ color: '#6f797a' }}>Giường: </strong><span style={{ fontWeight: 500 }}>{chiTiet.maGiuong.replace(/giường/i, '').trim()}</span></div>}
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><strong style={{ color: '#6f797a' }}>Ngày trả phòng thực tế: </strong><span style={{ fontWeight: 500, color: '#2f6765' }}>{fmtDate(chiTiet.ngayTraThucTe)}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><strong style={{ color: '#6f797a' }}>Ngày trả phòng thực tế: </strong><span style={{ fontWeight: 500, color: '#4A6549' }}>{fmtDate(chiTiet.ngayTraThucTe)}</span></div>
                   </div>
 
                   <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#191c1d', margin: '0 0 12px 0' }}>Chi tiết đối soát</h4>
@@ -228,7 +228,7 @@ export default function XacNhanKetQua() {
                           <tr><td style={{ padding: '16px 0 8px 0', color: '#ba1a1a', fontWeight: '700', fontSize: '16px' }}>Khách phải thanh toán thêm</td><td style={{ padding: '16px 0 8px 0', textAlign: 'right', color: '#ba1a1a', fontWeight: '700', fontSize: '16px' }}>{Number(chiTiet.soTienKhachPhaiTT).toLocaleString()}đ</td></tr>
                         )}
                         {chiTiet.soTienHoanThucTe === 0 && chiTiet.soTienKhachPhaiTT === 0 && (
-                          <tr><td colSpan="2" style={{ padding: '16px 0 8px 0', textAlign: 'center', color: '#2f6765', fontWeight: '700', fontSize: '16px' }}>Đã quyết toán (Không phát sinh dư nợ)</td></tr>
+                          <tr><td colSpan="2" style={{ padding: '16px 0 8px 0', textAlign: 'center', color: '#4A6549', fontWeight: '700', fontSize: '16px' }}>Đã quyết toán (Không phát sinh dư nợ)</td></tr>
                         )}
                       </tbody>
                     </table>
@@ -281,7 +281,7 @@ export default function XacNhanKetQua() {
             
             <div className="ktp-modal-footer" style={{ padding: '16px 24px', borderTop: '1px solid #e1e3e4', display: 'flex', justifyContent: 'flex-end', backgroundColor: '#ffffff', borderRadius: '0 0 12px 12px' }}>
               <div style={{ display: 'flex', gap: '12px' }}>
-                <button onClick={() => setModalOpen(false)} style={{ backgroundColor: '#ffffff', border: '1px solid #004c52', color: '#004c52', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>Đóng</button>
+                <button onClick={() => setModalOpen(false)} style={{ backgroundColor: '#ffffff', border: '1px solid #3D553C', color: '#3D553C', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>Đóng</button>
                 {!isSubmitted && (
                   isDongY ? (
                     <button className="ktp-btn-action-fill" onClick={submitXacNhan} style={{ padding: '10px 24px' }}>Xác nhận đồng ý</button>
@@ -310,7 +310,7 @@ export default function XacNhanKetQua() {
             </p>
             <button 
               onClick={() => { setIsSubmitted(false); setModalOpen(false); }} 
-              style={{ backgroundColor: '#004c52', color: '#ffffff', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', border: 'none', width: '100%', fontSize: '15px' }}
+              style={{ backgroundColor: '#3D553C', color: '#ffffff', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', border: 'none', width: '100%', fontSize: '15px' }}
             >
               Đóng
             </button>

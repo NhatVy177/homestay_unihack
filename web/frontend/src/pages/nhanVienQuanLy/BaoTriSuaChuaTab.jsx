@@ -70,8 +70,8 @@ export default function BaoTriSuaChuaTab() {
               padding: '12px 16px', 
               background: 'none', 
               border: 'none', 
-              borderBottom: activeSubTab === tab.id ? '2px solid #3b8280' : '2px solid transparent', 
-              color: activeSubTab === tab.id ? '#3b8280' : '#6f797a', 
+              borderBottom: activeSubTab === tab.id ? '2px solid #4A6549' : '2px solid transparent', 
+              color: activeSubTab === tab.id ? '#4A6549' : '#6f797a', 
               fontWeight: '600', 
               fontSize: '15px', 
               cursor: 'pointer', 
@@ -118,7 +118,7 @@ export default function BaoTriSuaChuaTab() {
                       <button 
                         className="ktp-btn-action-fill"
                         onClick={() => handleOpenDetail(item)}
-                        style={{ padding: '6px 16px', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', backgroundColor: '#528581', color: '#ffffff', border: 'none' }}
+                        style={{ padding: '6px 16px', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', backgroundColor: '#4A6549', color: '#ffffff', border: 'none' }}
                       >
                         Xử lý
                       </button>
@@ -141,7 +141,7 @@ export default function BaoTriSuaChuaTab() {
           <div className="ktp-modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '900px', maxWidth: '95%', maxHeight: '90vh', backgroundColor: '#f8f9fa', overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: '12px', animation: 'fadeIn 0.2s forwards' }}>
             
             {/* Header */}
-            <div style={{ padding: '16px 24px', backgroundColor: '#3b8280', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
+            <div style={{ padding: '16px 24px', backgroundColor: '#4A6549', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '600' }}>Chi tiết yêu cầu bảo trì: {selectedItem.id}</h3>
                 <p style={{ margin: '4px 0 0 0', opacity: 0.9, fontSize: '14px' }}>Mức độ: {selectedItem.mucDo}</p>
@@ -205,8 +205,8 @@ export default function BaoTriSuaChuaTab() {
 
               {/* 5. Kết quả xử lý (Cho phép chỉnh sửa nếu Đang xử lý, chỉ xem nếu Hoàn tất) */}
               {selectedItem.trangThai === 'Đang xử lý' && (
-                <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '8px', border: '1px solid #e1e3e4', borderLeft: '4px solid #00666d' }}>
-                  <h4 style={{ margin: '0 0 16px 0', fontSize: '15px', color: '#00666d' }}>5. Cập nhật kết quả xử lý</h4>
+                <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '8px', border: '1px solid #e1e3e4', borderLeft: '4px solid #4A6549' }}>
+                  <h4 style={{ margin: '0 0 16px 0', fontSize: '15px', color: '#4A6549' }}>5. Cập nhật kết quả xử lý</h4>
                   
                   <div style={{ marginBottom: '20px' }}>
                     <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#3f494a', marginBottom: '8px' }}>Loại kết quả *</label>
@@ -250,7 +250,7 @@ export default function BaoTriSuaChuaTab() {
                         <h5 style={{ margin: 0, fontSize: '15px', color: '#ff8f00', display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ display: 'flex', fontSize: '20px' }}><Icon name="warning" /></span> 6. Chi tiết hư hỏng cần đền bù
                         </h5>
-                        <button onClick={themHuHong} style={{ background: 'none', border: 'none', color: '#00666d', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <button onClick={themHuHong} style={{ background: 'none', border: 'none', color: '#4A6549', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <span style={{ display: 'flex', fontSize: '18px' }}><Icon name="add_circle" /></span> Thêm tài sản
                         </button>
                       </div>
@@ -328,7 +328,7 @@ export default function BaoTriSuaChuaTab() {
               {selectedItem.trangThai === 'Chờ tiếp nhận' && (
                 <>
                   <button onClick={() => setShowDetailModal(false)} style={{ backgroundColor: '#ffffff', color: '#c62828', border: '1px solid #c62828', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}>Từ chối</button>
-                  <button onClick={() => { alert('Đã tiếp nhận yêu cầu!'); setShowDetailModal(false); }} className="ktp-btn-action-fill" style={{ backgroundColor: '#3b8280', color: '#ffffff', border: 'none', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button onClick={() => { alert('Đã tiếp nhận yêu cầu!'); setShowDetailModal(false); }} className="ktp-btn-action-fill" style={{ backgroundColor: '#4A6549', color: '#ffffff', border: 'none', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ display: 'flex', fontSize: '20px' }}><Icon name="assignment_turned_in" /></span> Tiếp nhận xử lý
                   </button>
                 </>
@@ -340,7 +340,7 @@ export default function BaoTriSuaChuaTab() {
                   <button 
                     onClick={() => { alert('Đã cập nhật kết quả xử lý!'); setShowDetailModal(false); }} 
                     className="ktp-btn-action-fill" 
-                    style={{ backgroundColor: resultType === 'tu-choi' ? '#c62828' : '#3b8280', color: '#ffffff', border: 'none', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                    style={{ backgroundColor: resultType === 'tu-choi' ? '#c62828' : '#4A6549', color: '#ffffff', border: 'none', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
                   >
                     <span style={{ display: 'flex', fontSize: '20px' }}><Icon name={resultType === 'tu-choi' ? 'cancel' : 'check_circle'} /></span> 
                     {resultType === 'tu-choi' ? 'Lưu Từ chối' : 'Hoàn tất bảo trì'}

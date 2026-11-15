@@ -102,7 +102,7 @@ const STATUS_ORDER = ['Đã tiếp nhận', 'Chờ xác nhận cọc', 'Xác nh�
 
 const StatusBadge = ({ trangThai }) => {
   const cfg = STATUS_CONFIG[trangThai];
-  const s = cfg ? cfg.badge : { bg: '#eef2f3', fg: '#3f494a' };
+  const s = cfg ? cfg.badge : { bg: '#F1F4F0', fg: '#3f494a' };
 
   return (
     <span style={{ background: s.bg, color: s.fg, padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>
@@ -122,7 +122,7 @@ const CT_STATUS_CONFIG = {
 const CT_STATUS_ORDER = ['Chờ TT', 'Đã TT', 'Hết hạn'];
 const CtBadge = ({ trangThai }) => {
   const cfg = CT_STATUS_CONFIG[trangThai];
-  const s = cfg ? cfg.badge : { bg: '#eef2f3', fg: '#3f494a' };
+  const s = cfg ? cfg.badge : { bg: '#F1F4F0', fg: '#3f494a' };
   return (
     <span style={{ background: s.bg, color: s.fg, padding: '4px 12px', borderRadius: '999px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>
       {cfg ? cfg.badgeLabel : (trangThai || '—')}
@@ -134,8 +134,8 @@ const PAGE_SIZE = 10;
 const pageBtnStyle = (active, disabled) => ({
   minWidth: '34px', height: '34px', padding: '0 10px', borderRadius: '8px',
   cursor: disabled ? 'not-allowed' : 'pointer',
-  border: active ? '1px solid #2f6765' : '1px solid #d7dcdc',
-  background: active ? '#2f6765' : '#fff',
+  border: active ? '1px solid #4A6549' : '1px solid #d7dcdc',
+  background: active ? '#4A6549' : '#fff',
   color: active ? '#fff' : (disabled ? '#c4c7c8' : '#3f494a'),
   fontSize: '13px', fontWeight: 600
 });
@@ -592,13 +592,13 @@ export default function DatCocTab() {
       <div style={{ display: 'flex', gap: '24px', borderBottom: '1px solid #e0e3e3', marginBottom: '24px' }}>
         <div 
           onClick={() => setActiveSubTab('gui-yeu-cau')}
-          style={{ paddingBottom: '12px', cursor: 'pointer', fontWeight: activeSubTab === 'gui-yeu-cau' ? '600' : '500', color: activeSubTab === 'gui-yeu-cau' ? '#2f6765' : '#6f797a', borderBottom: activeSubTab === 'gui-yeu-cau' ? '2px solid #2f6765' : '2px solid transparent' }}
+          style={{ paddingBottom: '12px', cursor: 'pointer', fontWeight: activeSubTab === 'gui-yeu-cau' ? '600' : '500', color: activeSubTab === 'gui-yeu-cau' ? '#4A6549' : '#6f797a', borderBottom: activeSubTab === 'gui-yeu-cau' ? '2px solid #4A6549' : '2px solid transparent' }}
         >
           Gửi yêu cầu đặt cọc
         </div>
         <div
           onClick={() => setActiveSubTab('ghi-nhan-chung-tu')}
-          style={{ paddingBottom: '12px', cursor: 'pointer', fontWeight: activeSubTab === 'ghi-nhan-chung-tu' ? '600' : '500', color: activeSubTab === 'ghi-nhan-chung-tu' ? '#2f6765' : '#6f797a', borderBottom: activeSubTab === 'ghi-nhan-chung-tu' ? '2px solid #2f6765' : '2px solid transparent' }}
+          style={{ paddingBottom: '12px', cursor: 'pointer', fontWeight: activeSubTab === 'ghi-nhan-chung-tu' ? '600' : '500', color: activeSubTab === 'ghi-nhan-chung-tu' ? '#4A6549' : '#6f797a', borderBottom: activeSubTab === 'ghi-nhan-chung-tu' ? '2px solid #4A6549' : '2px solid transparent' }}
         >
           Ghi nhận chứng từ thanh toán
         </div>
@@ -669,7 +669,7 @@ export default function DatCocTab() {
                 const action = STATUS_CONFIG[item.trangThaiDangKy]?.action;
                 return (
                   <tr key={item.maDangKy}>
-                    <td style={{ fontWeight: '600', color: '#2f6765' }}>{item.maDangKy}</td>
+                    <td style={{ fontWeight: '600', color: '#4A6549' }}>{item.maDangKy}</td>
                     <td style={{ color: '#191c1d' }}>{item.hoTen}
                       {item.maPhieuDatCoc && item.khachThieuEmail &&
                         <small style={{ display: 'block', color: '#b45309' }}>Khách chưa có email, hãy báo khách trực tiếp.</small>}
@@ -693,7 +693,7 @@ export default function DatCocTab() {
                         </button>
                       )}
                       {action === 'chi-tiet' && (
-                        <button className="ktp-btn-action" style={{ padding: '6px 12px', fontSize: '13px', border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#2f6765' }} onClick={() => openDetail(item)}>
+                        <button className="ktp-btn-action" style={{ padding: '6px 12px', fontSize: '13px', border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#4A6549' }} onClick={() => openDetail(item)}>
                           Xem chi tiết
                         </button>
                       )}
@@ -782,7 +782,7 @@ export default function DatCocTab() {
                 const biTuChoi = daCoChungTu && !!(item.lyDoTuChoi && String(item.lyDoTuChoi).trim());
                 return (
                   <tr key={item.maPhieuDatCoc}>
-                    <td style={{ fontWeight: '600', color: '#2f6765' }}>{item.maPhieuDatCoc}</td>
+                    <td style={{ fontWeight: '600', color: '#4A6549' }}>{item.maPhieuDatCoc}</td>
                     <td>
                       <div style={{ fontWeight: '600', color: '#191c1d' }}>{item.hoTen}</div>
                       <div style={{ fontSize: '12px', color: '#6f797a' }}>{item.soDienThoai || ''}</div>
@@ -827,11 +827,11 @@ export default function DatCocTab() {
                     </td>
                     <td className="text-center">
                       {canGhiNhan(item) ? (
-                        <button className="ktp-btn-action-fill" style={{ backgroundColor: '#3b8280', padding: '6px 12px', fontSize: '12px' }} onClick={() => openGhiNhan(item)}>
+                        <button className="ktp-btn-action-fill" style={{ backgroundColor: '#4A6549', padding: '6px 12px', fontSize: '12px' }} onClick={() => openGhiNhan(item)}>
                           {daCoChungTu ? 'Cập nhật lại' : 'Ghi nhận chứng từ'}
                         </button>
                       ) : (
-                        <button className="ktp-btn-action" style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#2f6765', padding: '6px 12px', fontSize: '12px' }} onClick={() => setCtDetail(item)}>
+                        <button className="ktp-btn-action" style={{ border: '1px solid #c4c7c8', backgroundColor: '#fff', color: '#4A6549', padding: '6px 12px', fontSize: '12px' }} onClick={() => setCtDetail(item)}>
                           Xem chi tiết
                         </button>
                       )}
@@ -872,7 +872,7 @@ export default function DatCocTab() {
             </div>
             <div className="ktp-modal-body" style={{ padding: '0 24px 24px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <span style={{ fontWeight: 700, color: '#2f6765', fontSize: '18px' }}>{ctDetail.maPhieuDatCoc}</span>
+                <span style={{ fontWeight: 700, color: '#4A6549', fontSize: '18px' }}>{ctDetail.maPhieuDatCoc}</span>
                 <CtBadge trangThai={ctDetail.trangThaiThanhToan} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -908,7 +908,7 @@ export default function DatCocTab() {
       {showSendModal && selectedItem && (
         <div className="ktp-modal-overlay">
           <div className="ktp-modal" style={{ maxWidth: '760px', width: '100%' }}>
-            <div style={{ background: '#2f6765', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: '12px 12px 0 0' }}>
+            <div style={{ background: '#4A6549', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: '12px 12px 0 0' }}>
               <div>
                 <h3 style={{ margin: 0, color: '#fff', fontSize: '18px', fontWeight: 700 }}>Gửi yêu cầu đặt cọc</h3>
                 <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.75)', fontSize: '13px' }}>Mã phiếu đăng ký: <strong style={{ color: '#fff' }}>{selectedItem.maDangKy}</strong></p>
@@ -933,7 +933,7 @@ export default function DatCocTab() {
                       <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Icon name="person" /> Khách hàng</span>
                       {!editingInfo && (
                         <button onClick={openEditInfo} disabled={submitting} title="Chỉnh sửa thông tin khách hàng"
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2f6765', display: 'flex', alignItems: 'center', padding: '2px 4px', borderRadius: '4px' }}>
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4A6549', display: 'flex', alignItems: 'center', padding: '2px 4px', borderRadius: '4px' }}>
                           <Icon name="edit" style={{ fontSize: '16px' }} />
                         </button>
                       )}
@@ -1004,8 +1004,8 @@ export default function DatCocTab() {
                         return (
                           <label key={p.maPhong}
                             style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '10px',
-                              border: `1.5px solid ${chon ? '#3b8280' : '#e1e6e6'}`,
-                              background: chon ? '#eaf4f3' : (khoa ? '#f7f8f8' : '#fff'),
+                              border: `1.5px solid ${chon ? '#4A6549' : '#e1e6e6'}`,
+                              background: chon ? '#E8EDE7' : (khoa ? '#f7f8f8' : '#fff'),
                               opacity: khoa ? 0.6 : 1, cursor: khoa || savingPhong ? 'not-allowed' : 'pointer' }}>
                             <input type="radio" name="phongChot" checked={chon} disabled={khoa || savingPhong}
                               onChange={() => !khoa && handleChonPhong(p.maPhong)} />
@@ -1081,14 +1081,14 @@ export default function DatCocTab() {
       {showUploadModal && selectedPhieu && (
         <div className="ktp-modal-overlay" onClick={() => !submitting && setShowUploadModal(false)}>
           <div className="ktp-modal" style={{ maxWidth: '860px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ background: '#2f6765', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: '12px 12px 0 0' }}>
+            <div style={{ background: '#4A6549', padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: '12px 12px 0 0' }}>
               <h3 style={{ margin: 0, color: '#fff', fontSize: '18px', fontWeight: 700 }}>Ghi nhận chứng từ thanh toán</h3>
               <button onClick={() => setShowUploadModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', display: 'flex', padding: '4px' }}><Icon name="close" /></button>
             </div>
 
             <div className="ktp-modal-body" style={{ paddingTop: '16px' }}>
               {/* Dải thông tin phiếu (ngang) */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', border: '1px solid #e1e6e6', borderRadius: '10px', overflow: 'hidden', backgroundColor: '#f4f7f7', marginBottom: '18px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', border: '1px solid #e1e6e6', borderRadius: '10px', overflow: 'hidden', backgroundColor: '#F1F4F0', marginBottom: '18px' }}>
                 {[
                   ['receipt_long', 'Phiếu', selectedPhieu.maPhieuDatCoc],
                   ['person', 'Khách', selectedPhieu.hoTen],
@@ -1120,10 +1120,10 @@ export default function DatCocTab() {
                       return (
                         <button key={pt} type="button" disabled={submitting || !!initialPhuongThuc} onClick={() => handleChonPhuongThuc(pt)}
                           style={{ display: 'flex', alignItems: 'center', gap: '10px', textAlign: 'left', padding: '12px', borderRadius: '11px', cursor: submitting ? 'wait' : (initialPhuongThuc ? 'not-allowed' : 'pointer'),
-                            border: on ? '1.5px solid #3b8280' : '1.5px solid #e1e6e6', background: on ? '#eaf4f3' : '#fff', opacity: (!on && initialPhuongThuc) ? 0.5 : 1 }}>
-                          <Icon name={ic} style={{ fontSize: '21px', color: on ? '#2f6765' : '#8a9596' }} />
+                            border: on ? '1.5px solid #4A6549' : '1.5px solid #e1e6e6', background: on ? '#E8EDE7' : '#fff', opacity: (!on && initialPhuongThuc) ? 0.5 : 1 }}>
+                          <Icon name={ic} style={{ fontSize: '21px', color: on ? '#4A6549' : '#8a9596' }} />
                           <span style={{ lineHeight: 1.2 }}>
-                            <span style={{ fontWeight: 700, fontSize: '14px', color: on ? '#2f6765' : '#191c1d' }}>{pt}</span>
+                            <span style={{ fontWeight: 700, fontSize: '14px', color: on ? '#4A6549' : '#191c1d' }}>{pt}</span>
                             <small style={{ display: 'block', fontSize: '11px', color: '#6f797a' }}>{sub}</small>
                           </span>
                         </button>
@@ -1133,7 +1133,7 @@ export default function DatCocTab() {
                   {/* Khe cố định: thông tin CK (chuyển khoản) hoặc nút in (tiền mặt) */}
                   <div style={{ minHeight: '120px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     {ctPhuongThuc === 'Chuyển khoản' && (
-                      <div style={{ background: '#f4f7f7', border: '1px solid #e1e6e6', borderRadius: '12px', padding: '12px 14px', display: 'grid', gap: '7px', fontSize: '13px' }}>
+                      <div style={{ background: '#F1F4F0', border: '1px solid #e1e6e6', borderRadius: '12px', padding: '12px 14px', display: 'grid', gap: '7px', fontSize: '13px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}><span style={{ color: '#6f797a' }}>Ngân hàng</span><b>{selectedPaymentAccount.nganHang}</b></div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}><span style={{ color: '#6f797a' }}>Số tài khoản</span><b>{selectedPaymentAccount.soTaiKhoan}</b></div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}><span style={{ color: '#6f797a' }}>Chủ tài khoản</span><b style={{ textAlign: 'right' }}>{selectedPaymentAccount.chuTaiKhoan}</b></div>
@@ -1145,7 +1145,7 @@ export default function DatCocTab() {
                     )}
                     {ctPhuongThuc === 'Tiền mặt' && (
                       <button type="button" onClick={handleInPhieuDatCoc}
-                        style={{ width: '100%', border: '1.5px solid #3b8280', color: '#2f6765', background: '#fff', borderRadius: '10px', padding: '11px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer' }}>
+                        style={{ width: '100%', border: '1.5px solid #4A6549', color: '#4A6549', background: '#fff', borderRadius: '10px', padding: '11px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer' }}>
                         <Icon name="print" style={{ fontSize: '18px' }} /> In phiếu đặt cọc
                       </button>
                     )}
@@ -1160,12 +1160,12 @@ export default function DatCocTab() {
                     onClick={() => ctPhuongThuc && fileInputRef.current?.click()}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => { e.preventDefault(); if (ctPhuongThuc) setCtFile(e.dataTransfer.files?.[0] || null); }}
-                    style={{ flex: 1, minHeight: '150px', border: '1.6px dashed ' + (ctPhuongThuc ? '#3b8280' : '#d7dcdc'), borderRadius: '12px',
+                    style={{ flex: 1, minHeight: '150px', border: '1.6px dashed ' + (ctPhuongThuc ? '#4A6549' : '#d7dcdc'), borderRadius: '12px',
                       display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '18px',
-                      background: ctPhuongThuc ? '#eaf4f3' : '#f7f8f8', cursor: ctPhuongThuc ? 'pointer' : 'not-allowed' }}
+                      background: ctPhuongThuc ? '#E8EDE7' : '#f7f8f8', cursor: ctPhuongThuc ? 'pointer' : 'not-allowed' }}
                   >
-                    <Icon name="cloud_upload" style={{ fontSize: '30px', color: ctPhuongThuc ? '#3b8280' : '#b0b7b8' }} />
-                    <div style={{ fontWeight: 600, fontSize: '13.5px', color: ctPhuongThuc ? '#2f6765' : '#8a9596', marginTop: '6px' }}>
+                    <Icon name="cloud_upload" style={{ fontSize: '30px', color: ctPhuongThuc ? '#4A6549' : '#b0b7b8' }} />
+                    <div style={{ fontWeight: 600, fontSize: '13.5px', color: ctPhuongThuc ? '#4A6549' : '#8a9596', marginTop: '6px' }}>
                       {!ctPhuongThuc ? 'Chọn phương thức thanh toán trước'
                         : ctPhuongThuc === 'Tiền mặt' ? 'Kéo thả hoặc chọn phiếu đặt cọc đã ký' : 'Kéo thả hoặc chọn ảnh giao dịch'}
                     </div>
@@ -1187,7 +1187,7 @@ export default function DatCocTab() {
                   {ctFile && (
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#edeeef', padding: '10px 14px', borderRadius: '8px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#191c1d', overflow: 'hidden' }}>
-                        <Icon name="image" style={{ color: '#2f6765' }} />
+                        <Icon name="image" style={{ color: '#4A6549' }} />
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ctFile.name}</span>
                       </div>
                       <button type="button" onClick={(e) => { e.stopPropagation(); setCtFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#b3261e', display: 'flex' }}>
@@ -1207,7 +1207,7 @@ export default function DatCocTab() {
                     <div style={{ fontWeight: 700, color: '#b91c1c', marginBottom: '3px' }}>Chứng từ đã bị quản lý từ chối</div>
                     <div style={{ marginBottom: '5px' }}>Lý do: {selectedPhieu.lyDoTuChoi}</div>
                     {selectedPhieu.chungTuThanhToan && (
-                      <a href={fileChungTuUrl(selectedPhieu.chungTuThanhToan)} target="_blank" rel="noreferrer" style={{ color: '#2f6765', fontWeight: 600 }}>
+                      <a href={fileChungTuUrl(selectedPhieu.chungTuThanhToan)} target="_blank" rel="noreferrer" style={{ color: '#4A6549', fontWeight: 600 }}>
                         Xem lại chứng từ đã gửi
                       </a>
                     )}
@@ -1236,7 +1236,7 @@ export default function DatCocTab() {
             </div>
             <div className="ktp-modal-body" style={{ padding: '0 24px 24px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <span style={{ fontWeight: 700, color: '#2f6765', fontSize: '18px' }}>{detailItem.maDangKy}</span>
+                <span style={{ fontWeight: 700, color: '#4A6549', fontSize: '18px' }}>{detailItem.maDangKy}</span>
                 <StatusBadge trangThai={detailItem.trangThaiDangKy} />
               </div>
 
@@ -1260,7 +1260,7 @@ export default function DatCocTab() {
                   <>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '10px 0', borderBottom: '1px solid #f0f2f2' }}>
                       <span style={{ color: '#6f797a', fontSize: '14px' }}>Mã phiếu cọc</span>
-                      <span style={{ color: '#2f6765', fontSize: '14px', fontWeight: 600 }}>{detailItem.maPhieuDatCoc}</span>
+                      <span style={{ color: '#4A6549', fontSize: '14px', fontWeight: 600 }}>{detailItem.maPhieuDatCoc}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '10px 0', borderBottom: '1px solid #f0f2f2' }}>
                       <span style={{ color: '#6f797a', fontSize: '14px' }}>Số tiền cọc</span>

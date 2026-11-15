@@ -1367,7 +1367,7 @@
 
 .kh-profile-room-row-button:hover {
   border-color: var(--kp-primary);
-  box-shadow: 0 10px 22px rgba(0, 65, 68, 0.12);
+  box-shadow: 0 10px 22px rgba(74, 101, 73, 0.12);
   transform: translateY(-1px);
 }
 
@@ -2429,7 +2429,7 @@
 .dc-ticket-code-box {
   align-items: center;
   background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-primary-soft) 100%);
-  border: 1px solid rgba(47, 103, 101, 0.18);
+  border: 1px solid rgba(74, 101, 73, 0.18);
   border-radius: 8px;
   display: flex;
   gap: 16px;
@@ -2796,7 +2796,7 @@
 
 .hd-process-step.is-selectable:hover .hd-process-circle,
 .hd-process-step.is-selectable:focus-visible .hd-process-circle {
-  background: #eef9f8;
+  background: var(--color-surface-alt);
   box-shadow: 0 0 0 2px rgba(74, 101, 73, 0.22);
   color: var(--kp-primary);
 }
@@ -2964,15 +2964,15 @@
 }
 
 .hd-contract-choice:hover {
-  border-color: rgba(47, 103, 101, 0.42);
-  box-shadow: 0 10px 24px rgba(0, 65, 68, 0.1);
+  border-color: rgba(74, 101, 73, 0.42);
+  box-shadow: 0 10px 24px rgba(74, 101, 73, 0.1);
   transform: translateY(-1px);
 }
 
 .hd-contract-choice.is-selected {
   background: var(--color-primary-soft);
   border-color: var(--kp-primary);
-  box-shadow: 0 0 0 2px rgba(47, 103, 101, 0.12);
+  box-shadow: 0 0 0 2px rgba(74, 101, 73, 0.12);
 }
 
 .hd-contract-choice-main,
@@ -3493,7 +3493,7 @@
 
 .hd-payment-amount-box {
   align-items: center;
-  background: linear-gradient(180deg, var(--color-bg) 0%, #edf7f6 100%);
+  background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-surface-alt) 100%);
   border: 1px solid rgba(74, 101, 73, 0.16);
   border-radius: 8px;
   display: grid;
@@ -3779,7 +3779,7 @@
 }
 .hd-chip-gray svg {
   width: 12px;
-  color: #0d9488;
+  color: var(--color-primary);
 }
 
 .hd-action-buttons {
@@ -3832,7 +3832,7 @@
 
 .hd-return-date-field input:focus {
   border-color: var(--kp-primary);
-  box-shadow: 0 0 0 3px rgba(47, 103, 101, 0.12);
+  box-shadow: 0 0 0 3px rgba(74, 101, 73, 0.12);
   outline: none;
 }
 
@@ -3892,7 +3892,7 @@
   gap: 8px;
 }
 .hd-btn-teal:hover {
-  background: #1b4d4d;
+  background: var(--color-primary);
 }
 
 .hd-btn-danger {

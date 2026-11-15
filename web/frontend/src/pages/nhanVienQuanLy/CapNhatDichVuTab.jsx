@@ -35,7 +35,7 @@ export default function CapNhatDichVuTab() {
 
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-start' }}>
               <button style={{ backgroundColor: '#ffffff', color: '#3f494a', border: '1px solid #e1e3e4', padding: '8px 20px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}>Hủy</button>
-              <button className="ktp-btn-action-fill" style={{ backgroundColor: '#00666d', color: '#ffffff', border: 'none', padding: '8px 20px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}>Tải danh sách phòng</button>
+              <button className="ktp-btn-action-fill" style={{ backgroundColor: '#4A6549', color: '#ffffff', border: 'none', padding: '8px 20px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}>Tải danh sách phòng</button>
             </div>
           </div>
 
@@ -68,7 +68,7 @@ export default function CapNhatDichVuTab() {
                         <input type="text" defaultValue={room.endNuoc} style={{ width: '100px', padding: '8px 12px', border: '1px solid #bec8c9', borderRadius: '6px', textAlign: 'right', fontSize: '14px', outline: 'none' }} />
                       </td>
                       <td style={{ padding: '12px 16px', textAlign: 'center' }}>
-                        <button style={{ backgroundColor: '#ffffff', color: '#00666d', border: '1px solid #00666d', padding: '6px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}>Lưu</button>
+                        <button style={{ backgroundColor: '#ffffff', color: '#4A6549', border: '1px solid #4A6549', padding: '6px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s' }}>Lưu</button>
                       </td>
                     </tr>
                   ))}
@@ -78,7 +78,7 @@ export default function CapNhatDichVuTab() {
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
               <button style={{ backgroundColor: '#ffffff', color: '#3f494a', border: '1px solid #e1e3e4', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s', fontSize: '14px' }}>Hủy</button>
-              <button className="ktp-btn-action-fill" style={{ backgroundColor: '#00666d', color: '#ffffff', border: 'none', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s', fontSize: '14px' }}>
+              <button className="ktp-btn-action-fill" style={{ backgroundColor: '#4A6549', color: '#ffffff', border: 'none', padding: '10px 24px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'all 0.2s', fontSize: '14px' }}>
                 Lưu tất cả
               </button>
             </div>

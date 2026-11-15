@@ -65,15 +65,15 @@
   border: 1px solid #e0e3e3;
   border-radius: 8px;
   font-size: 14px;
-  background: #fafcfc;
+  background: var(--color-surface-alt);
   color: #191c1d;
   transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
 }
 .dktp-search-input:focus {
   outline: none;
-  border-color: #2f6765;
-  box-shadow: 0 0 0 3px rgba(47, 103, 101, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(74, 101, 73, 0.1);
 }
 
 /* ── Shared trả phòng search/list layout (nhân viên quản lý) ── */
@@ -121,7 +121,7 @@
 
 .tp-search-input,
 .tp-search-input-no-icon {
-  background: #fafcfc !important;
+  background: var(--color-surface-alt) !important;
   border-color: #e0e3e3 !important;
   border-radius: 8px !important;
   font-size: 14px !important;
@@ -136,8 +136,8 @@
 
 .tp-search-input:focus,
 .tp-search-input-no-icon:focus {
-  border-color: #2f6765 !important;
-  box-shadow: 0 0 0 3px rgba(47, 103, 101, 0.1) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(74, 101, 73, 0.1) !important;
 }
 
 .tp-search-status-tabs {
@@ -156,7 +156,7 @@
 }
 
 .tp-search-status-tabs .status-pill-tab.is-active {
-  border-color: #00666d;
+  border-color: var(--color-primary);
 }
 
 .tp-list-panel {
@@ -212,9 +212,9 @@
 .tp-btn-detail-outline {
   align-items: center;
   background: #fff;
-  border: 1px solid #00666d;
+  border: 1px solid var(--color-primary);
   border-radius: 8px;
-  color: #004c52;
+  color: var(--color-primary-hover);
   cursor: pointer;
   display: inline-flex;
   font-size: 13px;
@@ -227,11 +227,11 @@
 }
 
 .tp-btn-detail-outline:hover {
-  background: #eef8f8;
+  background: var(--color-surface-alt);
 }
 
 .tp-toast {
-  background: #2f6765;
+  background: var(--color-primary);
   border-radius: 8px;
   bottom: -64px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -262,7 +262,7 @@
   border-collapse: collapse;
 }
 .dktp-table th {
-  background: #f4f7f7;
+  background: var(--color-surface-alt);
   padding: 12px 16px;
   font-size: 11px;
   font-weight: 700;
@@ -279,7 +279,7 @@
   color: #3f494a;
   vertical-align: middle;
 }
-.dktp-table tbody tr:hover td { background: #fafcfc; }
+.dktp-table tbody tr:hover td { background: var(--color-surface-alt); }
 .dktp-table tbody tr:last-child td { border-bottom: none; }
 .dktp-th-center, .dktp-td-center { text-align: center !important; }
 
@@ -293,7 +293,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #1a6e60;
+  background: var(--color-primary);
   color: #fff;
   display: flex;
   align-items: center;
@@ -319,7 +319,7 @@
   align-items: center;
   gap: 5px;
   padding: 7px 16px;
-  background: #1a6e60;
+  background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -336,8 +336,8 @@
   gap: 5px;
   padding: 7px 16px;
   background: #fff;
-  color: #00666d;
-  border: 1.5px solid #00666d;
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
@@ -345,14 +345,14 @@
   transition: background 0.2s;
   white-space: nowrap;
 }
-.dktp-btn-view:hover { background: #eef8f8; }
+.dktp-btn-view:hover { background: var(--color-surface-alt); }
 
 /* ── Table footer ── */
 .dktp-table-footer {
   padding: 10px 16px;
   font-size: 13px;
   color: #9eaaab;
-  background: #fafcfc;
+  background: var(--color-surface-alt);
   border-top: 1px solid #e0e3e3;
 }
 
@@ -432,7 +432,7 @@
   justify-content: space-between;
   padding: 18px 20px 14px;
   border-bottom: 1px solid #e0e3e3;
-  background: linear-gradient(135deg, #f0fafa 0%, #fff 100%);
+  background: linear-gradient(135deg, var(--color-surface-alt) 0%, #fff 100%);
   flex-shrink: 0;
 }
 .dktp-modal-header-view {
@@ -447,11 +447,11 @@
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  background: #e0f2f1;
+  background: var(--color-primary-soft);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #00695c;
+  color: var(--color-primary);
   font-size: 20px;
   flex-shrink: 0;
 }
@@ -494,7 +494,7 @@
   gap: 6px;
   font-size: 12px;
   font-weight: 700;
-  color: #00695c;
+  color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin-bottom: 10px;
@@ -547,8 +547,8 @@
 
 /* ── Phiếu highlight (chỉ trong modal xem phiếu) ── */
 .dktp-phieu-highlight {
-  background: linear-gradient(135deg, #eef8ff 0%, #f0fafa 100%);
-  border: 1px solid #cce4e4;
+  background: linear-gradient(135deg, #eef8ff 0%, var(--color-surface-alt) 100%);
+  border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 14px 16px;
   display: flex;
@@ -564,7 +564,7 @@
 .dktp-phieu-ma-value {
   font-size: 16px;
   font-weight: 700;
-  color: #00695c;
+  color: var(--color-primary);
   font-family: 'Courier New', monospace;
 }
 
@@ -587,7 +587,7 @@
   gap: 6px;
   margin-top: 12px;
   padding: 8px 12px;
-  background: #f4f7f7;
+  background: var(--color-surface-alt);
   border-radius: 6px;
   font-size: 12px;
   color: #9eaaab;
@@ -606,14 +606,14 @@
   border-radius: 8px;
   font-size: 14px;
   color: #191c1d;
-  background: #fafcfc;
+  background: var(--color-surface-alt);
   transition: border-color 0.2s, box-shadow 0.2s;
   max-width: 220px;
 }
 .dktp-date-input:focus {
   outline: none;
-  border-color: #2f6765;
-  box-shadow: 0 0 0 3px rgba(47,103,101,0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(74, 101, 73, 0.1);
 }
 .dktp-date-hint {
   display: flex;
@@ -642,7 +642,7 @@
   gap: 10px;
   padding: 14px 20px;
   border-top: 1px solid #e0e3e3;
-  background: #fafcfc;
+  background: var(--color-surface-alt);
   flex-shrink: 0;
 }
 .dktp-btn-primary {
@@ -650,7 +650,7 @@
   align-items: center;
   gap: 6px;
   padding: 9px 20px;
-  background: #1a6e60;
+  background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -675,7 +675,7 @@
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
 }
-.dktp-btn-outline:hover { border-color: #9eaaab; background: #f4f7f7; }
+.dktp-btn-outline:hover { border-color: #9eaaab; background: var(--color-surface-alt); }
 .dktp-btn-outline:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* ── Spinners ── */
@@ -692,7 +692,7 @@
   display: inline-block;
   width: 16px; height: 16px;
   border: 2px solid #e0e3e3;
-  border-top-color: #2f6765;
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: dktp-spin 0.6s linear infinite;
   flex-shrink: 0;
@@ -705,7 +705,7 @@
   bottom: -80px;
   left: 50%;
   transform: translateX(-50%);
-  background: #1a6e60;
+  background: var(--color-primary);
   color: #fff;
   padding: 12px 24px;
   border-radius: 10px;

@@ -208,7 +208,7 @@ export default function XacNhanThanhToanTab() {
         <div className="ktp-modal-overlay" onClick={() => !submitting && setSelected(null)}>
           <div className="ktp-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '850px', width: '100%', maxHeight: '90vh', overflowY: 'auto', backgroundColor: '#ffffff', borderRadius: '12px' }}>
 
-            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#3b8280', color: '#ffffff', borderBottom: 'none', padding: '24px 32px' }}>
+            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#4A6549', color: '#ffffff', borderBottom: 'none', padding: '24px 32px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <h3 style={{ fontSize: '20px', margin: 0, color: '#ffffff', fontWeight: '700' }}>Chi tiết thanh toán cọc</h3>
               </div>
@@ -220,7 +220,7 @@ export default function XacNhanThanhToanTab() {
                 {/* Left Column */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                   <div className="ktp-section" style={{ padding: '20px', marginBottom: 0 }}>
-                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: '#3b8280', margin: '0 0 16px 0' }}>
+                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: '#4A6549', margin: '0 0 16px 0' }}>
                       <Icon name="person" /> Thông tin khách hàng
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -230,7 +230,7 @@ export default function XacNhanThanhToanTab() {
                   </div>
 
                   <div className="ktp-section" style={{ padding: '20px', marginBottom: 0 }}>
-                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: '#3b8280', margin: '0 0 16px 0' }}>
+                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: '#4A6549', margin: '0 0 16px 0' }}>
                       <Icon name="receipt_long" /> Thông tin phiếu đặt cọc
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -246,17 +246,17 @@ export default function XacNhanThanhToanTab() {
 
                 {/* Right Column */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  <div className="ktp-section" style={{ padding: '20px', marginBottom: 0, border: '1px solid #86d3da', backgroundColor: '#f5feff' }}>
-                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: '#3b8280', margin: '0 0 16px 0' }}>
+                  <div className="ktp-section" style={{ padding: '20px', marginBottom: 0, border: '1px solid #E0E3DF', backgroundColor: '#F1F4F0' }}>
+                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: '#4A6549', margin: '0 0 16px 0' }}>
                       <Icon name="image" /> Chứng từ thanh toán khách đã gửi
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {imgUrl ? (
                         isPdf ? (
-                          <a href={imgUrl} target="_blank" rel="noreferrer" style={{ color: '#2f6765', fontWeight: 600, fontSize: '14px' }}>📄 Mở file PDF chứng từ</a>
+                          <a href={imgUrl} target="_blank" rel="noreferrer" style={{ color: '#4A6549', fontWeight: 600, fontSize: '14px' }}>📄 Mở file PDF chứng từ</a>
                         ) : (
                           <a href={imgUrl} target="_blank" rel="noreferrer">
-                            <img src={imgUrl} alt="Chứng từ thanh toán" style={{ width: '100%', maxHeight: '260px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #cce4e4', backgroundColor: '#fff' }} />
+                            <img src={imgUrl} alt="Chứng từ thanh toán" style={{ width: '100%', maxHeight: '260px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #E0E3DF', backgroundColor: '#fff' }} />
                           </a>
                         )
                       ) : (
@@ -270,7 +270,7 @@ export default function XacNhanThanhToanTab() {
                     không nằm gọn trong cột phải nữa */}
                 {readOnly && (
                   <div className="ktp-section" style={{ gridColumn: '1 / -1', padding: '20px', marginBottom: 0 }}>
-                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: '#3b8280', margin: '0 0 12px 0' }}>
+                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: '#4A6549', margin: '0 0 12px 0' }}>
                       <Icon name="fact_check" /> Kết quả xử lý
                     </h4>
                     <StatusBadge trangThai={selected.trangThaiThanhToan} />
@@ -278,7 +278,7 @@ export default function XacNhanThanhToanTab() {
                 )}
                 {!readOnly && (
                   <div className="ktp-section" style={{ gridColumn: '1 / -1', padding: '20px', marginBottom: 0 }}>
-                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: '#3b8280', margin: '0 0 16px 0' }}>
+                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600', color: '#4A6549', margin: '0 0 16px 0' }}>
                       <Icon name="fact_check" /> Kết quả đối chiếu & Quyết định
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -286,21 +286,21 @@ export default function XacNhanThanhToanTab() {
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                         <div
                           onClick={() => setDecision('xac-nhan')}
-                          style={{ padding: '16px', borderRadius: '8px', border: decision === 'xac-nhan' ? '2px solid #00666d' : '1px solid #bec8c9', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', backgroundColor: decision === 'xac-nhan' ? '#f5feff' : '#ffffff' }}
+                          style={{ padding: '16px', borderRadius: '8px', border: decision === 'xac-nhan' ? '2px solid #4A6549' : '1px solid #bec8c9', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', backgroundColor: decision === 'xac-nhan' ? '#F1F4F0' : '#ffffff' }}
                         >
                           {/* Giống hệt radio ở màn Duyệt nhận cọc (DC02) — xem chú thích ở file đó */}
-                          <div style={{ width: '20px', height: '20px', boxSizing: 'border-box', borderRadius: '50%', border: decision === 'xac-nhan' ? '2px solid #00666d' : '2px solid #bec8c9', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            {decision === 'xac-nhan' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#00666d' }}></div>}
+                          <div style={{ width: '20px', height: '20px', boxSizing: 'border-box', borderRadius: '50%', border: decision === 'xac-nhan' ? '2px solid #4A6549' : '2px solid #bec8c9', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {decision === 'xac-nhan' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#4A6549' }}></div>}
                           </div>
                           <span style={{ fontWeight: '600', color: '#191c1d', fontSize: '14px' }}>Xác nhận hợp lệ</span>
                         </div>
 
                         <div
                           onClick={() => setDecision('tu-choi')}
-                          style={{ padding: '16px', borderRadius: '8px', border: decision === 'tu-choi' ? '2px solid #00666d' : '1px solid #bec8c9', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', backgroundColor: decision === 'tu-choi' ? '#f5feff' : '#ffffff' }}
+                          style={{ padding: '16px', borderRadius: '8px', border: decision === 'tu-choi' ? '2px solid #4A6549' : '1px solid #bec8c9', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', backgroundColor: decision === 'tu-choi' ? '#F1F4F0' : '#ffffff' }}
                         >
-                          <div style={{ width: '20px', height: '20px', boxSizing: 'border-box', borderRadius: '50%', border: decision === 'tu-choi' ? '2px solid #00666d' : '2px solid #bec8c9', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            {decision === 'tu-choi' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#00666d' }}></div>}
+                          <div style={{ width: '20px', height: '20px', boxSizing: 'border-box', borderRadius: '50%', border: decision === 'tu-choi' ? '2px solid #4A6549' : '2px solid #bec8c9', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {decision === 'tu-choi' && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#4A6549' }}></div>}
                           </div>
                           <span style={{ fontWeight: '600', color: '#191c1d', fontSize: '14px' }}>Từ chối xác nhận</span>
                         </div>

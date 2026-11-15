@@ -10,10 +10,10 @@ export default function HoaDonDinhKyTab() {
       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-end', marginBottom: '24px' }}>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <div style={{ display: 'flex', backgroundColor: '#ffffff', border: '1px solid #bec8c9', borderRadius: '8px', padding: '4px' }}>
-            <button style={{ padding: '8px 16px', backgroundColor: 'rgba(0, 102, 109, 0.05)', color: '#00666d', borderRadius: '6px', border: 'none', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}>Theo phòng</button>
+            <button style={{ padding: '8px 16px', backgroundColor: 'rgba(74, 101, 73, 0.05)', color: '#4A6549', borderRadius: '6px', border: 'none', fontWeight: '600', fontSize: '13px', cursor: 'pointer' }}>Theo phòng</button>
             <button style={{ padding: '8px 16px', backgroundColor: 'transparent', color: '#414753', border: 'none', fontWeight: '500', fontSize: '13px', cursor: 'pointer' }}>Theo khách hàng</button>
           </div>
-          <button style={{ backgroundColor: '#00666d', color: '#ffffff', padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: '600', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(0, 102, 109, 0.2)' }}>
+          <button style={{ backgroundColor: '#4A6549', color: '#ffffff', padding: '10px 20px', borderRadius: '8px', border: 'none', fontWeight: '600', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(74, 101, 73, 0.2)' }}>
             <Icon name="receipt_long" />
             Lập hóa đơn tất cả
           </button>
@@ -87,7 +87,7 @@ export default function HoaDonDinhKyTab() {
                 </div>
               </td>
               <td style={{ fontSize: '14px' }}>300.000đ</td>
-              <td style={{ fontSize: '14px', fontWeight: '700', color: '#00666d' }}>3.450.000đ</td>
+              <td style={{ fontSize: '14px', fontWeight: '700', color: '#4A6549' }}>3.450.000đ</td>
               <td>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: '#e1e3e4', color: '#414753', fontSize: '11px', fontWeight: '700', borderRadius: '999px', textTransform: 'uppercase' }}>
                   <span style={{ width: '6px', height: '6px', backgroundColor: '#717785', borderRadius: '50%' }}></span>
@@ -113,7 +113,7 @@ export default function HoaDonDinhKyTab() {
                 </div>
               </td>
               <td style={{ fontSize: '14px' }}>250.000đ</td>
-              <td style={{ fontSize: '14px', fontWeight: '700', color: '#00666d' }}>6.340.000đ</td>
+              <td style={{ fontSize: '14px', fontWeight: '700', color: '#4A6549' }}>6.340.000đ</td>
               <td>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', backgroundColor: 'rgba(147, 246, 170, 0.3)', color: '#0f5223', fontSize: '11px', fontWeight: '700', borderRadius: '999px', textTransform: 'uppercase' }}>
                   <span style={{ width: '6px', height: '6px', backgroundColor: '#0f5223', borderRadius: '50%' }}></span>
@@ -167,7 +167,7 @@ export default function HoaDonDinhKyTab() {
         <div className="ktp-modal-overlay" onClick={() => setModalType(null)}>
           <div className="ktp-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
             
-            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#3b8280', color: '#ffffff', borderBottom: 'none' }}>
+            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#4A6549', color: '#ffffff', borderBottom: 'none' }}>
               <h3 style={{ fontSize: '20px', margin: 0, color: '#ffffff' }}>{modalType === 'chua-lap' ? 'Lập hóa đơn dịch vụ' : 'Chi tiết hóa đơn dịch vụ'}</h3>
               <button className="ktp-modal-close" onClick={() => setModalType(null)} style={{ color: '#ffffff' }}>
                 <Icon name="close" />
@@ -267,7 +267,7 @@ export default function HoaDonDinhKyTab() {
                   <div style={{ fontSize: '12px', color: '#6f797a', fontStyle: 'italic' }}>Bằng chữ: Ba triệu bốn trăm năm mươi nghìn đồng chẵn.</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '28px', fontWeight: '800', color: '#00666d', marginBottom: '8px' }}>3.450.000đ</div>
+                  <div style={{ fontSize: '28px', fontWeight: '800', color: '#4A6549', marginBottom: '8px' }}>3.450.000đ</div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px', fontSize: '11px', fontWeight: '700', color: '#ba1a1a' }}>
                     <span style={{ width: '6px', height: '6px', backgroundColor: '#ba1a1a', borderRadius: '50%' }}></span>
                     {modalType === 'chua-lap' ? 'ĐANG CHỜ XỬ LÝ' : 'CHỜ THANH TOÁN'}

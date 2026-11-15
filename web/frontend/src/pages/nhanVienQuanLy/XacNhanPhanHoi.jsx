@@ -68,7 +68,7 @@ function InfoRow({ label, children }) {
 }
 
 function SummaryRow({ label, value, tone, strong }) {
-  const color = tone === 'danger' ? '#ba1a1a' : tone === 'success' ? '#137333' : tone === 'primary' ? '#00666d' : '#191c1d';
+  const color = tone === 'danger' ? '#ba1a1a' : tone === 'success' ? '#137333' : tone === 'primary' ? '#4A6549' : '#191c1d';
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '7px 0', borderBottom: '1px dashed #e1e3e4', fontSize: 13 }}>
       <span style={{ color: '#6f797a' }}>{label}</span>
@@ -79,7 +79,7 @@ function SummaryRow({ label, value, tone, strong }) {
 
 function SectionTitle({ icon, children, danger }) {
   return (
-    <h4 className="ktp-section-title" style={{ margin: '0 0 12px 0', color: danger ? '#ba1a1a' : '#3b8280' }}>
+    <h4 className="ktp-section-title" style={{ margin: '0 0 12px 0', color: danger ? '#ba1a1a' : '#4A6549' }}>
       <Icon name={icon} style={{ fontSize: 16 }} /> {children}
     </h4>
   );
@@ -100,7 +100,7 @@ function FinanceGroup({ group }) {
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, borderBottom: '1px solid #e1e3e4', paddingBottom: 8, marginBottom: 8 }}>
         <div>
-          <h5 style={{ margin: 0, color: '#00666d', fontSize: 13, fontWeight: 800 }}>{group.title}</h5>
+          <h5 style={{ margin: 0, color: '#4A6549', fontSize: 13, fontWeight: 800 }}>{group.title}</h5>
         </div>
         <strong style={{ color: group.total > 0 ? '#ba1a1a' : '#3f494a', fontSize: 15, fontWeight: 800, whiteSpace: 'nowrap' }}>{fmtMoney(group.total)}</strong>
       </div>
@@ -112,7 +112,7 @@ function FinanceGroup({ group }) {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            style={{ border: 'none', background: 'transparent', color: '#00666d', cursor: 'pointer', fontSize: 12, fontWeight: 700, padding: 0, display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            style={{ border: 'none', background: 'transparent', color: '#4A6549', cursor: 'pointer', fontSize: 12, fontWeight: 700, padding: 0, display: 'inline-flex', alignItems: 'center', gap: 4 }}
           >
             <Icon name={open ? 'expand_less' : 'expand_more'} style={{ fontSize: 16 }} />
             {open ? 'Ẩn chi tiết' : 'Xem chi tiết'}
@@ -343,8 +343,8 @@ export default function XacNhanPhanHoi() {
 
   const hoan = moneyValue(chiTiet?.soTienHoanThucTe);
   const thuThem = moneyValue(chiTiet?.soTienKhachPhaiTT);
-  const ketQuaColor = hoan > 0 ? '#00666d' : thuThem > 0 ? '#ba1a1a' : '#3f494a';
-  const ketQuaBg = hoan > 0 ? '#f0f9f9' : thuThem > 0 ? '#f9e8e3' : '#eef3f3';
+  const ketQuaColor = hoan > 0 ? '#4A6549' : thuThem > 0 ? '#ba1a1a' : '#3f494a';
+  const ketQuaBg = hoan > 0 ? '#F1F4F0' : thuThem > 0 ? '#f9e8e3' : '#F1F4F0';
   const ketQuaTitle = hoan > 0 ? 'Khách được hoàn cọc' : thuThem > 0 ? 'Khách phải thanh toán thêm' : 'Không phát sinh thanh toán';
   const ketQuaAmount = hoan > 0 ? fmtMoney(hoan) : thuThem > 0 ? fmtMoney(thuThem) : '';
   const isHopDong = Boolean(chiTiet?.maHopDong);
@@ -435,7 +435,7 @@ export default function XacNhanPhanHoi() {
                 <tr><td colSpan="7" style={{ textAlign: 'center', padding: 32, color: '#6f797a' }}>Không có phiếu đối soát nào đang chờ xử lý phản hồi.</td></tr>
               ) : filtered.map((row) => (
                 <tr key={row.maDoiSoat}>
-                  <td style={{ fontWeight: 700, color: '#2f6765' }}>{row.maDoiSoat}</td>
+                  <td style={{ fontWeight: 700, color: '#4A6549' }}>{row.maDoiSoat}</td>
                   <td><div style={{ fontWeight: 600 }}>{row.hoTenKhach}</div><div style={{ fontSize: 12, color: '#6f797a' }}>{row.sdtKhach}</div></td>
                   <td>
                     <span className={`tp-loai-badge ${row.maHopDong ? 'hd' : 'dc'}`} style={{ fontSize: 11 }}>{row.maHopDong ? 'Hợp đồng' : 'Đặt cọc'}</span>
@@ -468,7 +468,7 @@ export default function XacNhanPhanHoi() {
             style={{ width: 'calc(100vw - 64px)', maxWidth: 1200, maxHeight: '88vh', padding: 0, backgroundColor: '#fff', borderRadius: 12, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="ktp-modal-header" style={{ flex: '0 0 auto', padding: '16px 24px', backgroundColor: '#3b8280', borderRadius: '12px 12px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 'none' }}>
+            <div className="ktp-modal-header" style={{ flex: '0 0 auto', padding: '16px 24px', backgroundColor: '#4A6549', borderRadius: '12px 12px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 'none' }}>
               <div>
                 <h3 style={{ margin: 0, color: '#fff', fontSize: 20, fontWeight: 700 }}>
                   {selected?.trangThaiDoiSoat === 'Chờ phản hồi' ? 'Xử lý phản hồi đối soát' : 'Chi tiết phản hồi đối soát'}
@@ -582,7 +582,7 @@ export default function XacNhanPhanHoi() {
       )}
 
       <div className={`tp-toast ${toast.msg ? 'show' : ''}`} style={{ 
-        backgroundColor: toast.type === 'error' ? '#ba1a1a' : '#1a6e60',
+        backgroundColor: toast.type === 'error' ? '#ba1a1a' : '#4A6549',
         display: 'flex',
         alignItems: 'center',
         gap: '8px'
