@@ -1,6 +1,7 @@
 import doiSoatService from '../services/doiSoat.service.js';
 import hoanCocDoiSoatService from '../services/hoanCocDoiSoat.service.js';
 import thuThemDoiSoatService from '../services/thuThemDoiSoat.service.js';
+import { onWeb2SettlementSent } from '../integrations/avalanche/index.js';
 
 export async function uploadChungTuThanhToan(req, res, next) {
   try {
@@ -37,9 +38,11 @@ export async function taoDoiSoat(req, res, next) {
   try {
     const maNhanVienKeToan = req.user?.maNguoiDung;
     const data = await doiSoatService.taoDoiSoat(req.body, maNhanVienKeToan);
+    const xacNhanDienTu = await onWeb2SettlementSent(req.user, data?.maDoiSoat);
     res.status(201).json({
       message: 'Lập phiếu đối soát trả phòng thành công.',
-      doiSoat: data
+      doiSoat: data,
+      xacNhanDienTu
     });
   } catch (error) {
     next(error);

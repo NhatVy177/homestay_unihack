@@ -1200,3 +1200,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Thay đổi: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (tab Trả phòng, bước thanh toán): khi đối soát ở trạng thái "Chờ thanh toán thêm", đầu khung thanh toán hiện thẻ "Quét mã để chuyển khoản số tiền thu thêm" với VietQR (tài khoản nhận từ `.env`, số tiền = `SoTienKhachPhaiTT`, nội dung = mã đối soát + số điện thoại), kèm hướng dẫn tải minh chứng; `khachHangPortal.css` (`.hd-qr-card`). Dùng lại `VietQrCode` (J-C094); khi `PAYMENT_VIETQR_HIEN_SO_TIEN=false` (chế độ demo, J-C095) mã không kèm số tiền, khách tự nhập.
 - Kiểm tra: build OK. Chưa thử với bản đối soát thu thêm thật hoặc fixture UI (HD0001 hiện là hoàn cọc 500.000đ, không phải thu thêm).
 - Giới hạn: chỉ áp dụng thu thêm; hoàn cọc không cần QR vì tiền đi từ công ty ra khách.
+
+## 2026-11-15 14:24:28 +07:00 — J-C116 — Tự gửi bảng đối soát lên hệ thống xác nhận khi kế toán lập/điều chỉnh đối soát
+- Người thực hiện: Claude. Vy phản ánh: lập kết quả đối soát là đã gửi khách, không nên bắt kế toán bấm thêm "Gửi khách xác nhận" (Claude từng đề xuất bỏ bước này ở J-C114).
+- Thay đổi: `web/backend/integrations/avalanche/index.js` (`onWeb2SettlementSent`: tìm hợp đồng của đối soát, tìm hồ sơ xác nhận, gọi `propose` để gửi lên Fuji; bỏ qua nếu Avalanche tắt, đối soát không thuộc hợp đồng, hoặc hợp đồng chưa có hồ sơ xác nhận; lỗi chỉ ghi cảnh báo, không chặn Web2), `controllers/doiSoat.controller.js` (`taoDoiSoat` gọi hàm này sau khi lập và trả thêm `xacNhanDienTu`), `test/settlement-auto-publish.test.mjs`. Nút "Gửi khách xác nhận" ở tab "Khách xác nhận đối soát" vẫn còn làm đường dự phòng.
+- Áp dụng cho cả lần điều chỉnh sau khi khách phản đối (tạo phiên bản mới). **Không áp dụng ngược** cho DS0001 đã lập trước đó.
+- Kiểm tra: backend 92 pass, 4 skip, 0 fail; truy vấn tìm hợp đồng của đối soát chạy được trên HOMEDORM4 (DS0001 → HD0001). Chưa chạy thật qua giao diện. Backend đã khởi động lại.
+- Việc còn lại: với DS0001, kế toán bấm tay "Gửi khách xác nhận" một lần (hoặc lập lại đối soát để tự gửi); khách demo4 đồng ý ở tab Trả phòng.
