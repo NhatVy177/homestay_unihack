@@ -880,55 +880,44 @@
 
 /* Printing styles */
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  
-  .ktp-modal-overlay,
-  .ktp-modal-overlay * {
-    visibility: hidden;
-  }
-  
-  .ktp-modal,
-  .ktp-modal * {
-    visibility: hidden;
-  }
-  
-  /* Show only the contract container and its children */
-  .ktp-modal-overlay #print-area-wrapper,
-  .ktp-modal-overlay #print-area-wrapper * {
-    visibility: visible;
+  /* Chỉ giữ lại chuỗi phần tử chứa hợp đồng; mọi thứ khác (menu, thanh nút, ô tải bản ký...) bỏ hẳn khỏi bố cục để không chiếm trang trắng. */
+  body *:not(:has(#print-area-wrapper)):not(#print-area-wrapper):not(#print-area-wrapper *) {
+    display: none !important;
   }
 
-  .ktp-modal-overlay #print-area-wrapper {
-    position: absolute;
-    left: 0;
-    top: 0;
+  /* Lớp phủ/hộp thoại là position: fixed hoặc có cuộn riêng nên Chrome lặp lại/cắt nội dung; đưa về dòng chảy thường để tự ngắt trang. */
+  html, body, #root {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  :has(> #print-area-wrapper),
+  :has(#print-area-wrapper) {
+    position: static !important;
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    animation: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  #print-area-wrapper {
+    position: static !important;
     width: 100% !important;
     height: auto !important;
     padding: 0 !important;
     margin: 0 !important;
     background-color: white !important;
   }
-  
-  /* Lớp phủ/hộp thoại là position: fixed nên Chrome lặp lại nó trên mọi trang in và các trang sau bị chồng chữ.
-     Khi in, đưa chúng về dòng chảy bình thường để hợp đồng tự ngắt sang trang 2, 3. */
-  html, body {
-    height: auto !important;
-    overflow: visible !important;
-  }
-  .ktp-modal-overlay,
-  .ktp-modal,
-  .lhd-print-overlay {
-    position: static !important;
-    overflow: visible !important;
-    height: auto !important;
-    max-height: none !important;
-    transform: none !important;
-    animation: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-  }
+
   .contract-paper-a4 table,
   .contract-paper-a4 tr,
   .contract-paper-a4 h4 {

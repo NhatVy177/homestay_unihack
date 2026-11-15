@@ -1306,3 +1306,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Nguyên nhân: khi in, lớp phủ và hộp thoại xem hợp đồng vẫn là `position: fixed` / có cuộn riêng nên trình duyệt lặp lại phần trên cùng ở mọi trang và cắt nội dung dài.
 - Thay đổi: `web/frontend/src/pages/nhanVienSale/lapHopDongTab.css` (trong `@media print`: đưa `.ktp-modal-overlay`, `.ktp-modal`, `.lhd-print-overlay` về `position: static`, bỏ cuộn/chiều cao cố định; bảng, dòng bảng và tiêu đề Điều không bị cắt giữa chừng).
 - Kiểm tra: dựng trang mô phỏng cùng cấu trúc (lớp phủ cố định, hộp thoại cuộn, bài dài 70 dòng) và xuất PDF bằng Chrome: bản cũ chỉ in được 36/70 dòng trên 1 trang, bản mới in đủ 70/70 dòng trên 2 trang. Chưa in thử hợp đồng thật trên giao diện.
+
+## 2026-11-16 01:50:00 +07:00 — J-C134 — In hợp đồng: bỏ trang 1 trắng
+- Người thực hiện: Claude, theo phản ánh của Vy (bản xem trước in có 5 trang, trang 1 trắng; J-C133 mới chỉ sửa chữ chồng).
+- Nguyên nhân (suy luận, chưa tái hiện trên app thật): các phần giao diện khác chỉ bị ẩn bằng `visibility: hidden` nên vẫn chiếm chỗ trong bố cục, đẩy hợp đồng xuống các trang sau.
+- Thay đổi: `web/frontend/src/pages/nhanVienSale/lapHopDongTab.css` (`@media print`): mọi phần tử không nằm trên đường tới `#print-area-wrapper` được `display: none`; các phần tử cha của hợp đồng đưa về `static`, không cuộn, không chiều cao cố định; hợp đồng `position: static`.
+- Kiểm tra: build OK; trang mô phỏng (menu + nền cao 1800px + hộp thoại cuộn + nút In + ô tải bản ký + 70 dòng) xuất PDF Chrome: 2 trang, trang 1 bắt đầu bằng tiêu đề hợp đồng, đủ 70/70 dòng, không lọt menu/nút. Chưa in thử hợp đồng thật nên chưa xác nhận hết trang trắng trên app.
