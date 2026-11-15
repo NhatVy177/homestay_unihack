@@ -3,6 +3,7 @@ import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as cuTruRepository from '../repositories/cuTru.repository.js';
 import { requireValidMembers } from './nhanPhong.service.js';
 import { checkResidentsGender } from './genderRules.js';
+import { parseGroupMembers } from './groupMembers.js';
 import { notifyNhanPhong, notifyMemberInvites } from '../integrations/mail/nhanPhongNotifications.js';
 
 // D-026 mục 4: sau khi cọc xong, khách tự khai người ở trên web; hệ thống kiểm tra như D-024
@@ -18,7 +19,7 @@ export async function getCuTruCuaKhach(user, { query = executeQuery } = {}) {
   assertCustomer(user);
   const params = [{ name: 'MaKhachHang', type: sql.VarChar(6), value: user.maNguoiDung }];
   const deposits = (await query(`SELECT pdc.MaPhieuDatCoc AS maPhieuDatCoc, pdc.HinhThucThue AS hinhThucThue,
-      pdk.SoNguoiDuKienO AS soNguoiDuKienO, pdk.SoNam AS soNam, pdk.SoNu AS soNu, hs.MaHoSoCuTru AS maHoSoCuTru,
+      pdk.SoNguoiDuKienO AS soNguoiDuKienO, pdk.SoNam AS soNam, pdk.SoNu AS soNu, pdk.YeuCauKhac AS ghiChuDangKy, hs.MaHoSoCuTru AS maHoSoCuTru,
       ISNULL(hs.TrangThaiHoSo, N'Chưa cập nhật') AS trangThaiHoSo, hs.GhiChuQuanLy AS ghiChuQuanLy,
       CAST(CASE WHEN EXISTS (SELECT 1 FROM dbo.HopDongThue hd WHERE hd.MaPhieuCoc = pdc.MaPhieuDatCoc) THEN 1 ELSE 0 END AS BIT) AS coHopDong,
       (SELECT COUNT(*) FROM dbo.ChiTietDatCoc c WHERE c.MaPhieuDatCoc = pdc.MaPhieuDatCoc) AS soDongCoc,
@@ -45,8 +46,9 @@ export async function getCuTruCuaKhach(user, { query = executeQuery } = {}) {
     WHERE nd.MaNguoiDung = @MaKhachHang`, params)).recordset?.[0] || null;
   return {
     nguoiDaiDien,
-    phieu: deposits.map((item) => ({
+    phieu: deposits.map(({ ghiChuDangKy, ...item }) => ({
       ...item,
+      thanhVienDangKy: parseGroupMembers(ghiChuDangKy),
       coTheKhai: !item.coHopDong && EDITABLE.includes(item.trangThaiHoSo),
       thanhVien: members.filter((member) => member.maHoSoCuTru && member.maHoSoCuTru === item.maHoSoCuTru),
     })),

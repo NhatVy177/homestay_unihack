@@ -24,7 +24,11 @@ function initialMembers(phieu, nguoiDaiDien) {
     ...EMPTY_MEMBER, hoTen: nguoiDaiDien.hoTen || '', ngaySinh: dayOf(nguoiDaiDien.ngaySinh), gioiTinh: ['Nam', 'Nữ'].includes(nguoiDaiDien.gioiTinh) ? nguoiDaiDien.gioiTinh : '',
     cccd: nguoiDaiDien.cccd || '', sdt: nguoiDaiDien.sdt || '', email: nguoiDaiDien.email || '', quocTich: nguoiDaiDien.quocTich || 'Việt Nam',
   } : { ...EMPTY_MEMBER };
-  return [rep, ...Array.from({ length: count - 1 }, () => ({ ...EMPTY_MEMBER }))];
+  // Thành viên đã nhập ở form đăng ký nhóm thì điền sẵn, khách chỉ bổ sung ngày sinh/quốc tịch (J-C119).
+  const registered = (phieu.thanhVienDangKy || []).filter((m) => !m.daiDien)
+    .map((m) => ({ ...EMPTY_MEMBER, hoTen: m.hoTen, gioiTinh: m.gioiTinh, cccd: m.cccd, sdt: m.soDienThoai }));
+  const rest = [...registered, ...Array.from({ length: Math.max(0, count - 1 - registered.length) }, () => ({ ...EMPTY_MEMBER }))];
+  return [rep, ...rest];
 }
 
 function ResidenceForm({ phieu, nguoiDaiDien, onSubmit }) {
