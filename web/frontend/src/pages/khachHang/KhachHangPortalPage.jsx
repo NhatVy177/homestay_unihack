@@ -287,6 +287,7 @@ const DEMO_ROOM_IMAGES = [
 function Icon({ name, className = '' }) {
   const shapes = {
     home: <><path d="M3.5 11.2 12 4l8.5 7.2" /><path d="M5.5 10.4V20h13v-9.6" /><path d="M9.5 20v-5.8h5V20" /></>,
+    arrow_back: <><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></>,
     explore: <><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2.4 5.1-5.1 2.4 2.4-5.1 5.1-2.4Z" /></>,
     search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4 4" /></>,
     profile: <><path d="M7 4h7l3 3v13H7z" /><path d="M14 4v4h4M10 13h4M10 17h4" /></>,
@@ -4186,6 +4187,9 @@ export default function KhachHangPortalPage() {
     const interested = selectedRooms[0];
     return (
       <section className="kh-rent-page">
+        <button type="button" className="ui-btn ui-btn--secondary kh-rent-back" onClick={() => { setRentModal(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+          <Icon name="arrow_back" /> Quay lại
+        </button>
         <form className="kh-rent-card kh-register-modal kh-register-page" onSubmit={submitRent}>
           <header className="kh-rent-header">
             <span className="kh-rent-tag"><Icon name="profile" />Phiếu nhu cầu thuê</span>

@@ -125,6 +125,13 @@ try {
     await fill.page.getByRole('button', { name: 'Tôi quan tâm phòng này' }).click();
     const form = fill.page.locator('.kh-register-modal').first();
     await form.waitFor();
+    // Nút quay lại: về danh sách phòng, mở lại phiếu vẫn được
+    await fill.page.getByRole('button', { name: 'Quay lại', exact: true }).click();
+    await fill.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
+    assert.equal(await fill.page.locator('.kh-register-modal').count(), 0, 'quay lại thì đóng phiếu');
+    await fill.page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết' }).click();
+    await fill.page.getByRole('button', { name: 'Tôi quan tâm phòng này' }).click();
+    await form.waitFor();
     const labelled = (text) => form.locator('label', { hasText: text }).locator('input, select, textarea').first();
     await labelled('Ngày sinh').fill('2000-01-01');
     await labelled('Giới tính*').selectOption('Nam');

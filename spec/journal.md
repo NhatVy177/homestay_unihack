@@ -1207,3 +1207,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Áp dụng cho cả lần điều chỉnh sau khi khách phản đối (tạo phiên bản mới). **Không áp dụng ngược** cho DS0001 đã lập trước đó.
 - Kiểm tra: backend 92 pass, 4 skip, 0 fail; truy vấn tìm hợp đồng của đối soát chạy được trên HOMEDORM4 (DS0001 → HD0001). Chưa chạy thật qua giao diện. Backend đã khởi động lại.
 - Việc còn lại: với DS0001, kế toán bấm tay "Gửi khách xác nhận" một lần (hoặc lập lại đối soát để tự gửi); khách demo4 đồng ý ở tab Trả phòng.
+
+## 2026-11-15 14:33:42 +07:00 — J-C117 — Nút "Quay lại" ở trang "Đăng ký thuê phòng"
+- Người thực hiện: Claude, theo phản ánh của Vy (trang đăng ký thuê phòng không có nút quay lại).
+- Thay đổi: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (`renderRentRequestPage`: nút "Quay lại" đóng phiếu và về danh sách phòng; thêm biểu tượng `arrow_back` vào bộ biểu tượng riêng của cổng khách, trước đó các nút "Quay lại danh sách" hiện hình ngôi nhà), `khachHangPortal.css` (`.kh-rent-back` trải hết hàng lưới hai cột), `scripts/ui-interested-rooms.mjs` (kiểm tra quay lại rồi mở lại phiếu).
+- Kiểm tra: `ui-interested-rooms`, `ui-customer-invoices`, `ui-customer-deposit-history` PASS; đã xem ảnh trang đăng ký.
