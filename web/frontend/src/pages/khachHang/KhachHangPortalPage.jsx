@@ -4490,20 +4490,31 @@ export default function KhachHangPortalPage() {
 
         {groupStep === 3 && <div className="kh-grp-card">
           <div className="kh-grp-card-head"><h2>Xác nhận thông tin nhóm</h2></div>
-          <dl className="kh-grp-summary">
-            <div><dt>Phòng quan tâm</dt><dd>{selectedRooms.map((room) => room.tenPhong).join(', ')}</dd></div>
-            <div><dt>Số người</dt><dd>{summary.people.length} người ({summary.soNam} nam, {summary.soNu} nữ)</dd></div>
-            <div><dt>Khu vực · loại phòng</dt><dd>{[rentForm.khuVucMongMuon, rentForm.loaiPhongYeuCau].filter(Boolean).join(' · ') || '—'}</dd></div>
-            <div><dt>Mức giá tối đa</dt><dd>{rentForm.mucGiaToiDa ? `${Number(rentForm.mucGiaToiDa).toLocaleString('vi-VN')}đ/tháng` : '—'}</dd></div>
-            <div><dt>Dọn vào · thời hạn</dt><dd>{rentForm.ngayDuKienVaoO ? rentForm.ngayDuKienVaoO.split('-').reverse().join('/') : '—'} · {rentForm.thoiHanThue || '—'} tháng</dd></div>
-            <div><dt>Thời gian xem phòng</dt><dd>{[rentForm.ngayXemMongMuon ? rentForm.ngayXemMongMuon.split('-').reverse().join('/') : '', rentForm.khungGioRanh].filter(Boolean).join(', ') || 'Linh hoạt theo Sale'}</dd></div>
-          </dl>
-          <ul className="kh-grp-people">{summary.people.map((person, index) => <li key={`${person.cccd}-${index}`}>
-            <strong>{index + 1}. {person.hoTen}</strong>{index === 0 && <span className="kh-grp-badge-inline">Người đại diện</span>}
-            <small>{person.gioiTinh} · {person.soDienThoai} · CCCD {person.cccd}</small></li>)}</ul>
-          <div className="kh-grp-actions"><button type="button" className="kp-btn kp-btn-soft" onClick={goBack}>Quay lại</button>
-            <button type="button" className="kp-btn kp-btn-primary" disabled={submitting} onClick={() => submitRent({ preventDefault() {} })}>
-              {submitting ? 'Đang gửi...' : 'Xác nhận đăng ký nhóm'}</button></div>
+          <section className="kh-grp-panel">
+            <h3>Danh sách thành viên ({summary.people.length})</h3>
+            <ul className="kh-grp-rows">{summary.people.map((person, index) => <li key={`${person.cccd}-${index}`}>
+              <span className="kh-grp-name">{person.hoTen}{index === 0 && <b className="kh-grp-badge-inline">ĐẠI DIỆN</b>}</span>
+              <span><em>SĐT:</em> {person.soDienThoai}</span>
+              <span><em>CCCD:</em> {person.cccd}</span></li>)}</ul>
+          </section>
+          <section className="kh-grp-panel">
+            <h3>Thông tin thuê phòng chung</h3>
+            <dl className="kh-grp-summary">
+              <div><dt>Phòng:</dt><dd className="is-room">{selectedRooms.map((room) => room.tenPhong).join(', ')}</dd></div>
+              <div><dt>Số người:</dt><dd>{summary.people.length} người ({summary.soNam} nam, {summary.soNu} nữ)</dd></div>
+              <div><dt>Khu vực · loại phòng:</dt><dd>{[rentForm.khuVucMongMuon, rentForm.loaiPhongYeuCau].filter(Boolean).join(' · ') || '—'}</dd></div>
+              <div><dt>Mức giá tối đa:</dt><dd>{rentForm.mucGiaToiDa ? `${Number(rentForm.mucGiaToiDa).toLocaleString('vi-VN')}đ/tháng` : '—'}</dd></div>
+              <div><dt>Thời hạn:</dt><dd>{rentForm.thoiHanThue ? `${rentForm.thoiHanThue} Tháng` : '—'}</dd></div>
+              <div><dt>Ngày chuyển vào:</dt><dd>{rentForm.ngayDuKienVaoO ? rentForm.ngayDuKienVaoO.split('-').reverse().join('/') : '—'}</dd></div>
+              <div><dt>Ngày xem phòng:</dt><dd>{rentForm.ngayXemMongMuon ? rentForm.ngayXemMongMuon.split('-').reverse().join('/') : 'Linh hoạt theo Sale'}</dd></div>
+              <div><dt>Khung giờ rảnh:</dt><dd>{rentForm.khungGioRanh || VIEWING_SLOTS[0]}</dd></div>
+            </dl>
+          </section>
+          <div className="kh-grp-actions is-split">
+            <button type="button" className="kh-grp-back" onClick={goBack}><Icon name="arrow_back" /> Quay lại</button>
+            <button type="button" className="kp-btn kp-btn-primary kh-grp-confirm" disabled={submitting} onClick={() => submitRent({ preventDefault() {} })}>
+              {submitting ? 'Đang gửi...' : 'Xác nhận Đăng ký Nhóm'}</button>
+          </div>
         </div>}
       </section>
     );

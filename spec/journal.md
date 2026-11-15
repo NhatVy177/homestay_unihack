@@ -1231,3 +1231,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Nguyên nhân: bước 2 dùng lại lớp `kh-register-modal` của hộp thoại cũ (chiều cao tối đa 842px, rộng tối đa 826px, ẩn phần tràn) và `kh-register-scroll` (cuộn riêng), nên thẻ bị hẹp, lệch trái và có cuộn trong.
 - Sửa: `web/frontend/src/pages/khachHang/khachHangPortal.css`: ghi đè `.kh-grp-card.kh-register-modal` và `.kh-grp-card .kh-register-scroll` (không giới hạn kích thước, không cuộn trong, đệm theo thẻ nhóm); sao các luật nút tiện ích sang `.kh-grp-card .kh-amenity-chip` để đúng dạng viên thuốc.
 - Kiểm tra: build OK; `ui-interested-rooms` PASS; đã xem ảnh bước 2 ở 1440 và 390.
+
+## 2026-11-15 15:18:30 +07:00 — J-C121 — Bước 3 "Xác nhận thông tin nhóm" theo mẫu nhóm Hằng
+- Người thực hiện: Claude, theo yêu cầu của Vy (gửi ảnh bước 3 của Hằng).
+- Thay đổi: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (bước 3 của `renderGroupRentPage`: khối "Danh sách thành viên (n)" mỗi hàng gồm tên + nhãn ĐẠI DIỆN, SĐT, CCCD; khối "Thông tin thuê phòng chung" dạng nhãn - giá trị, thêm số người nam/nữ, khu vực/loại phòng, mức giá so với mẫu; nút "Quay lại" bên trái và "Xác nhận Đăng ký Nhóm" bên phải), `khachHangPortal.css` (`.kh-grp-panel`, `.kh-grp-rows`, `.kh-grp-actions.is-split`, `.kh-grp-confirm`, bản điện thoại xếp dọc).
+- Kiểm tra: build OK; `ui-interested-rooms` PASS (luồng nhóm gửi đúng phiếu); đã xem ảnh bước 3 ở 1440.

@@ -5181,3 +5181,27 @@
   border-color: var(--color-primary);
   color: var(--color-surface);
 }
+
+/* Bước 3 của form nhóm (theo mẫu nhóm Hằng): hai khối nền nhạt, hàng thành viên, thông tin chung */
+.kh-grp-panel { padding: 22px 28px; border-radius: 20px; background: #f6f8fa; display: grid; gap: 14px; }
+.kh-grp-panel h3 { margin: 0; padding-bottom: 12px; border-bottom: 1px solid #dfe3e8; font-size: 18px; font-weight: 600; }
+.kh-grp-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.kh-grp-rows li { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: center; padding: 14px 16px; border: 1px solid #e6e9ee; border-radius: 14px; background: #fff; font-weight: 600; }
+.kh-grp-rows em { font-style: normal; font-weight: 400; color: var(--color-text-muted); margin-right: 4px; }
+.kh-grp-name { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.kh-grp-panel .kh-grp-summary div { border-bottom: 0; padding: 4px 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.kh-grp-panel .kh-grp-summary dt { font-weight: 400; }
+.kh-grp-panel .kh-grp-summary dd { text-align: left; font-weight: 600; }
+.kh-grp-panel .kh-grp-summary dd.is-room { color: #7d9578; }
+.kh-grp-badge-inline { margin-left: 0; font-weight: 700; letter-spacing: .02em; }
+.kh-grp-actions.is-split { justify-content: space-between; align-items: center; }
+.kh-grp-back { display: inline-flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 24px; border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-surface); font: inherit; font-size: 16px; cursor: pointer; }
+.kh-grp-confirm { flex: 1; max-width: 420px; min-height: 52px; font-size: 16px; border-radius: 14px; background: #8fa68b; border-color: #8fa68b; color: #fff; }
+.kh-grp-confirm:hover:not(:disabled) { background: #7d9578; border-color: #7d9578; }
+@media (max-width: 800px) {
+  .kh-grp-panel { padding: 16px; }
+  .kh-grp-rows li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .kh-grp-actions.is-split { flex-direction: column-reverse; align-items: stretch; }
+  .kh-grp-confirm { max-width: none; }
+}
+.kh-grp-actions .kh-grp-back { border: 1px solid var(--color-border); background: var(--color-surface); }
