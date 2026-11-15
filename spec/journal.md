@@ -1359,3 +1359,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo yêu cầu của Vy (khách không hiểu "Phiên bản chính sách", mã đối chiếu file; bấm tên file phải xem được).
 - Thay đổi: `web/frontend/src/components/xacNhan/DocumentView.jsx`: `HandoverView` thêm tham số `showTechnical` (mặc định tắt). Khách và quản lý không còn thấy dòng "Phiên bản chính sách" và "Mã đối chiếu file"; thay bằng nút "Xem bản hợp đồng đã ký" mở file trong tab mới (tải kèm đăng nhập qua `GET /hop-dong/:id/ban-ky/file`). `web/frontend/src/pages/avalanche/AvalancheVerifyPage.jsx` bật `showTechnical` để trang kiểm chứng vẫn hiện mã băm. `scripts/handover-bundle-ui.mjs` sửa theo.
 - Kiểm tra: build OK; cú pháp script OK. `handover-bundle-ui` vẫn không chạy được trong worktree này (thiếu `blockchain/artifacts/DormSettlement.json`), nên phần test mới chưa chạy thật; chưa chụp ảnh. Quyền tải file: khách chủ hợp đồng và nhân viên Sale/Quản lý/Kế toán cùng chi nhánh (đã có sẵn ở backend).
+
+## 2026-11-16 09:40:00 +07:00 — J-C143 — Đổi email tài khoản demo5 để nhận mã OTP Privy
+- Người thực hiện: Claude, theo lựa chọn "cách 1" của Vy (muốn tài khoản vẫn là demo5 nhưng mã gửi về hộp thư của Vy).
+- Nguyên nhân: như J-C107; mã 6 số ở bước "Xác nhận biên bản" do Privy gửi tới `NguoiDung.Email`, không đi qua `MAIL_REDIRECT_TO`.
+- Giá trị **cũ**: `NguoiDung KH9323` (demo5) Email=`demo5@gmail.com`. Giá trị **mới**: `vynhat2k5+demo5@gmail.com`. Chỉ đổi khi bảng `AvalancheWallet` chưa có ví của KH9323 (đã kiểm tra: 0 dòng) và email mới chưa trùng (đã kiểm tra: 0). Đã cập nhật đúng 1 dòng.
+- Hoàn lại nếu cần: `UPDATE dbo.NguoiDung SET Email=N'demo5@gmail.com' WHERE MaNguoiDung=N'KH9323'` (khi chưa có ví).
+- Việc còn lại: Vy đăng xuất demo5, đăng nhập lại (token cũ còn mang email cũ), rồi bấm "Gửi mã" ở tab Hợp đồng. Chỉ đổi dữ liệu DB, không có file mã nguồn nào đổi.
