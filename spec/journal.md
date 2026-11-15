@@ -1236,3 +1236,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo yêu cầu của Vy (gửi ảnh bước 3 của Hằng).
 - Thay đổi: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (bước 3 của `renderGroupRentPage`: khối "Danh sách thành viên (n)" mỗi hàng gồm tên + nhãn ĐẠI DIỆN, SĐT, CCCD; khối "Thông tin thuê phòng chung" dạng nhãn - giá trị, thêm số người nam/nữ, khu vực/loại phòng, mức giá so với mẫu; nút "Quay lại" bên trái và "Xác nhận Đăng ký Nhóm" bên phải), `khachHangPortal.css` (`.kh-grp-panel`, `.kh-grp-rows`, `.kh-grp-actions.is-split`, `.kh-grp-confirm`, bản điện thoại xếp dọc).
 - Kiểm tra: build OK; `ui-interested-rooms` PASS (luồng nhóm gửi đúng phiếu); đã xem ảnh bước 3 ở 1440.
+
+## 2026-11-15 22:21:36 +07:00 — J-C122 — Nới rộng form "Lập lịch xem phòng mới"
+- Người thực hiện: Claude, theo phản ánh của Vy (form nhỏ, hai cột chen chúc).
+- Thay đổi: `web/frontend/src/styles/saleAppointmentLayout.css`: hộp thoại rộng tối đa 1240px (trước 1040px); cột phải tối thiểu 340px, không dính trên (sticky) trong hộp thoại; dưới 1100px xếp một cột để phần thông tin phiếu và form lập lịch đều có đủ chiều ngang.
+- Kiểm tra: build OK. Chưa có script giao diện riêng cho hộp thoại này nên chưa chụp ảnh sau khi sửa.
