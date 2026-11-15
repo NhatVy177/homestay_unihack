@@ -4018,27 +4018,10 @@ export default function KhachHangPortalPage() {
                   </div>
                 </div>
               </div>
-              <div className="dc-info-blocks">
-                <section className="dc-info-block">
-                  <h3 className="dc-section-title"><Icon name="profile" />Thông tin khách hàng</h3>
-                  <div className="dc-info-grid">
-                <div><span>Khách hàng</span><strong>{phieu.tenKhachHang || 'Chưa cập nhật'}</strong></div>
-                <div><span>Số điện thoại</span><strong>{phieu.sdtKhachHang || 'Chưa cập nhật'}</strong></div>
-                  </div>
-                </section>
-                <section className="dc-info-block">
-                  <h3 className="dc-section-title"><Icon name="deposit" />Thông tin cọc</h3>
-                  <div className="dc-info-grid">
-                <div><span>Loại phòng</span><strong>{phieu.loaiPhong || phieu.tenPhong || 'Chưa cập nhật'}</strong></div>
-                <div><span>Cơ sở</span><strong>{phieu.tenChiNhanh || 'Chưa cập nhật'}</strong></div>
-                <div><span>Số tiền cọc</span><strong style={{ color: 'var(--dc-primary)' }}>{Number(phieu.soTienCoc).toLocaleString('vi-VN')} VNĐ</strong></div>
-                {doiSoatTraPhongCoc && <div><span>Tỷ lệ hoàn cọc</span><strong>{formatPercent(doiSoatTraPhongCoc.tyLeHoanCocHienTai)}</strong></div>}
-                {doiSoatTraPhongCoc && <div><span>Số tiền được hoàn</span><strong style={{ color: 'var(--color-success)' }}>{formatSettlementMoney(soTienHoanCoc)}</strong></div>}
-                {phieu.thoiHanThanhToan && <div><span>Hạn thanh toán</span><strong style={{ color: isExpired ? 'var(--dc-danger)' : 'inherit' }}>{formatDate(phieu.thoiHanThanhToan, true)}</strong></div>}
-                {phieu.tenNhanVienPhuTrach && <div><span>Nhân viên phụ trách</span><strong>{phieu.tenNhanVienPhuTrach}</strong></div>}
-                  </div>
-                </section>
-              </div>
+              {doiSoatTraPhongCoc && <div className="dc-info-grid">
+                <div><span>Tỷ lệ hoàn cọc</span><strong>{formatPercent(doiSoatTraPhongCoc.tyLeHoanCocHienTai)}</strong></div>
+                <div><span>Số tiền được hoàn</span><strong style={{ color: 'var(--color-success)' }}>{formatSettlementMoney(soTienHoanCoc)}</strong></div>
+              </div>}
             </div>
 
             {/* DC05: chứng từ bị quản lý từ chối → giữ nguyên file cũ, hiện lý do để khách gửi lại */}

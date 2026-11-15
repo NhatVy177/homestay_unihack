@@ -38,6 +38,11 @@ function ResidenceForm({ phieu, nguoiDaiDien, onSubmit }) {
   const update = (index, field, value) => setMembers((list) => list.map((m, i) => (i === index ? { ...m, [field]: value } : m)));
   const genderIssue = checkResidentsGender(members, phieu);
   const missing = members.some((m) => !m.hoTen.trim() || !m.ngaySinh || !m.gioiTinh || !m.cccd.trim() || !m.sdt.trim() || !m.quocTich.trim());
+  // Nút gửi bị mờ khi còn thiếu: liệt kê cụ thể người nào thiếu mục nào để khách biết điền gì.
+  const missingText = members.map((m, i) => {
+    const gaps = [!m.hoTen.trim() && 'họ tên', !m.ngaySinh && 'ngày sinh', !m.gioiTinh && 'giới tính', !m.cccd.trim() && 'CCCD', !m.sdt.trim() && 'số điện thoại', !m.quocTich.trim() && 'quốc tịch'].filter(Boolean);
+    return gaps.length ? `Người ở ${i + 1}: ${gaps.join(', ')}` : '';
+  }).filter(Boolean).join('; ');
   async function submit(event) {
     event.preventDefault();
     if (missing || genderIssue || !consent || saving) return;
@@ -66,6 +71,8 @@ function ResidenceForm({ phieu, nguoiDaiDien, onSubmit }) {
     <label className="cres-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
       <span>Tôi xác nhận các thành viên đồng ý cung cấp thông tin để làm thủ tục thuê phòng và đăng ký tạm trú.</span></label>
     <p className="cres-note"><Icon name="badge" /> Nhân viên sẽ đối chiếu CCCD gốc của từng người khi ký hợp đồng tại quầy.</p>
+    {missing && <p className="customer-viewing-error" role="status">Còn thiếu thông tin: {missingText}.</p>}
+    {!missing && !genderIssue && !consent && <p className="cres-note">Tick ô xác nhận phía trên để gửi.</p>}
     {genderIssue && <p className="customer-viewing-error" role="alert">{genderIssue}</p>}
     {error && <p className="customer-viewing-error" role="alert">{error}</p>}
     <div className="cres-actions"><button type="submit" className="ui-btn ui-btn--primary" disabled={missing || Boolean(genderIssue) || !consent || saving}>{saving ? 'Đang gửi...' : 'Gửi thông tin cư trú'}</button></div>

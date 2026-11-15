@@ -1275,3 +1275,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Giữ nguyên: dòng phiên bản chính sách trong `components/xacNhan/DocumentView.jsx` (hồ sơ đối chiếu bằng chứng trên chuỗi, dành cho kiểm chứng).
 - Kiểm tra: build OK; `ui-customer-invoices`, `ui-customer-deposit-history`, `ui-customer-deposit-request` PASS; `handover-bundle-ui` chạy lại (kết quả ở báo cáo).
 - Đính chính J-C128: `handover-bundle-ui.mjs` không chạy được trong worktree này (thiếu `blockchain/artifacts/DormSettlement.json`, cần biên dịch hợp đồng trước) nên dòng sửa ở script đó chưa được kiểm chứng bằng chạy thật.
+
+## 2026-11-15 23:58:00 +07:00 — J-C129 — Bỏ hai khung thông tin ở phiếu cọc; báo rõ thông tin cư trú còn thiếu
+- Người thực hiện: Claude, theo yêu cầu của Vy.
+- Thay đổi: `KhachHangPortalPage.jsx`: phiếu cọc không còn hai khung "Thông tin khách hàng" và "Thông tin cọc" (chỉ còn thanh mã phiếu/trạng thái; khi đã có đối soát vẫn hiện tỷ lệ và số tiền hoàn cọc). `CustomerResidenceTab.jsx`: nút "Gửi thông tin cư trú" mờ do thiếu ngày sinh của người ở 2, 3 (tên, CCCD, SĐT được điền sẵn từ phiếu nhóm, ngày sinh thì không có) mà không báo lý do; nay hiện dòng "Còn thiếu thông tin: Người ở n: ngày sinh…" và nhắc tick ô xác nhận.
+- Kiểm tra: build OK; `ui-customer-residence`, `ui-customer-deposit-history`, `ui-customer-invoices` PASS. Chưa chụp ảnh.
