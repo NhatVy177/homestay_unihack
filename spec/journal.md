@@ -1180,3 +1180,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Sửa: 5 file `services/kiemTraTraPhong.service.js`, `GhiNhanBanGiaoRa.service.js`, `thanhlytraphong.service.js`, `xacNhanKetQua.service.js`, `xacNhanPhanHoi.service.js` dùng `sql` xuất từ `database/connection.js` (tự chọn đúng driver); chỉ đổi dòng import.
 - Kiểm tra: backend 89 pass, 4 skip, 0 fail; mở Transaction qua `sql` dùng chung trên HOMEDORM4 rồi rollback: chạy được. Chưa chạy lại thao tác lưu biên bản thật (đang chờ Vy bấm lại).
 - Quan sát khác (chưa xử lý): log có `Không tìm thấy ảnh` (404) từ `traPhongSoSanh.service.js`; ô "Ảnh lúc trả phòng" trong màn của Vy hiện ô trống. Có thể do ảnh chưa lưu được do lỗi trên; cần xem lại sau khi lưu thành công.
+
+## 2026-11-15 14:01:36 +07:00 — J-C113 — Chạy lại migration C4 trả phòng lên HOMEDORM4 (gỡ điều kiện "đã thanh lý" ở danh sách hoàn cọc, D-041)
+- Người thực hiện: Claude, Vy đồng ý ("có").
+- Phát hiện: tab kế toán "Chi tiền thanh lý → Ghi nhận hoàn cọc" trống vì `SP_TraPhong_KeToan_DanhSachChoHoanCoc` trong DB vẫn đòi `hd.TrangThai = N'Đã thanh lý'` (trái D-041: chi hoàn cọc trước khi đóng hợp đồng) và đòi phiếu trả phòng `Chờ hoàn cọc`. Bản vá `patchRefundList` đã có trong `scripts/checkout-lifecycle-db.mjs` nhưng chưa chạy lên DB.
+- Đã chạy `node scripts/checkout-lifecycle-db.mjs migrate`: cài lại schema C4 và 6 thủ tục (3 tài chính, 2 legacy, danh sách hoàn cọc), "businessRowsChanged: false". Kiểm tra sau: định nghĩa danh sách hoàn cọc không còn điều kiện thanh lý cũ và có dấu `C4_REFUND_BEFORE_CLOSE`.
+- Dữ liệu giữ nguyên: HD0001 "Hiệu lực"; DS0001 "Chờ hoàn cọc" (hoàn 500.000đ, đã chọn nhận qua MB Bank ở màn cũ); TP0001 "Chờ ký biên bản".
+- Việc còn lại: để kế toán thấy phiếu cần mốc 2 (TP0001 chuyển "Chờ hoàn cọc" khi khách đồng ý bảng đối soát trên chuỗi): kế toán NV0008 gửi DS0001 ở tab "Khách xác nhận đối soát", khách demo4 đồng ý ở tab Hợp đồng; sau đó chi hoàn cọc kèm chứng từ.
