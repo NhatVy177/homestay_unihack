@@ -1,12 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { money } from '../../lib/avalanche/api.js';
+import { httpClient } from '../../api/httpClient.js';
 function saveAttachment(file) {
   const bytes = Uint8Array.from(atob(file.dataBase64), c => c.charCodeAt(0));
   const url = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
   const link = document.createElement('a'); link.href = url; link.download = file.name; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-export function HandoverView({ policy, handover }) {
+// Mở bản hợp đồng đã ký trong tab mới (file được bảo vệ nên phải tải kèm đăng nhập rồi mới xem).
+function SignedContractLink({ contractId, name }) {
+  const [state, setState] = useState({ busy: false, error: '' });
+  async function open() {
+    setState({ busy: true, error: '' });
+    try {
+      const response = await httpClient.get(`/hop-dong/${encodeURIComponent(contractId)}/ban-ky/file`, { responseType: 'blob' });
+      const url = URL.createObjectURL(response.data);
+      if (!window.open(url, '_blank')) { const link = document.createElement('a'); link.href = url; link.download = name || 'hop-dong'; link.click(); }
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      setState({ busy: false, error: '' });
+    } catch {
+      setState({ busy: false, error: 'Chưa mở được bản hợp đồng đã ký. Vui lòng thử lại.' });
+    }
+  }
+  return <>
+    <button type="button" className="xn-link" disabled={state.busy} onClick={open}>{state.busy ? 'Đang mở...' : 'Xem bản hợp đồng đã ký'}</button>
+    {state.error && <p role="alert" className="xn-muted">{state.error}</p>}
+  </>;
+}
+
+// showTechnical: chỉ trang kiểm chứng (AvalancheVerifyPage) hiện mã băm/phiên bản; khách và quản lý chỉ thấy nội dung dễ hiểu.
+export function HandoverView({ policy, handover, showTechnical = false }) {
   if (!handover) return null;
   const p = handover.payload, files = p.attachments || [];
   const terms = p.contractTerms;
@@ -21,13 +44,15 @@ export function HandoverView({ policy, handover }) {
         <div><dt>Ngày kết thúc</dt><dd>{terms.endDate}</dd></div>
         <div><dt>Kỳ thanh toán</dt><dd>{terms.paymentCycle}</dd></div>
         <div><dt>Tiền cọc theo phiếu</dt><dd>{money(terms.depositVnd)}</dd></div>
-        <div><dt>Phiên bản chính sách</dt><dd>{p.policyVersion}</dd></div>
+        {showTechnical && <div><dt>Phiên bản chính sách</dt><dd>{p.policyVersion}</dd></div>}
       </dl>
-      {p.signedContract && <details><summary>Thông tin bản hợp đồng đã ký</summary>
-        <p>{p.signedContract.name}</p>
-        <p>Mã đối chiếu file: <code className="ui-evidence-hash">{p.signedContract.sha256}</code></p>
-        <p>Bản lưu chỉ chứa mã đối chiếu; hợp đồng gốc được lưu riêng.</p>
-      </details>}
+      {p.signedContract && (showTechnical
+        ? <details><summary>Thông tin bản hợp đồng đã ký</summary>
+            <p>{p.signedContract.name}</p>
+            <p>Mã đối chiếu file: <code className="ui-evidence-hash">{p.signedContract.sha256}</code></p>
+            <p>Bản lưu chỉ chứa mã đối chiếu; hợp đồng gốc được lưu riêng.</p>
+          </details>
+        : <p className="xn-signed"><SignedContractLink contractId={terms.contractId} name={p.signedContract.name} /></p>)}
     </section>}
     <table className="xn-table"><thead><tr><th>Tài sản</th><th>SL</th><th>Tình trạng lúc nhận phòng</th></tr></thead>
       <tbody>{p.inventory.map((item, i) => <tr key={i}><td>{item.item}</td><td>{item.quantity}</td><td>{item.condition}</td></tr>)}</tbody></table>

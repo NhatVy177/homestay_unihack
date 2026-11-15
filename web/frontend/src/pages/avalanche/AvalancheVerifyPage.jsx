@@ -69,7 +69,7 @@ export default function AvalancheVerifyPage() {
                 {Object.entries(result.chainResults).map(([kind, checked]) => <p key={kind}>{kind === 'handover' ? 'Bàn giao' : 'Đối soát'}: khớp bản ghi trên chuỗi; {checked.accepted ? 'đã xác nhận' : 'chưa xác nhận'}.</p>)}
                 {result.web2Only && <p>Hồ sơ này không có bản xác nhận trên chuỗi.</p>}
               </> : <><h2>Nội dung khớp bản ghi trên chain</h2><p>Trạng thái: {result.status}. {result.accepted ? 'Đã được bên cần xác nhận chấp nhận.' : 'Chưa được chấp nhận.'}</p></>}
-              {result.kind === 'handover' && evidence && <HandoverView policy={evidence.documents.policy} handover={evidence.documents.handover} />}
+              {result.kind === 'handover' && evidence && <HandoverView showTechnical policy={evidence.documents.policy} handover={evidence.documents.handover} />}
               {result.kind === 'settlement' && (
                 <p>Phiên bản {result.version}{result.superseded ? ' — đã có bản mới hơn' : ' — bản mới nhất'};
                   {result.disputed ? ' đã từng bị phản đối;' : ''}

@@ -122,7 +122,7 @@ try {
       await page.goto(base + '/kiem-chung-avalanche', { waitUntil: 'domcontentloaded' });
       await page.locator('#evidence-file').setInputFiles({ name: 'synthetic-evidence.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(bundle)) });
       await page.getByRole('heading', { name: 'Nội dung khớp bản ghi trên chain' }).waitFor();
-      if (index === 1) { await page.getByRole('heading', { name: 'Điều khoản hợp đồng' }).waitFor(); await page.getByText('Thông tin bản hợp đồng đã ký').click(); }
+      if (index === 1) { await page.getByRole('heading', { name: 'Điều khoản hợp đồng' }).waitFor(); await page.getByRole('button', { name: 'Xem bản hợp đồng đã ký' }).waitFor(); assert.equal(await page.getByText('Mã đối chiếu file', { exact: false }).count(), 0); }
       else assert.equal(await page.getByRole('heading', { name: 'Điều khoản hợp đồng' }).count(), 0);
       await capture(`verify-v${index + 1}`);
     }
