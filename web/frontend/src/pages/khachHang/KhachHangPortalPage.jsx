@@ -290,11 +290,21 @@ const DEMO_ROOM_IMAGES = [
   'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1400&q=85'
 ];
 
+// Đếm ngược đến hạn thanh toán, tự cập nhật mỗi giây.
+function DepositCountdown({ deadlineMs }) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer); }, []);
+  const left = Math.max(0, Math.floor((deadlineMs - now) / 1000));
+  const pad = (n) => String(n).padStart(2, '0');
+  return <strong className="dpay-countdown">{pad(Math.floor(left / 3600))}:{pad(Math.floor((left % 3600) / 60))}:{pad(left % 60)}</strong>;
+}
+
 function Icon({ name, className = '' }) {
   const shapes = {
     home: <><path d="M3.5 11.2 12 4l8.5 7.2" /><path d="M5.5 10.4V20h13v-9.6" /><path d="M9.5 20v-5.8h5V20" /></>,
     arrow_back: <><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></>,
     close: <><path d="M18 6 6 18M6 6l12 12" /></>,
+    schedule: <><circle cx="12" cy="12" r="8.5" /><polyline points="12 7.5 12 12 15.5 14" /></>,
     explore: <><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2.4 5.1-5.1 2.4 2.4-5.1 5.1-2.4Z" /></>,
     search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4 4" /></>,
     profile: <><path d="M7 4h7l3 3v13H7z" /><path d="M14 4v4h4M10 13h4M10 17h4" /></>,
@@ -3812,7 +3822,6 @@ export default function KhachHangPortalPage() {
   // Màn "Thanh toán đặt cọc" khi phiếu đang chờ thanh toán (theo mẫu): phương thức bên trái; số tiền, phòng, tiến trình bên phải.
   function renderDepositPaymentLayout(phieu) {
     const deadlineMs = phieu.thoiHanThanhToan ? new Date(phieu.thoiHanThanhToan).getTime() - 7 * 60 * 60 * 1000 : 0;
-    const remainingMinutes = Math.max(0, Math.ceil((deadlineMs - depositClock) / 60000));
     const account = getPaymentAccount(phieu);
     const transferContent = `${phieu.maPhieuCoc} ${phieu.sdtKhachHang || ''}`.trim();
     const amount = Number(phieu.soTienCoc) || 0;
@@ -3827,9 +3836,6 @@ export default function KhachHangPortalPage() {
     ];
     return (
       <section className="dc-detail dpay">
-        {!!deadlineMs && <div className="dc-banner dc-banner-info">
-          <Icon name="schedule" /> <strong>Còn {Math.floor(remainingMinutes / 60)} giờ {remainingMinutes % 60} phút để thanh toán</strong>
-        </div>}
         <header className="dpay-head">
           <h2>Thanh toán đặt cọc</h2>
           <p>Vui lòng hoàn tất thanh toán để giữ chỗ phòng của bạn.</p>
@@ -3875,7 +3881,7 @@ export default function KhachHangPortalPage() {
               <span>Số tiền đặt cọc</span>
               <strong>{amount.toLocaleString('vi-VN')} VNĐ</strong>
               {phieu.cachTinhCoc && <p className="dpay-formula">Cách tính: {moTaCachTinhCoc(phieu.cachTinhCoc)}</p>}
-              {phieu.thoiHanThanhToan && <p className="dpay-pill"><Icon name="schedule" /> Thời hạn thanh toán: {formatDate(phieu.thoiHanThanhToan, true)}</p>}
+              {!!deadlineMs && <p className="dpay-pill"><Icon name="schedule" /> <span>Còn lại</span> <DepositCountdown deadlineMs={deadlineMs} /></p>}
             </section>
             <section className="dc-section-card dpay-room">
               <h3 className="dc-section-title">{phieu.tenPhong || 'Phòng đã chọn'}</h3>

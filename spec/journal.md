@@ -1253,3 +1253,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Thay đổi: `web/frontend/src/pages/nhanVienSale/LichXemPhongTab.jsx` (nút mở trang đầy đủ như "Lập lịch hẹn", có nút quay lại), `SaleNewViewingModal.jsx` (bỏ vỏ hộp thoại, chỉ tải phiếu rồi dùng `LapLichChoHoSo`), `web/frontend/src/styles/saleAppointmentLayout.css` (bỏ CSS hộp thoại J-C122/J-C123). Backend: `repositories/lichXemPhong.repository.js` (`layPhongDaCoLichXem` đọc `ChiTietXemPhong` theo phiếu), `services/lichXemPhong.service.js` (`getPhongPhuHop` loại phòng đã từng có lịch xem khỏi danh sách phòng phù hợp và khỏi phòng quan tâm chọn sẵn).
 - Kiểm tra: build OK; backend 95 pass, 0 fail. Chưa chạy trên DB thật và chưa chụp ảnh.
 - Ghi chú: J-C122/J-C123 (nới hộp thoại) bị thay thế bởi mục này.
+
+## 2026-11-15 22:58:00 +07:00 — J-C125 — Trang thanh toán cọc: đếm ngược, bỏ dòng "Còn n giờ"
+- Người thực hiện: Claude, theo yêu cầu của Vy.
+- Thay đổi: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx`: bỏ banner "Còn n giờ n phút để thanh toán" ở trang thanh toán cọc; thẻ số tiền hiện "Còn lại HH:MM:SS" đếm ngược mỗi giây (`DepositCountdown`); thêm biểu tượng đồng hồ `schedule` cho `Icon` cục bộ (trước đó thiếu nên hiện hình ngôi nhà). `khachHangPortal.css`: `.dpay-countdown`.
+- Kiểm tra: build OK; `ui-customer-deposit-history` và `ui-customer-invoices` PASS. Chưa chụp ảnh.
