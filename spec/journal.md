@@ -1268,3 +1268,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo phản ánh của Vy (bấm tab ví còn phải bấm thêm nút mới thấy QR; mã đơn dạng chuỗi ngẫu nhiên khó hiểu).
 - Thay đổi: `KhachHangPortalPage.jsx` (tab "Ví điện tử (mô phỏng)" bấm là tạo đơn và vào cổng ngay, bỏ trạng thái `walletTab` và nút "Mở cổng ví điện tử" của J-C126), `web/frontend/src/pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx` (bỏ dòng "Mã đơn"), `scripts/ui-customer-invoices.mjs`.
 - Kiểm tra: build OK; `ui-customer-invoices`, `ui-customer-deposit-history` PASS. Chưa chụp ảnh.
+
+## 2026-11-15 23:45:00 +07:00 — J-C128 — Ví mô phỏng thanh toán ngay trong trang; bỏ dòng phiên bản chính sách
+- Người thực hiện: Claude, theo phản ánh của Vy.
+- Thay đổi: `KhachHangPortalPage.jsx`: tab "Ví điện tử (mô phỏng)" hiện nội dung và số tiền ngay trong trang, nút "Xác nhận thanh toán (mô phỏng)" tạo đơn, xác nhận rồi tải lại phiếu, không chuyển trang; không vẽ mã QR giả vì không quét được (muốn quét thật dùng tab QR chuyển khoản). `components/common/DepositPolicyPanel.jsx`: bỏ dòng "Phiên bản chính sách" (mã băm khách không hiểu). `scripts/ui-customer-invoices.mjs`, `scripts/handover-bundle-ui.mjs` cập nhật theo.
+- Giữ nguyên: dòng phiên bản chính sách trong `components/xacNhan/DocumentView.jsx` (hồ sơ đối chiếu bằng chứng trên chuỗi, dành cho kiểm chứng).
+- Kiểm tra: build OK; `ui-customer-invoices`, `ui-customer-deposit-history`, `ui-customer-deposit-request` PASS; `handover-bundle-ui` chạy lại (kết quả ở báo cáo).

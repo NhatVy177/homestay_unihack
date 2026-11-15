@@ -103,7 +103,7 @@ try {
         kind === 'policy' ? { depositId: 'DC0001' } : { contractId: 'HD0001' }));
       window.renderC1('policy');
     });
-    await page.getByText('Phiên bản chính sách:', { exact: false }).waitFor();
+    await page.getByText('Chính sách hoàn cọc', { exact: false }).first().waitFor();
     assert.equal(await page.getByRole('button', { name: 'Xác nhận chính sách' }).isDisabled(), true);
     await capture('legacy-policy');
     await page.getByRole('checkbox').check();

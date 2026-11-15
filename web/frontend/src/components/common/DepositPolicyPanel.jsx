@@ -25,7 +25,6 @@ export default function DepositPolicyPanel({ depositId }) {
     {error && <p role="alert" className="ui-evidence-error">{error}</p>}
     {!policy && !error && <p role="status">Đang tải chính sách...</p>}
     {policy && <>
-      <p>Phiên bản chính sách: <strong>{policy.version}</strong></p>
       <p className="ui-preserve-lines">{policy.text}</p>
       {policy.requiresConfirmation && !policy.ready && <>
         <p>Đây là chính sách bổ sung cho hồ sơ cũ. Bạn cần đọc và xác nhận trước khi nhận bản bàn giao mới.</p>

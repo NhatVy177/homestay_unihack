@@ -1052,6 +1052,7 @@ export default function KhachHangPortalPage() {
   const [residence, setResidence] = useState(null);
   const [residenceError, setResidenceError] = useState('');
   const [depositClock, setDepositClock] = useState(Date.now());
+  const [walletTab, setWalletTab] = useState(false), [walletBusy, setWalletBusy] = useState(false);
   useEffect(() => {
     if (activeTab !== 'dat-coc') return undefined;
     const timer = setInterval(() => setDepositClock(Date.now()), 30000);
@@ -3803,6 +3804,21 @@ export default function KhachHangPortalPage() {
     }
   }
 
+  // Ví mô phỏng thanh toán ngay trong trang (không chuyển trang): tạo đơn rồi xác nhận, sau đó tải lại phiếu.
+  async function thanhToanViTaiCho() {
+    if (!datCocSelected || walletBusy) return;
+    setWalletBusy(true);
+    try {
+      const { data: order } = await httpClient.post(`/thanh-toan-mo-phong/dat-coc/${datCocSelected.maPhieuCoc}`);
+      await httpClient.post(`/thanh-toan-mo-phong/${order.id}/thanh-toan`);
+      setWalletTab(false);
+      setToast('Thanh toán bằng ví thành công (mô phỏng).');
+      await loadDatCoc();
+    } catch (error) {
+      setToast(error?.response?.data?.message || 'Thanh toán bằng ví mô phỏng không thành công.');
+    } finally { setWalletBusy(false); }
+  }
+
   function renderDatCocList() {
     if (locks['dat-coc']) return renderLocked('dat-coc');
     if (datCocLoading) return <div className="kp-loading"><span /><p>Đang tải phiếu cọc...</p></div>;
@@ -3845,11 +3861,19 @@ export default function KhachHangPortalPage() {
             <section className="dc-section-card dpay-card">
               <h3 className="dc-section-title">Phương thức thanh toán</h3>
               <div className="dpay-tabs" role="group" aria-label="Chọn phương thức thanh toán">
-                <button type="button" aria-pressed={isTransfer} className={`dpay-tab${isTransfer ? ' is-active' : ''}`} onClick={() => { if (!isTransfer) chonPhuongThucCoc('Chuyển khoản'); }}><Icon name="invoice" /> QR chuyển khoản</button>
-                <button type="button" aria-pressed={isCash} className={`dpay-tab${isCash ? ' is-active' : ''}`} onClick={() => { if (!isCash) chonPhuongThucCoc('Tiền mặt'); }}><Icon name="profile" /> Tiền mặt tại quầy</button>
-                <button type="button" className="dpay-tab" onClick={thanhToanViMoPhong}><Icon name="payment" /> Ví điện tử (mô phỏng)</button>
+                <button type="button" aria-pressed={isTransfer && !walletTab} className={`dpay-tab${isTransfer && !walletTab ? ' is-active' : ''}`} onClick={() => { setWalletTab(false); if (!isTransfer) chonPhuongThucCoc('Chuyển khoản'); }}><Icon name="invoice" /> QR chuyển khoản</button>
+                <button type="button" aria-pressed={isCash && !walletTab} className={`dpay-tab${isCash && !walletTab ? ' is-active' : ''}`} onClick={() => { setWalletTab(false); if (!isCash) chonPhuongThucCoc('Tiền mặt'); }}><Icon name="profile" /> Tiền mặt tại quầy</button>
+                <button type="button" aria-pressed={walletTab} className={`dpay-tab${walletTab ? ' is-active' : ''}`} onClick={() => setWalletTab(true)}><Icon name="payment" /> Ví điện tử (mô phỏng)</button>
               </div>
-              {isTransfer && <div className="dpay-transfer">
+              {walletTab && <div className="dpay-wallet-panel">
+                <div className="dc-bank-info dpay-bank">
+                  <div><span>Nội dung</span><strong>Tiền cọc – phiếu {phieu.maPhieuCoc}</strong></div>
+                  <div><span>Số tiền</span><strong>{amount.toLocaleString('vi-VN')} VNĐ</strong></div>
+                </div>
+                <p className="dc-bank-note">Đây là ví mô phỏng để thử luồng nên không có mã QR thật và không trừ tiền thật. Bấm nút bên dưới để giả lập ví xác nhận; muốn quét mã thật hãy dùng tab QR chuyển khoản.</p>
+                <button type="button" className="kp-btn kp-btn-primary kp-full" disabled={walletBusy} onClick={thanhToanViTaiCho}>{walletBusy ? 'Đang xử lý…' : 'Xác nhận thanh toán (mô phỏng)'}</button>
+              </div>}
+              {!walletTab && isTransfer && <div className="dpay-transfer">
                 <VietQrCode account={account} amount={amount} content={transferContent} />
                 <div className="dc-bank-info dpay-bank">
                   <div><span>Ngân hàng</span><strong>{account.nganHang}</strong></div>
@@ -3858,9 +3882,9 @@ export default function KhachHangPortalPage() {
                   <div><span>Nội dung chuyển khoản</span><strong>{transferContent}</strong><button type="button" onClick={() => navigator.clipboard.writeText(transferContent)}>Sao chép</button></div>
                 </div>
               </div>}
-              {isCash && <p className="dc-bank-note">Bạn đến quầy {phieu.tenChiNhanh || 'của cơ sở'} để nộp {amount.toLocaleString('vi-VN')} VNĐ bằng tiền mặt. Nhân viên sẽ lập giấy biên nhận đặt cọc để hai bên cùng ký.</p>}
+              {!walletTab && isCash && <p className="dc-bank-note">Bạn đến quầy {phieu.tenChiNhanh || 'của cơ sở'} để nộp {amount.toLocaleString('vi-VN')} VNĐ bằng tiền mặt. Nhân viên sẽ lập giấy biên nhận đặt cọc để hai bên cùng ký.</p>}
             </section>
-            {isTransfer && <section className="dc-section-card dpay-card">
+            {!walletTab && isTransfer && <section className="dc-section-card dpay-card">
               <h3 className="dc-section-title"><Icon name="profile" />Minh chứng thanh toán</h3>
               <p className="dc-bank-note">Vui lòng tải lên ảnh chụp biên lai hoặc màn hình giao dịch thành công.</p>
               <form onSubmit={submitMinhChung} className="dc-upload-form">

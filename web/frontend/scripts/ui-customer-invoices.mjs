@@ -47,6 +47,10 @@ try {
     await page.getByRole('heading', { name: 'Thanh toán đặt cọc', level: 2 }).waitFor();
     assert.equal(await page.getByRole('button', { name: 'QR chuyển khoản', exact: true }).getAttribute('aria-pressed'), 'true');
     assert.equal(await page.getByRole("button", { name: "Ví điện tử (mô phỏng)" }).count(), 1);
+    await page.getByRole("button", { name: "Ví điện tử (mô phỏng)" }).click();
+    await page.getByRole("button", { name: "Xác nhận thanh toán (mô phỏng)" }).waitFor();
+    assert.equal(await page.locator(".dpay-transfer").count(), 0);
+    await page.getByRole("button", { name: "QR chuyển khoản", exact: true }).click();
     assert.match(await page.locator('.dpay-formula').innerText(), /1\.400\.000đ\/giường × 1 giường × 2 tháng = 2\.800\.000đ/);
     const qr = page.locator('.vietqr-code img');
     await qr.waitFor();
