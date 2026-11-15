@@ -1373,3 +1373,4 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kết quả: 35 file, khoảng 395 chỗ đổi (nhiều nhất: `BanGiaoPhongTab.jsx`, `ThuNhanPhongTab.jsx`, `DatCocTab.jsx`, `dangKyTraPhongTab.css`, `cuTru.css`, `lichXemPhong.css`, `xacNhan.css`).
 - Cố ý giữ: màu xanh dương thông tin (#1565c0, #e3f2fd...), màu xanh lá trạng thái thành công, xám trung tính, và hai trang cũ `khachMoi.css`, `khachDangThue.css` (biến `--km-green`, `--rt-green`, không còn là màn chính).
 - Kiểm tra: build OK; `ui-customer-invoices`, `ui-customer-residence`, `ui-customer-deposit-history` PASS. Chưa chụp ảnh từng màn nên chưa xác nhận bằng mắt.
+- Bổ sung J-C144: hai màu có kênh trong suốt dạng 8 chữ số (`#00666d22` ở `xacNhan.css`, `#17323218` ở `avalancheVerify.css`) lúc quét bị sót, đã đổi sang rgba màu theme. File `pages/nhanVienSale/refactor.cjs` là script cũ không chạy trong ứng dụng nên không đổi.
