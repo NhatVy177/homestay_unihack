@@ -2,6 +2,8 @@ import OverviewCards from '../../components/common/OverviewCards.jsx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import { banGiaoPhongApi } from './banGiaoPhong.api.js';
+import { httpClient } from '../../api/httpClient.js';
+import { avalancheApi, errorMessage } from '../../lib/avalanche/api.js';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import '../nhanPhong/cuTru.css';
 
@@ -98,6 +100,7 @@ export default function BanGiaoPhongTab() {
   const [ghiChuChung, setGhiChuChung] = useState('');
   const [notice, setNotice] = useState(null);
   const [successDialog, setSuccessDialog] = useState(null);
+  const [thieuBanKy, setThieuBanKy] = useState(false), [guiLai, setGuiLai] = useState({ busy: false, message: '', error: '' });
   const [danhSachChoBanGiao, setDanhSachChoBanGiao] = useState([]);
   const [loadingDanhSach, setLoadingDanhSach] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -190,9 +193,12 @@ export default function BanGiaoPhongTab() {
     setNotice(null);
     setHopDong(null);
     setDanhSachTaiSan([]);
+    setThieuBanKy(false);
 
     try {
       const res = await banGiaoPhongApi.traCuuHopDongBanGiao(cleanMaHopDong);
+      // Bản xem gửi khách cần ảnh hợp đồng đã ký (Sale tải); báo trước để khỏi lập xong mới biết không gửi được.
+      httpClient.get(`/hop-dong/${encodeURIComponent(cleanMaHopDong)}/ban-ky`).then((r) => setThieuBanKy(!r.data)).catch(() => setThieuBanKy(false));
       const futureStartMessage = isFutureDate(res.data.hopDong?.ngayBatDau)
         ? getFutureStartMessage(res.data.hopDong.ngayBatDau)
         : null;
@@ -272,14 +278,16 @@ export default function BanGiaoPhongTab() {
       });
       const ketQua = res.data.ketQua;
       const xacNhan = res.data.xacNhanDienTu;
+      setGuiLai({ busy: false, message: '', error: '' });
       setSuccessDialog({
         title: 'Lập biên bản thành công',
+        canGuiLai: xacNhan?.status === 'failed',
         message: `${res.data.thongBao || 'Đã lập biên bản bàn giao.'}${ketQua?.maBienBan ? ` Mã biên bản: ${ketQua.maBienBan}.` : ''}`,
         maBienBan: ketQua?.maBienBan || res.data.maBienBan,
         xacNhan: xacNhan?.status === 'published'
           ? `${xacNhan.notification === 'sent' ? 'Đã gửi biên bản vào tài khoản và đã gửi email cho khách.' : 'Đã gửi biên bản vào tài khoản khách để xác nhận.'} Khách có thể xác nhận ngay trên điện thoại hoặc yêu cầu chỉnh sửa; theo dõi ở tab "Khách xác nhận biên bản".`
           : xacNhan?.status === 'failed'
-            ? `Chưa gửi được bản xem cho khách: ${xacNhan.message} Có thể gửi lại ở tab "Khách xác nhận biên bản".`
+            ? `Chưa gửi được bản xem cho khách: ${xacNhan.message} Bạn có thể bấm "Gửi lại cho khách" bên dưới sau khi xử lý (hoặc gửi ở tab "Khách xác nhận biên bản").`
             : null
       });
       setDanhSachChoBanGiao((items) => items.filter((item) => item.maHopDong !== hopDong.maHopDong));
@@ -381,13 +389,34 @@ export default function BanGiaoPhongTab() {
               {successDialog.xacNhan && (
                 <p style={{ margin: '14px 0 0', color: '#3f494a', fontSize: '14px', lineHeight: 1.6 }}>{successDialog.xacNhan}</p>
               )}
+              {guiLai.message && <p style={{ margin: '12px 0 0', color: '#146236', fontSize: '14px' }} role="status">{guiLai.message}</p>}
+              {guiLai.error && <p style={{ margin: '12px 0 0', color: '#9b1c1c', fontSize: '14px' }} role="alert">{guiLai.error}</p>}
             </div>
-            <div style={{ padding: '16px 24px', borderTop: '1px solid #e1e3e4', display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ padding: '16px 24px', borderTop: '1px solid #e1e3e4', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              {successDialog.canGuiLai && !guiLai.message && (
+                <button
+                  type="button"
+                  className="ktp-btn-outline"
+                  style={{ padding: '10px 18px', whiteSpace: 'nowrap' }}
+                  disabled={guiLai.busy}
+                  onClick={async () => {
+                    setGuiLai({ busy: true, message: '', error: '' });
+                    try {
+                      await avalancheApi.post('/cases', { sourceId: successDialog.maBienBan });
+                      setGuiLai({ busy: false, message: 'Đã gửi biên bản cho khách xác nhận.', error: '' });
+                    } catch (error) {
+                      setGuiLai({ busy: false, message: '', error: errorMessage(error) });
+                    }
+                  }}
+                >
+                  {guiLai.busy ? 'Đang gửi...' : 'Gửi lại cho khách'}
+                </button>
+              )}
               <button
                 type="button"
                 className="ktp-btn-submit"
                 style={{ padding: '10px 24px' }}
-                onClick={() => setSuccessDialog(null)}
+                onClick={() => { setSuccessDialog(null); setGuiLai({ busy: false, message: '', error: '' }); }}
               >
                 Đóng
               </button>
@@ -976,6 +1005,15 @@ export default function BanGiaoPhongTab() {
                   </div>
                 </div>
               </div>
+
+              {thieuBanKy && !hopDong?.daCoBienBanBanGiaoVao && (
+                <div className="ktp-inline-notice ktp-inline-notice-warning" style={{ marginBottom: '16px' }} role="status">
+                  <div>
+                    <strong>Hợp đồng chưa có ảnh hợp đồng đã ký</strong>
+                    <p>Bạn vẫn lưu được biên bản, nhưng biên bản chưa gửi được cho khách xác nhận cho tới khi Sale tải ảnh hợp đồng đã ký lên (Lập hợp đồng, mục "Bản hợp đồng đã ký"). Sau đó bấm "Gửi lại cho khách" hoặc gửi ở tab "Khách xác nhận biên bản".</p>
+                  </div>
+                </div>
+              )}
 
               <label className="ktp-label">Ghi chú chung</label>
               <textarea

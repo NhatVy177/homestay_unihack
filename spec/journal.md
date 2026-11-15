@@ -1348,3 +1348,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo phản ánh của Vy (chữ "Xem biên bản" bị rớt thành hai dòng ở danh sách hợp đồng có thể bàn giao).
 - Sửa: `web/frontend/src/pages/nhanVienQuanLy/BanGiaoPhongTab.jsx`: thêm `white-space: nowrap` cho nút "Xem biên bản" và "Bàn giao".
 - Kiểm tra: build OK; chưa chụp ảnh.
+
+## 2026-11-16 08:30:00 +07:00 — J-C141 — Bàn giao tài sản: báo trước khi thiếu ảnh hợp đồng đã ký, gửi lại cho khách ngay trong hộp thoại
+- Người thực hiện: Claude, theo phản ánh của Vy (bàn giao xong mà biên bản BG0002 không tới khách).
+- Chẩn đoán (chỉ đọc DB): HD0002 chưa có bản ghi ảnh hợp đồng đã ký (`SignedContractEvidence`), nên lần tự gửi `publish` bị chặn ("Sale cần tải ảnh hợp đồng đã ký trước khi phát hành bàn giao v2"); chưa có hồ sơ xác nhận nào cho HD0002. Quản lý không biết vì lý do chỉ hiện ở hộp thoại cũ/nhật ký.
+- Thay đổi: `web/frontend/src/pages/nhanVienQuanLy/BanGiaoPhongTab.jsx`: khi mở hợp đồng cần bàn giao, gọi `GET /hop-dong/:id/ban-ky` và hiện cảnh báo "Hợp đồng chưa có ảnh hợp đồng đã ký" ngay trong form; hộp thoại "Lập biên bản thành công" khi tự gửi lỗi có nút "Gửi lại cho khách" (gọi `POST /avalanche/cases`) và hiện kết quả hoặc lý do lỗi.
+- Kiểm tra: build OK; không có script giao diện riêng cho màn này nên chưa kiểm tự động; chưa chụp ảnh. Việc Sale tải ảnh hợp đồng và gửi BG0002 do Vy làm.
