@@ -10,6 +10,14 @@ function normalizeStatus(value) {
   return normalizeText(value);
 }
 
+// Các phòng đã đưa vào lịch xem trước đó của phiếu (kể cả lịch đã xem/hủy) để không mời xem lại.
+export async function layPhongDaCoLichXem(maDangKy) {
+  const result = await executeQuery(`
+    SELECT DISTINCT MaPhong AS maPhong FROM dbo.ChiTietXemPhong WHERE MaDangKy = @MaDangKy;
+  `, [{ name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy }]);
+  return result.recordset.map((row) => row.maPhong);
+}
+
 export async function tuChoiHoSoNeuTatCaLichBiHuy(maDangKy) {
   await executeQuery(`
     UPDATE dbo.PhieuDangKy

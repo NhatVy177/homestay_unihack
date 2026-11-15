@@ -84,6 +84,7 @@ export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
   const canNewViewing = detailFinished && !schedules.some(s => s.maDangKy === detail.maDangKy && !['Đã xem', 'Đã hủy', 'Khách không đến'].includes(s.trangThai));
   const recordingOutcome = ['da-xem', 'khach-khong-den'].includes(modalType);
   const outcomeLabel = modalType === 'da-xem' ? 'Đã xem' : 'Khách không đến';
+  if (newViewingFor) return <SaleNewViewingModal maDangKy={newViewingFor} onClose={() => setNewViewingFor(null)} onCreated={() => { setSuccess('Đã lập lịch xem phòng mới cho phiếu ' + newViewingFor + '.'); fetchSchedules(); }} />;
   if (creating) return <SaleScheduleCreate schedules={schedules} onBack={() => setCreating(false)} onCreated={fetchSchedules} onSchedulingChange={onSchedulingChange} />;
 
   return <div className="sale-view">
@@ -121,7 +122,6 @@ export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
       </section>
       </aside>
     </div>
-    {newViewingFor && <SaleNewViewingModal maDangKy={newViewingFor} onClose={() => setNewViewingFor(null)} onCreated={() => { setSuccess('Đã lập lịch xem phòng mới cho phiếu ' + newViewingFor + '.'); fetchSchedules(); }} />}
     {modalType && selectedSchedule && <div className="ktp-modal-overlay sale-modal" onClick={() => { if (!saving) setModalType(null); }}><div className="ktp-modal" role="dialog" aria-modal="true" aria-labelledby="sale-edit-schedule-title" onClick={e => e.stopPropagation()}><div className="ktp-modal-header"><h3 id="sale-edit-schedule-title">{recordingOutcome ? `Ghi nhận ${outcomeLabel}?` : modalType === 'reschedule' ? 'Đổi lịch xem phòng' : 'Hủy lịch xem phòng?'}</h3><button className="ktp-modal-close" aria-label="Đóng hộp thoại" disabled={saving} onClick={() => setModalType(null)}><Icon name="close" /></button></div>
       <div className="ktp-modal-body"><p><strong>{selectedSchedule.hoTenKhach}</strong><br />{selectedSchedule.id} · {selectedSchedule.danhSachPhong}</p>{modalType === 'reschedule' && <div className="sale-form-grid"><label className="ui-form-field">Ngày xem mới<input className="ui-input" type="date" value={newDate} onChange={e => setNewDate(e.target.value)} /></label><label className="ui-form-field">Giờ xem mới<input className="ui-input" type="time" value={newTime} onChange={e => setNewTime(e.target.value)} /></label></div>}
       <label className="ui-form-field">{recordingOutcome ? 'Ghi chú buổi xem' : modalType === 'reschedule' ? 'Ghi chú xử lý' : 'Ghi chú lý do hủy'}<textarea className="ui-textarea" rows="3" maxLength={recordingOutcome ? 500 : undefined} value={note} onChange={e => setNote(e.target.value)} disabled={saving} /></label>{recordingOutcome && outcomeError && <p className="sale-alert sale-alert--danger" role="alert">{outcomeError}</p>}</div>

@@ -1247,3 +1247,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Nguyên nhân: điều kiện chuyển một cột dựa vào chiều rộng cửa sổ, trong khi vùng chứa là hộp thoại hẹp hơn cửa sổ.
 - Sửa: `web/frontend/src/styles/saleAppointmentLayout.css`: hộp thoại rộng tối đa 1440px; thân hộp thoại là vùng chứa (`container-type: inline-size`), hai cột (1.7fr / 1fr) như màn lập lịch, chỉ xếp một cột khi chiều rộng vùng chứa dưới 860px.
 - Kiểm tra: build OK; chưa chụp ảnh giao diện.
+
+## 2026-11-15 22:45:00 +07:00 — J-C124 — "Lập lịch xem phòng mới" về trang đầy đủ, không hiện phòng đã xem
+- Người thực hiện: Claude, theo yêu cầu của Vy: thay vì hộp thoại, chuyển sang trang lập lịch như ban đầu; không hiện các phòng đã xem trước đó.
+- Thay đổi: `web/frontend/src/pages/nhanVienSale/LichXemPhongTab.jsx` (nút mở trang đầy đủ như "Lập lịch hẹn", có nút quay lại), `SaleNewViewingModal.jsx` (bỏ vỏ hộp thoại, chỉ tải phiếu rồi dùng `LapLichChoHoSo`), `web/frontend/src/styles/saleAppointmentLayout.css` (bỏ CSS hộp thoại J-C122/J-C123). Backend: `repositories/lichXemPhong.repository.js` (`layPhongDaCoLichXem` đọc `ChiTietXemPhong` theo phiếu), `services/lichXemPhong.service.js` (`getPhongPhuHop` loại phòng đã từng có lịch xem khỏi danh sách phòng phù hợp và khỏi phòng quan tâm chọn sẵn).
+- Kiểm tra: build OK; backend 95 pass, 0 fail. Chưa chạy trên DB thật và chưa chụp ảnh.
+- Ghi chú: J-C122/J-C123 (nới hộp thoại) bị thay thế bởi mục này.

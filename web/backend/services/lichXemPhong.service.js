@@ -351,8 +351,9 @@ export async function getPhongPhuHop(maDangKy, user = null) {
     const rows = filterRoomsByProfileCapacity(roomRows, profileRecord)
       .filter((row) => !user?.maChiNhanh || row.maChiNhanh === user.maChiNhanh || row.MaChiNhanh === user.maChiNhanh);
     const khongCoChiNhanhPhuHop = rows.some((row) => Boolean(row.khongCoChiNhanhPhuHop));
+    const daXem = new Set(await lichXemPhongRepository.layPhongDaCoLichXem(hoSoId));
     const rooms = rows
-      .filter((row) => row.maPhong)
+      .filter((row) => row.maPhong && !daXem.has(row.maPhong))
       .map((row) => ({
         ...row,
         id: row.maPhong,
@@ -365,7 +366,7 @@ export async function getPhongPhuHop(maDangKy, user = null) {
       }));
 
     // D-043: phòng khách đã quan tâm trên hồ sơ, để màn lập lịch chọn sẵn.
-    const phongQuanTam = await phongQuanTamRepository.layPhongQuanTam(hoSoId);
+    const phongQuanTam = (await phongQuanTamRepository.layPhongQuanTam(hoSoId)).filter((room) => !daXem.has(room.maPhong));
 
     return {
       rooms,
