@@ -1173,3 +1173,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - PDF chỉ để người đọc (hợp đồng, tài sản, chính sách, mã băm hợp đồng ký, ví, mã giao dịch kèm link Snowtrace) và ghi rõ file JSON mới là bản kiểm chứng. Chưa hỗ trợ bản đối soát (settlement).
 - Kiểm tra: build OK; `ui-evidence-print` PASS (nội dung, link Snowtrace, thoát ký tự HTML, tạo PDF thật 89 KB, không tràn ngang); đã xem ảnh trang in.
 - **Mốc 1 đã lên Fuji thật** (từ file bằng chứng HD0001 của Vy, đã đối chiếu trên chuỗi): phát hành `0x45760412ccb075464c993f46372016a86d66d10f1365be90c4b3c6d30d704aaf` (khối 61101056, 13:06:24 15/11/2026), khách xác nhận `0xcd729cedadcebe1f3d1f2cc7b53600f17336b9425d05f9e9935aff9585ee6fc3` (khối 61101062, 13:06:36). Cả hai `status: success`, gửi tới hợp đồng `0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C`. Đây là bằng chứng một phần của bước A3 (chưa chạy mốc 2).
+
+## 2026-11-15 13:33:07 +07:00 — J-C112 — Sửa lỗi "this._acquiredConnection.on is not a function" khi lưu biên bản kiểm tra trả phòng
+- Người thực hiện: Claude. Phát hiện khi Vy bấm "Xác nhận lưu biên bản" ở màn kiểm tra trả phòng của quản lý (HD0001).
+- Nguyên nhân: máy dùng đăng nhập Windows nên pool SQL là `mssql/msnodesqlv8` (chọn trong `database/connection.js`), nhưng `services/kiemTraTraPhong.service.js` (và 3 file khác) nạp `import sql from 'mssql'` (bản tedious). `new sql.Transaction(pool)` ghép hai bản khác nhau nên lỗi. Chỗ này chưa từng chạy thật trên máy này.
+- Sửa: 5 file `services/kiemTraTraPhong.service.js`, `GhiNhanBanGiaoRa.service.js`, `thanhlytraphong.service.js`, `xacNhanKetQua.service.js`, `xacNhanPhanHoi.service.js` dùng `sql` xuất từ `database/connection.js` (tự chọn đúng driver); chỉ đổi dòng import.
+- Kiểm tra: backend 89 pass, 4 skip, 0 fail; mở Transaction qua `sql` dùng chung trên HOMEDORM4 rồi rollback: chạy được. Chưa chạy lại thao tác lưu biên bản thật (đang chờ Vy bấm lại).
+- Quan sát khác (chưa xử lý): log có `Không tìm thấy ảnh` (404) từ `traPhongSoSanh.service.js`; ô "Ảnh lúc trả phòng" trong màn của Vy hiện ô trống. Có thể do ảnh chưa lưu được do lỗi trên; cần xem lại sau khi lưu thành công.
