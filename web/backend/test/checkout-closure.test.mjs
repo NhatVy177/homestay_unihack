@@ -91,6 +91,13 @@ test('C4: proof bytes are hashed, scoped and safe; external or another settlemen
     await assert.rejects(p.financial({...row,settlementId:'DS0002'}),/không thuộc/);
     await assert.rejects(p.financial({...row,paymentReference:'https://host/proof.pdf'}),/chưa hợp lệ/);
     await assert.rejects(p.financial({...row,paymentReference:'/uploads/chung-tu-doi-soat/../x'}),/chưa hợp lệ/);
+    // Ảnh khách tự tải khi chuyển khoản thu thêm nằm ở /uploads/chung-tu/<DS>-<thời gian>.<đuôi>.
+    const customerUploads=resolve(dir,'customer');await mkdir(customerUploads);
+    const png=Buffer.from('89504e470d0a1a0a0000','hex');await writeFile(resolve(customerUploads,'DS0002-1794769026091.png'),png);
+    const pc=new ClosureProofs({directory:resolve(dir,'private'),uploads,customerUploads});
+    const topUp={settlementId:'DS0002',topUpDueVnd:2640000,paymentReference:'/uploads/chung-tu/DS0002-1794769026091.png',paidAt:'2026-11-16T07:00:00Z'};
+    assert.equal((await pc.financial(topUp)).direction,'top-up');
+    await assert.rejects(pc.financial({...topUp,settlementId:'DS0003'}),/không thuộc/);
     const saved=await p.contact('HD0001',{buffer:file,originalname:'proof.pdf'});
     assert.equal((await p.get('HD0001',saved.id)).meta.sha256,actual.sha256);
     await assert.rejects(p.get('HD0002',saved.id),/thiếu/);

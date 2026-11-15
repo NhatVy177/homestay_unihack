@@ -715,6 +715,7 @@ function GhiNhanThanhToanPanel({ type }) {
   const [loadingRows, setLoadingRows] = useState(false);
   const [localMessage, setLocalMessage] = useState('');
   const [localError, setLocalError] = useState('');
+  const [modalError, setModalError] = useState(''); // lỗi khi ghi nhận: hiện ngay trong hộp thoại, không hiện ở đầu trang
   const [selectedRefund, setSelectedRefund] = useState(null);
   const [refundDetail, setRefundDetail] = useState(null);
   const [refundRooms, setRefundRooms] = useState([]);
@@ -819,6 +820,7 @@ function GhiNhanThanhToanPanel({ type }) {
 
   async function openRefundModal(row, mode = 'pending') {
     const isCompleted = mode === 'completed';
+    setModalError('');
     setSelectedRefund({ ...row, _viewMode: mode });
     setRefundDetail(null);
     setRefundRooms([]);
@@ -878,6 +880,7 @@ function GhiNhanThanhToanPanel({ type }) {
     setSubmittingRefund(true);
     setLocalError('');
     setLocalMessage('');
+    setModalError('');
     try {
       let chungTuThanhToan = refundForm.chungTuThanhToan;
       if (refundEvidence?.file) {
@@ -906,7 +909,7 @@ function GhiNhanThanhToanPanel({ type }) {
       setSelectedRefund(null);
       await loadRows();
     } catch (err) {
-      setLocalError(err.response?.data?.message || `Không ghi nhận được ${isThuThem ? 'thu thêm' : 'hoàn cọc'}.`);
+      setModalError(err.response?.data?.message || `Không ghi nhận được ${isThuThem ? 'thu thêm' : 'hoàn cọc'}.`);
     } finally {
       setSubmittingRefund(false);
     }
@@ -926,7 +929,7 @@ function GhiNhanThanhToanPanel({ type }) {
       setSelectedRefund(null);
       await loadRows();
     } catch (err) {
-      setLocalError(err.response?.data?.message || 'Không thể không xác nhận chứng từ thu thêm.');
+      setModalError(err.response?.data?.message || 'Không thể không xác nhận chứng từ thu thêm.');
     } finally {
       setSubmittingRefund(false);
     }
@@ -1237,6 +1240,7 @@ function GhiNhanThanhToanPanel({ type }) {
               ) : null}
             </div>
 
+            {modalError && <p className="qt-modal-error" role="alert"><Icon name="error" /> {modalError}</p>}
             <div className="ktp-modal-footer">
               {selectedRefund._viewMode === 'completed' ? (
                 <button className="ktp-btn-cancel" type="button" onClick={() => setSelectedRefund(null)}>

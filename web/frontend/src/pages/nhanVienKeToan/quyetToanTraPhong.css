@@ -28,3 +28,6 @@
 .qt-loading { padding: var(--space-6); }
 .qt-full-span { grid-column: 1 / -1; display: grid; gap: var(--space-3); }
 .qt-inspection-item { border-top: 1px solid var(--color-border); padding-top: 10px; margin-top: 10px; }
+/* Lỗi khi ghi nhận thu thêm/hoàn cọc hiện ngay trong hộp thoại. */
+.qt-modal-error { display: flex; align-items: flex-start; gap: 8px; margin: 0 24px 12px; padding: 10px 14px; border-radius: var(--radius-md, 12px); background: var(--color-danger-soft); color: var(--color-danger); font-size: 14px; }
+.qt-modal-error .ui-icon { flex-shrink: 0; width: 18px; height: 18px; }

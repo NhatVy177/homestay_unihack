@@ -17,8 +17,8 @@ export function proofType(buffer) {
 }
 
 export class ClosureProofs {
-  constructor({ directory = resolve('secrets/checkout-closure'), uploads = resolve('uploads/chung-tu-doi-soat') } = {}) {
-    Object.assign(this,{directory,uploads});
+  constructor({ directory = resolve('secrets/checkout-closure'), uploads = resolve('uploads/chung-tu-doi-soat'), customerUploads = resolve('uploads/chung-tu') } = {}) {
+    Object.assign(this,{directory,uploads,customerUploads});
   }
   async save(contractId, bytes, name, mediaType) {
     if (!validCode(contractId) || !Buffer.isBuffer(bytes) || !bytes.length || bytes.length > LIMIT) throw createServiceError('Chứng từ tối đa 5 MB.',400);
@@ -45,10 +45,13 @@ export class ClosureProofs {
     const amount=Number(row.refundDueVnd || row.topUpDueVnd || 0);
     if (!amount || !row.paymentReference || !row.paidAt) return null;
     let bytes,name,mediaType;
-    const match=/^\/uploads\/chung-tu-doi-soat\/([A-Za-z0-9_.-]+)$/.exec(row.paymentReference);
+    // Chứng từ do kế toán tải (chung-tu-doi-soat/<DS>_...) hoặc khách tải khi chuyển khoản thu thêm (chung-tu/<DS>-...).
+    const staff=/^\/uploads\/chung-tu-doi-soat\/([A-Za-z0-9_.-]+)$/.exec(row.paymentReference);
+    const customer=!staff && /^\/uploads\/chung-tu\/([A-Za-z0-9_.-]+)$/.exec(row.paymentReference);
+    const match=staff || customer;
     if (match) {
-      if (!match[1].startsWith(row.settlementId+'_')) throw createServiceError('Chứng từ không thuộc đối soát này.',409);
-      const root=await realpath(this.uploads), file=await realpath(resolve(root,match[1]));
+      if (!match[1].startsWith(row.settlementId+(staff ? '_' : '-'))) throw createServiceError('Chứng từ không thuộc đối soát này.',409);
+      const root=await realpath(staff ? this.uploads : this.customerUploads), file=await realpath(resolve(root,match[1]));
       if (!file.startsWith(root+sep)) throw createServiceError('Đường dẫn chứng từ không hợp lệ.',409);
       if ((await stat(file)).size>LIMIT) throw createServiceError('Chứng từ vượt quá 5 MB.',409);
       bytes=await readFile(file); name=match[1]; mediaType=proofType(bytes);
