@@ -121,7 +121,7 @@ function TenantCase({ c, signer, reload, show = 'all' }) {
     : !trustedDeployment.address ? 'Hệ thống xác thực chưa được cấu hình đầy đủ.'
       : signer.status === 'error' ? signer.error : signer.status === 'preparing' && pending ? 'Đang chuẩn bị xác nhận cho tài khoản của bạn…' : '';
   const handoverLabel = c.state === 'change-requested' ? ['Đã gửi yêu cầu chỉnh sửa', 'info'] : waitingHandover ? ['Chờ bạn xác nhận', 'warn'] : ['Đã xác nhận', 'done'];
-  return <article className="xn-card">
+  return <article className={show === 'settlement' ? 'xn-card is-bare' : 'xn-card'}>
     {show !== 'settlement' && <>
     <div className="xn-head">
       <div><h3>Biên bản bàn giao phòng</h3><p>Hợp đồng {c.contractId} · bản số {revision} · phát hành {dateTime(draft?.publishedAt)}</p></div>
@@ -153,11 +153,11 @@ function TenantCase({ c, signer, reload, show = 'all' }) {
     </div>}
     </>}
     {show !== 'handover' && latest && <section className="xn-doc">
-      <div className="xn-head"><div><h3>{show === 'settlement' ? 'Xác nhận đối soát' : 'Đối soát tiền cọc'}</h3><p>Phiên bản {latest.bundle.version}</p></div>
-        <Pill label={latest.accepted ? ['Đã đồng ý', 'done'] : latest.dispute ? ['Đã gửi phản hồi', 'info'] : ['Chờ bạn xem', 'warn']} /></div>
+      {show !== 'settlement' && <><div className="xn-head"><div><h3>Đối soát tiền cọc</h3><p>Phiên bản {latest.bundle.version}</p></div>
+        <Pill label={latest.accepted ? ['Đã đồng ý', 'done'] : latest.dispute ? ['Đã gửi phản hồi', 'info'] : ['Chờ bạn xem', 'warn']} /></div></>}
       {/* Tab Trả phòng đã có "Chi tiết đối soát" và "Tóm tắt quyết toán" ở trên nên không lặp lại bảng, chỉ giữ thao tác xác nhận. */}
       {show === 'settlement'
-        ? !latest.accepted && !latest.dispute && <p className="xn-muted">Kiểm tra chi tiết đối soát và tóm tắt quyết toán ở trên. Nếu đúng, bấm "Đồng ý đối soát" và xác nhận bằng mã gửi về email; nếu chưa đúng, gửi phản hồi cho kế toán.</p>
+        ? null
         : <SettlementView bundle={latest.bundle} />}
       {latest.dispute && <div className="xn-alert info">Bạn đã phản hồi: “{latest.dispute.payload.reason}”. Kế toán sẽ xem xét và gửi phiên bản mới nếu có điều chỉnh.</div>}
       {c.state === 'settlement-pending' && !c.pending && <>
@@ -178,7 +178,7 @@ function TenantCase({ c, signer, reload, show = 'all' }) {
           <a href="/kiem-chung-avalanche" target="_blank" rel="noreferrer">Kiểm tra đối soát</a></div>
         <span className="xn-muted">Tải file bản lưu lên để tự kiểm tra đối soát chưa bị sửa.</span>
       </div>}
-      <p className="xn-muted">Đồng ý đối soát không có nghĩa là đã nhận tiền; việc hoàn/thu tiền thực hiện theo quy trình thanh toán của HomeStayDorm.</p>
+      {show !== 'settlement' && <p className="xn-muted">Đồng ý đối soát không có nghĩa là đã nhận tiền; việc hoàn/thu tiền thực hiện theo quy trình thanh toán của HomeStayDorm.</p>}
       {!latest.bundle.confirmationReceipt && !latest.disputeReceipt && <div className="xn-actions"><button type="button" className="xn-link" onClick={() => downloadEvidence({ ...latest.bundle, dispute: latest.dispute, disputeReceipt: latest.disputeReceipt }, `doi-soat-${c.contractId}-v${latest.bundle.version}.json`)}>Tải bản lưu đối soát</button></div>}
       {c.versions.length > 1 && <details className="xn-history"><summary>Các phiên bản trước ({c.versions.length - 1})</summary>
         <ol>{c.versions.slice(0, -1).map(v => <li key={v.bundle.version}>Phiên bản {v.bundle.version}{v.dispute ? ` — bạn phản hồi: “${v.dispute.payload.reason}”` : ''} — đã được thay bằng phiên bản mới.</li>)}</ol>

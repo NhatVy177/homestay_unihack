@@ -51,3 +51,8 @@
 
 /* B4: statement choice in the accountant tab */
 .xn-form label.xn-radio-option { flex-direction: row; align-items: center; font-weight: 400; }
+/* Tab Trả phòng: chỉ hàng nút đồng ý / phản hồi / tải bản lưu, không khung. */
+.xn-card.is-bare { padding: 0; margin: 8px 0 0; border: none; background: transparent; box-shadow: none; }
+.xn-card.is-bare .xn-doc { gap: 8px; }
+.xn-card.is-bare .xn-doc { flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: 16px; }
+.xn-card.is-bare .xn-doc > .xn-form, .xn-card.is-bare .xn-doc > .xn-alert, .xn-card.is-bare .xn-doc > p { flex-basis: 100%; }

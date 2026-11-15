@@ -1425,3 +1425,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo phản ánh của Vy (khối "Đối soát tiền cọc" lặp lại thông tin đã có ở "Chi tiết đối soát" và "Tóm tắt quyết toán").
 - Sửa: `web/frontend/src/components/xacNhan/HopDongXacNhanSection.jsx`: ở chế độ `show="settlement"` (tab Trả phòng) khối đổi tên "Xác nhận đối soát", không hiện lại bảng khoản trừ và số tiền, chỉ còn trạng thái, lời nhắc, nút "Đồng ý đối soát" / "Không đồng ý / phản hồi" và tải bản lưu. Giữ khối vì đây là nơi khách ký xác nhận mốc 2 lên Fuji; trình duyệt vẫn so nội dung ký với bảng đối soát trước khi ký. Trang `/xac-nhan` vẫn hiện bảng đầy đủ.
 - Kiểm tra: build OK; chưa chụp ảnh.
+
+## 2026-11-16 17:20:00 +07:00 — J-C153 — Tab Trả phòng: chỉ còn hàng nút xác nhận đối soát, không khung
+- Người thực hiện: Claude, theo phản ánh của Vy (khung "Xác nhận đối soát" thừa và xấu; chỉ cần nút đồng ý / không đồng ý và tải bản lưu).
+- Sửa: `web/frontend/src/components/xacNhan/HopDongXacNhanSection.jsx` (chế độ `show="settlement"`: bỏ tiêu đề, nhãn trạng thái, câu nhắc và câu "Đồng ý đối soát không có nghĩa là đã nhận tiền"; thẻ dùng lớp `is-bare`), `xacNhan.css` (`.xn-card.is-bare`: không viền, không nền, nút và liên kết tải bản lưu cùng một hàng; thông báo/form phản hồi xuống dòng riêng).
+- Kiểm tra: build OK; chưa chụp ảnh.
