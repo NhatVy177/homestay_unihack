@@ -75,7 +75,7 @@ const VIEWING_SLOTS = ['Linh hoạt theo Sale', 'Buổi sáng (7:00–11:30)', '
 const AMENITY_OPTIONS = ['Máy lạnh', 'Wifi mạnh', 'WC riêng', 'Bếp chung', 'Máy giặt'];
 
 // Thời gian xem và tiện ích chưa có cột riêng: gộp vào ghi chú của hồ sơ để Sale đọc khi tiếp nhận.
-const EMPTY_GROUP_MEMBER = { hoTen: '', gioiTinh: '', cccd: '', soDienThoai: '', email: '' };
+const EMPTY_GROUP_MEMBER = { hoTen: '', ngaySinh: '', gioiTinh: '', cccd: '', soDienThoai: '', email: '' };
 
 function composeRentNote(form = {}) {
   const lines = [];
@@ -85,8 +85,8 @@ function composeRentNote(form = {}) {
   else if (form.ghiChuThoiGian) lines.push(`Thời gian xem mong muốn: ${form.ghiChuThoiGian.trim()}.`);
   if (form.tienIchMongMuon?.length) lines.push(`Tiện ích mong muốn: ${form.tienIchMongMuon.join(', ')}.`);
   if (form.thanhVienNhom?.length) {
-    const people = [{ hoTen: form.hoTen, gioiTinh: form.gioiTinh, soDienThoai: form.soDienThoai, cccd: form.cccd, daiDien: true }, ...form.thanhVienNhom];
-    lines.push(`Nhóm ${people.length} người: ${people.map((p, i) => `${i + 1}) ${p.hoTen} (${[p.gioiTinh, p.soDienThoai, p.cccd ? `CCCD ${p.cccd}` : ''].filter(Boolean).join(', ')})${p.daiDien ? ' - người đại diện' : ''}`).join('; ')}.`);
+    const people = [{ hoTen: form.hoTen, gioiTinh: form.gioiTinh, soDienThoai: form.soDienThoai, cccd: form.cccd, ngaySinh: form.ngaySinh, daiDien: true }, ...form.thanhVienNhom];
+    lines.push(`Nhóm ${people.length} người: ${people.map((p, i) => `${i + 1}) ${p.hoTen} (${[p.gioiTinh, p.soDienThoai, p.cccd ? `CCCD ${p.cccd}` : '', p.ngaySinh ? `sinh ${p.ngaySinh.split('-').reverse().join('/')}` : ''].filter(Boolean).join(', ')})${p.daiDien ? ' - người đại diện' : ''}`).join('; ')}.`);
   }
   if (form.ghiChu?.trim()) lines.push(form.ghiChu.trim());
   return lines.join('\n');
@@ -4400,6 +4400,10 @@ export default function KhachHangPortalPage() {
       const label = index === 0 ? 'Người đại diện' : `Thành viên ${index + 1}`;
       if (!String(person.hoTen || '').trim()) return `${label}: vui lòng nhập họ và tên.`;
       if (!['Nam', 'Nữ'].includes(person.gioiTinh)) return `${label}: vui lòng chọn giới tính.`;
+      if (index > 0) {
+        const birthError = getBirthDateError(person.ngaySinh);
+        if (!person.ngaySinh || birthError) return `${label}: ${birthError || 'vui lòng nhập ngày sinh.'}`;
+      }
       const cccdError = getCccdError(person.cccd);
       if (cccdError || !person.cccd) return `${label}: ${cccdError || 'vui lòng nhập CCCD 12 số.'}`;
       const phoneError = getPhoneError(person.soDienThoai);
@@ -4478,6 +4482,7 @@ export default function KhachHangPortalPage() {
             <h3><Icon name="people" /> Thành viên {index + 2}</h3>
             <div className="kh-grp-grid">
               <label><span>Họ và tên</span><input value={member.hoTen} onChange={(e) => updateGroupMember(index, 'hoTen', e.target.value)} /></label>
+              <label><span>Ngày sinh</span><input type="date" max={getMaxBirthDate()} value={member.ngaySinh} onChange={(e) => updateGroupMember(index, 'ngaySinh', e.target.value)} /></label>
               <label><span>Giới tính</span><select value={member.gioiTinh} onChange={(e) => updateGroupMember(index, 'gioiTinh', e.target.value)}><option value="">Chọn</option><option value="Nam">Nam</option><option value="Nữ">Nữ</option></select></label>
               <label><span>Số CCCD</span><input inputMode="numeric" maxLength={12} value={member.cccd} onChange={(e) => updateGroupMember(index, 'cccd', e.target.value.replace(/\D/g, '').slice(0, 12))} /></label>
               <label><span>Số điện thoại</span><input inputMode="numeric" maxLength={10} value={member.soDienThoai} onChange={(e) => updateGroupMember(index, 'soDienThoai', e.target.value.replace(/\D/g, '').slice(0, 10))} /></label>

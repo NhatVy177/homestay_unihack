@@ -7,9 +7,13 @@ const note = 'Thời gian xem mong muốn: ngày 01/12/2026, Buổi chiều.\nNh
 
 test('group members written by the registration form are read back', () => {
   assert.deepEqual(parseGroupMembers(note), [
-    { hoTen: 'Nguyễn Văn A', gioiTinh: 'Nam', soDienThoai: '0901234567', cccd: '012345678901', daiDien: true },
-    { hoTen: 'Trần Thị B', gioiTinh: 'Nữ', soDienThoai: '0911111111', cccd: '098765432109', daiDien: false },
+    { hoTen: 'Nguyễn Văn A', gioiTinh: 'Nam', soDienThoai: '0901234567', cccd: '012345678901', ngaySinh: '', daiDien: true },
+    { hoTen: 'Trần Thị B', gioiTinh: 'Nữ', soDienThoai: '0911111111', cccd: '098765432109', ngaySinh: '', daiDien: false },
   ]);
+});
+test('birth date written as "sinh dd/mm/yyyy" is read back as ISO', () => {
+  const [member] = parseGroupMembers('Nhóm 2 người: 1) An (Nam, 0901234567, CCCD 012345678901, sinh 05/03/2003) - người đại diện; 2) Bình (Nữ, 0911111111, CCCD 098765432109).');
+  assert.equal(member.ngaySinh, '2003-03-05');
 });
 test('notes without a group line or with a broken one never throw', () => {
   assert.deepEqual(parseGroupMembers('Phòng quan tâm: Phòng 101.'), []);

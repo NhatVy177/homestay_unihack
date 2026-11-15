@@ -11,6 +11,8 @@ export function parseGroupMembers(note) {
     const cccd = parts.find((part) => /^CCCD\s/i.test(part))?.replace(/^CCCD\s+/i, '') || '';
     const gioiTinh = parts.find((part) => part === 'Nam' || part === 'Nữ') || '';
     const soDienThoai = parts.find((part) => /^\d{9,11}$/.test(part)) || '';
-    return { hoTen: match[1].trim(), gioiTinh, soDienThoai, cccd, daiDien: Boolean(match[3]) };
+    const birth = parts.find((part) => /^sinh\s+\d{2}\/\d{2}\/\d{4}$/i.test(part))?.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    const ngaySinh = birth ? `${birth[3]}-${birth[2]}-${birth[1]}` : '';
+    return { hoTen: match[1].trim(), gioiTinh, soDienThoai, cccd, ngaySinh, daiDien: Boolean(match[3]) };
   }).filter((member) => member?.hoTen);
 }

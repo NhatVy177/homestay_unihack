@@ -1280,3 +1280,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo yêu cầu của Vy.
 - Thay đổi: `KhachHangPortalPage.jsx`: phiếu cọc không còn hai khung "Thông tin khách hàng" và "Thông tin cọc" (chỉ còn thanh mã phiếu/trạng thái; khi đã có đối soát vẫn hiện tỷ lệ và số tiền hoàn cọc). `CustomerResidenceTab.jsx`: nút "Gửi thông tin cư trú" mờ do thiếu ngày sinh của người ở 2, 3 (tên, CCCD, SĐT được điền sẵn từ phiếu nhóm, ngày sinh thì không có) mà không báo lý do; nay hiện dòng "Còn thiếu thông tin: Người ở n: ngày sinh…" và nhắc tick ô xác nhận.
 - Kiểm tra: build OK; `ui-customer-residence`, `ui-customer-deposit-history`, `ui-customer-invoices` PASS. Chưa chụp ảnh.
+
+## 2026-11-16 00:20:00 +07:00 — J-C130 — Nhập ngày sinh ngay ở form đăng ký nhóm
+- Người thực hiện: Claude, theo câu hỏi của Vy (có cần ngày sinh không; nếu cần thì phải có ô nhập).
+- Lý do giữ: ngày sinh dùng cho khai báo tạm trú và hợp đồng, nên vẫn bắt buộc ở hồ sơ cư trú. Trước đây form nhóm không hỏi nên người ở 2, 3 phải nhập lại ở tab Thông tin cư trú và nút gửi bị mờ.
+- Thay đổi: `KhachHangPortalPage.jsx` (ô "Ngày sinh" cho từng thành viên ở bước 1, bắt buộc và kiểm tra tuổi; ghi vào ghi chú dạng "sinh dd/mm/yyyy"), `web/backend/services/groupMembers.js` (đọc lại ngày sinh), `CustomerResidenceTab.jsx` (điền sẵn ngày sinh), `web/backend/test/group-members.test.mjs`, `scripts/ui-interested-rooms.mjs`.
+- Kiểm tra: backend 96 pass; build OK; `ui-interested-rooms` PASS (thiếu ngày sinh thì không sang bước 2, phiếu gửi có "sinh 20/05/2003"); `ui-customer-residence` chạy lại.
+- Giới hạn: phiếu nhóm đã gửi trước đây (như demo5) không có ngày sinh, vẫn phải nhập tay ở tab Thông tin cư trú.

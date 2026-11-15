@@ -123,6 +123,9 @@ try {
     const member2 = page.locator('.kh-grp-member').nth(1);
     await member2.getByLabel('Họ và tên').fill('Trần Thị B');
     await member2.getByLabel('Giới tính').selectOption('Nữ');
+    await page.getByRole('button', { name: 'Tiếp tục' }).click();
+    assert.equal(await page.locator('.kh-grp-steps li.is-current strong').innerText(), 'Thành viên nhóm', 'thiếu ngày sinh thành viên thì chưa sang bước 2');
+    await member2.getByLabel('Ngày sinh').fill('2003-05-20');
     await member2.getByLabel('Số CCCD').fill('098765432109');
     await member2.getByLabel('Số điện thoại').fill('0911111111');
     await page.getByRole('button', { name: '+ Thêm thành viên' }).click();
@@ -148,7 +151,7 @@ try {
     assert.ok(groupSent, 'đã gửi phiếu nhóm');
     assert.equal(groupSent.body.soNguoiO, '2'); assert.equal(groupSent.body.soNam, '1'); assert.equal(groupSent.body.soNu, '1');
     assert.equal(groupSent.body.gioiTinhThue, 'Khác');
-    assert.match(groupSent.body.ghiChu, /Nhóm 2 người: 1\) Nguyễn Văn A .* - người đại diện; 2\) Trần Thị B/);
+    assert.match(groupSent.body.ghiChu, /Nhóm 2 người: 1\) Nguyễn Văn A .* - người đại diện; 2\) Trần Thị B .*sinh 20\/05\/2003/);
     writes.length = 0; bodies.length = 0;
 
     assert.equal(errors.length, 0, `browser errors: ${errors.join('; ')}`);

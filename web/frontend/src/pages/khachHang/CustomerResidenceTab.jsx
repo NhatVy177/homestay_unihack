@@ -26,7 +26,7 @@ function initialMembers(phieu, nguoiDaiDien) {
   } : { ...EMPTY_MEMBER };
   // Thành viên đã nhập ở form đăng ký nhóm thì điền sẵn, khách chỉ bổ sung ngày sinh/quốc tịch (J-C119).
   const registered = (phieu.thanhVienDangKy || []).filter((m) => !m.daiDien)
-    .map((m) => ({ ...EMPTY_MEMBER, hoTen: m.hoTen, gioiTinh: m.gioiTinh, cccd: m.cccd, sdt: m.soDienThoai }));
+    .map((m) => ({ ...EMPTY_MEMBER, hoTen: m.hoTen, gioiTinh: m.gioiTinh, cccd: m.cccd, sdt: m.soDienThoai, ngaySinh: m.ngaySinh || '' }));
   const rest = [...registered, ...Array.from({ length: Math.max(0, count - 1 - registered.length) }, () => ({ ...EMPTY_MEMBER }))];
   return [rep, ...rest];
 }
