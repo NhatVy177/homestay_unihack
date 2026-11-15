@@ -1263,3 +1263,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo yêu cầu của Vy.
 - Thay đổi: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (trang thanh toán cọc có ba tab: QR chuyển khoản, Tiền mặt tại quầy, Ví điện tử (mô phỏng); tab ví chỉ là trạng thái giao diện `walletTab`, không đổi phương thức đã lưu trên phiếu; nút "Mở cổng ví điện tử" vẫn đi tới cổng mô phỏng như cũ), `khachHangPortal.css` (`.dpay-wallet-panel`), `web/frontend/scripts/ui-customer-invoices.mjs` (kiểm tra tab ví).
 - Kiểm tra: build OK; `ui-customer-invoices`, `ui-customer-deposit-history`, `ui-customer-deposit-request` PASS. Chưa chụp ảnh.
+
+## 2026-11-15 23:25:00 +07:00 — J-C127 — Tab ví mở thẳng cổng; bỏ "Mã đơn" ở cổng mô phỏng
+- Người thực hiện: Claude, theo phản ánh của Vy (bấm tab ví còn phải bấm thêm nút mới thấy QR; mã đơn dạng chuỗi ngẫu nhiên khó hiểu).
+- Thay đổi: `KhachHangPortalPage.jsx` (tab "Ví điện tử (mô phỏng)" bấm là tạo đơn và vào cổng ngay, bỏ trạng thái `walletTab` và nút "Mở cổng ví điện tử" của J-C126), `web/frontend/src/pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx` (bỏ dòng "Mã đơn"), `scripts/ui-customer-invoices.mjs`.
+- Kiểm tra: build OK; `ui-customer-invoices`, `ui-customer-deposit-history` PASS. Chưa chụp ảnh.

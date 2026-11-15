@@ -31,7 +31,6 @@ export default function ThanhToanMoPhongPage() {
       {order && <>
         <dl>
           <div><dt>Nội dung</dt><dd>{description}</dd></div>
-          <div><dt>Mã đơn</dt><dd>{order.id}</dd></div>
           <div className="tm-amount"><dt>Số tiền</dt><dd>{money(order.amountVnd)}</dd></div>
         </dl>
         {order.status === 'Pending' && <>
