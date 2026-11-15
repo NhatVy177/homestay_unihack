@@ -546,7 +546,8 @@ export default function BanGiaoPhongTab() {
                             borderRadius: '8px',
                             cursor: 'pointer',
                             fontWeight: 600,
-                            fontSize: '13px'
+                            fontSize: '13px',
+                            whiteSpace: 'nowrap'
                           }}
                           onClick={() => handleSearch(item.maHopDong)}
                           disabled={loading}
@@ -557,7 +558,7 @@ export default function BanGiaoPhongTab() {
                         <button
                           type="button"
                           className="ktp-btn-submit"
-                          style={{ padding: '8px 14px', minWidth: '92px' }}
+                          style={{ padding: '8px 14px', minWidth: '92px', whiteSpace: 'nowrap' }}
                           onClick={() => handleSearch(item.maHopDong)}
                           disabled={loading || !item.daDongTienDauKy}
                         >
