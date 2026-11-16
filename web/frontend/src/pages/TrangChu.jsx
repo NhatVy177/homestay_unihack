@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import AccountMenu from '../components/common/AccountMenu.jsx';
+import DemoAccounts from '../components/common/DemoAccounts.jsx';
 import { safeNextPath } from '../auth/returnPath.js';
 import { httpClient } from '../api/httpClient.js';
 import { Icon } from '../components/common/Icon.jsx';
@@ -199,6 +200,7 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
                 Chưa có tài khoản?{' '}
                 <button type="button" onClick={() => { setError(''); onSwitchMode('register'); }}>Đăng ký ngay</button>
               </p>
+              <DemoAccounts onPick={setLoginForm} />
             </form>
           )}
 

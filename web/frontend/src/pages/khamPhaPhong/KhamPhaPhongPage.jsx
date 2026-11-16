@@ -1,3 +1,4 @@
+import ShareRoomButton from '../../components/common/ShareRoomButton.jsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { httpClient } from '../../api/httpClient.js';
@@ -405,6 +406,7 @@ function DetailModal({ room, onClose, onRegister }) {
         </div>
         <div className="kp-modal-actions">
           <button className="kp-btn kp-btn-soft" type="button" onClick={onClose}>Đóng</button>
+          <ShareRoomButton room={room} />
           <button className="kp-btn kp-btn-primary" type="button" onClick={onRegister}>Đăng ký nhu cầu thuê</button>
         </div>
       </div>

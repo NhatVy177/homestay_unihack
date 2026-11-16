@@ -1,0 +1,12 @@
+.dma { margin-top: 12px; border-top: 1px solid var(--color-border, #E0E3DF); padding-top: 12px; font-size: 13px; }
+.dma summary { cursor: pointer; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; font-size: 12px; color: var(--color-text-muted, #5E655C); list-style: none; }
+.dma summary::-webkit-details-marker { display: none; }
+.dma summary::after { content: ' ⌄'; }
+.dma[open] summary::after { content: ' ⌃'; }
+.dma-body { display: grid; gap: 10px; max-height: 240px; overflow-y: auto; margin-top: 10px; padding-right: 4px; }
+.dma-group { display: grid; gap: 6px; }
+.dma-group > strong { font-size: 12px; color: var(--color-primary, #4A6549); }
+.dma-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: 1px solid var(--color-border, #E0E3DF); border-radius: var(--radius-sm, 8px); background: var(--color-surface-alt, #F1F4F0); font: inherit; font-size: 13px; text-align: left; color: var(--color-text, #191C1A); cursor: pointer; }
+.dma-item:hover { border-color: var(--color-primary, #4A6549); }
+.dma-item small { color: var(--color-text-muted, #5E655C); }
+.dma-note { margin: 0; font-size: 12px; color: var(--color-text-muted, #5E655C); }
