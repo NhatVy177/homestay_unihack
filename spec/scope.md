@@ -99,6 +99,11 @@ Mức bám mẫu và danh sách mục bên dưới được **D-035 thay thế**
 - Dữ liệu từ các API public hiện có: nổi bật + khám phá + bộ lọc, gộp theo mã phòng và chỉ hiển thị tối đa 6 ở mục nổi bật; thống kê có nhãn đúng tập dữ liệu. Giữ query `khuVuc`, `loaiPhong`, `mucGiaToiDa`, `phong`, form và xử lý tài khoản; không thêm control ngày/giờ không có nghiệp vụ hỗ trợ. Mô hình nhà ghi rõ minh họa; map dùng địa chỉ/tên chi nhánh từ API, điểm khu vực tham khảo từ OpenStreetMap, không giả tọa độ tòa nhà. Không sao chép giá/phòng/tài khoản liên hệ của 23homestay.
 - Kiểm tra bố cục 1440/1024/768/390/320px, cả trạng thái rỗng/lỗi; danh sách chi nhánh mobile cuộn trong panel. Kiểm riêng chuyển động bật/giảm bằng browser: autoplay/pause, transform, gallery drag/phím, render nhà trước/sau mở và xoay, chọn chi nhánh/3D map, modal tài khoản/tư vấn/thông tin. Fixture map dùng style nền riêng để kiểm tương tác ổn định; kiểm thêm OpenFreeMap thật bằng lượt đọc public, phân biệt hai nguồn kết quả.
 
+### Tinh chỉnh gallery và liên hệ — D-036 / J-060
+
+- Gallery tự chạy phải → trái; ảnh hai rìa tiến gần người xem, lớn hơn giữa, mép trên/dưới xéo tạo cảm giác đổ xuống theo ảnh Vy gửi. Chiều cao co giãn trên màn lớn, giữ 280px ở mobile; vẫn kéo/phím/quán tính, không tự chạy khi giảm chuyển động, không tràn ngang toàn trang.
+- Số liên hệ trang chủ **0795749721**, các vị trí hiển thị và `tel:` dùng cùng hằng số; áp dụng thẻ điện thoại, popup tư vấn, nút gọi nổi và footer. Không đổi dữ liệu liên hệ từng chi nhánh/nhân viên hoặc tạo tài khoản Zalo suy đoán từ số.
+
 Không đưa CCCD, địa chỉ, tài khoản ngân hàng, ảnh hoặc nội dung biên bản lên chain. Chain chỉ giữ ID khó đoán, ví, commitment, version/state và số tiền tối thiểu cần thiết. Không khẳng định hash/salt bảo đảm ẩn danh hoặc chữ ký tự chứng minh hiệu lực pháp lý.
 
 Kiểm thử cần phủ sai quyền/chữ ký, replay/hết hạn/sai domain, sai version/hash, tổng tiền và làm tròn, sửa file/thiếu salt/ảnh, relayer timeout/gas, SQL lệch chain và khôi phục ví. Ghi kết quả thực tế ở nhật ký; chưa có kết quả cho bộ yêu cầu này trong repo hiện hành.

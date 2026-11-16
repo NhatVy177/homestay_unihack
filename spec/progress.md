@@ -1,5 +1,11 @@
 # Tiến độ và điểm tiếp tục
 
+## Gallery chạy trái và ảnh rìa đổ xuống — 2026-11-17 00:39:48 +07:00 (D-036 / J-060)
+
+- Đã đổi gallery từ chạy trái → phải sang **phải → trái**; dùng camera phối cảnh, tăng độ sâu/độ lớn ở hai rìa và làm mép ảnh xéo xuống theo ảnh Vy gửi. Chiều cao tăng theo viewport lớn (1920px: 538px, 1440px: 403px), mobile giữ 280px. Kéo/phím/quán tính và giảm chuyển động giữ được; phép wrap hỗ trợ offset âm chạy liên tục.
+- Số liên hệ công khai trang chủ đổi thành **0795749721**, chữ và link gọi dùng chung `CONTACT_PHONE`; đồng bộ 4 vị trí khi popup tư vấn mở. Không thay số riêng của chi nhánh/nhân viên trong nghiệp vụ.
+- Ảnh mới 1920/1440/390px đã xem ở `web/frontend/.ui-screens/gallery-refinement/`, không tràn ngang; browser motion pass cả bật/giảm, xác nhận tự chạy phải → trái, drag/phím và đủ 4 link `tel:0795749721`. Build/layout cuối đợt và chi tiết kết quả ghi J-060. Bản xem vẫn `http://127.0.0.1:5191/`; chờ Vy xem góc cong mới, không tự merge main.
+
 ## Hiệu ứng và đủ mục trang chủ — 2026-11-17 00:27:45 +07:00 (D-035 / J-059)
 
 - Hoàn thành code/kiểm tra local trên `feat/ui-refresh-1`, tiếp nối `9d58786`. Trang chủ bám thứ tự các mục thực tế của 23homestay: hero, gallery cong WebGL, 6 phòng, giới thiệu/nhà 3D/số liệu, bản đồ, 3 thẻ liên hệ, footer và liên hệ nổi; đã bỏ đánh giá/quy trình tự thêm. Có autoplay/crossfade/zoom, reveal/stagger, tilt/shine, gallery drag/quán tính/phím, nhà xoay/mở/gộp tầng, đếm số, map zoom/chọn điểm/2D–3D, hover và tư vấn nổi. Giữ màu, tiêu đề dùng font serif local; cảnh/map lazy-loaded, có chế độ giảm chuyển động.

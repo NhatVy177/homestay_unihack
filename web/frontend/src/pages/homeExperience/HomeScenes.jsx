@@ -34,8 +34,9 @@ export function CurvedGallery({ photos }) {
     let lastTime = performance.now();
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-10, 10, 2.5, -2.5, .1, 100);
+    const camera = new THREE.PerspectiveCamera(30, 1, .1, 100);
     camera.position.z = 10;
+    const viewportHalfWidth = { value: 10 };
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.setClearColor(0xffffff, 0);
     renderer.domElement.setAttribute('aria-hidden', 'true');
@@ -66,12 +67,17 @@ export function CurvedGallery({ photos }) {
         });
       });
       const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-      // Bend both edges of each image along the same wide arc as the reference.
+      // Bring the outer edges toward the viewer: larger, slanted panels that fall outward.
       material.onBeforeCompile = shader => {
+        shader.uniforms.uGalleryHalfWidth = viewportHalfWidth;
+        shader.vertexShader = 'uniform float uGalleryHalfWidth;\n' + shader.vertexShader;
         shader.vertexShader = shader.vertexShader.replace('#include <project_vertex>', `
           vec4 worldPosition = modelMatrix * vec4(transformed, 1.0);
-          worldPosition.y += pow(worldPosition.x * 0.065, 2.0) * 0.32;
-          worldPosition.z -= pow(worldPosition.x * 0.065, 2.0) * 0.42;
+          float bend = clamp(worldPosition.x / uGalleryHalfWidth, -1.5, 1.5);
+          float edge = bend * bend;
+          worldPosition.y *= 1.0 + edge * 0.04;
+          worldPosition.y -= edge * 0.045;
+          worldPosition.z += edge * 0.7;
           gl_Position = projectionMatrix * viewMatrix * worldPosition;
         `);
       };
@@ -83,8 +89,8 @@ export function CurvedGallery({ photos }) {
       const w = element.clientWidth;
       const h = element.clientHeight;
       const aspect = w / h;
-      camera.left = -2.65 * aspect; camera.right = 2.65 * aspect;
-      camera.top = 2.65; camera.bottom = -2.65;
+      camera.aspect = aspect;
+      viewportHalfWidth.value = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z * aspect;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
     }
@@ -97,10 +103,11 @@ export function CurvedGallery({ photos }) {
       if (!visible || document.hidden) return;
       if (!dragging) {
         velocity *= .955;
-        position += (motion.matches ? 0 : .006) * delta + velocity * delta;
+        position += (motion.matches ? 0 : -.008) * delta + velocity * delta;
       }
       for (let i = 0; i < meshes.length; i++) {
-        meshes[i].position.x = ((i * (width + gap) + position + total * 100) % total) - total / 2;
+        const wrapped = (i * (width + gap) + position) % total;
+        meshes[i].position.x = ((wrapped + total) % total) - total / 2;
       }
       renderer.render(scene, camera);
       element.dataset.offset = position.toFixed(2);

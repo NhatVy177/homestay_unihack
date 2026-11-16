@@ -51,6 +51,10 @@ try {
     await page.locator('.hx-curved-gallery[data-ready=true]').waitFor();
     await page.waitForTimeout(700);
     const before = Number(await gallery.getAttribute('data-offset'));
+    await page.waitForTimeout(450);
+    const afterAutoplay = Number(await gallery.getAttribute('data-offset'));
+    if (reduced) assert.equal(afterAutoplay, before, 'reduced motion must keep the gallery stationary');
+    else assert.ok(afterAutoplay < before, 'gallery must automatically travel from right to left');
     const bounds = await gallery.boundingBox();
     await page.mouse.move(bounds.x + bounds.width * .55, bounds.y + bounds.height * .5);
     await page.mouse.down(); await page.mouse.move(bounds.x + bounds.width * .25, bounds.y + bounds.height * .5, { steps: 12 }); await page.mouse.up();
@@ -91,12 +95,14 @@ try {
     assert.match(await page.locator('.hx-map-detail strong').innerText(), /Bình Thạnh/);
     await page.getByRole('button', { name: 'Mở tư vấn', exact: true }).click();
     assert.equal(await page.getByRole('dialog', { name: 'Tư vấn phòng' }).isVisible(), true);
+    assert.equal(await page.getByRole('dialog', { name: 'Tư vấn phòng' }).getByRole('link', { name: '0795749721', exact: true }).getAttribute('href'), 'tel:0795749721');
+    assert.equal(await page.locator('a[href^="tel:"]').evaluateAll(links => links.length === 4 && links.every(link => link.getAttribute('href') === 'tel:0795749721')), true, 'all homepage phone links must use the supplied contact number');
     await page.keyboard.press('Escape'); assert.equal(await page.getByRole('dialog', { name: 'Tư vấn phòng' }).count(), 0);
     await page.getByRole('button', { name: 'Điều khoản và chính sách bảo mật', exact: true }).click();
     assert.equal(await page.getByRole('dialog', { name: 'Điều khoản và chính sách bảo mật' }).isVisible(), true);
     await page.keyboard.press('Escape');
     assert.deepEqual(errors, []); assert.deepEqual(writes, []);
-    results.push({ reduced, heroAnimation: animationName, autoplay: reduced ? 'disabled' : 'passed', pause: 'passed', gallery: 'drag and keyboard passed', cardTilt: 'passed', house: 'geometry explosion, rotation, branch switch passed', map: '3 markers, select and 3D passed (fixture style)', contact: 'passed', policy: 'passed', errors, writes });
+    results.push({ reduced, heroAnimation: animationName, autoplay: reduced ? 'disabled' : 'passed', pause: 'passed', gallery: 'right-to-left autoplay, drag and keyboard passed', cardTilt: 'passed', house: 'geometry explosion, rotation, branch switch passed', map: '3 markers, select and 3D passed (fixture style)', contact: '0795749721 text and all 4 telephone links passed', policy: 'passed', errors, writes });
     console.log(`PASS motion ${reduced ? 'reduced' : 'enabled'}`);
     await context.close();
   }

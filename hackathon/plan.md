@@ -273,6 +273,8 @@ Kết quả T-21 và danh sách đợt 2 nằm ở `spec/progress.md` / J-045: �
 
 **D-035 / J-059 thay bố cục D-034 (17/11):** Vy yêu cầu đủ mục và cả hiệu ứng của trang mẫu. Trang chủ hiện hành theo chuỗi hero → gallery cong kéo → 6 phòng → giới thiệu/nhà 3D/số liệu → map → 3 thẻ liên hệ → footer, kèm liên hệ nổi; bỏ đánh giá/quy trình tự thêm trước đó. Thêm autoplay/crossfade/zoom, reveal/stagger, tilt/shine, quán tính, xoay/mở tầng/đếm số và map 2D/3D. Dùng Three.js 0.187.0 và MapLibre 6.18.0 lazy-loaded, font Playfair Display local cho tiêu đề; giữ React/CSS, màu và nghiệp vụ/API tài khoản. Tái dùng API public để có đủ phòng/chi nhánh, giữ bộ lọc thuê tháng; không bịa Zalo hoặc tọa độ tòa nhà. Nghiệm thu 5 độ rộng và 2 chế độ chuyển động, xem chi tiết ở scope/progress/J-059. Không đổi lịch D-025 hoặc suy nghiệm thu Fuji từ UI.
 
+**Tinh chỉnh D-036 / J-060 (17/11):** theo ảnh mới của Vy, gallery chạy phải → trái, dùng phối cảnh để ảnh ngoài rìa lớn hơn/xéo/đổ xuống, tăng chiều cao theo màn lớn; giữ thao tác và chế độ giảm chuyển động. Số liên hệ công khai trang chủ đổi thành 0795749721 ở cả chữ và link gọi; số chi nhánh/nhân viên trong nghiệp vụ giữ nguyên. Vẫn thuộc T-21, kiểm ảnh 1920/1440/390px và các ca layout/motion hiện có.
+
 Nếu thử ví nhúng/relayer chưa đạt, ưu tiên sửa lát cắt nhỏ này và cắt simulator/point trước. Ví giao dịch trực tiếp trên Fuji có thể dùng kiểm thử nội bộ trong lúc phát triển, nhưng chưa đạt mục tiêu UX nộp bài. Không âm thầm coi fallback là chức năng đã hoàn thành.
 
 Các phụ thuộc còn lại: chốt nghiệp vụ cọc với Vy; quyền truy cập SQL/dữ liệu mẫu; chọn và cấu hình SDK ví; kết nối RPC/nguồn AVAX thử cho relayer/deploy. Không yêu cầu Vy gửi khóa bí mật qua chat.

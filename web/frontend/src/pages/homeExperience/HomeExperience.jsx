@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '../../components/common/Icon.jsx';
-import { groupBranches, imageFallback, imageFor, money, priceFor, unitFor } from './homeData.js';
+import { CONTACT_PHONE, groupBranches, imageFallback, imageFor, money, priceFor, unitFor } from './homeData.js';
 import './experience.css';
 
 const CurvedGallery = lazy(() => import('./HomeScenes.jsx').then(module => ({ default: module.CurvedGallery })));
@@ -161,7 +161,7 @@ export function ContactSection() {
   // The project has no verified Zalo account; show the same third contact card as an onsite enquiry.
   return <section className="hx-section hx-contact-section" id="lien-he"><div className="tc-container"><SectionHeading title="Liên Hệ" subtitle="Chúng mình luôn sẵn sàng lắng nghe bạn." />
     <div className="hx-contact-cards">{[
-      ['phone', 'Điện thoại', '028 1111 0001', 'tel:02811110001'],
+      ['phone', 'Điện thoại', CONTACT_PHONE, `tel:${CONTACT_PHONE}`],
       ['mail', 'Email', 'q1@homedorm.vn', 'mailto:q1@homedorm.vn'],
       ['chat', 'Tư vấn', 'Trao đổi về phòng của bạn', '#tu-van'],
     ].map(([icon, title, value, href], i) => <Reveal key={icon} delay={180 + i * 150} kind="spring"><a href={href} className="hx-contact-card" onClick={icon === 'chat' ? event => { event.preventDefault(); window.dispatchEvent(new Event('homedorm:open-contact')); } : undefined}><span className="hx-contact-icon"><ContactIcon name={icon} /></span><span className="hx-contact-label">{title}</span><strong>{value}</strong></a></Reveal>)}</div>
@@ -178,9 +178,9 @@ export function FloatingContact() {
     return () => { window.removeEventListener('homedorm:open-contact', show); window.removeEventListener('keydown', close); };
   }, []);
   return <aside className="hx-floating-contact" aria-label="Liên hệ nhanh">
-    {open && <div className="hx-contact-popover" role="dialog" aria-label="Tư vấn phòng"><button type="button" aria-label="Đóng tư vấn" onClick={() => setOpen(false)}><Icon name="close" /></button><strong>Chào bạn, mình có thể giúp gì?</strong><p>Gọi hoặc gửi email để được tư vấn phòng, lịch xem và thông tin thuê.</p><a href="tel:02811110001"><ContactIcon name="phone" />028 1111 0001</a><a href="mailto:q1@homedorm.vn"><ContactIcon name="mail" />q1@homedorm.vn</a></div>}
+    {open && <div className="hx-contact-popover" role="dialog" aria-label="Tư vấn phòng"><button type="button" aria-label="Đóng tư vấn" onClick={() => setOpen(false)}><Icon name="close" /></button><strong>Chào bạn, mình có thể giúp gì?</strong><p>Gọi hoặc gửi email để được tư vấn phòng, lịch xem và thông tin thuê.</p><a href={`tel:${CONTACT_PHONE}`}><ContactIcon name="phone" />{CONTACT_PHONE}</a><a href="mailto:q1@homedorm.vn"><ContactIcon name="mail" />q1@homedorm.vn</a></div>}
     <button className="hx-float-chat" type="button" aria-label="Mở tư vấn" aria-expanded={open} onClick={() => setOpen(current => !current)}><ContactIcon name="chat" /></button>
-    <a className="hx-float-phone" href="tel:02811110001" aria-label="Gọi HomestayDorm"><ContactIcon name="phone" /></a>
+    <a className="hx-float-phone" href={`tel:${CONTACT_PHONE}`} aria-label="Gọi HomestayDorm"><ContactIcon name="phone" /></a>
   </aside>;
 }
 
@@ -200,7 +200,7 @@ export function FooterPublic({ onOpenAuth }) {
   return <><footer className="tc-footer hx-footer"><div className="tc-container"><div className="hx-footer-grid">
     <Reveal><a href="#trang-chu" className="tc-logo tc-logo--light"><Icon name="home" />Homestay<strong>Dorm</strong></a><p>Ngôi nhà ấm cúng của bạn tại Sài Gòn.</p></Reveal>
     <Reveal delay={120}><h3>Liên kết nhanh</h3><a href="#phong-noi-bat">Phòng</a><button className="hx-policy-link" ref={policyButton} type="button" onClick={() => setPolicyOpen(true)}>Điều khoản và chính sách bảo mật</button></Reveal>
-    <Reveal delay={240}><h3>Kết nối với chúng mình</h3><div className="hx-footer-social"><a href="tel:02811110001" aria-label="Điện thoại"><ContactIcon name="phone" /></a><a href="mailto:q1@homedorm.vn" aria-label="Email"><ContactIcon name="mail" /></a><button type="button" aria-label="Tư vấn" onClick={() => window.dispatchEvent(new Event('homedorm:open-contact'))}><ContactIcon name="chat" /></button></div><div className="hx-footer-auth"><button type="button" onClick={() => onOpenAuth('login')}>Đăng nhập</button><button type="button" onClick={() => onOpenAuth('register')}>Đăng ký</button></div></Reveal>
+    <Reveal delay={240}><h3>Kết nối với chúng mình</h3><div className="hx-footer-social"><a href={`tel:${CONTACT_PHONE}`} aria-label="Điện thoại"><ContactIcon name="phone" /></a><a href="mailto:q1@homedorm.vn" aria-label="Email"><ContactIcon name="mail" /></a><button type="button" aria-label="Tư vấn" onClick={() => window.dispatchEvent(new Event('homedorm:open-contact'))}><ContactIcon name="chat" /></button></div><div className="hx-footer-auth"><button type="button" onClick={() => onOpenAuth('login')}>Đăng nhập</button><button type="button" onClick={() => onOpenAuth('register')}>Đăng ký</button></div></Reveal>
     </div><Reveal><div className="hx-copyright">© {new Date().getFullYear()} HomestayDorm. Đồ án môn học.</div></Reveal></div></footer>
     {policyOpen && <div className="hx-policy-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setPolicyOpen(false); }}><div className="hx-policy-dialog" role="dialog" aria-modal="true" aria-labelledby="hx-policy-title"><button type="button" ref={closeButton} aria-label="Đóng điều khoản" onClick={() => setPolicyOpen(false)}><Icon name="close" /></button><h2 id="hx-policy-title">Điều khoản và chính sách bảo mật</h2><h3>Thông tin thuê phòng</h3><p>Giá và tiện ích được trình bày trong từng phòng. Các khoản thu, tiền cọc và điều kiện thuê cụ thể được xác nhận trong hồ sơ thuê và hợp đồng; hãy đọc kỹ trước khi xác nhận.</p><h3>Tài khoản và hồ sơ</h3><p>Bạn cần đăng nhập để xem và thực hiện các thao tác trong hồ sơ thuê của mình. Không chia sẻ mật khẩu hoặc mã xác nhận với người khác.</p><h3>Liên hệ</h3><p>Nếu cần làm rõ thông tin hoặc yêu cầu hỗ trợ về tài khoản, liên hệ <a href="mailto:q1@homedorm.vn">q1@homedorm.vn</a>.</p></div></div>}
   </>;

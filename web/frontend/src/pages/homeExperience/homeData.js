@@ -2,6 +2,7 @@ export const ROOM_IMAGES = {
   LP0001: '/images/home/dorm.jpg', LP0002: '/images/home/hero.jpg',
   LP0003: '/images/home/room.jpg', LP0004: '/images/home/living.jpg',
 };
+export const CONTACT_PHONE = '0795749721';
 export const imageFor = room => room?.UrlImg || ROOM_IMAGES[room?.MaLoaiPhong] || ROOM_IMAGES.LP0001;
 export const priceFor = room => Number(room?.GiaThueTheoGiuong || room?.GiaThueNguyenPhong || 0);
 export const money = value => Number(value).toLocaleString('vi-VN') + 'đ';
