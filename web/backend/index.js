@@ -100,11 +100,13 @@ async function start() {
   const server = app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
     console.log(`Connected to SQL Server database: ${process.env.DB_NAME || 'not configured'}`);
-    startHoaDonQuaHanScheduler();
-    startDatCocHetHanScheduler();
-    startYeuCauCocQuaHanScheduler();
-    startNhacThuDauKyScheduler();
-    startLichXemPhongDenGioScheduler();
+    if (process.env.SCHEDULERS_ENABLED !== 'false') {
+      startHoaDonQuaHanScheduler();
+      startDatCocHetHanScheduler();
+      startYeuCauCocQuaHanScheduler();
+      startNhacThuDauKyScheduler();
+      startLichXemPhongDenGioScheduler();
+    }
   });
 
   server.on('error', (error) => {

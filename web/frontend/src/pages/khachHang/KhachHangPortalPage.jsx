@@ -1,8 +1,10 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { khachMoiApi } from '../khachMoi/khachMoi.api.js';
 import { datCocApi } from '../datCoc/datCoc.api.js';
+import ChiTietPhongView from '../../components/rooms/RoomDetailView.jsx';
+import { normalizeRoomDetail, getDemoRoomImage, getRoomFloor } from '../../components/rooms/roomDetail.js';
 import ResultModal from '../../components/common/ResultModal.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import '../khamPhaPhong/khamPhaPhong.css';
@@ -199,14 +201,6 @@ function getRoomTypeRequirementError(form = {}) {
 
   return '';
 }
-
-const DEMO_ROOM_IMAGES = [
-  'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1400&q=85',
-  'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1400&q=85',
-  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1400&q=85',
-  'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1400&q=85',
-  'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1400&q=85'
-];
 
 function Icon({ name, className = '' }) {
   const shapes = {
@@ -436,12 +430,6 @@ function normalizeMoneyVnd(value) {
   return Math.round(amount);
 }
 
-function formatServiceMoney(value, unit) {
-  const amount = Number(value);
-  if (!Number.isFinite(amount) || amount <= 0) return 'Chưa cập nhật';
-  return `${amount.toLocaleString('vi-VN')}đ${unit ? `/${unit}` : ''}`;
-}
-
 function formatDate(value, withTime = false) {
   if (!value) return 'Chưa có';
   return new Intl.DateTimeFormat('vi-VN', withTime ? { dateStyle: 'short', timeStyle: 'short' } : { dateStyle: 'short' }).format(new Date(value));
@@ -451,19 +439,6 @@ function getArea(room = {}) {
   const parts = String(room.diaChi || '').split(',').map((part) => part.trim()).filter(Boolean);
   if (parts.length >= 3) return parts[parts.length - 2];
   return room.chiNhanh || 'Chưa cập nhật';
-}
-
-function getRoomFloor(maPhong) {
-  const numberPart = String(maPhong || '').match(/\d+/)?.[0];
-  const roomNumber = Number(numberPart);
-  if (!Number.isFinite(roomNumber) || roomNumber < 100) return null;
-  return Math.floor(roomNumber / 100);
-}
-
-function getDemoRoomImage(maPhong, index = 0) {
-  const numberPart = String(maPhong || '').match(/\d+/)?.[0];
-  const offset = Number(numberPart || 0);
-  return DEMO_ROOM_IMAGES[(offset + index) % DEMO_ROOM_IMAGES.length];
 }
 
 function getTraPhongActiveStep(yeuCauTraPhong) {
@@ -500,83 +475,6 @@ function unwrapApiPayload(payload) {
     return payload.data;
   }
   return payload || {};
-}
-
-function normalizeImageItems(source) {
-  const rawImages = Array.isArray(source)
-    ? source
-    : (source?.hinhAnh || source?.hinhAnhs || source?.anh || source?.images || source?.danhSachAnh || []);
-  const images = Array.isArray(rawImages) ? rawImages : [];
-
-  return images
-    .map((image, index) => {
-      const urlAnh = image?.urlAnh || image?.urlImg || image?.UrlImg || image?.UrlAnh || image?.url || image?.duongDan;
-      if (!urlAnh) return null;
-      return {
-        stt: image?.stt || image?.STTAnh || image?.sttAnh || image?.id || index + 1,
-        urlAnh,
-        moTa: image?.moTa || image?.MoTa || image?.alt || ''
-      };
-    })
-    .filter(Boolean);
-}
-
-function normalizeRoomDetail(payload, fallback = {}) {
-  const raw = unwrapApiPayload(payload);
-  const merged = { ...fallback, ...raw };
-  const images = normalizeImageItems(merged);
-  const fallbackImage = merged.anhDai || merged.urlImg || merged.urlAnh || merged.UrlImg || merged.UrlAnh;
-
-  const maPhong = merged.maPhong || merged.MaPhong || merged.id || fallback.maPhong || fallback.MaPhong || fallback.id || '';
-  const tenPhong = merged.tenPhong || merged.TenPhong || fallback.tenPhong || fallback.TenPhong || maPhong;
-  const giaThue = merged.giaThue ?? merged.GiaThue ?? merged.giaThueHangThang ?? merged.giaThueTheoGiuong ?? fallback.giaThue ?? fallback.GiaThue ?? null;
-  const normalizedImages = images.map((image, index) => ({
-    ...image,
-    fallbackUrl: image.fallbackUrl || getDemoRoomImage(maPhong, index)
-  }));
-  const demoImages = DEMO_ROOM_IMAGES.map((_, index) => ({
-    stt: index + 1,
-    urlAnh: getDemoRoomImage(maPhong, index),
-    moTa: `${tenPhong} - ảnh minh họa ${index + 1}`,
-    laAnhDemo: true
-  }));
-  const fallbackImages = fallbackImage
-    ? [
-        { stt: 1, urlAnh: fallbackImage, moTa: tenPhong || '', fallbackUrl: getDemoRoomImage(maPhong, 0) },
-        ...DEMO_ROOM_IMAGES.slice(1).map((_, index) => ({
-          stt: index + 2,
-          urlAnh: getDemoRoomImage(maPhong, index + 1),
-          moTa: `${tenPhong} - ảnh minh họa ${index + 2}`,
-          laAnhDemo: true
-        }))
-      ]
-    : demoImages;
-  const hinhAnh = normalizedImages.length ? normalizedImages : fallbackImages;
-  const tienNghi = Array.isArray(merged.tienNghi)
-    ? merged.tienNghi
-    : (Array.isArray(merged.taiSan) ? merged.taiSan : []);
-  const dichVuUocTinh = Array.isArray(merged.dichVuUocTinh) ? merged.dichVuUocTinh : [];
-
-  return {
-    ...merged,
-    id: merged.id || maPhong,
-    maPhong,
-    tenPhong,
-    gioiTinhChoPhep: merged.gioiTinhChoPhep || merged.GioiTinhChoPhep || fallback.gioiTinhChoPhep || '',
-    hinhThucThue: merged.hinhThucThue || merged.HinhThucThue || fallback.hinhThucThue || '',
-    loaiPhong: merged.loaiPhong || merged.TenLoaiPhong || merged.loaiPhongYeuCau || fallback.loaiPhong || '',
-    moTa: merged.moTa || merged.MoTa || fallback.moTa || '',
-    sucChua: merged.sucChua ?? merged.SucChuaToiDa ?? merged.toiDa ?? fallback.sucChua ?? '',
-    tang: merged.tang ?? merged.Tang ?? fallback.tang ?? getRoomFloor(maPhong),
-    giaThue,
-    giaThueTheoGiuong: merged.giaThueTheoGiuong ?? merged.GiaThueTheoGiuong ?? fallback.giaThueTheoGiuong,
-    chiNhanh: merged.chiNhanh || merged.TenChiNhanh || fallback.chiNhanh || '',
-    diaChi: merged.diaChi || merged.DiaChi || fallback.diaChi || '',
-    anhDai: merged.anhDai || hinhAnh[0]?.urlAnh || fallback.anhDai,
-    hinhAnh,
-    tienNghi,
-    dichVuUocTinh
-  };
 }
 
 function statusTone(status = '') {
@@ -688,176 +586,11 @@ function RoomPhoto({ room }) {
   return <img src={failed ? fallbackSrc : (src || fallbackSrc)} alt={room.tenPhong} onError={() => setFailed(true)} />;
 }
 
-function GalleryPhoto({ urlAnh, fallbackUrl, moTa, index }) {
-  const [failed, setFailed] = useState(false);
-  const src = failed ? fallbackUrl : (urlAnh || fallbackUrl);
-
-  if (!src) {
-    return (
-      <div className="kh-gallery-placeholder">
-        <Icon name="room" />
-      </div>
-    );
-  }
-
-  return <img src={src} alt={moTa || `Ảnh ${index + 1}`} onError={() => setFailed(true)} loading="lazy" />;
-}
-
-function ChiTietPhongView({ phong, onBack, onRent }) {
-  const [lightbox, setLightbox] = useState(null);
-  const anh = phong.hinhAnh || [];
-  const tienNghi = phong.tienNghi || [];
-  const dichVuUocTinh = phong.dichVuUocTinh || [];
-  const mainAnh = anh[0];
-  const extraAnh = anh.slice(1, 5);
-
-  return (
-    <section className="kh-detail-view">
-      <button className="kh-detail-back" type="button" onClick={onBack}>
-        <Icon name="explore" />← Quay lại khám phá phòng
-      </button>
-
-      <div className="kh-detail-header">
-        <h1 className="kh-detail-title">{phong.tenPhong}</h1>
-        <p className="kh-detail-addr"><Icon name="map" />{phong.diaChi}</p>
-      </div>
-
-      {/* Gallery */}
-      <div className="kh-gallery-grid">
-        <div className="kh-gallery-main" onClick={() => mainAnh && setLightbox(0)}>
-          {mainAnh
-            ? <GalleryPhoto urlAnh={mainAnh.urlAnh} fallbackUrl={mainAnh.fallbackUrl} moTa={mainAnh.moTa || phong.tenPhong} index={0} />
-            : <div className="kh-gallery-placeholder"><Icon name="room" /></div>}
-        </div>
-        <div className="kh-gallery-thumbs">
-          {extraAnh.map((img, idx) => (
-            <div key={img.stt} className="kh-gallery-thumb" onClick={() => setLightbox(idx + 1)}>
-              <GalleryPhoto urlAnh={img.urlAnh} fallbackUrl={img.fallbackUrl} moTa={img.moTa} index={idx + 1} />
-              {idx === 3 && anh.length > 5 && (
-                <div className="kh-gallery-more">+{anh.length - 5} ảnh</div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Body grid */}
-      <div className="kh-detail-body">
-        <div className="kh-detail-left">
-          {/* Thông tin chung */}
-          <div className="kh-detail-section">
-            <h2>Thông tin chung</h2>
-            <div className="kh-detail-stats">
-              <div>
-                <Icon name="people" />
-                <span>Tối đa</span>
-                <strong>{phong.sucChua} Người</strong>
-              </div>
-              {phong.tang != null && (
-                <div>
-                  <Icon name="layers" />
-                  <span>Tầng</span>
-                  <strong>Tầng {phong.tang}</strong>
-                </div>
-              )}
-            </div>
-            {phong.moTa && <p className="kh-detail-mota">{phong.moTa}</p>}
-          </div>
-
-          {tienNghi.length > 0 && (
-            <div className="kh-detail-section">
-              <h2>Tiện nghi phòng</h2>
-              <div className="kh-amenity-list">
-                {tienNghi.map((item) => (
-                  <div key={item.maTaiSan || item.tenTienNghi || item.tenTaiSan}>
-                    <Icon name="check" />
-                    <span>{item.tenTienNghi || item.tenTaiSan}</span>
-                    {Number(item.soLuong) > 1 && <small>x{item.soLuong}</small>}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Tat ca anh */}
-          {anh.length > 0 && (
-            <div className="kh-detail-section">
-              <h2>Tất cả hình ảnh ({anh.length})</h2>
-              <div className="kh-all-photos">
-                {anh.map((img, idx) => (
-                  <div key={img.stt} className="kh-all-photo-item" onClick={() => setLightbox(idx)}>
-                    <GalleryPhoto urlAnh={img.urlAnh} fallbackUrl={img.fallbackUrl} moTa={img.moTa} index={idx} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Sidebar */}
-        <aside className="kh-detail-sidebar">
-          <div className="kh-detail-price-card">
-            <div className="kh-detail-price-top">
-              <span>Giá thuê hàng tháng</span>
-              <strong>{formatMoney(phong.giaThue)}</strong>
-            </div>
-            {dichVuUocTinh.length > 0 && (
-              <div className="kh-detail-service-list">
-                <h3>Chi phí dịch vụ ước tính</h3>
-                {dichVuUocTinh.map((item) => (
-                  <div className="kh-detail-service-row" key={item.maDichVu || item.tenDichVu}>
-                    <span>{item.tenDichVu}</span>
-                    <strong>{formatServiceMoney(item.donGia, item.donViTinh)}</strong>
-                  </div>
-                ))}
-              </div>
-            )}
-            <button className="kp-btn kp-btn-primary kp-full kh-detail-cta kh-detail-register" type="button" onClick={() => onRent(phong)}>
-              Đăng ký thuê ngay
-            </button>
-            <div className="kh-detail-note">
-              <Icon name="info" />
-              <span>Có thể dọn vào ngày sau khi ký hợp đồng và đóng cọc.</span>
-            </div>
-          </div>
-
-          <div className="kh-detail-info-card">
-            <div><span>Chi nhánh</span><strong>{phong.chiNhanh || 'Chưa cập nhật'}</strong></div>
-            {/* Khách biết TÊN phòng, không biết mã. Mã chỉ dùng để xử lý dữ liệu bên trong. */}
-            <div><span>Phòng</span><strong>{phong.tenPhong || phong.maPhong}</strong></div>
-            {phong.giaThueTheoGiuong && (
-              <div><span>Giá/giường</span><strong>{Number(phong.giaThueTheoGiuong).toLocaleString('vi-VN')}đ</strong></div>
-            )}
-          </div>
-        </aside>
-      </div>
-
-      {/* Lightbox */}
-      {lightbox !== null && (
-        <div className="kh-lightbox" onClick={() => setLightbox(null)}>
-          <button className="kh-lightbox-close" type="button" onClick={() => setLightbox(null)}>✕</button>
-          <button className="kh-lightbox-prev" type="button" onClick={(e) => { e.stopPropagation(); setLightbox((lightbox - 1 + anh.length) % anh.length); }}>‹</button>
-          <div className="kh-lightbox-img" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={anh[lightbox]?.urlAnh || anh[lightbox]?.fallbackUrl}
-              alt={anh[lightbox]?.moTa || ''}
-              onError={(event) => {
-                event.currentTarget.onerror = null;
-                event.currentTarget.src = anh[lightbox]?.fallbackUrl || getDemoRoomImage(phong.maPhong, lightbox);
-              }}
-            />
-            {anh[lightbox]?.moTa && <p>{anh[lightbox].moTa}</p>}
-          </div>
-          <button className="kh-lightbox-next" type="button" onClick={(e) => { e.stopPropagation(); setLightbox((lightbox + 1) % anh.length); }}>›</button>
-        </div>
-      )}
-    </section>
-  );
-}
-
 export default function KhachHangPortalPage() {
   const { user, dangXuat } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const incomingRoomHandled = useRef(null);
   // Link trong email (/khach-hang?tab=hop-dong) và cổng thanh toán mô phỏng mở đúng tab.
   const [activeTab, setActiveTab] = useState(() => {
     const tab = new URLSearchParams(window.location.search).get('tab');
@@ -951,6 +684,24 @@ export default function KhachHangPortalPage() {
     loadPortal(filtersInitial);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const roomId = params.get('phong');
+    if (loading || !overview || params.get('dangKy') !== '1' || !roomId || incomingRoomHandled.current === roomId) return;
+    let active = true;
+    khachMoiApi.getChiTietPhong(roomId).then(({ data }) => {
+      if (!active) return;
+      incomingRoomHandled.current = roomId;
+      setActiveTab('kham-pha');
+      openRentForm(normalizeRoomDetail(data));
+      params.delete('phong'); params.delete('dangKy');
+      navigate({ pathname: location.pathname, search: `?${params.toString()}` }, { replace: true });
+    }).catch(requestError => {
+      if (active) setToast(requestError.response?.data?.message || 'Không thể tải phòng đã chọn. Vui lòng chọn lại phòng.');
+    });
+    return () => { active = false; };
+  }, [loading, overview, location.search]);
 
   useEffect(() => {
     if (!toast) return undefined;

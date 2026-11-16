@@ -1,5 +1,14 @@
 # Tiến độ và điểm tiếp tục
 
+## Chi tiết phòng ngoài trang chủ giống portal khách — 2026-11-17 00:58:49 +07:00 (D-037 / F-16 / J-061)
+
+- Hoàn thành code/kiểm tra local trên `feat/ui-refresh-1`, từ `fb41b58`: thay modal tóm tắt công khai bằng trang chi tiết đầy đủ dùng chung `components/rooms/RoomDetailView.jsx`, helper và CSS với portal. Có ảnh chính/ảnh nhỏ/tất cả ảnh, lightbox/phím/Escape, thông tin, tiện nghi, giá/phí dịch vụ, nút đăng ký; link/query/bộ lọc được giữ. Phòng vẫn xem được khi không nằm trong kết quả bộ lọc; không cần đăng nhập để đọc.
+- GET `/api/trang-chu/phong/:maPhong` tái dùng SP chi tiết, chỉ trả trường giới thiệu qua DTO public. Test backend mới bảo vệ việc loại dữ liệu khách/giá vốn tài sản; API hồ sơ vẫn cần auth. Đăng ký thuê chuyển qua login nếu cần, giữ phòng bằng `next`, mở form cũ sau khi tải overview, khóa quy trình thuê hiện tại vẫn áp dụng; không tự gửi hồ sơ.
+- Kiểm tra mới: build frontend pass; backend 27 pass/1 skip SQL; smoke Avalanche UI pass. `scripts/ui-public-room.mjs` pass 1440/390px, gallery/lightbox/back/forward, private/public dùng chung, form giữ phòng, khóa đăng ký, 404/503/retry và hủy phản hồi cũ; không JS exception/tràn ngang, 0 API ghi. Đối chiếu helper sau tách với HEAD cũ: 4 kiểu payload/fallback giữ kết quả như cũ.
+- GET thật trên backend 5001: P101 200 có 5 ảnh/4 tiện nghi/5 dịch vụ, Z999 404, ABC 400; `/khach-moi/tong-quan` không token vẫn 401. Đã xem ảnh thật desktop/mobile ở `.ui-screens/public-room-detail/`, không đăng nhập hoặc POST dữ liệu thật. Các ca form/auth dùng fixture, chưa nghiệm thu tài khoản/SMTP/Fuji thật.
+- Bản xem mới **`http://127.0.0.1:5192/`** kết nối backend riêng 5001 (PID 31320, `SCHEDULERS_ENABLED=false`); frontend giữ trong exec session 72723. Server 5191 vẫn dùng backend 5000 của checkout `HomeStayDorm-integ`, nên dùng **5192** để xem đợt này. Lệnh quản lý server nền bị automatic approval review chặn; đã dùng server foreground trong phiên quản lý, không dừng/chỉnh server checkout khác. Mặc định scheduler của ứng dụng vẫn bật, chỉ tắt ở backend preview riêng.
+- Bước kế: Vy xem trang mới; triển khai thực tế cần chạy backend từ cùng commit để có GET public. Chỉ push nhánh UI, không merge main; giữ nguyên backend lockfile có trước. T-22/Fuji giữ trạng thái riêng.
+
 ## Gallery chạy trái và ảnh rìa đổ xuống — 2026-11-17 00:39:48 +07:00 (D-036 / J-060)
 
 - Đã đổi gallery từ chạy trái → phải sang **phải → trái**; dùng camera phối cảnh, tăng độ sâu/độ lớn ở hai rìa và làm mép ảnh xéo xuống theo ảnh Vy gửi. Chiều cao tăng theo viewport lớn (1920px: 538px, 1440px: 403px), mobile giữ 280px. Kéo/phím/quán tính và giảm chuyển động giữ được; phép wrap hỗ trợ offset âm chạy liên tục.
