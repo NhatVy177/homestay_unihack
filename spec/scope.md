@@ -84,6 +84,12 @@ Vy chọn `D:\Nam4\Contest\Homestay-Dorm` làm mẫu cho cách trình bày, khô
 - Thanh tìm kiếm: một thẻ trắng chứa ô dạng viên có icon, tiếp theo là bộ lọc trạng thái dạng viên có số trong ngoặc; nút xóa lọc và các bộ chọn ngày/trạng thái riêng vẫn hoạt động như cũ. Desktop tự phân bổ chỗ, mobile xuống hàng; bảng dài cuộn trong thẻ, không làm rộng toàn trang.
 - Áp dụng cho các danh sách Sale/Quản lý/Kế toán đang có bộ lọc và số đếm, cùng kiểu thẻ tổng quan/lọc Admin. Trang không có số đếm hoặc không có tìm kiếm trước đó không được thêm số liệu hay control không có xử lý. Không đổi API, phép lọc, handler, native controls, trạng thái hoặc quyền thao tác.
 
+### Bố cục trang chủ theo 23homestay — D-034
+
+- Chỉ route `/` (`TrangChu.jsx`/`TrangChu.css`): thanh đầu trang, hero ảnh lớn với chuyển ảnh thủ công và thanh tìm phòng, dải ảnh không gian, phòng nổi bật, giới thiệu, đánh giá minh họa, chọn khu vực, quy trình thuê, liên hệ và footer. Giữ tông sage/nâu gỗ và Lexend/Inter; ảnh minh họa có nguồn và asset local, không lấy ảnh/logo/source từ trang tham khảo.
+- Phòng nổi bật dùng API hiện hành; ưu tiên ảnh API, ảnh lỗi dùng ảnh dự phòng. Tìm phòng giữ `khuVuc`, `loaiPhong`, `mucGiaToiDa`; chi tiết giữ `phong`. Liên kết khu vực mở bộ lọc sẵn có, không thêm bản đồ hoặc dữ liệu chi nhánh giả. Giữ form/xử lý đăng nhập/đăng ký; menu mobile mở/đóng, Escape và chọn liên kết hoạt động.
+- Nghiệm thu local: 1440/1024/768/390/320px không tràn/cắt nội dung, ảnh tải được; kiểm chuyển ảnh, bộ lọc/URL, chi tiết, khu vực, modal tài khoản và trạng thái API rỗng/lỗi. Browser fixture không gửi API ghi, không thay nghiệm thu tài khoản/SQL/SMTP/Privy/Fuji thật.
+
 Không đưa CCCD, địa chỉ, tài khoản ngân hàng, ảnh hoặc nội dung biên bản lên chain. Chain chỉ giữ ID khó đoán, ví, commitment, version/state và số tiền tối thiểu cần thiết. Không khẳng định hash/salt bảo đảm ẩn danh hoặc chữ ký tự chứng minh hiệu lực pháp lý.
 
 Kiểm thử cần phủ sai quyền/chữ ký, replay/hết hạn/sai domain, sai version/hash, tổng tiền và làm tròn, sửa file/thiếu salt/ảnh, relayer timeout/gas, SQL lệch chain và khôi phục ví. Ghi kết quả thực tế ở nhật ký; chưa có kết quả cho bộ yêu cầu này trong repo hiện hành.

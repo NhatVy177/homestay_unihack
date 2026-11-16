@@ -269,6 +269,8 @@ Kết quả T-21 và danh sách đợt 2 nằm ở `spec/progress.md` / J-045: �
 
 **Bổ sung D-033 / J-056:** đồng bộ danh sách theo ảnh Vy gửi: thẻ tổng quan dùng số đếm sẵn có, thanh tìm kiếm dạng viên kèm bộ lọc, bảng riêng. Áp dụng qua `OverviewCards` và CSS chung cho Sale/Quản lý/Kế toán/Admin; giữ các bộ chọn ngày và toàn bộ tìm kiếm/lọc hiện hành. Kiểm tra 22 màn/tab ở 1440px/390px, có ca dữ liệu giả xác minh số đếm, tìm kiếm và lọc trạng thái. Phần này vẫn là T-21/UI, không thực hiện thay đổi nghiệp vụ T-22 hay đổi lịch.
 
+**Bổ sung D-034 / J-058 (16/11):** Vy yêu cầu trang chủ giống cấu trúc https://www.23homestay.vn/, giữ màu hiện tại. T-21 bổ sung riêng route `/`: header gọn, hero ảnh lớn/chuyển ảnh/tìm phòng, gallery, phòng nổi bật từ API, giới thiệu, đánh giá minh họa, khu vực, quy trình, liên hệ và footer. Tự viết React/CSS; lưu local 4 ảnh Unsplash vốn đã tham chiếu, không chép tài sản của mẫu. Giữ handler tài khoản, query tìm kiếm và route chi tiết; kiểm 5 độ rộng 1440/1024/768/390/320px và các nút, API rỗng/lỗi. Đây là đợt bổ sung giao diện ngày 16/11, không đổi lịch D-025, không thực hiện T-22 hoặc nghiệm thu Fuji.
+
 Nếu thử ví nhúng/relayer chưa đạt, ưu tiên sửa lát cắt nhỏ này và cắt simulator/point trước. Ví giao dịch trực tiếp trên Fuji có thể dùng kiểm thử nội bộ trong lúc phát triển, nhưng chưa đạt mục tiêu UX nộp bài. Không âm thầm coi fallback là chức năng đã hoàn thành.
 
 Các phụ thuộc còn lại: chốt nghiệp vụ cọc với Vy; quyền truy cập SQL/dữ liệu mẫu; chọn và cấu hình SDK ví; kết nối RPC/nguồn AVAX thử cho relayer/deploy. Không yêu cầu Vy gửi khóa bí mật qua chat.

@@ -1,5 +1,12 @@
 # Tiến độ và điểm tiếp tục
 
+## Trang chủ theo mẫu 23homestay — 2026-11-16 23:45:37 +07:00 (D-034 / J-058)
+
+- Đã cấu trúc lại route `/` trên `feat/ui-refresh-1`: header ngang, hero ảnh lớn và chuyển ảnh, tìm phòng, gallery, phòng nổi bật, giới thiệu, đánh giá minh họa, chọn khu vực, quy trình, liên hệ và footer. Giữ sage/nâu gỗ, Lexend/Inter; ảnh minh họa lưu local, ảnh API vẫn ưu tiên và có fallback. Giữ API/route/query và xử lý tài khoản, không sửa nghiệp vụ/backend/database/blockchain.
+- Browser local `scripts/ui-home.mjs`: 5 độ rộng 1440/1024/768/390/320px pass; không tràn/cắt nội dung, ảnh hỏng hoặc JS exception. Chuyển ảnh, menu mobile/Escape/chọn mục, mở đăng nhập/đăng ký, bộ lọc → query, chi tiết phòng và liên kết khu vực pass; API rỗng/lỗi có thông báo đúng, không tạo phòng giả; 0 API ghi. Ảnh và `report.json` nằm trong `web/frontend/.ui-screens/home-refresh/` bị ignore, dữ liệu phòng kiểm thử là fixture.
+- Kiểm tra bổ sung: frontend build pass (cảnh báo dependency/chunk lớn có sẵn); backend 25 pass/1 skip SQL; smoke Avalanche UI pass. Đây là kiểm thử local, chưa đăng nhập tài khoản thật hoặc kiểm HTTP/SQL/SMTP/Privy/Fuji trọn luồng trong đợt này.
+- Bản xem đúng checkout `D:\HomeStayDorm`: `http://127.0.0.1:5191/` (Vite PID 34608). Cổng 5173 đang phục vụ `D:\HomeStayDorm-integ`, không dùng để nghiệm thu thay đổi tại repo này. Bước kế: Vy xem bố cục; các nội dung/form chuyên biệt còn lại và T-22/Fuji giữ trạng thái riêng, chưa tự merge main. Giữ nguyên, không stage `web/backend/package-lock.json` có từ đầu phiên.
+
 ## Runtime đăng nhập local — 2026-11-10 09:52:21 +07:00 (J-057)
 
 - Vy báo không đăng nhập được; kiểm tra frontend 5173 còn chạy nhưng backend 5000 đã dừng. Đã khởi động lại backend bằng tiến trình nền ẩn PID 92484, kết nối SQL HOMEDORM4 thành công. Trang xem: `http://127.0.0.1:5173/`.
