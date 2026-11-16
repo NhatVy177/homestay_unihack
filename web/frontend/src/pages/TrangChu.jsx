@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthContext.jsx';
 import AccountMenu from '../components/common/AccountMenu.jsx';
 import DemoAccounts from '../components/common/DemoAccounts.jsx';
 import GoogleAuthSection from '../components/common/GoogleAuthSection.jsx';
+import TrustStrip from './homeExperience/TrustStrip.jsx';
 import { safeNextPath } from '../auth/returnPath.js';
 import { httpClient } from '../api/httpClient.js';
 import { Icon } from '../components/common/Icon.jsx';
@@ -605,6 +606,7 @@ export default function TrangChu() {
           </div>
         </section>
 
+        <TrustStrip />
         <AboutSection rooms={catalog} branches={branches} roomTypes={roomTypes} onViewDetail={viewRoomDetail} />
         <LocationSection rooms={catalog} branches={branches} />
         <ContactSection />
