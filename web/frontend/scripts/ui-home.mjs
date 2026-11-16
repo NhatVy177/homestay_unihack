@@ -5,16 +5,22 @@ import { chromium } from 'playwright-core';
 
 // Read-only visual fixtures. Never submit credentials or write to the real API.
 const base = process.env.UI_BASE_URL || 'http://127.0.0.1:5191';
-const output = resolve('.ui-screens/home-refresh');
+const output = resolve('.ui-screens/home-effects/layout');
 await mkdir(output, { recursive: true });
 const rooms = [
   { MaPhong: 'UI-1', TenPhong: 'Phòng minh họa 101', MaLoaiPhong: 'LP0002', TenLoaiPhong: 'Phòng 2 người', TenChiNhanh: 'Chi nhánh minh họa', SucChuaToiDa: 2, GiaThueTheoGiuong: 2200000 },
   { MaPhong: 'UI-2', TenPhong: 'Phòng minh họa 102', MaLoaiPhong: 'LP0001', TenLoaiPhong: 'Phòng 4 người', TenChiNhanh: 'Chi nhánh minh họa', SucChuaToiDa: 4, GiaThueTheoGiuong: 1800000 },
   { MaPhong: 'UI-3', TenPhong: 'Phòng minh họa 103', MaLoaiPhong: 'LP0004', TenLoaiPhong: 'Phòng VIP 2 người', TenChiNhanh: 'Chi nhánh minh họa', SucChuaToiDa: 2, GiaThueTheoGiuong: 3500000, UrlImg: '/missing-room-image-for-ui-fixture.jpg' },
 ];
+const branchNames = ['HomeDorm Quận 1', 'HomeDorm Bình Thạnh', 'HomeDorm Thủ Đức'];
+const addresses = ['12 Nguyễn Trãi, Quận 1, TP.HCM', '45 Điện Biên Phủ, Bình Thạnh, TP.HCM', '88 Võ Văn Ngân, Thủ Đức, TP.HCM'];
+rooms.forEach((room, index) => { room.TenChiNhanh = branchNames[index]; room.DiaChi = addresses[index]; });
+rooms.push(...rooms.map((room, index) => ({ ...room, MaPhong: `UI-${index + 4}`, TenPhong: `Phòng minh họa ${index + 104}` })));
+const filterData = { khuVuc: branchNames.map((name, index) => ({ tenChiNhanh: name, diaChi: addresses[index] })), loaiPhong: [{ maLoaiPhong: 'LP0001', tenLoaiPhong: 'Phòng 2 người' }] };
 const browser = await chromium.launch({
   executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   headless: true,
+  args: ['--enable-unsafe-swiftshader'],
 });
 const report = [];
 
@@ -28,11 +34,15 @@ async function capture(page, name) {
     scrollTo(0, 0);
     await document.fonts.ready;
   });
+  for (const selector of ['.hx-curved-gallery[data-ready=true]', '.hx-house-scene[data-ready=true]', '.hx-live-map[data-ready=true]']) await page.locator(selector).waitFor({ state: 'attached' });
+  await page.waitForTimeout(300);
   const metrics = await page.evaluate(() => ({
     width: innerWidth,
     scrollWidth: document.documentElement.scrollWidth,
     brokenImages: [...document.images].filter(img => !img.naturalWidth).map(img => img.getAttribute('src')),
     overflowing: [...document.querySelectorAll('header *, main *, footer *')].filter(element => {
+      // The mobile branch list intentionally scrolls horizontally inside its own panel.
+      if (element.closest('.hx-map-list, .maplibregl-control-container, .maplibregl-marker')) return false;
       const box = element.getBoundingClientRect();
       return box.width && (box.right > innerWidth + 1 || box.left < -1) && getComputedStyle(element).position !== 'absolute';
     }).map(element => element.className),
@@ -53,19 +63,23 @@ try {
       const request = route.request();
       if (!new URL(request.url()).pathname.startsWith('/api/')) return route.fallback();
       if (!['GET', 'OPTIONS'].includes(request.method())) writes.push(request.method() + ' ' + new URL(request.url()).pathname);
-      return route.fulfill({ json: request.url().includes('/trang-chu/phong-noi-bat') ? { data: rooms } : [] });
+      const path = new URL(request.url()).pathname;
+      const data = path.endsWith('/bo-loc') ? filterData : path.endsWith('/phong-noi-bat') ? rooms.slice(0, 3) : path.endsWith('/kham-pha-phong') ? rooms : [];
+      return route.fulfill({ json: { data } });
     });
+    await context.route('https://tiles.openfreemap.org/**', route => route.fulfill({ json: { version: 8, sources: {}, layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#e8ede7' } }] } }));
     const page = await context.newPage();
     page.on('pageerror', error => errors.push(error.message));
-    await page.goto(base, { waitUntil: 'networkidle' });
-    assert.equal(await page.locator('.tc-room-card').count(), 3);
+    await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.locator('.tc-room-card').first().waitFor();
+    assert.equal(await page.locator('.tc-room-card').count(), 6);
     assert.equal(await page.locator('#gioi-thieu').count(), 1);
     const metrics = await capture(page, `verified-${width}`);
 
     await page.getByRole('button', { name: 'Ảnh tiếp theo', exact: true }).click();
-    assert.equal(await page.locator('.tc-hero-photo').getAttribute('src'), '/images/home/living.jpg');
+    assert.equal(await page.locator('.hx-hero-slide.is-active .tc-hero-photo').getAttribute('src'), '/images/home/living.jpg');
     await page.getByRole('button', { name: 'Ảnh trước', exact: true }).click();
-    assert.equal(await page.locator('.tc-hero-photo').getAttribute('src'), '/images/home/hero.jpg');
+    assert.equal(await page.locator('.hx-hero-slide.is-active .tc-hero-photo').getAttribute('src'), '/images/home/hero.jpg');
     await page.getByRole('button', { name: 'Xem ảnh 3', exact: true }).click();
     assert.equal(await page.getByRole('button', { name: 'Xem ảnh 3', exact: true }).getAttribute('aria-pressed'), 'true');
 
@@ -105,7 +119,8 @@ try {
     await page.locator('.tc-room-cta').first().click();
     assert.equal(new URL(page.url()).searchParams.get('phong'), 'UI-1');
     await page.goto(base);
-    await page.locator('.tc-location-card').filter({ hasText: 'Bình Thạnh' }).click();
+    await page.locator('.hx-map-item').filter({ hasText: 'Bình Thạnh' }).click();
+    await page.locator('.hx-map-detail').getByRole('button', { name: 'Xem các phòng', exact: true }).click();
     assert.equal(new URL(page.url()).searchParams.get('khuVuc'), 'Bình Thạnh');
     assert.deepEqual(errors, []);
     assert.deepEqual(writes, []);
@@ -117,7 +132,9 @@ try {
     const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
     await page.route('**/api/**', route => new URL(route.request().url()).pathname.startsWith('/api/')
       ? route.fulfill({ status: state === 'error' ? 503 : 200, json: { data: [] } }) : route.fallback());
-    await page.goto(base, { waitUntil: 'networkidle' });
+    await page.route('https://tiles.openfreemap.org/**', route => route.fulfill({ json: { version: 8, sources: {}, layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#e8ede7' } }] } }));
+    await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.locator('.tc-rooms-empty').waitFor();
     assert.equal(await page.locator('.tc-rooms-empty').isVisible(), true);
     assert.equal(await page.locator('.tc-room-card').count(), 0);
     await capture(page, state);

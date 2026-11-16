@@ -1,5 +1,13 @@
 # Tiến độ và điểm tiếp tục
 
+## Hiệu ứng và đủ mục trang chủ — 2026-11-17 00:27:45 +07:00 (D-035 / J-059)
+
+- Hoàn thành code/kiểm tra local trên `feat/ui-refresh-1`, tiếp nối `9d58786`. Trang chủ bám thứ tự các mục thực tế của 23homestay: hero, gallery cong WebGL, 6 phòng, giới thiệu/nhà 3D/số liệu, bản đồ, 3 thẻ liên hệ, footer và liên hệ nổi; đã bỏ đánh giá/quy trình tự thêm. Có autoplay/crossfade/zoom, reveal/stagger, tilt/shine, gallery drag/quán tính/phím, nhà xoay/mở/gộp tầng, đếm số, map zoom/chọn điểm/2D–3D, hover và tư vấn nổi. Giữ màu, tiêu đề dùng font serif local; cảnh/map lazy-loaded, có chế độ giảm chuyển động.
+- Kiểm tra mới sau source cuối: `node scripts/ui-home.mjs` pass 5 độ rộng 1440/1024/768/390/320px + rỗng/lỗi, không JS exception/ảnh DOM hỏng/tràn ngang toàn trang, bộ lọc/query/chi tiết và modal tài khoản giữ được; panel chi nhánh mobile cuộn riêng. `node scripts/ui-home-effects.mjs` pass cả bật/giảm chuyển động: autoplay/zoom/pause, drag/phím, tilt, ảnh render nhà thay đổi khi mở/xoay, đổi chi nhánh, 3 điểm map/3D, tư vấn và thông tin thuê/bảo mật. 0 API ghi trong fixture; bản đồ fixture dùng style nền tối giản.
+- Lượt đọc public thật local xác nhận 44 phòng trong catalog, 3 chi nhánh, 4 loại; tải và xem gallery/nhà mở tầng, bản đồ OpenFreeMap có tile và 3 điểm khu vực. Không thao tác ghi hoặc đăng nhập thật. Ghim là điểm tham khảo khu vực có nhãn, nhà là mô hình minh họa; không coi là đo đạc tòa nhà hay nghiệm thu SQL/SMTP/Privy/Fuji.
+- Frontend build pass (còn cảnh báo dependency/chunk lớn; Three.js/map chia chunk riêng), backend 25 pass/1 skip SQL, smoke Avalanche UI pass. Ảnh/report/log ở `web/frontend/.ui-screens/home-effects/{layout,motion}/` và ảnh bản đồ/nhà thật trong `.ui-screens/home-effects/`, đều ignore. Font có OFL, ảnh vẫn ưu tiên API và fallback local.
+- Bản xem vẫn `http://127.0.0.1:5191/`, đúng checkout `D:\HomeStayDorm`; 5173 là checkout khác. Bước kế: Vy kiểm giao diện/chuyển động thực tế; có thể cấu hình kênh Zalo hoặc tọa độ từng tòa nhà khi có thông tin thật. Nghiệp vụ thuê theo giờ, T-22 và Fuji không được triển khai trong đợt này. Chỉ push nhánh UI, không merge main; tiếp tục giữ nguyên `web/backend/package-lock.json` có từ đầu.
+
 ## Trang chủ theo mẫu 23homestay — 2026-11-16 23:45:37 +07:00 (D-034 / J-058)
 
 - Đã cấu trúc lại route `/` trên `feat/ui-refresh-1`: header ngang, hero ảnh lớn và chuyển ảnh, tìm phòng, gallery, phòng nổi bật, giới thiệu, đánh giá minh họa, chọn khu vực, quy trình, liên hệ và footer. Giữ sage/nâu gỗ, Lexend/Inter; ảnh minh họa lưu local, ảnh API vẫn ưu tiên và có fallback. Giữ API/route/query và xử lý tài khoản, không sửa nghiệp vụ/backend/database/blockchain.

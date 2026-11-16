@@ -86,9 +86,18 @@ Vy chọn `D:\Nam4\Contest\Homestay-Dorm` làm mẫu cho cách trình bày, khô
 
 ### Bố cục trang chủ theo 23homestay — D-034
 
+Mức bám mẫu và danh sách mục bên dưới được **D-035 thay thế** ngày 17/11; giữ để tra lịch sử đợt J-058.
+
 - Chỉ route `/` (`TrangChu.jsx`/`TrangChu.css`): thanh đầu trang, hero ảnh lớn với chuyển ảnh thủ công và thanh tìm phòng, dải ảnh không gian, phòng nổi bật, giới thiệu, đánh giá minh họa, chọn khu vực, quy trình thuê, liên hệ và footer. Giữ tông sage/nâu gỗ và Lexend/Inter; ảnh minh họa có nguồn và asset local, không lấy ảnh/logo/source từ trang tham khảo.
 - Phòng nổi bật dùng API hiện hành; ưu tiên ảnh API, ảnh lỗi dùng ảnh dự phòng. Tìm phòng giữ `khuVuc`, `loaiPhong`, `mucGiaToiDa`; chi tiết giữ `phong`. Liên kết khu vực mở bộ lọc sẵn có, không thêm bản đồ hoặc dữ liệu chi nhánh giả. Giữ form/xử lý đăng nhập/đăng ký; menu mobile mở/đóng, Escape và chọn liên kết hoạt động.
 - Nghiệm thu local: 1440/1024/768/390/320px không tràn/cắt nội dung, ảnh tải được; kiểm chuyển ảnh, bộ lọc/URL, chi tiết, khu vực, modal tài khoản và trạng thái API rỗng/lỗi. Browser fixture không gửi API ghi, không thay nghiệm thu tài khoản/SQL/SMTP/Privy/Fuji thật.
+
+### Đủ mục và hiệu ứng của trang tham khảo — D-035 / J-059
+
+- Danh sách hiện hành của `/`: header → hero → gallery cong → tối đa 6 phòng nổi bật → giới thiệu/số liệu/nhà 3D → vị trí/bản đồ → 3 thẻ liên hệ → footer; có nút tư vấn và gọi điện nổi. Bỏ hai mục đánh giá/quy trình tự thêm ở D-034 theo trang mẫu thực tế ngày 17/11. Giữ nhận diện/màu, thêm Playfair Display local có giấy phép cho tiêu đề trang chủ; không ảnh hưởng font các màn nghiệp vụ.
+- Hiệu ứng cần hoạt động: hero tự chuyển 6 giây/crossfade 1 giây/zoom chậm, có điều khiển thủ công và pause khi tương tác; reveal khi cuộn và lệch nhịp các thẻ; gallery cong WebGL kéo/quán tính, phím mũi tên; thẻ phòng tilt/shine và zoom ảnh; nhà 3D kéo xoay, mở/gộp tầng có nội thất và chọn chi nhánh; số liệu đếm lên từ dữ liệu; map kéo/zoom, chọn điểm/danh sách, chuyển góc nhìn 2D/3D; liên hệ nổi mở tư vấn thật, liên kết footer mở thông tin thuê/bảo mật. Tôn trọng `prefers-reduced-motion`, có fallback khi thiếu WebGL; tải lười cảnh/bản đồ và ngừng vẽ cảnh ngoài viewport.
+- Dữ liệu từ các API public hiện có: nổi bật + khám phá + bộ lọc, gộp theo mã phòng và chỉ hiển thị tối đa 6 ở mục nổi bật; thống kê có nhãn đúng tập dữ liệu. Giữ query `khuVuc`, `loaiPhong`, `mucGiaToiDa`, `phong`, form và xử lý tài khoản; không thêm control ngày/giờ không có nghiệp vụ hỗ trợ. Mô hình nhà ghi rõ minh họa; map dùng địa chỉ/tên chi nhánh từ API, điểm khu vực tham khảo từ OpenStreetMap, không giả tọa độ tòa nhà. Không sao chép giá/phòng/tài khoản liên hệ của 23homestay.
+- Kiểm tra bố cục 1440/1024/768/390/320px, cả trạng thái rỗng/lỗi; danh sách chi nhánh mobile cuộn trong panel. Kiểm riêng chuyển động bật/giảm bằng browser: autoplay/pause, transform, gallery drag/phím, render nhà trước/sau mở và xoay, chọn chi nhánh/3D map, modal tài khoản/tư vấn/thông tin. Fixture map dùng style nền riêng để kiểm tương tác ổn định; kiểm thêm OpenFreeMap thật bằng lượt đọc public, phân biệt hai nguồn kết quả.
 
 Không đưa CCCD, địa chỉ, tài khoản ngân hàng, ảnh hoặc nội dung biên bản lên chain. Chain chỉ giữ ID khó đoán, ví, commitment, version/state và số tiền tối thiểu cần thiết. Không khẳng định hash/salt bảo đảm ẩn danh hoặc chữ ký tự chứng minh hiệu lực pháp lý.
 
