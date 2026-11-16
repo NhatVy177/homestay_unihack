@@ -1,6 +1,7 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { executeProcedure, executeQuery, sql } from '../database/connection.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
+import { googleClientId, verifyGoogleIdToken } from './googleAuth.js';
 
 function getAuthSecret() {
   return process.env.AUTH_SECRET || 'happyroom-auth-secret';
@@ -223,4 +224,58 @@ export async function getSessionUser(token) {
 
 export async function dangXuat(token) {
   return token;
+}
+
+// ---- Đăng nhập / đăng ký bằng tài khoản Google (email Google làm danh tính) ----
+export function cauHinhGoogle() {
+  const clientId = googleClientId();
+  return { enabled: Boolean(clientId), clientId: clientId || null };
+}
+
+const GOOGLE_PROFILE_MINUTES = 15;
+
+// Chỉ tài khoản khách hàng dùng được đường này. Email Google đã được Google xác minh nên khớp email tài khoản là đủ;
+// tài khoản nhân viên vẫn đăng nhập bằng tên đăng nhập và mật khẩu.
+export async function dangNhapGoogle(data = {}, { verify = verifyGoogleIdToken, query = executeQuery } = {}) {
+  const profile = await verify(data.credential);
+  const result = await query(`SELECT tk.TenDangNhap AS tenDangNhap, tk.MaNguoiDung AS maNguoiDung, nd.HoTen AS hoTen, nd.NgaySinh AS ngaySinh,
+      nd.GioiTinh AS gioiTinh, nd.Email AS email, nd.SDT AS soDienThoai, nd.LoaiNguoiDung AS vaiTro, tk.TrangThai AS trangThai,
+      nv.ChucVu AS chucVu, nv.MaChiNhanh AS maChiNhanh, kh.QuocTich AS quocTich, kh.CCCD AS cccd
+    FROM dbo.TaiKhoan tk
+    JOIN dbo.NguoiDung nd ON nd.MaNguoiDung = tk.MaNguoiDung
+    LEFT JOIN dbo.NhanVien nv ON nv.MaNhanVien = tk.MaNguoiDung
+    LEFT JOIN dbo.KhachHang kh ON kh.MaKhachHang = tk.MaNguoiDung
+    WHERE LOWER(nd.Email) = @Email`, [{ name: 'Email', type: sql.VarChar(100), value: profile.email }]);
+  const rows = result.recordset || [];
+  if (rows.length > 1) throw createServiceError('Email này đang gắn với nhiều tài khoản, vui lòng đăng nhập bằng tên đăng nhập.', 409);
+  const record = rows[0];
+  if (record) {
+    if (record.vaiTro !== 'KhachHang') throw createServiceError('Tài khoản nhân viên đăng nhập bằng tên đăng nhập và mật khẩu.', 403);
+    if (record.trangThai === 'Vô hiệu hóa') throw createServiceError('Tài khoản đã bị vô hiệu hóa.', 401);
+    return toUser(record);
+  }
+  return {
+    needsProfile: true, email: profile.email, hoTen: profile.hoTen,
+    profileToken: signToken({ kind: 'google-signup', email: profile.email, hoTen: profile.hoTen, exp: Date.now() + GOOGLE_PROFILE_MINUTES * 60 * 1000 }),
+  };
+}
+
+function taoTenDangNhapTuEmail(email) {
+  if (email.length <= 50) return email;
+  return `${email.split('@')[0].slice(0, 44)}${String(Math.floor(1000 + Math.random() * 9000))}`;
+}
+
+// Email Google chưa có tài khoản: khách bổ sung ngày sinh, giới tính, số điện thoại rồi hệ thống tạo tài khoản
+// (tên đăng nhập là email, mật khẩu ngẫu nhiên vì khách đăng nhập bằng Google).
+export async function hoanTatDangKyGoogle(data = {}, { register = dangKy } = {}) {
+  const payload = verifyToken(data.profileToken);
+  if (!payload || payload.kind !== 'google-signup' || !payload.email) {
+    throw createServiceError('Phiên đăng ký bằng Google đã hết hạn, vui lòng đăng nhập Google lại.', 401);
+  }
+  const matKhau = randomBytes(24).toString('base64url');
+  return register({
+    tenDangNhap: taoTenDangNhapTuEmail(payload.email), matKhau, xacNhanMatKhau: matKhau,
+    hoTen: String(data.hoTen || payload.hoTen || '').trim(), ngaySinh: data.ngaySinh, gioiTinh: data.gioiTinh,
+    soDienThoai: data.soDienThoai, email: payload.email,
+  });
 }

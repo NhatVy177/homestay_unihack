@@ -41,6 +41,22 @@ export function AuthProvider({ children }) {
     return data.user;
   }
 
+  // Đăng nhập Google: khách đã có tài khoản thì vào luôn; email mới thì trả needsProfile để khách bổ sung thông tin.
+  async function dangNhapGoogle(credential) {
+    const { data } = await authApi.dangNhapGoogle(credential);
+    if (data.needsProfile) return data;
+    storeSession(data);
+    setUser(data.user);
+    return { user: data.user };
+  }
+
+  async function hoanTatGoogle(formData) {
+    const { data } = await authApi.hoanTatGoogle(formData);
+    storeSession(data);
+    setUser(data.user);
+    return { user: data.user };
+  }
+
   async function dangKy(formData) {
     const { data } = await authApi.dangKy(formData);
     storeSession(data);
@@ -68,7 +84,7 @@ export function AuthProvider({ children }) {
   }
 
   const value = useMemo(
-    () => ({ user, isLoading, dangNhap, dangKy, dangXuat }),
+    () => ({ user, isLoading, dangNhap, dangKy, dangXuat, dangNhapGoogle, hoanTatGoogle }),
     [user, isLoading]
   );
 

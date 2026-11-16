@@ -78,3 +78,9 @@ Khi thay đổi một quyết định, thêm mã mới cùng thời gian, lý do
 | Q-09 | Có nhắc sau 24h hay deadline cứng khác không? | Vy chốt sau → **đã trả lời ở D-028** (2026-11-10): nhắc email 24 giờ và 72 giờ, không tự xác nhận thay, vẫn giao chìa khóa | F-02; mặc định chưa tự hủy/khóa hoặc ký thay khi quá hạn. |
 
 Theo handoff §4, BTC đã trả lời cho dùng dự án cũ/thi solo và hướng Web2 → Web3 phù hợp. Không mở lại cùng câu hỏi xin phép; Q-06/Q-07 là các thông tin còn thiếu riêng biệt.
+
+## D-048 — Đăng nhập và đăng ký bằng Google, email làm danh tính (2026-11-17)
+- Quyết định (Vy yêu cầu): thêm đăng nhập/đăng ký bằng tài khoản Google; email Google được dùng làm danh tính vì dự án đã dùng email nhiều (mã OTP Privy, thư thông báo, mời thành viên).
+- Cách làm: Google Identity Services ở trình duyệt gửi ID token; máy chủ tự xác thực chữ ký bằng khóa công khai của Google (không thêm thư viện), kiểm `aud`, `iss`, hạn và `email_verified`. Chỉ tài khoản **khách hàng** dùng được đường này; tài khoản nhân viên vẫn đăng nhập bằng tên đăng nhập và mật khẩu (tránh việc người ngoài có Gmail trùng email gieo sẵn của nhân viên vào được hệ thống). Email đã có tài khoản khách thì đăng nhập luôn; email mới thì khách bổ sung ngày sinh, giới tính, số điện thoại rồi hệ thống tạo tài khoản (tên đăng nhập là email, mật khẩu ngẫu nhiên). Cần `GOOGLE_CLIENT_ID` trong `web/backend/.env`; để trống thì nút Google tự ẩn.
+- Không thay thế: đăng ký và đăng nhập bằng tên đăng nhập/mật khẩu vẫn giữ. Ví Privy và mã OTP xác nhận biên bản không đổi (vẫn gửi tới email của tài khoản).
+- Rủi ro đã biết: email gieo sẵn trong dữ liệu mẫu (ví dụ `demo5@gmail.com` hay `kh…@…`) nếu trùng một Gmail thật của người khác thì người đó đăng nhập Google được vào tài khoản khách đó; chấp nhận trên dữ liệu thử, cần dọn trước khi dùng thật.

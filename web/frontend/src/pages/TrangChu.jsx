@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import AccountMenu from '../components/common/AccountMenu.jsx';
 import DemoAccounts from '../components/common/DemoAccounts.jsx';
+import GoogleAuthSection from '../components/common/GoogleAuthSection.jsx';
 import { safeNextPath } from '../auth/returnPath.js';
 import { httpClient } from '../api/httpClient.js';
 import { Icon } from '../components/common/Icon.jsx';
@@ -200,6 +201,7 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
                 Chưa có tài khoản?{' '}
                 <button type="button" onClick={() => { setError(''); onSwitchMode('register'); }}>Đăng ký ngay</button>
               </p>
+              <GoogleAuthSection onDone={onClose} />
               <DemoAccounts onPick={setLoginForm} />
             </form>
           )}
@@ -267,6 +269,7 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
                 Đã có tài khoản?{' '}
                 <button type="button" onClick={() => { setError(''); onSwitchMode('login'); }}>Đăng nhập</button>
               </p>
+              <GoogleAuthSection onDone={onClose} label="Hoặc đăng ký bằng Google" />
             </form>
           )}
         </div>

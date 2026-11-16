@@ -50,3 +50,15 @@ export async function dangXuat(req, res) {
   await service.dangXuat(getToken(req));
   res.status(204).send();
 }
+
+export function cauHinhGoogle(req, res) {
+  res.json(service.cauHinhGoogle());
+}
+
+export async function dangNhapGoogle(req, res, next) {
+  try { res.json(await service.dangNhapGoogle(req.body)); } catch (err) { next(err); }
+}
+
+export async function hoanTatDangKyGoogle(req, res, next) {
+  try { res.status(201).json(await service.hoanTatDangKyGoogle(req.body)); } catch (err) { next(err); }
+}
