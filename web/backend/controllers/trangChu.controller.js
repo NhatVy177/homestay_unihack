@@ -1,5 +1,16 @@
 import { getPool } from '../database/connection.js';
-import { getBoLocPhongKhamPha, getDanhSachPhongKhamPha } from '../services/phongKhamPha.service.js';
+import { getBoLocPhongKhamPha, getDanhSachPhongKhamPha, getChiTietPhong } from '../services/phongKhamPha.service.js';
+import { toPublicRoomDetail } from '../models/publicRoom.dto.js';
+
+export async function getChiTietPhongCongKhai(req, res, next) {
+  const roomId = String(req.params.maPhong || '');
+  if (!/^[a-zA-Z0-9]{4}$/.test(roomId)) return res.status(400).json({ message: 'Mã phòng không hợp lệ.' });
+  try {
+    const room = await getChiTietPhong(roomId);
+    if (!room) return res.status(404).json({ message: 'Không tìm thấy phòng.' });
+    res.json({ data: toPublicRoomDetail(room) });
+  } catch (error) { next(error); }
+}
 
 /**
  * GET /api/trang-chu/phong-noi-bat

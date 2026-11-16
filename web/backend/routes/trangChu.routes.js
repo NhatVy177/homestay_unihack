@@ -3,13 +3,15 @@ import {
   getBoLocKhamPhaPhong,
   getLoaiPhong,
   getPhongKhamPha,
-  getPhongNoiBat
+  getPhongNoiBat,
+  getChiTietPhongCongKhai
 } from '../controllers/trangChu.controller.js';
 
 const router = express.Router();
 
 // Public routes — không cần requireAuth
 router.get('/phong-noi-bat', getPhongNoiBat);
+router.get('/phong/:maPhong', getChiTietPhongCongKhai);
 router.get('/loai-phong', getLoaiPhong);
 router.get('/kham-pha-phong/bo-loc', getBoLocKhamPhaPhong);
 router.get('/kham-pha-phong', getPhongKhamPha);

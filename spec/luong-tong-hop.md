@@ -73,6 +73,9 @@ Trạng thái hồ sơ (`PhieuDangKy`): Chờ tiếp nhận → **Đã tiếp nh
 
 ### 3.1 Giai đoạn 1: Đăng ký và xem phòng (D-026, D-042)
 
+Trang chủ công khai theo D-049 → D-051 (bố cục/hiệu ứng, gallery phải → trái, liên hệ 0795749721). Trước đăng nhập, khách bấm Xem phòng để đọc cùng chi tiết thư viện ảnh/tiện nghi/giá dịch vụ với portal tại `/kham-pha-phong?phong=...` (D-052/F-16); GET public chỉ trả dữ liệu giới thiệu. Đăng ký giữ phòng qua đăng nhập và mở form cũ, không tự gửi hồ sơ. Quy tắc D-042 về hết chỗ/chờ cọc và khóa đăng ký vẫn áp dụng sau gộp J-X083.
+
+
 1. Khách tạo tài khoản (email bắt buộc, đúng định dạng, không trùng — D-016), gửi hồ sơ đăng ký: số người, giới tính, giá tối đa, khu vực, ngày vào ở, thời hạn thuê.
 2. Sale tiếp nhận hồ sơ và **hẹn một buổi xem**. Mỗi hồ sơ **chỉ một buổi xem**, gồm **một hoặc nhiều phòng cùng chi nhánh**. Dời giờ vẫn là buổi đó.
 3. Sau giờ hẹn, buổi tự thành **"Đã xem"** (hệ thống tự đặt theo giờ). Nếu khách vắng, Sale ghi **"Khách không đến"**.

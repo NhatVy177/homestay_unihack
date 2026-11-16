@@ -6,78 +6,9 @@ import { safeNextPath } from '../auth/returnPath.js';
 import { httpClient } from '../api/httpClient.js';
 import { Icon } from '../components/common/Icon.jsx';
 import '../styles/TrangChu.css';
+import { GallerySection, AboutSection, LocationSection, ContactSection, RoomCard, FooterPublic, FloatingContact, SectionHeading, Reveal, useReducedMotion } from './homeExperience/HomeExperience.jsx';
+import { normalizeRoom } from './homeExperience/homeData.js';
 
-// ── Ảnh placeholder theo loại phòng ─────────────────────────
-const ROOM_IMAGES = {
-  LP0001: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80',
-  LP0002: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600&q=80',
-  LP0003: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80',
-  LP0004: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80',
-};
-
-// ── Tiện ích mặc định theo loại phòng ───────────────────────
-const ROOM_AMENITIES = {
-  LP0001: ['Điều hòa', 'Wifi', 'Tủ cá nhân'],
-  LP0002: ['Điều hòa', 'Wifi', 'Tủ cá nhân'],
-  LP0003: ['Wifi', 'Quạt', 'Tủ cá nhân'],
-  LP0004: ['Điều hòa', 'Wifi', 'WC riêng'],
-};
-
-// ── Đánh giá tĩnh ───────────────────────────────────────────
-const TESTIMONIALS = [
-  { id: 1, name: 'Nguyễn Văn An', role: 'Sinh viên ĐH Bách Khoa', avatar: 'A', rating: 5,
-    text: 'Giao diện rất dễ dùng, tìm phòng nhanh và quy trình đặt cọc rõ ràng. Mình đã thuê phòng chỉ trong 1 ngày!' },
-  { id: 2, name: 'Trần Thị Bình', role: 'Nhân viên văn phòng', avatar: 'B', rating: 5,
-    text: 'Phòng chất lượng, đúng như mô tả. Hệ thống thông báo hạn thanh toán rất tiện, không lo quên.' },
-  { id: 3, name: 'Lê Quốc Cường', role: 'Học viên cao học', avatar: 'C', rating: 4,
-    text: 'Thích nhất là phần quản lý hợp đồng và gửi yêu cầu sửa chữa ngay trên app. Nhân viên phản hồi rất nhanh.' },
-];
-
-const PROCESS_STEPS = [
-  { step: '01', icon: 'register', title: 'Đăng ký tài khoản', desc: 'Tạo tài khoản khách hàng miễn phí và điền thông tin cá nhân cần thiết.' },
-  { step: '02', icon: 'search', title: 'Tìm & xem phòng', desc: 'Lọc phòng theo khu vực, loại phòng, giá thuê và xem chi tiết tiện ích.' },
-  { step: '03', icon: 'deposit', title: 'Đặt cọc xác nhận', desc: 'Nhân viên xác nhận thông tin và hướng dẫn bạn hoàn tất đặt cọc nhanh chóng.' },
-  { step: '04', icon: 'home', title: 'Nhận phòng & ở', desc: 'Nhận bàn giao phòng, ký hợp đồng và bắt đầu cuộc sống mới tiện nghi.' },
-];
-
-function ProcessIcon({ name }) {
-  const icons = {
-    register: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="tc-step-svg">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
-        <line x1="16" y1="13" x2="8" y2="13" />
-        <line x1="16" y1="17" x2="8" y2="17" />
-        <circle cx="9" cy="9" r="1" />
-      </svg>
-    ),
-    search: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="tc-step-svg">
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        <path d="M11 8v6M8 11h6" />
-      </svg>
-    ),
-    deposit: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="tc-step-svg">
-        <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
-        <line x1="2" y1="10" x2="22" y2="10" />
-        <path d="M12 14v2M8 15h8" />
-      </svg>
-    ),
-    home: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="tc-step-svg">
-        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
-    ),
-  };
-  return icons[name] || null;
-}
-
-// ────────────────────────────────────────────────────────────
-// Auth Modal (Đăng nhập / Đăng ký inline)
-// ────────────────────────────────────────────────────────────
 const INIT_LOGIN = { tenDangNhap: '', matKhau: '' };
 const INIT_REGISTER = { tenDangNhap: '', hoTen: '', ngaySinh: '', gioiTinh: '', email: '', soDienThoai: '', matKhau: '', xacNhanMatKhau: '' };
 
@@ -279,6 +210,12 @@ function HeaderPublic({ onOpenAuth }) {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  useEffect(() => {
+    function closeOnEscape(event) { if (event.key === 'Escape') setMobileOpen(false); }
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, []);
+
   return (
     <header className="tc-header">
       <nav className="tc-nav-inner">
@@ -289,11 +226,12 @@ function HeaderPublic({ onOpenAuth }) {
           Homestay<strong>Dorm</strong>
         </a>
 
-        <div className={`tc-nav-links ${mobileOpen ? 'tc-nav-links--open' : ''}`}>
-          <a href="#trang-chu" className="tc-nav-link tc-nav-link--active">Trang chủ</a>
-          <a href="#phong-noi-bat" className="tc-nav-link">Phòng & Giường</a>
-          <a href="#quy-trinh" className="tc-nav-link">Quy trình</a>
+        <div id="tc-public-menu" className={`tc-nav-links ${mobileOpen ? 'tc-nav-links--open' : ''}`} onClick={() => setMobileOpen(false)}>
+          <a href="#phong-noi-bat" className="tc-nav-link">Phòng</a>
+          <a href="#vi-tri" className="tc-nav-link">Vị trí</a>
+          <a href="#gioi-thieu" className="tc-nav-link">Giới thiệu</a>
           <a href="#lien-he" className="tc-nav-link">Liên hệ</a>
+          {!user && <button className="tc-nav-register" type="button" onClick={() => onOpenAuth('register')}>Đăng ký tài khoản <Icon name="arrow_forward" /></button>}
         </div>
 
         <div className="tc-nav-actions">
@@ -312,7 +250,8 @@ function HeaderPublic({ onOpenAuth }) {
           )}
           <button
             className={`tc-hamburger ${mobileOpen ? 'tc-hamburger--open' : ''}`}
-            type="button" aria-label="Mở menu"
+            type="button" aria-label={mobileOpen ? 'Đóng menu' : 'Mở menu'}
+            aria-expanded={mobileOpen} aria-controls="tc-public-menu"
             onClick={() => setMobileOpen(v => !v)}
           >
             <span /><span /><span />
@@ -420,8 +359,24 @@ function SearchDropdown({ icon, label, value, options, onChange }) {
   );
 }
 
-function HeroSection({ onOpenAuth }) {
+function HeroSection() {
   const navigate = useNavigate();
+  const [slide, setSlide] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [interactionPaused, setInteractionPaused] = useState(false);
+  const reduced = useReducedMotion();
+  const slides = [
+    { image: '/images/home/hero.jpg', label: 'Một góc nghỉ ngơi ấm cúng' },
+    { image: '/images/home/living.jpg', label: 'Không gian sống ngập ánh sáng' },
+    { image: '/images/home/dorm.jpg', label: 'Cùng chia sẻ một mái nhà' },
+  ];
+  useEffect(() => {
+    if (reduced || paused || interactionPaused) return;
+    const timer = window.setInterval(() => {
+      if (!document.hidden) setSlide(current => (current + 1) % 3);
+    }, 6000);
+    return () => window.clearInterval(timer);
+  }, [reduced, paused, interactionPaused]);
   const [search, setSearch] = useState({ area: '', type: '', price: '' });
   const areaOptions = [
     { value: '', label: 'Tất cả' },
@@ -453,14 +408,18 @@ function HeroSection({ onOpenAuth }) {
   }
 
   return (
-    <section className="tc-hero" id="trang-chu">
+    <section className="tc-hero hx-hero" id="trang-chu" aria-label="Chào mừng đến HomestayDorm" onMouseEnter={() => setInteractionPaused(true)} onMouseLeave={() => setInteractionPaused(false)} onFocusCapture={() => setInteractionPaused(true)} onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setInteractionPaused(false); }}>
+      <div className="hx-hero-slides">{slides.map((item, index) => <div className={`hx-hero-slide ${slide === index ? 'is-active' : ''}`} key={item.image} aria-hidden={slide !== index}><img className="tc-hero-photo" src={item.image} alt={item.label} fetchpriority={index === 0 ? 'high' : 'auto'} /></div>)}</div>
       <div className="tc-hero-overlay" />
+      <div className="hx-hero-orb hx-hero-orb--one" /><div className="hx-hero-orb hx-hero-orb--two" />
       <div className="tc-hero-content">
+        <span className="tc-hero-kicker">HOMESTAY & DORM · THÀNH PHỐ HỒ CHÍ MINH</span>
         <h1 className="tc-hero-title">
-          Tìm phòng vừa ý,<br />chi phí hợp lý
+          HomestayDorm
         </h1>
+        <span className="hx-hero-line" />
         <p className="tc-hero-subtitle">
-          Homestay ấm cúng và ký túc xá hiện đại — được chọn lọc kỹ lưỡng cho sinh viên và người đi làm tại TP.HCM.
+          Ngôi nhà ấm cúng của bạn tại Sài Gòn
         </p>
 
         <form className="tc-search-bar" onSubmit={handleSearch}>
@@ -535,8 +494,19 @@ function HeroSection({ onOpenAuth }) {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
+            <span>Tìm phòng trống</span>
           </button>
         </form>
+        <a href="#phong-noi-bat" className="tc-hero-explore">Xem Phòng <Icon name="arrow_forward" /></a>
+      </div>
+      <button className="tc-slide-arrow tc-slide-arrow--prev" type="button" aria-label="Ảnh trước" onClick={() => setSlide((slide + slides.length - 1) % slides.length)}><Icon name="chevron_left" /></button>
+      <button className="tc-slide-arrow tc-slide-arrow--next" type="button" aria-label="Ảnh tiếp theo" onClick={() => setSlide((slide + 1) % slides.length)}><Icon name="chevron_right" /></button>
+      <div className="tc-hero-bottom">
+        <span />
+        <div className="tc-slide-dots" aria-label="Chọn ảnh không gian">
+          {slides.map((item, index) => <button key={item.image} type="button" aria-label={`Xem ảnh ${index + 1}`} aria-pressed={slide === index} onClick={() => setSlide(index)} />)}
+        </div>
+        <button className="hx-pause-slides" type="button" aria-label={paused ? 'Tiếp tục chuyển ảnh' : 'Tạm dừng chuyển ảnh'} onClick={() => setPaused(current => !current)}>{paused ? '▶' : 'Ⅱ'}</button>
       </div>
     </section>
   );
@@ -545,176 +515,14 @@ function HeroSection({ onOpenAuth }) {
 // ────────────────────────────────────────────────────────────
 // Room Card — dữ liệu từ DB
 // ────────────────────────────────────────────────────────────
-function RoomCard({ room, onViewDetail }) {
-  const img = room.UrlImg || ROOM_IMAGES[room.MaLoaiPhong] || ROOM_IMAGES.LP0001;
-  const amenities = ROOM_AMENITIES[room.MaLoaiPhong] || ['Wifi', 'Điều hòa'];
-  const gia = room.GiaThueTheoGiuong
-    ? room.GiaThueTheoGiuong.toLocaleString('vi-VN')
-    : room.GiaThueNguyenPhong?.toLocaleString('vi-VN') ?? '—';
-
-  return (
-    <div className="tc-card-outer">
-      <article className="tc-room-card tc-card-inner">
-        <div className="tc-room-img-wrap">
-          <img className="tc-room-img" src={img} alt={room.TenPhong} loading="lazy" />
-          <span className="tc-room-price-badge">{gia}đ/<span>giường/tháng</span></span>
-        </div>
-        <div className="tc-room-body">
-          <div className="tc-room-meta">
-            <span className="tc-room-type">{room.TenLoaiPhong}</span>
-            <span className="tc-room-capacity">👥 {room.SucChuaToiDa} người</span>
-          </div>
-          <h3 className="tc-room-name">{room.TenPhong}</h3>
-          <p className="tc-room-area">📍 {room.TenChiNhanh}</p>
-          {room.MoTa && <p className="tc-room-desc">{room.MoTa}</p>}
-          <div className="tc-room-tags">
-            {amenities.map(a => <span key={a} className="tc-tag">{a}</span>)}
-          </div>
-          <div className="tc-room-footer">
-            <button className="tc-room-cta" type="button" onClick={() => onViewDetail(room)}>
-              Xem chi tiết <span className="tc-arrow-circle">→</span>
-            </button>
-          </div>
-        </div>
-      </article>
-    </div>
-  );
-}
-
-// ────────────────────────────────────────────────────────────
-// Testimonials
-// ────────────────────────────────────────────────────────────
-function TestimonialSection() {
-  return (
-    <section className="tc-section tc-testimonials-section" id="danh-gia">
-      <div className="tc-container">
-        <div className="tc-section-head tc-section-head--center">
-          <span className="tc-eyebrow">Khách hàng nói gì</span>
-          <h2 className="tc-section-title">Hàng trăm khách thuê hài lòng</h2>
-          <p className="tc-section-sub">Trải nghiệm thực tế từ người đã thuê qua hệ thống HomestayDorm.</p>
-        </div>
-        <div className="tc-testimonials-grid">
-          {TESTIMONIALS.map(t => (
-            <div key={t.id} className="tc-card-outer">
-              <div className="tc-testimonial-card tc-card-inner">
-                <div className="tc-stars">{'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}</div>
-                <p className="tc-testimonial-text">"{t.text}"</p>
-                <div className="tc-testimonial-author">
-                  <div className="tc-avatar">{t.avatar}</div>
-                  <div>
-                    <div className="tc-author-name">{t.name}</div>
-                    <div className="tc-author-role">{t.role}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ────────────────────────────────────────────────────────────
-// Process
-// ────────────────────────────────────────────────────────────
-function ProcessSection({ onOpenAuth }) {
-  return (
-    <section className="tc-section tc-process-section" id="quy-trinh">
-      <div className="tc-container">
-        <div className="tc-section-head tc-section-head--center">
-          <span className="tc-eyebrow">Quy trình thuê phòng</span>
-          <h2 className="tc-section-title">4 bước đơn giản để có chỗ ở</h2>
-          <p className="tc-section-sub">Quy trình minh bạch, thường hoàn thành trong 1–2 ngày làm việc.</p>
-        </div>
-        <div className="tc-process-grid">
-          {PROCESS_STEPS.map((s, idx) => (
-            <div key={s.step} className="tc-card-outer">
-              <div className="tc-step-card tc-card-inner">
-                <div className="tc-step-number">{s.step}</div>
-                <div className="tc-step-icon">
-                  <ProcessIcon name={s.icon} />
-                </div>
-                <h3 className="tc-step-title">{s.title}</h3>
-                <p className="tc-step-desc">{s.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="tc-process-cta">
-          <button className="tc-btn-primary tc-btn-large" type="button" onClick={() => onOpenAuth('register')}>
-            Bắt đầu ngay — Miễn phí
-          </button>
-          <button className="tc-btn-outline tc-btn-large" type="button" onClick={() => onOpenAuth('login')}>
-            Đã có tài khoản
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ────────────────────────────────────────────────────────────
-// Footer
-// ────────────────────────────────────────────────────────────
-function FooterPublic({ onOpenAuth }) {
-  return (
-    <footer className="tc-footer" id="lien-he">
-      <div className="tc-container">
-        <div className="tc-footer-grid">
-          <div className="tc-footer-brand">
-            <a href="#trang-chu" className="tc-logo tc-logo--light">
-              <svg className="tc-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9.5L12 3l9 6.5V21H3V9.5z"/><path d="M9 21V12h6v9"/>
-              </svg>
-              Homestay<strong>Dorm</strong>
-            </a>
-            <p className="tc-footer-tagline">
-              Hệ thống quản lý phòng trọ, homestay và ký túc xá — TP.HCM.
-            </p>
-          </div>
-          <div>
-            <h4 className="tc-footer-heading">Điều hướng</h4>
-            <ul className="tc-footer-links">
-              <li><a href="#trang-chu">Trang chủ</a></li>
-              <li><a href="#phong-noi-bat">Phòng nổi bật</a></li>
-              <li><a href="#quy-trinh">Quy trình thuê</a></li>
-              <li><a href="#danh-gia">Đánh giá</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="tc-footer-heading">Tài khoản</h4>
-            <ul className="tc-footer-links">
-              <li><button type="button" onClick={() => onOpenAuth('login')}>Đăng nhập</button></li>
-              <li><button type="button" onClick={() => onOpenAuth('register')}>Đăng ký</button></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="tc-footer-heading">Liên hệ</h4>
-            <ul className="tc-footer-contact">
-              <li>📍 12 Nguyễn Trãi, Quận 1, TP.HCM</li>
-              <li>☎ 028 1111 0001</li>
-              <li>✉ q1@homedorm.vn</li>
-            </ul>
-          </div>
-        </div>
-        <div className="tc-footer-bottom">
-          <span>© 2026 HomestayDorm. Đồ án môn học.</span>
-          <span>Homestay &amp; Dorm Management System</span>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-// ────────────────────────────────────────────────────────────
-// Main Page
-// ────────────────────────────────────────────────────────────
 export default function TrangChu() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isLoading } = useAuth();
   const [rooms, setRooms] = useState([]);
+  const [catalog, setCatalog] = useState([]);
+  const [branches, setBranches] = useState([]);
+  const [roomTypes, setRoomTypes] = useState([]);
   const [loadingRooms, setLoadingRooms] = useState(true);
   const [authModal, setAuthModal] = useState(null); // null | 'login' | 'register'
   useEffect(() => {
@@ -733,10 +541,25 @@ export default function TrangChu() {
   }, [navigate]);
 
   useEffect(() => {
-    httpClient.get('/trang-chu/phong-noi-bat')
-      .then(res => setRooms(res.data.data || []))
-      .catch(() => setRooms([]))
-      .finally(() => setLoadingRooms(false));
+    let active = true;
+    Promise.allSettled([
+      httpClient.get('/trang-chu/phong-noi-bat'),
+      httpClient.get('/trang-chu/kham-pha-phong'),
+      httpClient.get('/trang-chu/kham-pha-phong/bo-loc'),
+    ]).then(([featured, all, filters]) => {
+      if (!active) return;
+      const featuredRooms = featured.status === 'fulfilled' && Array.isArray(featured.value.data.data) ? featured.value.data.data.map(normalizeRoom) : [];
+      const allRooms = all.status === 'fulfilled' && Array.isArray(all.value.data.data) ? all.value.data.data.map(normalizeRoom) : [];
+      const unique = [...new Map([...featuredRooms, ...allRooms].filter(room => room.MaPhong).map(room => [room.MaPhong, room])).values()];
+      setCatalog(unique);
+      setRooms(unique.slice(0, 6));
+      if (filters.status === 'fulfilled') {
+        setBranches(filters.value.data.data?.khuVuc || []);
+        setRoomTypes(filters.value.data.data?.loaiPhong || []);
+      }
+      setLoadingRooms(false);
+    });
+    return () => { active = false; };
   }, []);
 
   return (
@@ -744,16 +567,13 @@ export default function TrangChu() {
       <HeaderPublic onOpenAuth={openAuth} />
 
       <main>
-        <HeroSection onOpenAuth={openAuth} />
+        <HeroSection />
+        <GallerySection rooms={catalog} />
 
         {/* Phòng nổi bật */}
-        <section className="tc-section tc-rooms-section" id="phong-noi-bat">
+        <section className="hx-section tc-rooms-section" id="phong-noi-bat">
           <div className="tc-container">
-            <div className="tc-section-head">
-              <span className="tc-eyebrow">Phòng nổi bật</span>
-              <h2 className="tc-section-title">Các lựa chọn đang được quan tâm</h2>
-              <p className="tc-section-sub">Phòng được chọn lọc kỹ lưỡng về chất lượng, vị trí và mức giá hợp lý.</p>
-            </div>
+            <SectionHeading title="Phòng Nổi Bật" subtitle="Những không gian được chọn lọc cho cuộc sống mỗi ngày." />
 
             {loadingRooms ? (
               <div className="tc-rooms-loading">
@@ -762,25 +582,27 @@ export default function TrangChu() {
               </div>
             ) : rooms.length > 0 ? (
               <div className="tc-rooms-grid">
-                {rooms.map(room => <RoomCard key={room.MaPhong} room={room} onViewDetail={viewRoomDetail} />)}
+                {rooms.map((room, index) => <RoomCard key={room.MaPhong} room={room} index={index} onViewDetail={viewRoomDetail} />)}
               </div>
             ) : (
               <div className="tc-rooms-empty">Hiện chưa có phòng nào để hiển thị.</div>
             )}
 
-            <div className="tc-rooms-more">
+            <Reveal className="tc-rooms-more" delay={200}>
               <button className="tc-btn-outline" type="button" onClick={() => navigate('/kham-pha-phong')}>
-                Khám phá thêm phòng →
+                Xem Tất Cả Phòng →
               </button>
-            </div>
+            </Reveal>
           </div>
         </section>
 
-        <TestimonialSection />
-        <ProcessSection onOpenAuth={openAuth} />
+        <AboutSection rooms={catalog} branches={branches} roomTypes={roomTypes} onViewDetail={viewRoomDetail} />
+        <LocationSection rooms={catalog} branches={branches} />
+        <ContactSection />
       </main>
 
       <FooterPublic onOpenAuth={openAuth} />
+      <FloatingContact />
 
       {/* Auth Modal */}
       {authModal && (
