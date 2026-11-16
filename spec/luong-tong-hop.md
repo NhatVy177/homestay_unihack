@@ -73,6 +73,9 @@ Trạng thái hồ sơ (`PhieuDangKy`): Chờ tiếp nhận → **Đã tiếp nh
 
 ### 3.1 Giai đoạn 1: Đăng ký và xem phòng (D-026, D-042)
 
+Trang chủ công khai theo D-049 → D-051 (bố cục/hiệu ứng, gallery phải → trái, liên hệ 0795749721). Trước đăng nhập, khách bấm Xem phòng để đọc cùng chi tiết thư viện ảnh/tiện nghi/giá dịch vụ với portal tại `/kham-pha-phong?phong=...` (D-052/F-16); GET public chỉ trả dữ liệu giới thiệu. Đăng ký giữ phòng qua đăng nhập và mở form cũ, không tự gửi hồ sơ. Quy tắc D-042 về hết chỗ/chờ cọc và khóa đăng ký vẫn áp dụng sau gộp J-X083.
+
+
 1. Khách tạo tài khoản (email bắt buộc, đúng định dạng, không trùng — D-016), gửi hồ sơ đăng ký: số người, giới tính, giá tối đa, khu vực, ngày vào ở, thời hạn thuê.
 2. Sale mở "Lập lịch hẹn", thấy các phiếu đang chờ xếp lịch và **hẹn một buổi xem** (không còn bước tiếp nhận riêng, D-044: lập lịch cho phiếu mới là tiếp nhận phiếu; Sale vẫn từ chối được phiếu kèm lý do). Mỗi hồ sơ **chỉ một buổi xem**, gồm **một hoặc nhiều phòng cùng chi nhánh**. Dời giờ vẫn là buổi đó.
 3. *(D-045)* Khách bấm **Xác nhận lịch** đúng phiên bản ngày/giờ. Khi Sale đổi ngày/giờ, khách xác nhận lại; không tự xác nhận thay khách. **Chưa xác nhận thì Sale không được ghi Đã xem/Khách không đến**, kể cả đã tới giờ. Sau khi khách xác nhận và đã đến giờ, Sale ghi kết quả theo D-026/C5-a; hệ thống không tự đánh dấu theo giờ.

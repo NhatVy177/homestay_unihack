@@ -1,8 +1,11 @@
-import ShareRoomButton from '../../components/common/ShareRoomButton.jsx';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { httpClient } from '../../api/httpClient.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
+import RoomDetailView from '../../components/rooms/RoomDetailView.jsx';
+import { normalizeRoomDetail } from '../../components/rooms/roomDetail.js';
+import { getAuthenticatedHomePath } from '../../auth/auth.routes.js';
+import { CONTACT_PHONE } from '../homeExperience/homeData.js';
 import { filterUnlockedRooms } from '../../utils/lockedRooms.js';
 import './khamPhaPhong.css';
 
@@ -366,51 +369,9 @@ function Sidebar({ user, onAuthRequired }) {
       </nav>
       <div className="kp-support-mini">
         <span>Hỗ trợ 24/7</span>
-        <strong>1900 6789</strong>
+        <strong>{CONTACT_PHONE}</strong>
       </div>
     </aside>
-  );
-}
-
-function DetailModal({ room, onClose, onRegister }) {
-  if (!room) return null;
-
-  return (
-    <div className="kp-modal-backdrop" onMouseDown={onClose}>
-      <div className="kp-modal" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}>
-        <div className="kp-modal-head">
-          <div>
-            <h2>{room.tenPhong}</h2>
-          </div>
-          <button type="button" aria-label="Đóng" onClick={onClose}>×</button>
-        </div>
-        <div className="kp-modal-grid">
-          <div className="kp-modal-media"><RoomVisual room={room} /></div>
-          <div className="kp-modal-info">
-            <div><span>Mã phòng</span><strong>{room.maPhong}</strong></div>
-            <div><span>Loại phòng</span><strong>{room.loaiPhong}</strong></div>
-            <div className="is-wide">
-              <span>Giá thuê</span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                {room.giaTheoGiuong != null && <strong className="kp-accent">{formatMoney(room.giaTheoGiuong)}<span>/giường</span></strong>}
-                {room.giaNguyenPhong != null && <strong className="kp-accent">{formatMoney(room.giaNguyenPhong)}<span>/căn</span></strong>}
-              </div>
-            </div>
-            <div><span>Sức chứa</span><strong>{room.sucChua} người</strong></div>
-            <div><span>Chỗ trống</span><strong>{room.soChoTrong} chỗ</strong></div>
-            <div><span>Giới tính cho phép</span><strong>{room.gioiTinhChoPhep}</strong></div>
-            <div className="is-wide"><span>Chi nhánh</span><strong>{room.chiNhanh}</strong></div>
-            <div className="is-wide"><span>Địa chỉ</span><strong>{room.diaChi}</strong></div>
-            {room.moTa && <div className="is-wide"><span>Mô tả</span><p>{room.moTa}</p></div>}
-          </div>
-        </div>
-        <div className="kp-modal-actions">
-          <button className="kp-btn kp-btn-soft" type="button" onClick={onClose}>Đóng</button>
-          <ShareRoomButton room={room} />
-          <button className="kp-btn kp-btn-primary" type="button" onClick={onRegister}>Đăng ký nhu cầu thuê</button>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -425,6 +386,9 @@ export default function KhamPhaPhongPage() {
   const [rooms, setRooms] = useState([]);
   const [filterOptions, setFilterOptions] = useState({ loaiPhong: [], khuVuc: [] });
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(Boolean(roomIdFromSearch));
+  const [detailError, setDetailError] = useState('');
+  const [detailAttempt, setDetailAttempt] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -457,12 +421,22 @@ export default function KhamPhaPhongPage() {
   }, [activeFilters]);
 
   useEffect(() => {
-    if (loading || !roomIdFromSearch) return;
-    const matchedRoom = rooms.find((room) => String(room.maPhong || '').toLowerCase() === roomIdFromSearch.toLowerCase());
-    if (matchedRoom) {
-      setSelectedRoom(matchedRoom);
-    }
-  }, [loading, roomIdFromSearch, rooms]);
+    if (!roomIdFromSearch) { setSelectedRoom(null); setDetailLoading(false); setDetailError(''); return; }
+    const controller = new AbortController();
+    setSelectedRoom(null);
+    setDetailLoading(true);
+    setDetailError('');
+    window.scrollTo({ top: 0 });
+    httpClient.get(`/trang-chu/phong/${encodeURIComponent(roomIdFromSearch)}`, { signal: controller.signal })
+      .then(({ data }) => {
+        if (!controller.signal.aborted) setSelectedRoom(normalizeRoomDetail(data));
+      })
+      .catch(requestError => {
+        if (!controller.signal.aborted) setDetailError(requestError.response?.data?.message || 'Không thể tải chi tiết phòng lúc này.');
+      })
+      .finally(() => { if (!controller.signal.aborted) setDetailLoading(false); });
+    return () => controller.abort();
+  }, [roomIdFromSearch, detailAttempt]);
 
   const areaOptions = useMemo(() => {
     const map = new Map();
@@ -506,11 +480,20 @@ export default function KhamPhaPhongPage() {
   }
 
   function goRegister() {
-    setSelectedRoom(null);
-    if (user) navigate('/khach-hang');
+    const target = selectedRoom?.maPhong
+      ? `/khach-hang?tab=kham-pha&phong=${encodeURIComponent(selectedRoom.maPhong)}&dangKy=1`
+      : '/khach-hang';
+    if (user) navigate(user.vaiTro === 'KhachHang' ? target : getAuthenticatedHomePath(user));
+    else navigate(`/?next=${encodeURIComponent(target)}`);
   }
 
-  function goLogin() {}
+  function goLogin() { navigate(`/?next=${encodeURIComponent('/khach-hang')}`); }
+
+  function openDetail(room) {
+    const params = new URLSearchParams(location.search);
+    params.set('phong', room.maPhong || room.MaPhong);
+    navigate({ pathname: location.pathname, search: `?${params.toString()}` });
+  }
 
   function closeDetail() {
     setSelectedRoom(null);
@@ -531,7 +514,7 @@ export default function KhamPhaPhongPage() {
         <header className="kp-topbar">
           <div>
             <span className="kp-eyebrow">Khám phá phòng</span>
-            <h1>Chào {user?.hoTen || 'bạn'},</h1>
+            {!roomIdFromSearch && <h1>Chào {user?.hoTen || 'bạn'},</h1>}
             <p>Tìm không gian sống phù hợp theo khu vực, giá thuê và hình thức ở.</p>
           </div>
           <div className="kp-top-actions">
@@ -552,7 +535,13 @@ export default function KhamPhaPhongPage() {
         </header>
 
         <main className="kp-main">
-          <div className="kp-grid">
+          {roomIdFromSearch ? (
+            <section className="kp-public-detail" aria-label="Chi tiết phòng">
+              {detailLoading ? <div className="kp-loading" role="status"><span /><p>Đang tải chi tiết phòng...</p></div>
+                : detailError ? <div className="kp-detail-error" role="alert"><h1>Chưa thể mở phòng</h1><p>{detailError}</p><button className="kp-btn kp-btn-soft" type="button" onClick={closeDetail}>Quay lại khám phá phòng</button><button className="kp-btn kp-btn-primary" type="button" onClick={() => setDetailAttempt(value => value + 1)}>Thử lại</button></div>
+                : selectedRoom && <RoomDetailView key={selectedRoom.maPhong} phong={selectedRoom} onBack={closeDetail} onRent={goRegister} />}
+            </section>
+          ) : <div className="kp-grid">
             <section className="kp-content" aria-label="Danh sách phòng khám phá">
               <form className="kp-filter-panel" onSubmit={applyFilters}>
                 <label className="kp-keyword">
@@ -617,7 +606,7 @@ export default function KhamPhaPhongPage() {
                         <RoomCard
                           key={room.maPhong}
                           room={room}
-                          onViewDetail={setSelectedRoom}
+                          onViewDetail={openDetail}
                           onRegister={goRegister}
                         />
                       ))}
@@ -677,12 +666,12 @@ export default function KhamPhaPhongPage() {
                 <div>
                   <h3>Cần tư vấn thêm?</h3>
                   <p>Chuyên viên HomestayDorm sẽ hỗ trợ chọn phòng theo nhu cầu.</p>
-                  <button className="kp-btn kp-btn-light kp-full" type="button"><LineIcon name="phone" />Liên hệ ngay</button>
+                  <a className="kp-btn kp-btn-light kp-full" href={`tel:${CONTACT_PHONE}`}><LineIcon name="phone" />Liên hệ ngay</a>
                 </div>
                 <LineIcon name="phone" className="kp-support-watermark" />
               </div>
             </aside>
-          </div>
+          </div>}
         </main>
 
         <footer className="kp-footer">
@@ -702,7 +691,7 @@ export default function KhamPhaPhongPage() {
         <button type="button" onClick={goLogin}><LineIcon name="logo" /><span>Tài khoản</span></button>
       </nav>
 
-      <DetailModal room={selectedRoom} onClose={closeDetail} onRegister={goRegister} />
+
     </div>
   );
 }

@@ -6,6 +6,7 @@ import './shareRoomButton.css';
 export const roomShareUrl = (maPhong) => `${window.location.origin}/kham-pha-phong?phong=${encodeURIComponent(maPhong)}`;
 
 export default function ShareRoomButton({ room }) {
+  // room: { maPhong, tenPhong }; link luôn trỏ về trang khám phá công khai của phòng đó.
   const [open, setOpen] = useState(false), [copied, setCopied] = useState(false);
   const url = roomShareUrl(room.maPhong);
   const text = `${room.tenPhong} - HomeStayDorm`;
@@ -16,7 +17,7 @@ export default function ShareRoomButton({ room }) {
     setCopied(true); setTimeout(() => setCopied(false), 2000);
   }
   return <div className="srb">
-    <button type="button" className="kp-btn kp-btn-soft" aria-expanded={open} onClick={() => setOpen((value) => !value)}>Chia sẻ</button>
+    <button type="button" className="srb-trigger" aria-expanded={open} onClick={() => setOpen((value) => !value)}>Chia sẻ</button>
     {open && <div className="srb-menu" role="menu">
       <a role="menuitem" href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`} target="_blank" rel="noreferrer">Chia sẻ lên Facebook</a>
       <button type="button" role="menuitem" onClick={copy}>{copied ? 'Đã sao chép link' : 'Sao chép link (dán vào Messenger, Zalo)'}</button>

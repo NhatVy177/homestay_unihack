@@ -1,5 +1,15 @@
 # Tiến độ hiện tại
 
+Cập nhật: **2026-11-17 01:23:44 +07:00** (J-X083, gộp trang chủ và chi tiết phòng theo yêu cầu Vy). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+
+## Trang chủ và chi tiết phòng — bản gộp J-X083
+
+- Vy đã yêu cầu “push lên đâu chưa, r gộp thử”: cho phép gộp `feat/ui-refresh-1` (`6334b9a`) vào `main` mới nhất (`45c63f7`). Thực hiện ở worktree riêng `D:\HomeStayDorm-homepage-merge`, nhánh `integration/homepage-merge`; checkout gốc và backend lockfile đang sửa dở được giữ nguyên.
+- Bản gộp giữ toàn bộ nghiệp vụ main, khung khách mới, chính sách cọc/quyết toán và scheduler C4; không khôi phục job tự đánh dấu lịch xem đã bị bỏ. Trang chủ có bố cục/hiệu ứng mới, gallery chạy phải → trái, số 0795749721; chi tiết public và portal dùng chung component. Quy tắc D-042 vẫn áp dụng: Hết chỗ khóa nút, Đang chờ cọc vẫn cho quan tâm và hiện ghi chú; DTO public có nhãn trạng thái.
+- Kiểm tra mới trên bản gộp: backend **59 pass/3 skip SQL**, blockchain local **25 pass/1 skip SQL**, frontend build và smoke Avalanche UI pass. Browser trên bản production preview 5195: trang chủ 1440/1024/768/390/320px + rỗng/lỗi; hiệu ứng bật/giảm; chi tiết public/khách, login giữ phòng, form và khóa đăng ký, 404/503/retry/race, trạng thái public và D-042 khách/Sale ở 1440/390px đều pass, 0 API ghi. Đã xem ảnh detail desktop/mobile. Lần đầu browser tới dev server 5194 hết thời gian khởi tạo, sau đó kiểm đầy đủ trên production preview thành công. Không nghiệm thu SQL/SMTP/Privy/Fuji thật trong đợt này.
+- Quyết định trang chủ trên nhánh cũ trùng D-034..D-037 của main, đã đổi tham chiếu sang **D-049..D-052** trong hồ sơ được gộp; lịch sử gốc vẫn ở Git. `spec/journal.md` giữ cả lịch sử main và các đợt J-058..J-061. Các nhánh nghiệp vụ khác chưa vào main không thuộc đợt gộp này.
+- Bước kế: commit merge J-X083 bằng NhatVy177 và push `HEAD:main`, xác nhận hash remote, báo Vy. Runtime 5192/5001 ở checkout gốc vẫn là nhánh UI trước gộp; backend/SQL của checkout tích hợp 5173/5000 không thay đổi.
+
 Cập nhật: **2026-11-15 01:10:30 +07:00** (J-C105: chặn lệch giới tính sớm, D-047; J-C103: tab khách "Thông tin cư trú", chờ migration; J-C099: tab "Hóa đơn của tôi" khớp mẫu nhóm; J-C093: tab khách "Hóa đơn & thanh toán" nhiều kỳ; J-C092: D-046 thư mời thành viên cư trú; trước đó J-C090: khách tự gửi giữ chỗ "Tôi muốn đặt cọc", Sale "Lập lịch xem phòng mới"; D-045 đã migrate và gộp ở `integration/d043-d045`). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
@@ -30,7 +40,7 @@ Hạn nộp **21/11/2026 23:59** (mục tiêu nội bộ 20/11). Web2 chạy loc
 
 | Nhánh | Nội dung | Trạng thái |
 |---|---|---|
-| `main` (`0b42fb2`) | Đã merge PR #5, #7, #8: A2, C2/B3, C3 và B4 | Gốc nhánh C5-a sau fetch |
+| `main` (merge J-X083 từ `45c63f7`) | Đã có các PR đến #15; gộp thêm trang chủ/chi tiết phòng `6334b9a` | Kiểm thử bản gộp pass; push/xác minh remote ở cuối đợt J-X083 |
 | `chore/fuji-deploy` (Codex) | A2; worktree `D:\HomeStayDorm-fuji-deploy` từ `origin/main` `3725840`; khóa gốc giữ ở A1 | Funding/deploy/verify thật xong; env riêng A2 đã chuẩn bị, config route/roles khớp; chưa restart ứng dụng đầy đủ/A3 |
 | `feat/ui-shared-shell` (Claude) | B0: khung chung cho 5 vai trò; bỏ tab của ứng dụng cũ (D-039); sửa lỗi tab kế toán | Đã vào main qua PR #5 |
 | `feat/ui-list-b1` (Claude) | Tạo từ `feat/ui-shared-shell` (nên chứa luôn B0). Bộ danh sách chung theo mẫu bên Hằng (J-C062); bản nháp hồ sơ nộp D1–D3 (J-C063) | Đã vào main qua PR #5 |

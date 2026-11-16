@@ -14,6 +14,7 @@ try {
     await ctx.route('**/api/**', (route) => {
       const path = new URL(route.request().url()).pathname;
       if (!path.startsWith('/api/')) return route.fallback();
+      if (path === '/api/trang-chu/phong/P103') return route.fulfill({ json: { data: { ...room, anh: [], dichVu: [], tienNghi: [] } } });
       if (path === '/api/trang-chu/kham-pha-phong') return route.fulfill({ json: { data: [room] } });
       if (path === '/api/trang-chu/kham-pha-phong/bo-loc') return route.fulfill({ json: { data: { loaiPhong: [], khuVuc: [] } } });
       return route.fulfill({ json: [] });
@@ -21,7 +22,7 @@ try {
     const page = await ctx.newPage();
     page.on('pageerror', (e) => errors.push(e.message));
     await page.goto(`${base}/kham-pha-phong?phong=P103`, { waitUntil: 'domcontentloaded' });
-    await page.getByRole('dialog').getByRole('button', { name: 'Chia sẻ' }).click();
+    await page.getByRole('button', { name: 'Chia sẻ', exact: true }).click();
     const fb = page.getByRole('menuitem', { name: 'Chia sẻ lên Facebook' });
     const href = await fb.getAttribute('href');
     assert.match(href, /^https:\/\/www\.facebook\.com\/sharer\/sharer\.php\?u=/);

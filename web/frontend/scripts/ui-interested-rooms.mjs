@@ -58,7 +58,7 @@ try {
     await page.locator('.kh-room-card').nth(2).getByRole('button', { name: 'Xem chi tiết' }).click();
     const full = page.locator('.kh-detail-register');
     await full.waitFor();
-    assert.match(await page.locator('.kh-detail-availability').innerText(), /Đã hết chỗ/);
+    assert.match(await page.locator('.kh-detail-room-status').innerText(), /Hết chỗ/);
     assert.equal(await full.isDisabled(), true, 'phòng hết chỗ: nút bị khóa');
     assert.match(await full.innerText(), /Hết chỗ/i);
     await page.screenshot({ path: `.ui-screens/interested-rooms/chi-tiet-het-cho-${width}.png` });
@@ -69,17 +69,17 @@ try {
     const waiting = page.locator('.kh-detail-register');
     await waiting.waitFor();
     assert.equal(await waiting.isDisabled(), false, 'phòng chờ cọc: vẫn cho quan tâm');
-    assert.match(await page.locator('.kh-detail-flow-note').innerText(), /đang có người giữ chỗ/);
-    assert.match(await page.locator('.kh-detail-availability').innerText(), /2 giường đang chờ cọc/);
+    assert.match(await page.locator('.kh-detail-note').innerText(), /đang có người giữ chỗ/);
+    assert.match(await page.locator('.kh-detail-room-status').innerText(), /Đang chờ cọc/);
 
     // Phòng còn trống: hiện số giường trống và nút "Tôi quan tâm phòng này"
     await page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
     await page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
     await page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết' }).click();
-    const open = page.getByRole('button', { name: 'Tôi quan tâm phòng này' });
+    const open = page.getByRole('button', { name: 'Đăng ký thuê ngay' });
     await open.waitFor();
-    assert.match(await page.locator('.kh-detail-availability').innerText(), /Còn 4 giường trống/);
-    assert.match(await page.locator('.kh-detail-bed-note').innerText(), /Sale sẽ xếp giường cụ thể/);
+    assert.match(await page.locator('.kh-detail-room-status').innerText(), /Còn trống/);
+    assert.match(await page.locator('.kh-detail-note').innerText(), /ký hợp đồng và đóng cọc/);
     await page.screenshot({ path: `.ui-screens/interested-rooms/chi-tiet-con-trong-${width}.png` });
     await open.click();
 
@@ -164,7 +164,7 @@ try {
     await fill.page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
     await fill.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
     await fill.page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết' }).click();
-    await fill.page.getByRole('button', { name: 'Tôi quan tâm phòng này' }).click();
+    await fill.page.getByRole('button', { name: 'Đăng ký thuê ngay' }).click();
     const form = fill.page.locator('.kh-register-modal').first();
     await form.waitFor();
     // Nút quay lại: về danh sách phòng, mở lại phiếu vẫn được
@@ -172,7 +172,7 @@ try {
     await fill.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
     assert.equal(await fill.page.locator('.kh-register-modal').count(), 0, 'quay lại thì đóng phiếu');
     await fill.page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết' }).click();
-    await fill.page.getByRole('button', { name: 'Tôi quan tâm phòng này' }).click();
+    await fill.page.getByRole('button', { name: 'Đăng ký thuê ngay' }).click();
     await form.waitFor();
     const labelled = (text) => form.locator('label', { hasText: text }).locator('input, select, textarea').first();
     await labelled('Ngày sinh').fill('2000-01-01');
