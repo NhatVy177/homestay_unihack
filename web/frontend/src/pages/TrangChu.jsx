@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
-import { getAuthenticatedHomePath } from '../auth/auth.routes.js';
+import AccountMenu from '../components/common/AccountMenu.jsx';
 import { safeNextPath } from '../auth/returnPath.js';
 import { httpClient } from '../api/httpClient.js';
 import { Icon } from '../components/common/Icon.jsx';
@@ -117,7 +117,10 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
       const requested = new URLSearchParams(location.search).get('next');
       const from = location.state?.from;
       const statePath = from ? `${from.pathname || ''}${from.search || ''}${from.hash || ''}` : '';
-      navigate(safeNextPath(requested) || safeNextPath(statePath) || getAuthenticatedHomePath(user), { replace: true });
+      // Không có trang cần quay lại thì ở lại trang chủ; vào khu làm việc bằng menu "Tài khoản của tôi".
+      const back = safeNextPath(requested) || safeNextPath(statePath);
+      if (back) navigate(back, { replace: true });
+      else if (user && location.pathname !== '/') navigate('/', { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Không thể đăng nhập lúc này.');
     } finally { setLoading(false); }
@@ -131,7 +134,6 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
     try {
       await dangKy(regForm);
       onClose();
-      navigate('/khach-hang', { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Không thể đăng ký lúc này.');
     } finally { setLoading(false); }
@@ -275,7 +277,7 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
 // Header
 // ────────────────────────────────────────────────────────────
 function HeaderPublic({ onOpenAuth }) {
-  const { user, dangXuat } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -298,12 +300,7 @@ function HeaderPublic({ onOpenAuth }) {
 
         <div className="tc-nav-actions">
           {user ? (
-            <>
-              <button className="tc-btn-ghost" type="button" onClick={() => navigate(getAuthenticatedHomePath(user))}>
-                Dashboard
-              </button>
-              <button className="tc-btn-outline" type="button" onClick={dangXuat}>Đăng xuất</button>
-            </>
+            <AccountMenu />
           ) : (
             <>
               <button className="tc-btn-ghost" type="button" onClick={() => onOpenAuth('login')}>Đăng nhập</button>

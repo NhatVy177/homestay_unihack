@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { authApi } from '../pages/auth/auth.api.js';
 import { clearSession, getStoredSession, getStoredToken, storeSession } from './auth.storage.js';
+import LogoutConfirmDialog from './LogoutConfirmDialog.jsx';
 
 const AuthContext = createContext(null);
 
@@ -16,6 +17,7 @@ function mergeFilled(base = {}, update = {}) {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(Boolean(getStoredToken()));
+  const [confirmingLogout, setConfirmingLogout] = useState(false);
 
   useEffect(() => {
     if (!getStoredToken()) {
@@ -45,16 +47,24 @@ export function AuthProvider({ children }) {
     setUser(data.user);
   }
 
-  async function dangXuat() {
+  // Đăng xuất thật, chỉ chạy sau khi người dùng xác nhận.
+  async function thucHienDangXuat() {
     try {
       await authApi.dangXuat();
     } finally {
       clearSession();
       setUser(null);
+      setConfirmingLogout(false);
       if (window.location.pathname !== '/') {
         window.location.assign('/');
       }
     }
+  }
+
+  // Mọi nút "Đăng xuất" trong ứng dụng gọi hàm này: hỏi lại trước khi đăng xuất.
+  function dangXuat() {
+    setConfirmingLogout(true);
+    return Promise.resolve();
   }
 
   const value = useMemo(
@@ -62,7 +72,10 @@ export function AuthProvider({ children }) {
     [user, isLoading]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>
+    {children}
+    {confirmingLogout && <LogoutConfirmDialog onCancel={() => setConfirmingLogout(false)} onConfirm={thucHienDangXuat} />}
+  </AuthContext.Provider>;
 }
 
 export function useAuth() {
