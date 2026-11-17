@@ -146,7 +146,7 @@ export function LocationSection({ rooms, branches }) {
       <Reveal delay={100}><div className="hx-location-layout">
         <div className="hx-map-list">{groups.length ? groups.map((group, i) => <button className={`hx-map-item ${selected === i ? 'is-active' : ''}`} type="button" key={group.name} onClick={() => setSelected(i)}><img src={group.image} alt="" onError={imageFallback} /><span><strong>{group.name}</strong><small>{group.address}</small><em>{group.rooms.length} phòng đang giới thiệu</em></span><Icon name="arrow_forward" /></button>) : <p>Chưa có thông tin chi nhánh để hiển thị.</p>}</div>
         <div className="hx-map-panel"><Suspense fallback={<div className="hx-map-loading">Đang tải bản đồ...</div>}>{near && <HomeMap groups={groups} selected={selected} onSelect={setSelected} />}</Suspense>
-          {selected !== null && groups[selected] && <div className="hx-map-detail"><strong>{groups[selected].name}</strong><span>{groups[selected].address}</span><button type="button" onClick={() => navigate(`/kham-pha-phong?khuVuc=${encodeURIComponent(groups[selected].area || groups[selected].name)}`)}>Xem các phòng <Icon name="arrow_forward" /></button></div>}
+          {selected !== null && groups[selected] && <div className="hx-map-detail"><strong>{groups[selected].name}</strong><span>{groups[selected].address}</span><button type="button" onClick={() => navigate(`/phong?khuVuc=${encodeURIComponent(groups[selected].area || groups[selected].name)}`)}>Xem các phòng <Icon name="arrow_forward" /></button></div>}
         </div>
       </div></Reveal><p className="hx-map-caption">Điểm ghim biểu thị khu vực tham khảo; địa chỉ chi tiết hiển thị trong danh sách chi nhánh.</p>
     </div>

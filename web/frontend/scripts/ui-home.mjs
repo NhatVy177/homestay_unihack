@@ -121,6 +121,7 @@ try {
     await page.goto(base);
     await page.locator('.hx-map-item').filter({ hasText: 'Bình Thạnh' }).click();
     await page.locator('.hx-map-detail').getByRole('button', { name: 'Xem các phòng', exact: true }).click();
+    assert.equal(new URL(page.url()).pathname, '/phong', 'nút Xem các phòng trên bản đồ đi trang phòng');
     assert.equal(new URL(page.url()).searchParams.get('khuVuc'), 'Bình Thạnh');
     assert.deepEqual(errors, []);
     assert.deepEqual(writes, []);
