@@ -5,6 +5,7 @@ import AccountMenu from '../components/common/AccountMenu.jsx';
 import DemoAccounts from '../components/common/DemoAccounts.jsx';
 import GoogleAuthSection from '../components/common/GoogleAuthSection.jsx';
 import ForgotPasswordForm from '../components/common/ForgotPasswordForm.jsx';
+import TrustStrip from './homeExperience/TrustStrip.jsx';
 import ServicesShowcase from './homeExperience/ServicesShowcase.jsx';
 import { safeNextPath } from '../auth/returnPath.js';
 import { httpClient } from '../api/httpClient.js';
@@ -619,6 +620,7 @@ export default function TrangChu() {
         </section>
 
         <ServicesShowcase />
+        <TrustStrip />
         <AboutSection rooms={catalog} branches={branches} roomTypes={roomTypes} onViewDetail={viewRoomDetail} />
         <LocationSection rooms={catalog} branches={branches} />
         <ContactSection />

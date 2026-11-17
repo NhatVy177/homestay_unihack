@@ -1684,3 +1684,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Sửa: `web/frontend/src/pages/TrangChu.jsx` (bỏ `TrustStrip`; nhãn và gợi ý ô đăng nhập thành "Tên hoặc email đăng nhập", icon người). Xóa: `homeExperience/TrustStrip.jsx`, `homeExperience/trustStrip.css`, `scripts/ui-trust-strip.mjs`. Giữ nguyên backend `GET /api/trang-chu/minh-bach` và `integrations/avalanche/publicStats.js` cùng test của chúng (backend không đổi).
 - Rà lại trang chủ, trang phòng, trang dịch vụ, menu: không còn chữ Avalanche, blockchain, Snowtrace hay "bằng chứng"; còn câu khẩu hiệu "Thuê phòng minh bạch, cọc rõ ràng" ở chân trang con và "thanh toán minh bạch" ở mục Dịch vụ (lời thường, không nói công nghệ).
 - Kiểm tra: build OK; `ui-home`, `ui-email-auth`, `ui-public-pages`, `ui-share-demo`, `ui-account-menu` PASS. Đã kéo `origin/main` (commit `068563a` của Codex) về trước khi đẩy, không xung đột.
+
+## 2026-11-17 20:36:29 +07:00 — J-C177 — Đính chính J-C176: khôi phục dải "Thuê minh bạch"
+- Người thực hiện: Claude. Vy phản hồi: chỉ muốn đổi cách trình bày cho tự nhiên, không bảo gỡ; Claude đã hiểu sai và gỡ khi chưa hỏi.
+- Khôi phục đúng bản ở `068563a`: `web/frontend/src/pages/homeExperience/TrustStrip.jsx`, `trustStrip.css`, `web/frontend/scripts/ui-trust-strip.mjs`; `pages/TrangChu.jsx` gắn lại `<TrustStrip />` sau mục Dịch vụ. Giữ nhãn ô đăng nhập "Tên hoặc email đăng nhập". Quyết định: D-058 (thay D-057).
+- Kiểm tra: build OK; `ui-trust-strip`, `ui-home` PASS.
+- Còn lại: chờ Vy chọn cách trình bày mới cho dải này rồi mới sửa.
