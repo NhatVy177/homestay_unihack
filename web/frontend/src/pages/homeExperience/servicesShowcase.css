@@ -1,5 +1,5 @@
 .sv { padding: 72px 0; background: var(--color-bg, #F6F8F5); }
-.sv-inner { width: min(1120px, calc(100% - 32px)); margin: 0 auto; display: grid; grid-template-columns: 5fr 7fr; gap: 48px; align-items: center; }
+.sv-inner { width: min(1216px, calc(100% - 48px)); margin: 0 auto; display: grid; grid-template-columns: 5fr 7fr; gap: 48px; align-items: center; }
 .sv-photo { margin: 0; aspect-ratio: 4 / 4.5; border-radius: 32px; overflow: hidden; box-shadow: var(--shadow-md, 0 8px 24px rgba(25, 28, 26, .12)); }
 .sv-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .sv-content { display: grid; gap: 16px; }

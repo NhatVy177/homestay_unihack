@@ -240,3 +240,24 @@
   .tc-page .hx-room-card { transform: none; }
   .tc-page .hx-hero .tc-hero-photo { animation: none; }
 }
+
+/* Mục "Phòng trống tiêu biểu" theo mẫu của Hằng: đầu mục có nút xem tất cả, 4 thẻ một hàng, nhãn loại phòng, tiện ích dạng viên thuốc. */
+.hx-rooms-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 40px; flex-wrap: wrap; }
+.hx-rooms-eyebrow { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--tc-primary); }
+.tc-page .hx-rooms-head h2 { margin: 0; font-family: var(--hx-display); font-size: clamp(26px, 3.4vw, 38px); line-height: 1.2; color: var(--tc-on-surface); }
+.hx-rooms-all { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 18px; border: 1px solid transparent; border-radius: 999px; background: none; font: inherit; font-weight: 600; color: var(--tc-primary); cursor: pointer; transition: background .2s, border-color .2s; }
+.hx-rooms-all:hover { background: var(--tc-surface-low); border-color: var(--tc-primary); }
+.hx-rooms-all .ui-icon { width: 16px; height: 16px; transition: transform .3s; }
+.hx-rooms-all:hover .ui-icon { transform: translateX(4px); }
+.tc-page .tc-rooms-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.hx-room-image { position: relative; }
+.hx-room-badge { position: absolute; top: 12px; right: 12px; padding: 4px 12px; border-radius: 999px; background: var(--tc-primary); color: #fff; font-size: 12px; font-weight: 600; }
+.hx-room-tags span { display: inline-flex; align-items: center; gap: 4px; }
+.hx-room-tags .ui-icon { width: 12px; height: 12px; }
+.hx-room-bottom { align-items: center; }
+.hx-room-bottom strong { color: var(--tc-primary); font-size: 18px; }
+.hx-room-bottom > div > span { font-size: 12px; }
+.tc-page .hx-room-bottom .tc-room-cta.hx-room-view { padding: 8px 16px; border-radius: 12px; background: var(--tc-surface-low); color: var(--tc-primary); font-size: 13px; font-weight: 600; transition: background .2s, color .2s; }
+.tc-page .hx-room-bottom .tc-room-cta.hx-room-view:hover { background: var(--tc-primary); color: #fff; }
+@media (max-width: 1100px) { .tc-page .tc-rooms-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .tc-page .tc-rooms-grid { grid-template-columns: 1fr; } .hx-rooms-head { margin-bottom: 24px; } }

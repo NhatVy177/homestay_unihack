@@ -573,7 +573,7 @@ export default function TrangChu() {
       const allRooms = all.status === 'fulfilled' && Array.isArray(all.value.data.data) ? all.value.data.data.map(normalizeRoom) : [];
       const unique = [...new Map([...featuredRooms, ...allRooms].filter(room => room.MaPhong).map(room => [room.MaPhong, room])).values()];
       setCatalog(unique);
-      setRooms(unique.slice(0, 6));
+      setRooms(unique.slice(0, 4));
       if (filters.status === 'fulfilled') {
         setBranches(filters.value.data.data?.khuVuc || []);
         setRoomTypes(filters.value.data.data?.loaiPhong || []);
@@ -594,7 +594,10 @@ export default function TrangChu() {
         {/* Phòng nổi bật */}
         <section className="hx-section tc-rooms-section" id="phong-noi-bat">
           <div className="tc-container">
-            <SectionHeading title="Phòng trống tiêu biểu" subtitle="Những không gian được chọn lọc cho cuộc sống mỗi ngày." />
+            <div className="hx-rooms-head">
+              <div><span className="hx-rooms-eyebrow">Phòng trống</span><h2>Phòng trống tiêu biểu</h2></div>
+              <button className="hx-rooms-all" type="button" onClick={() => navigate('/kham-pha-phong')}>Xem tất cả phòng <Icon name="arrow_forward" /></button>
+            </div>
 
             {loadingRooms ? (
               <div className="tc-rooms-loading">
@@ -608,12 +611,6 @@ export default function TrangChu() {
             ) : (
               <div className="tc-rooms-empty">Hiện chưa có phòng nào để hiển thị.</div>
             )}
-
-            <Reveal className="tc-rooms-more" delay={200}>
-              <button className="tc-btn-outline" type="button" onClick={() => navigate('/kham-pha-phong')}>
-                Xem Tất Cả Phòng →
-              </button>
-            </Reveal>
           </div>
         </section>
 

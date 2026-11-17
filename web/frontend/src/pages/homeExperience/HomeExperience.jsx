@@ -102,10 +102,10 @@ export function RoomCard({ room, onViewDetail, index = 0 }) {
   function reset() { card.current.style.setProperty('--rx', '0deg'); card.current.style.setProperty('--ry', '0deg'); }
   return <Reveal delay={(index % 3) * 100} kind="spring">
     <article className="hx-room-card tc-room-card" ref={card} onPointerMove={tilt} onPointerLeave={reset}>
-      <button className="hx-room-image" type="button" onClick={() => onViewDetail(room)} aria-label={`Xem ${room.TenPhong}`}><img src={imageFor(room)} alt={room.TenPhong} loading="lazy" onError={imageFallback} /></button>
+      <button className="hx-room-image" type="button" onClick={() => onViewDetail(room)} aria-label={`Xem ${room.TenPhong}`}><img src={imageFor(room)} alt={room.TenPhong} loading="lazy" onError={imageFallback} /><span className="hx-room-badge">{room.TenLoaiPhong}</span></button>
       <div className="hx-room-body"><h3>{room.TenPhong}</h3><p className="hx-room-area"><Icon name="home" />{room.TenChiNhanh}</p>
-        <div className="hx-room-tags"><span>{room.TenLoaiPhong}</span><span>Wifi</span>{room.SucChuaToiDa && <span>{room.SucChuaToiDa} người</span>}</div>
-        <div className="hx-room-bottom"><div><small>TỪ</small><strong>{priceFor(room) ? money(priceFor(room)) : 'Liên hệ'}</strong><span> / {unitFor(room)}</span></div><button className="tc-room-cta" type="button" onClick={() => onViewDetail(room)}>Xem phòng <Icon name="arrow_forward" /></button></div>
+        <div className="hx-room-tags"><span><Icon name="wifi" />Wifi miễn phí</span>{room.SucChuaToiDa && <span><Icon name="group" />{room.SucChuaToiDa} người</span>}</div>
+        <div className="hx-room-bottom"><div><strong>{priceFor(room) ? money(priceFor(room)) : 'Liên hệ'}</strong><span> / {unitFor(room)}</span></div><button className="tc-room-cta hx-room-view" type="button" onClick={() => onViewDetail(room)}>Xem ngay</button></div>
       </div>
     </article>
   </Reveal>;
