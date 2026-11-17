@@ -1579,3 +1579,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kết quả: `git push origin HEAD:main` thành công, `beec69a..b6508ec`; `origin/main` = `b6508ec`. Thư mục `D:\HomeStayDorm` chuyển sang nhánh `main`, đồng bộ với remote.
 - Lưu ý còn mở: commit sớm `b449df8` trong lịch sử có dòng đồng tác giả "Co-Authored-By" (đã đẩy từ trước và nay nằm trong `main`); sửa phải ghi lại lịch sử và đẩy ép nên chưa làm, chờ Vy quyết.
 - Việc còn lại trước khi nộp: dán `GOOGLE_CLIENT_ID`, tắt cài đặt demo, kiểm README không có thông tin cá nhân, chạy thêm hồ sơ mẫu lên Fuji, quay demo.
+
+## 2026-11-17 16:50:00 +07:00 — J-C166 — Mũi tên menu tài khoản bị lệch
+- Người thực hiện: Claude, theo phản ánh của Vy (mũi tên cạnh tên tài khoản nhìn lệch xuống).
+- Nguyên nhân: mũi tên là ký tự chữ "⌄" nên bị lệch theo đường cơ sở của chữ, không canh giữa với tên.
+- Sửa: `web/frontend/src/components/common/AccountMenu.jsx` (dùng biểu tượng SVG), `accountMenu.css`.
+- Kiểm tra: build OK; `ui-account-menu` PASS; đã xem ảnh, mũi tên canh giữa, lật lên khi mở menu.
