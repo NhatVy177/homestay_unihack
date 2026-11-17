@@ -1572,3 +1572,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Sao sang thư mục gốc (không nằm trong git): `web/backend/.env`, `web/frontend/.env` (bản cũ của gốc lưu thành `.env.bak-before-consolidation`), `web/backend/secrets/` và `web/backend/uploads/` (chứng từ khách tải lên, không ghi đè file có sẵn). Cài lại thư viện cho backend và frontend.
 - Chạy lại từ thư mục gốc: backend cổng 5000 (kết nối HOMEDORM4), frontend cổng 5173; `GET /api/trang-chu/minh-bach` trả số liệu thật từ Fuji.
 - Chưa làm: gộp vào `main` (chờ Vy duyệt Pull Request); xóa `D:\HomeStayDorm-integ`. Hai tiến trình xem thử cũ ở cổng 5192 và 5001 (của thư mục gốc, bản cũ) vẫn đang chạy vì thao tác dừng chúng không được cho phép; Vy tắt tay nếu không cần.
+
+## 2026-11-17 16:20:00 +07:00 — J-C165 — Gộp `integration/d043-d045` vào `main`
+- Người thực hiện: Claude, theo yêu cầu rõ ràng của Vy ("gộp lên main luôn đi").
+- Trước khi đẩy: `origin/main` (`beec69a`) đã nằm trong nhánh tích hợp nên là bước tiến thẳng (fast-forward), không cần commit gộp; không có `.env`, khóa hay thư mục `secrets/` nào được theo dõi trong git; 94 commit đi vào `main`.
+- Kết quả: `git push origin HEAD:main` thành công, `beec69a..b6508ec`; `origin/main` = `b6508ec`. Thư mục `D:\HomeStayDorm` chuyển sang nhánh `main`, đồng bộ với remote.
+- Lưu ý còn mở: commit sớm `b449df8` trong lịch sử có dòng đồng tác giả "Co-Authored-By" (đã đẩy từ trước và nay nằm trong `main`); sửa phải ghi lại lịch sử và đẩy ép nên chưa làm, chờ Vy quyết.
+- Việc còn lại trước khi nộp: dán `GOOGLE_CLIENT_ID`, tắt cài đặt demo, kiểm README không có thông tin cá nhân, chạy thêm hồ sơ mẫu lên Fuji, quay demo.
