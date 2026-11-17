@@ -1,6 +1,6 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-17 17:01:25 +07:00** (J-X087, gộp nhà3D và bỏ nhãn tầng vào main theo yêu cầu Vy). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-17 20:49:37 +07:00** (J-X088, chỉnh ảnh đại diện bằng cây bút). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Trang chủ/nhà3D trên main
 
@@ -15,7 +15,7 @@ Cập nhật: **2026-11-15 01:10:30 +07:00** (J-C105: chặn lệch giới tính
 
 ## Tóm tắt
 
-**Đăng nhập/hồ sơ (J-C168, D-054, nhánh `feat/email-login-profile-home`):** đăng nhập bằng email, quên mật khẩu OTP, ảnh đại diện + đổi mật khẩu, mục Dịch vụ ở trang chủ, "Khám phá phòng" nhảy về mục phòng; có code, test tự động và chạy thật trên backend với HOMEDORM4 (trừ gửi OTP thật). Chờ Vy xem rồi merge.
+**Hồ sơ/ảnh đại diện (J-X088, nhánh `fix/avatar-pencil`, từ main `ba4831a`):** `AccountSecurity.jsx`/`accountSecurity.css` dùng cây bút ngay góc ảnh để chọn/cập nhật ảnh; bỏ nút chữ Đổi ảnh/Xóa ảnh và dòng hướng dẫn, giữ lỗi định dạng/2MB, loading/kết quả và form mật khẩu. Build và smoke Verify/D-017/D-018/D-023/D-024 pass; `ui-customer-profile` pass1440/390 (keyboard/mouse/filechooser, file sai/quá cỡ không gửi API, uploadfixture cập nhật ảnh, menu/cư trú), đã xem ảnh; Sale mobile pass. Chỉ APIfixture, không upload ảnh/tài khoản thật hoặc ghi DB. Bản xem **`http://localhost:5202/khach-hang`**, worktree `D:\HomeStayDorm-avatar-edit`; chỉ push nhánh review, không merge main theo quy ước hiện hành. Các tính năng đăng nhập email/OTP/đổi mật khẩu/ảnh của D-054 ở main giữ nguyên.
 
 D-045 có code trên `feat/customer-viewing-confirmation` từ origin/main `45c63f7`, worktree riêng `D:\HomeStayDorm-ui-small-fixes`: trang lịch khách theo ảnh, API xác nhận đúng phiên bản, reset khi đổi giờ, chặn Đã xem/Khách không đến tới khi khách xác nhận. Build + avalanche UI qua; backend 61 pass/4 skip SQL, blockchain local 25 pass/1 skip; SQL D-045 riêng 1 pass trên DB tạm tự xóa, đã thử migration hai lần/race/quyền/guard. UI fixture qua 1440/390 với 18 ảnh `.ui-screens/customer-viewing-confirmation/`, C5-a có thêm ca chưa xác nhận và vẫn giữ đổi/hủy/ghi kết quả. Không phải nghiệm thu A3/Fuji hay xác nhận trên hồ sơ thật.
 

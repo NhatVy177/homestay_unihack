@@ -37,6 +37,8 @@
 
 ---
 
+Hồ sơ cá nhân (D-054, trình bày J-X088): chỉnh ảnh bằng nút cây bút ngay trên ảnh; không còn hai nút chữ đổi/xóa hoặc dòng hướng dẫn dung lượng. File vẫn kiểm PNG/JPG/WebP≤2MB và có báo lỗi/kết quả; không đổi xác thực/quyền/đổi mật khẩu.
+
 ## 1. Vai trò và hệ thống
 
 | Vai trò | Làm gì chính |

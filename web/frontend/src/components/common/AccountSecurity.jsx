@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { authApi } from '../../pages/auth/auth.api.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { resolveAvatarUrl } from './avatarUrl.js';
+import { Icon } from './Icon.jsx';
 import './accountSecurity.css';
 
 const TYPES = ['image/png', 'image/jpeg', 'image/webp'];
@@ -30,12 +31,6 @@ export default function AccountSecurity({ details }) {
     catch (e) { setAvatarMsg({ error: true, text: e?.response?.data?.message || 'Không cập nhật được ảnh.' }); }
     finally { setBusy(false); }
   }
-  async function remove() {
-    setBusy(true); setAvatarMsg(null);
-    try { await authApi.xoaAvatar(); capNhatAvatar(null); setAvatarMsg({ text: 'Đã xóa ảnh đại diện.' }); }
-    catch (e) { setAvatarMsg({ error: true, text: e?.response?.data?.message || 'Không xóa được ảnh.' }); }
-    finally { setBusy(false); }
-  }
   async function changePassword(event) {
     event.preventDefault(); setPwMsg(null);
     if (form.matKhauMoi.length < 6) { setPwMsg({ error: true, text: 'Mật khẩu mới phải có ít nhất 6 ký tự.' }); return; }
@@ -51,16 +46,17 @@ export default function AccountSecurity({ details }) {
 
   return <div className="acs">
     <section className="acs-card" aria-label="Ảnh đại diện">
-      <div className="acs-avatar">{src ? <img src={src} alt="Ảnh đại diện" /> : <span aria-hidden="true">{initialOf(user)}</span>}</div>
+      <div className="acs-avatar-wrap">
+        <div className="acs-avatar">{src ? <img src={src} alt="Ảnh đại diện" /> : <span aria-hidden="true">{initialOf(user)}</span>}</div>
+        <button type="button" className="acs-avatar-edit" aria-label="Chỉnh ảnh đại diện" aria-busy={busy}
+          title={busy ? 'Đang cập nhật ảnh đại diện' : 'Chỉnh ảnh đại diện'} disabled={busy} onClick={() => fileRef.current?.click()}>
+          <Icon name="mode_edit" />
+        </button>
+        <input ref={fileRef} type="file" accept={TYPES.join(',')} hidden onChange={pick} />
+      </div>
       <div className="acs-body">
         <h3>{details ? (user?.hoTen || 'Thông tin cá nhân') : 'Ảnh đại diện'}</h3>
         {details && <dl className="acs-details">{details.filter(([, value]) => value).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>}
-        <p>Ảnh đại diện: PNG, JPG hoặc WebP, tối đa 2MB.</p>
-        <div className="acs-actions">
-          <button type="button" className="acs-btn" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? 'Đang tải...' : 'Đổi ảnh'}</button>
-          {src && <button type="button" className="acs-btn acs-btn--ghost" disabled={busy} onClick={remove}>Xóa ảnh</button>}
-          <input ref={fileRef} type="file" accept={TYPES.join(',')} hidden onChange={pick} />
-        </div>
         {avatarMsg && <p className={avatarMsg.error ? 'acs-msg acs-msg--error' : 'acs-msg'} role={avatarMsg.error ? 'alert' : 'status'}>{avatarMsg.text}</p>}
       </div>
     </section>
