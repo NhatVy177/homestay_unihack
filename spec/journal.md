@@ -112,6 +112,20 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kết quả: backend ký JWT RS256 (`sub`, `iss=homestaydorm`, `aud`=App ID, hạn 10 phút), chữ ký verify được bằng JWKS, JWKS không chứa phần khóa riêng.
 - Còn lại: Vy bật JWT-based auth trên dashboard và dán public key (claim `sub`); giữ App Secret ở nơi an toàn (code không dùng tới); sau đó deploy local + bật `AVALANCHE_ENABLED` để thử luồng ví thật.
 
+## 2026-11-05 17:31:24 +07:00 — J-010 — Bắt buộc email khi khách đăng ký tài khoản (D-016)
+
+- Người thực hiện: Claude theo yêu cầu Vy.
+- Trao đổi: Vy hỏi form "Tạo tài khoản mới" có nên bắt buộc email. Claude đề xuất bắt buộc + đúng định dạng + không trùng (OTP và thông báo đi qua email; ví nhúng gắn với email). Vy đồng ý → D-016.
+- Đính chính: mốc `23:50:00` ở J-009 và D-015 là ghi sai; giờ máy lúc ghi J-010 là 17:31 cùng ngày, nên J-009 diễn ra trước 17:31 ngày 05/11 (không rõ giờ chính xác).
+- File và nội dung:
+  - `database/SP_Chung/auth.sql` (`SP_DangKy`): bắt buộc email, kiểm tra định dạng, chặn email đã dùng cho tài khoản khác (mã lỗi 50002 → HTTP 409); khi khách đã có hồ sơ (nhân viên tạo trước) thì email tài khoản ghi đè email cũ.
+  - `web/backend/services/auth.service.js`: kiểm tra thiếu/sai định dạng email trước khi gọi SP.
+  - `web/frontend/src/pages/TrangChu.jsx`: ô Email có dấu `*`, `required`, `maxLength=100`.
+  - Hồ sơ: `spec/decisions.md` (D-016), `spec/scope.md` (F-01), `hackathon/plan.md`, `spec/progress.md` (T-15).
+- Không thêm UNIQUE ở bảng `NguoiDung`: DB local đã có 1 email trùng giữa 2 tài khoản; nhiều SP của nhân viên (đặt cọc, khách mới, admin) cập nhật email khách và sẽ lỗi khó hiểu nếu có ràng buộc.
+- Kiểm tra: áp `SP_DangKy` vào DB local; thiếu email → 50001, sai định dạng (2 kiểu) → 50001, trùng → 50002, hợp lệ → tạo được (trong transaction đã rollback, không còn dữ liệu thử). `web/backend npm test` pass; frontend build qua. Chưa thử bằng giao diện.
+- Còn lại: Vy quyết có sửa 1 email trùng và 8 tài khoản thiếu email trong DB local không (không tự sửa). Các việc của J-009 vẫn giữ nguyên.
+
 ## 2026-11-05 23:50:00 +07:00 — J-009 — JWT Privy cần gói trả phí; chuyển sang OTP email (D-015) và dựng môi trường test local
 
 - Người thực hiện: Claude theo yêu cầu Vy. Thời gian trên là lúc ghi; trao đổi diễn ra từ sau J-008.
@@ -130,20 +144,6 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Chưa kiểm tra: OTP Privy thật trên trình duyệt (cần Vy nhận mã email), luồng đầy đủ qua giao diện với DB thật, Fuji.
 - Còn lại: Vy chạy `run.ps1` và thử; nhận phản hồi BTC (Q-10); T-08 Fuji.
 - Git: commit mã J-009 trên main.
-
-## 2026-11-05 17:31:24 +07:00 — J-010 — Bắt buộc email khi khách đăng ký tài khoản (D-016)
-
-- Người thực hiện: Claude theo yêu cầu Vy.
-- Trao đổi: Vy hỏi form "Tạo tài khoản mới" có nên bắt buộc email. Claude đề xuất bắt buộc + đúng định dạng + không trùng (OTP và thông báo đi qua email; ví nhúng gắn với email). Vy đồng ý → D-016.
-- Đính chính: mốc `23:50:00` ở J-009 và D-015 là ghi sai; giờ máy lúc ghi J-010 là 17:31 cùng ngày, nên J-009 diễn ra trước 17:31 ngày 05/11 (không rõ giờ chính xác).
-- File và nội dung:
-  - `database/SP_Chung/auth.sql` (`SP_DangKy`): bắt buộc email, kiểm tra định dạng, chặn email đã dùng cho tài khoản khác (mã lỗi 50002 → HTTP 409); khi khách đã có hồ sơ (nhân viên tạo trước) thì email tài khoản ghi đè email cũ.
-  - `web/backend/services/auth.service.js`: kiểm tra thiếu/sai định dạng email trước khi gọi SP.
-  - `web/frontend/src/pages/TrangChu.jsx`: ô Email có dấu `*`, `required`, `maxLength=100`.
-  - Hồ sơ: `spec/decisions.md` (D-016), `spec/scope.md` (F-01), `hackathon/plan.md`, `spec/progress.md` (T-15).
-- Không thêm UNIQUE ở bảng `NguoiDung`: DB local đã có 1 email trùng giữa 2 tài khoản; nhiều SP của nhân viên (đặt cọc, khách mới, admin) cập nhật email khách và sẽ lỗi khó hiểu nếu có ràng buộc.
-- Kiểm tra: áp `SP_DangKy` vào DB local; thiếu email → 50001, sai định dạng (2 kiểu) → 50001, trùng → 50002, hợp lệ → tạo được (trong transaction đã rollback, không còn dữ liệu thử). `web/backend npm test` pass; frontend build qua. Chưa thử bằng giao diện.
-- Còn lại: Vy quyết có sửa 1 email trùng và 8 tài khoản thiếu email trong DB local không (không tự sửa). Các việc của J-009 vẫn giữ nguyên.
 
 ## 2026-11-06 00:39:30 +07:00 — J-011 — Kiểm tra dữ liệu phòng trống và tài khoản nhân viên để test
 
@@ -516,6 +516,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `spec/decisions.md` (D-027), `spec/scope.md` (F-15), `spec/progress.md` (mục 8 chuyển "Đã chốt", thêm 8a, mục 12 còn giai đoạn 6–9). Không sửa code. Cùng nhánh `docs/d026-flow-redesign`.
 - Việc còn lại: bàn giai đoạn 6 (bàn giao) → 9; chốt mục 7, 9, 10, 11.
 
+## 2026-11-10 02:15:29 +07:00 — J-053 — Trao đổi về quy chuẩn icon và form theo giao diện tham khảo
+
+- Người thực hiện: Codex trao đổi với Vy; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Yêu cầu/câu hỏi: Vy muốn học cả quy định dùng icon và bố trí form, không chỉ màu sắc. Codex xác nhận có thể tham khảo nguyên tắc thiết kế rồi tự viết bằng CSS/React và bộ `Icon.jsx` hiện có, phù hợp D-025; giữ nguyên nghiệp vụ, API, SP, dữ liệu và props/class/id hiện hành.
+- Đề xuất chưa chốt: đồng nhất nét/kích thước/vị trí icon; nhãn và dấu bắt buộc của form, nhóm trường, khoảng cách, helper/error, trạng thái readonly/disabled; thứ bậc nút chính/phụ/nguy hiểm và khung modal. Đợt 1 mới tập trung nền và khung, chưa chuẩn hóa sâu toàn bộ form/tab. Chưa có ảnh/link mẫu cụ thể trong phiên để đối chiếu, chưa chốt bộ quy chuẩn hay triển khai UI mới.
+- File: chỉ `spec/journal.md` ghi trao đổi; chưa đổi scope/plan hoặc thêm quyết định vì chi tiết vẫn là đề xuất. Không sửa code ứng dụng, không chạy lại build/test. Tiếp tục nhánh `feat/ui-refresh-1`, commit/push hồ sơ theo quy ước; backend lockfile có sẵn không stage.
+
 ## 2026-11-10 02:19:42 +07:00 — J-049 — Chốt bàn giao vào phòng và cách xác nhận OTP (D-028)
 
 - Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
@@ -539,20 +546,6 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `spec/decisions.md` (D-030), `spec/scope.md` (F-04), `spec/progress.md` (mục 10 đã chốt, thêm 20–23, mục 12 chỉ còn mốc 3), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
 - Việc còn lại: Vy quyết mốc chuỗi 3 (mục 9) và hai đề xuất nhỏ (mục 7, 11); sau đó Claude viết prompt Codex cho T-22.
 
-## 2026-11-10 02:39:33 +07:00 — J-052 — Chốt đóng hồ sơ, không thêm mốc chuỗi 3 (D-031)
-
-- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
-- Claude so sánh A (mốc chuỗi 3, sửa contract trước 14/11) và B (gói bằng chứng cuối trên Web2, không sửa contract), khuyên B vì số tiền đã chi vẫn do kế toán tự khai và rủi ro lịch; khuyên có mục 7 (chính sách hoàn cọc trên phiếu/email cọc) và mục 11 (thanh tiến trình thẻ lịch xem). Vy: "chốt theo những gì bạn đề xuất".
-- File: `spec/decisions.md` (D-031; ghi chú D-030 trỏ sang D-031), `spec/scope.md` (F-15, F-04), `spec/progress.md` (mục 7, 11 đã chốt; mục 9 để sau bản thi; thêm 9a; mục 12 xong), `hackathon/plan.md` (§3 đoạn D-026), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
-- Việc còn lại: Claude viết prompt Codex cho T-22; Vy merge `feat/ui-refresh-1` rồi `docs/d026-flow-redesign`.
-
-## 2026-11-10 02:15:29 +07:00 — J-053 — Trao đổi về quy chuẩn icon và form theo giao diện tham khảo
-
-- Người thực hiện: Codex trao đổi với Vy; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
-- Yêu cầu/câu hỏi: Vy muốn học cả quy định dùng icon và bố trí form, không chỉ màu sắc. Codex xác nhận có thể tham khảo nguyên tắc thiết kế rồi tự viết bằng CSS/React và bộ `Icon.jsx` hiện có, phù hợp D-025; giữ nguyên nghiệp vụ, API, SP, dữ liệu và props/class/id hiện hành.
-- Đề xuất chưa chốt: đồng nhất nét/kích thước/vị trí icon; nhãn và dấu bắt buộc của form, nhóm trường, khoảng cách, helper/error, trạng thái readonly/disabled; thứ bậc nút chính/phụ/nguy hiểm và khung modal. Đợt 1 mới tập trung nền và khung, chưa chuẩn hóa sâu toàn bộ form/tab. Chưa có ảnh/link mẫu cụ thể trong phiên để đối chiếu, chưa chốt bộ quy chuẩn hay triển khai UI mới.
-- File: chỉ `spec/journal.md` ghi trao đổi; chưa đổi scope/plan hoặc thêm quyết định vì chi tiết vẫn là đề xuất. Không sửa code ứng dụng, không chạy lại build/test. Tiếp tục nhánh `feat/ui-refresh-1`, commit/push hồ sơ theo quy ước; backend lockfile có sẵn không stage.
-
 ## 2026-11-10 02:31:09 +07:00 — J-054 — Tham chiếu dự án Vy chọn, áp dụng quy chuẩn icon và form
 
 - Người thực hiện: Codex theo yêu cầu Vy chỉ định `D:\Nam4\Contest\Homestay-Dorm` để học theo icon/form, tiếp nối J-053; giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`. D-032 bổ sung nguồn tham chiếu cho D-025; các kích thước cụ thể là lựa chọn triển khai của Codex để Vy xem, chưa coi là nghiệm thu thị giác của Vy.
@@ -564,6 +557,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Ảnh/kiểm tra form: thêm `web/frontend/scripts/ui-forms.mjs`, dùng phiên/API giả lập và chặn toàn bộ API trong browser, không gửi thao tác ghi. 12 trạng thái trước + 12 sau ở `.ui-screens/forms-{before,after}/`: Sale bước 1, lỗi validation, bước 2; Admin tạo nhân viên; đăng nhập và đăng ký, mỗi trạng thái ở 1440px/390px. Validation cũ chặn bước 1 thiếu thông tin và đi tiếp bước 2 khi điền hợp lệ; readonly còn nguyên, modal/thanh nút nằm trong viewport; không JS exception/cuộn ngang toàn trang. Lượt đầu script phải bổ sung bước bấm “Tạo tài khoản” sau khi vào tab nhân viên Admin; báo cáo cuối là lượt chạy lại pass. Đã xem ảnh mẫu, ảnh form Sale, đăng nhập và form Admin mobile để sửa phần trình bày.
 - Kiểm tra khung chạy lại: `ui-screens.mjs after` 14/14 màn không lỗi JS hoặc tràn ngang, font tải được, 4/4 menu mobile mở/đóng/Escape pass. Ảnh ở `.ui-screens/after/` được cập nhật theo bản mới; tất cả ảnh/report/log bị ignore. Cổng đang chạy để Vy xem vẫn là `http://127.0.0.1:5173/`; cần tải lại để nhận bản mới.
 - Còn lại: các form nghiệp vụ đặc thù còn inline styles, bảng/empty-state của đợt 2 theo J-045; chưa coi lớp CSS chung là bằng chứng mọi form đã đồng bộ/đăng nhập thật đã đạt. Chỉ push `feat/ui-refresh-1`, commit danh tính `NhatVy177`; không stage backend lockfile hoặc ảnh, không merge/push main.
+
+## 2026-11-10 02:39:33 +07:00 — J-052 — Chốt đóng hồ sơ, không thêm mốc chuỗi 3 (D-031)
+
+- Người thực hiện: Claude cùng Vy (thảo luận); giờ lấy bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"`.
+- Claude so sánh A (mốc chuỗi 3, sửa contract trước 14/11) và B (gói bằng chứng cuối trên Web2, không sửa contract), khuyên B vì số tiền đã chi vẫn do kế toán tự khai và rủi ro lịch; khuyên có mục 7 (chính sách hoàn cọc trên phiếu/email cọc) và mục 11 (thanh tiến trình thẻ lịch xem). Vy: "chốt theo những gì bạn đề xuất".
+- File: `spec/decisions.md` (D-031; ghi chú D-030 trỏ sang D-031), `spec/scope.md` (F-15, F-04), `spec/progress.md` (mục 7, 11 đã chốt; mục 9 để sau bản thi; thêm 9a; mục 12 xong), `hackathon/plan.md` (§3 đoạn D-026), `spec/journal.md`. Không sửa code. Nhánh `docs/d026-flow-redesign`.
+- Việc còn lại: Claude viết prompt Codex cho T-22; Vy merge `feat/ui-refresh-1` rồi `docs/d026-flow-redesign`.
 
 ## 2026-11-10 02:43:47 +07:00 — J-055 — Gỡ xung đột số D-xxx/J-xxx khi gộp main vào `feat/ui-refresh-1`
 
@@ -806,6 +806,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả); đã xem ảnh hộp thoại lập đối soát 1440px.
 - Chưa làm: ô tìm kiếm và phân trang của bộ danh sách chung cho 3 bảng của màn Quyết toán; C4.
 
+## 2026-11-11 23:23:49 +07:00 — J-C068 — B4 (tiếp): tìm kiếm và phân trang màn Quyết toán
+
+- Người thực hiện: Claude, nhánh `feat/b4-settlement-ui`. `QuyetToanTraPhongTab.jsx`: 3 ô tìm kiếm viết tay đổi sang `ListSearch` (nút xóa từ khóa trong ô thay nút "Xóa lọc"); dòng "Đang tải danh sách..." đổi sang dòng khung xương `TableState`; 3 bảng (thu thêm/hoàn cọc, kết quả đối soát, lập đối soát) có `ListPagination` 10 dòng/trang, đổi bộ lọc hay từ khóa thì về trang 1. Không đổi logic nghiệp vụ.
+- `scripts/ui-settlement-c3.mjs` thêm 12 phiếu giả, kiểm tra "Hiển thị 1–10 / 12 phiếu".
+- Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả).
+- Còn: C4.
+
 ## 2026-11-11 23:53:30 +07:00 — J-X070 — C5-a: Sale ghi kết quả buổi xem, bỏ tự Đã xem; giữ thay đổi C3 cho B1/B5
 
 - Người thực hiện: Codex. Vy nhắc giữ thẻ thu thêm trong tab Hợp đồng và hai chỗ chữ cổng mô phỏng rồi bảo tiếp. Đã đọc ghi chú C3/J-C066, kiểm code `feat/t22-settlement`; fetch thấy main `0b42fb2` đã merge PR #7/#8 và J-C067 ghi Vy giao C5-a cho Codex. Tạo nhánh `fix/c5a-viewing-status`/worktree `D:\HomeStayDorm-c5a` từ origin/main mới nhất; không tự merge hoặc push main. A3/J-X069 vẫn ở nhánh `fix/fuji-e2e` `b892b5b`, chưa merge main.
@@ -856,12 +863,6 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Lỗi: `migrate` lần 2 báo "There is already an object named 'SP_TraPhong_QuanLy_XacNhanThanhLy'" và rollback toàn bộ (không đổi gì). Nguyên nhân: SQL Server lưu `CREATE OR ALTER` thành `CREATE PROCEDURE`; nhánh "đã vá" của `patchLegacyProcedure` trả nguyên văn nên lệnh thành CREATE trùng. Sửa `web/backend/scripts/checkout-lifecycle-db.mjs` (nhánh đã vá cũng đổi đầu thành `CREATE OR ALTER`), thêm test chạy lại vào `test/checkout-closure.test.mjs`.
 - Kiểm tra: backend `npm test` 52 qua/2 bỏ qua; `migrate` chạy lại trên HOMEDORM4 thành công. Nhánh `fix/c4-migration-rerun`.
 - Còn: Vy merge nhánh sửa, restart backend nối HOMEDORM4 (để nạp route/job C4); nghiệm thu C4 cùng A3.
-## 2026-11-11 23:23:49 +07:00 — J-C068 — B4 (tiếp): tìm kiếm và phân trang màn Quyết toán
-
-- Người thực hiện: Claude, nhánh `feat/b4-settlement-ui`. `QuyetToanTraPhongTab.jsx`: 3 ô tìm kiếm viết tay đổi sang `ListSearch` (nút xóa từ khóa trong ô thay nút "Xóa lọc"); dòng "Đang tải danh sách..." đổi sang dòng khung xương `TableState`; 3 bảng (thu thêm/hoàn cọc, kết quả đối soát, lập đối soát) có `ListPagination` 10 dòng/trang, đổi bộ lọc hay từ khóa thì về trang 1. Không đổi logic nghiệp vụ.
-- `scripts/ui-settlement-c3.mjs` thêm 12 phiếu giả, kiểm tra "Hiển thị 1–10 / 12 phiếu".
-- Kiểm tra: build qua; `ui-settlement-c3.mjs`, `test:list-kit`, `test:avalanche-ui` qua (dữ liệu giả).
-- Còn: C4.
 
 ## 2026-11-12 22:21:08 +07:00 — J-X074 — C4: gỡ vòng chờ danh sách hoàn cọc trước thanh lý
 
@@ -1070,35 +1071,6 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: `ui-customer-invoices` PASS sau build. Chưa quét lại bằng MoMo.
 - Việc còn lại: Vy tải lại trang (Ctrl+F5), quét QR mới rồi báo kết quả.
 
-## 2026-11-15 09:40:00 +07:00 — J-C097 — Màn "Thanh toán đặt cọc" theo mẫu cho phiếu đang chờ thanh toán
-- Người thực hiện: Claude. Lý do: Vy gửi ảnh mẫu, yêu cầu chuyển giao diện trả cọc sang bố cục đó.
-- Thay đổi: khi phiếu "Chờ thanh toán", tab hiện màn mới gồm cột trái (phương thức, mã QR + thông tin chuyển khoản có nút sao chép, nút ví mô phỏng, khung minh chứng, chính sách hoàn cọc) và cột phải (thẻ số tiền + hạn, thông tin phòng, tiến trình đặt cọc). Các trạng thái khác (từ chối, đã gửi, hoàn tất, hết hạn) vẫn dùng bố cục cũ.
-- Khác mẫu có chủ ý: không có tab ATM/Visa vì hệ thống chưa có cổng thẻ; "Tiền mặt tại quầy" thay cho tab thứ ba; nút "Gửi chứng từ thanh toán" giữ nguyên thay cho "Xác nhận đã thanh toán", vì xác nhận chỉ do kế toán làm (D-023); nội dung chuyển khoản vẫn là `mã phiếu + sđt`, không dùng mẫu "HS DORM Phòng101".
-- File: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (`renderDepositPaymentLayout`, nhánh sớm `if (isWaiting)`), `khachHangPortal.css` (`.dpay-*`), `scripts/ui-customer-invoices.mjs` (kiểm tra tiêu đề, tab đang chọn, nút ví).
-- Kiểm tra: build OK; `ui-customer-invoices` PASS ở 1440/390 (fixture API, không ghi DB); đã xem ảnh màn hình 1440.
-- Việc còn lại: Vy xem trên điện thoại và trạng thái đã gửi chứng từ (bố cục cũ, chưa đổi).
-
-## 2026-11-15 10:20:00 +07:00 — J-C098 — Sau khi gửi chứng từ đặt cọc, khách về danh sách "Hóa đơn & thanh toán"
-- Người thực hiện: Claude. Lý do: Vy báo sau khi gửi chứng từ thì trang vẫn ở chi tiết phiếu; Vy muốn về danh sách lịch sử, phiếu hiện "Chờ xác nhận".
-- Thay đổi: `submitMinhChung` đóng chi tiết phiếu sau khi gửi thành công và cuộn lên đầu; ô trạng thái trong bảng không xuống dòng.
-- Chưa làm: tab "Lịch sử đặt cọc" riêng. Hiện danh sách hóa đơn và phiếu cọc gộp trong một tab, nên chưa tách. Ảnh mẫu "Hóa đơn của tôi" (mã HD-HDTT, loại "Hoàn cọc") không có trong repo này; chưa rõ đó là ứng dụng nào.
-- Kiểm tra: build OK; `ui-customer-invoices` PASS (fixture API).
-
-## 2026-11-15 11:05:00 +07:00 — J-C099 — Tab "Hóa đơn của tôi" khớp mẫu nhóm (InvoicesDashboardPage.tsx)
-- Người thực hiện: Claude. Lý do: Vy xác nhận ảnh "Hóa đơn của tôi" là tab hóa đơn và thanh toán cần giống, và sau khi thanh toán quay lại phải hiện đúng như vậy.
-- Mẫu: `D:\Nam4\Contest\Homestay-Dorm\apps\frontend\src\features\customer\InvoicesDashboardPage.tsx` và `components/InvoiceTable.tsx` (không phải repo này).
-- Thay đổi: tiêu đề và mô tả như mẫu; 4 thẻ "Hóa đơn chưa trả / Tổng chi phí tháng N / Hạn thanh toán gần nhất / Hóa đơn quá hạn" tính trên toàn bộ khoản; bộ lọc "Tất cả các tháng / Tất cả năm / Tất cả loại" với nhãn loại như mẫu; nhãn trạng thái "Đã thanh toán / Chờ thanh toán / Chờ xác nhận / Quá hạn"; phiếu cọc đã gửi chứng từ là "Chờ xác nhận" (không đếm vào "chưa trả", chỉ hiện khi lọc "Chưa thanh toán"); hóa đơn kỳ đầu là "Nhận phòng", hàng tháng là "Định kỳ".
-- File: `web/frontend/src/pages/khachHang/CustomerInvoicesList.jsx`, `customerInvoices.css`, `scripts/ui-customer-invoices.mjs`.
-- Chưa có: loại "Hoàn cọc" (hoàn tiền cọc khi trả phòng) chưa có trong dữ liệu; các loại "Dịch vụ", "Phát sinh" chưa có nguồn.
-- Kiểm tra: build OK; `ui-customer-invoices` PASS ở 1440/390 (fixture API); đã xem ảnh 1440.
-
-## 2026-11-15 12:40:00 +07:00 — J-C100 — Tab "Lịch sử đặt cọc" cho khách; trả lời ai duyệt thanh toán
-- Người thực hiện: Claude. Lý do: Vy yêu cầu thêm tab lịch sử đặt cọc theo mẫu nhóm (`DepositHistoryPage.tsx`); sau khi gửi yêu cầu giữ chỗ hoặc gửi chứng từ, khách chuyển sang tab này.
-- Trao đổi: Vy hỏi ai duyệt thanh toán, kế toán hay quản lý. Code hiện tại: **quản lý** duyệt yêu cầu giữ chỗ (D-020/D-023), **kế toán** xác nhận đã nhận tiền (`xacNhanThanhToanCoc` chỉ cho kế toán). Claude đề xuất giữ kế toán để tách người duyệt phòng và người xác nhận tiền (D-021); chưa có quyết định đổi. Sửa nhãn tiến trình "Đang chờ Quản lý duyệt giao dịch" (sai) thành "Kế toán đang kiểm tra và xác nhận đã nhận tiền".
-- File: backend `services/khachGiuCho.service.js` (`getYeuCauGiuChoCuaKhach`), `controllers/khachMoi.controller.js`, `routes/khachMoi.routes.js` (`GET /khach-moi/yeu-cau-giu-cho`), `test/khach-giu-cho.test.mjs`; frontend `pages/khachHang/CustomerDepositHistory.jsx` + `customerDepositHistory.css` (4 ô thống kê, tìm kiếm, thẻ yêu cầu/phiếu cọc, mở phiếu để thanh toán), `KhachHangPortalPage.jsx` (tab `lich-su-coc`, gửi chứng từ xong sang tab này), `lichXemPhong/CustomerViewingSchedule.jsx` (gửi yêu cầu giữ chỗ xong, đóng hộp thoại thì sang tab này), `khachMoi.api.js`, `khachHangPortal.css` (sửa tràn ngang trang thanh toán cọc ở 390px), `scripts/ui-customer-deposit-history.mjs`, `ui-customer-deposit-request.mjs`.
-- Kiểm tra: backend test pass; UI PASS `ui-customer-deposit-history`, `ui-customer-deposit-request`, `ui-customer-invoices`, `ui-customer-viewing-confirmation` ở 1440/390 (fixture API); đã xem ảnh 1440. Đã kiểm tra truy vấn yêu cầu giữ chỗ chạy được trên HOMEDORM4 (chỉ đọc).
-- Giới hạn: yêu cầu bị quản lý từ chối hoặc quá hạn 12 giờ không còn hiện (hồ sơ về "Đã xem"); cột "Hình thức thuê" của phiếu cọc để "—" vì API danh sách phiếu cọc chưa trả trường này.
-
 ## 2026-11-15 00:25:11 +07:00 — J-C101 — Bàn lại ai xác nhận tiền cọc (chỉ thảo luận)
 - Người thực hiện: Claude, trao đổi với Vy. Chưa đổi file code.
 - Vy hỏi vì sao không để quản lý xác nhận tiền, và đề xuất: kế toán lập hóa đơn (tránh hệ thống tự tính sai), quản lý chỉ kiểm đã nhận đủ tiền.
@@ -1140,6 +1112,28 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Giá trị **mới**: DK0007 SoNam=0, SoNu=1; P205 GioiTinhChoPhep=N'Nữ'; CT0001 TrangThaiHoSo=N'Chưa cập nhật' (xóa ghi chú/ngày gửi duyệt/quản lý duyệt). Phiếu cọc DC0003 giữ nguyên (Đã TT, Hiệu lực), giường G01 vẫn đã cọc.
 - Lý do: dữ liệu thử ghi nhầm 1 nam cho khách nữ nên luật D-047 chặn khai lại. Chỉ là sửa dữ liệu thử, không đổi code.
 
+## 2026-11-15 09:40:00 +07:00 — J-C097 — Màn "Thanh toán đặt cọc" theo mẫu cho phiếu đang chờ thanh toán
+- Người thực hiện: Claude. Lý do: Vy gửi ảnh mẫu, yêu cầu chuyển giao diện trả cọc sang bố cục đó.
+- Thay đổi: khi phiếu "Chờ thanh toán", tab hiện màn mới gồm cột trái (phương thức, mã QR + thông tin chuyển khoản có nút sao chép, nút ví mô phỏng, khung minh chứng, chính sách hoàn cọc) và cột phải (thẻ số tiền + hạn, thông tin phòng, tiến trình đặt cọc). Các trạng thái khác (từ chối, đã gửi, hoàn tất, hết hạn) vẫn dùng bố cục cũ.
+- Khác mẫu có chủ ý: không có tab ATM/Visa vì hệ thống chưa có cổng thẻ; "Tiền mặt tại quầy" thay cho tab thứ ba; nút "Gửi chứng từ thanh toán" giữ nguyên thay cho "Xác nhận đã thanh toán", vì xác nhận chỉ do kế toán làm (D-023); nội dung chuyển khoản vẫn là `mã phiếu + sđt`, không dùng mẫu "HS DORM Phòng101".
+- File: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (`renderDepositPaymentLayout`, nhánh sớm `if (isWaiting)`), `khachHangPortal.css` (`.dpay-*`), `scripts/ui-customer-invoices.mjs` (kiểm tra tiêu đề, tab đang chọn, nút ví).
+- Kiểm tra: build OK; `ui-customer-invoices` PASS ở 1440/390 (fixture API, không ghi DB); đã xem ảnh màn hình 1440.
+- Việc còn lại: Vy xem trên điện thoại và trạng thái đã gửi chứng từ (bố cục cũ, chưa đổi).
+
+## 2026-11-15 10:20:00 +07:00 — J-C098 — Sau khi gửi chứng từ đặt cọc, khách về danh sách "Hóa đơn & thanh toán"
+- Người thực hiện: Claude. Lý do: Vy báo sau khi gửi chứng từ thì trang vẫn ở chi tiết phiếu; Vy muốn về danh sách lịch sử, phiếu hiện "Chờ xác nhận".
+- Thay đổi: `submitMinhChung` đóng chi tiết phiếu sau khi gửi thành công và cuộn lên đầu; ô trạng thái trong bảng không xuống dòng.
+- Chưa làm: tab "Lịch sử đặt cọc" riêng. Hiện danh sách hóa đơn và phiếu cọc gộp trong một tab, nên chưa tách. Ảnh mẫu "Hóa đơn của tôi" (mã HD-HDTT, loại "Hoàn cọc") không có trong repo này; chưa rõ đó là ứng dụng nào.
+- Kiểm tra: build OK; `ui-customer-invoices` PASS (fixture API).
+
+## 2026-11-15 11:05:00 +07:00 — J-C099 — Tab "Hóa đơn của tôi" khớp mẫu nhóm (InvoicesDashboardPage.tsx)
+- Người thực hiện: Claude. Lý do: Vy xác nhận ảnh "Hóa đơn của tôi" là tab hóa đơn và thanh toán cần giống, và sau khi thanh toán quay lại phải hiện đúng như vậy.
+- Mẫu: `D:\Nam4\Contest\Homestay-Dorm\apps\frontend\src\features\customer\InvoicesDashboardPage.tsx` và `components/InvoiceTable.tsx` (không phải repo này).
+- Thay đổi: tiêu đề và mô tả như mẫu; 4 thẻ "Hóa đơn chưa trả / Tổng chi phí tháng N / Hạn thanh toán gần nhất / Hóa đơn quá hạn" tính trên toàn bộ khoản; bộ lọc "Tất cả các tháng / Tất cả năm / Tất cả loại" với nhãn loại như mẫu; nhãn trạng thái "Đã thanh toán / Chờ thanh toán / Chờ xác nhận / Quá hạn"; phiếu cọc đã gửi chứng từ là "Chờ xác nhận" (không đếm vào "chưa trả", chỉ hiện khi lọc "Chưa thanh toán"); hóa đơn kỳ đầu là "Nhận phòng", hàng tháng là "Định kỳ".
+- File: `web/frontend/src/pages/khachHang/CustomerInvoicesList.jsx`, `customerInvoices.css`, `scripts/ui-customer-invoices.mjs`.
+- Chưa có: loại "Hoàn cọc" (hoàn tiền cọc khi trả phòng) chưa có trong dữ liệu; các loại "Dịch vụ", "Phát sinh" chưa có nguồn.
+- Kiểm tra: build OK; `ui-customer-invoices` PASS ở 1440/390 (fixture API); đã xem ảnh 1440.
+
 ## 2026-11-15 12:28:30 +07:00 — J-C107 — Đổi email tài khoản demo4 để nhận mã OTP Privy
 - Người thực hiện: Claude, theo yêu cầu của Vy (muốn tài khoản vẫn là demo4 nhưng mã gửi về hộp thư của Vy).
 - Nguyên nhân: mã 6 số ở bước "Xác nhận biên bản" do Privy gửi thẳng tới email của tài khoản (`NguoiDung.Email`), không đi qua `MAIL_REDIRECT_TO`. Email cũ `demo4@gmail.com` là địa chỉ tự đặt, Vy không nhận được, và có thể thuộc người khác. `vynhat2k5@gmail.com` đã được 3 tài khoản khách khác dùng (KH0031, KH0032, KH9102), nên dùng dạng có dấu `+` giống nhân viên (`vynhat2k5+nv0001@gmail.com`).
@@ -1159,6 +1153,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra (chỉ đọc): RPC trả mã chuỗi 43113; hợp đồng `0x70bF…389C` có mã; số dư ví relayer 0,1 AVAX, manager ≈0,15 AVAX, accountant 0,1 AVAX.
 - Hệ quả: các bước ghi chuỗi (mốc 1 khi khách xác nhận biên bản, mốc 2) giờ ghi lên **Fuji thật** và tốn gas từ ví vận hành; mỗi giao dịch có thể tra trên Snowtrace.
 - Chưa kiểm tra: khách thật bấm xác nhận biên bản đến khi có giao dịch trên Fuji (đang chờ Vy thử).
+
+## 2026-11-15 12:40:00 +07:00 — J-C100 — Tab "Lịch sử đặt cọc" cho khách; trả lời ai duyệt thanh toán
+- Người thực hiện: Claude. Lý do: Vy yêu cầu thêm tab lịch sử đặt cọc theo mẫu nhóm (`DepositHistoryPage.tsx`); sau khi gửi yêu cầu giữ chỗ hoặc gửi chứng từ, khách chuyển sang tab này.
+- Trao đổi: Vy hỏi ai duyệt thanh toán, kế toán hay quản lý. Code hiện tại: **quản lý** duyệt yêu cầu giữ chỗ (D-020/D-023), **kế toán** xác nhận đã nhận tiền (`xacNhanThanhToanCoc` chỉ cho kế toán). Claude đề xuất giữ kế toán để tách người duyệt phòng và người xác nhận tiền (D-021); chưa có quyết định đổi. Sửa nhãn tiến trình "Đang chờ Quản lý duyệt giao dịch" (sai) thành "Kế toán đang kiểm tra và xác nhận đã nhận tiền".
+- File: backend `services/khachGiuCho.service.js` (`getYeuCauGiuChoCuaKhach`), `controllers/khachMoi.controller.js`, `routes/khachMoi.routes.js` (`GET /khach-moi/yeu-cau-giu-cho`), `test/khach-giu-cho.test.mjs`; frontend `pages/khachHang/CustomerDepositHistory.jsx` + `customerDepositHistory.css` (4 ô thống kê, tìm kiếm, thẻ yêu cầu/phiếu cọc, mở phiếu để thanh toán), `KhachHangPortalPage.jsx` (tab `lich-su-coc`, gửi chứng từ xong sang tab này), `lichXemPhong/CustomerViewingSchedule.jsx` (gửi yêu cầu giữ chỗ xong, đóng hộp thoại thì sang tab này), `khachMoi.api.js`, `khachHangPortal.css` (sửa tràn ngang trang thanh toán cọc ở 390px), `scripts/ui-customer-deposit-history.mjs`, `ui-customer-deposit-request.mjs`.
+- Kiểm tra: backend test pass; UI PASS `ui-customer-deposit-history`, `ui-customer-deposit-request`, `ui-customer-invoices`, `ui-customer-viewing-confirmation` ở 1440/390 (fixture API); đã xem ảnh 1440. Đã kiểm tra truy vấn yêu cầu giữ chỗ chạy được trên HOMEDORM4 (chỉ đọc).
+- Giới hạn: yêu cầu bị quản lý từ chối hoặc quá hạn 12 giờ không còn hiện (hồ sơ về "Đã xem"); cột "Hình thức thuê" của phiếu cọc để "—" vì API danh sách phiếu cọc chưa trả trường này.
 
 ## 2026-11-15 12:57:08 +07:00 — J-C110 — Xóa hồ sơ xác nhận HD0001 gắn chuỗi cục bộ để phát hành lại trên Fuji
 - Người thực hiện: Claude, Vy đồng ý ("ok") sau khi được giải thích.
@@ -1460,24 +1461,6 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Sửa: `web/frontend/src/components/checkout/CheckoutLifecyclePanel.jsx`: tách ô "Thu / hoàn", "Trạng thái", "Thao tác" thành hàm dùng chung; khi có `focusContractId` hiện thẻ gọn (Đối soát, Trạng thái, Thu/hoàn tiền, Chìa khóa) và hàng nút (Đã thu chìa khóa, Kiểm tra điều kiện, xử lý không xác nhận, Tải gói bằng chứng), không tiêu đề/ô tìm/bảng. Sửa luôn lỗi cũ: ô "Thu / hoàn" khi đã đủ điều kiện hiện trống (huy hiệu "Đủ điều kiện" không hiện) → nay ghi "Đã đủ tiền và chứng từ". `checkoutClosure.css` (thẻ gọn), `pages/nhanVienQuanLy/XuLyTraPhongTab.jsx` + `quanLyHopDong.css` (hộp thoại Kết thúc hợp đồng hẹp 720px). `scripts/ui-manager-contracts.mjs` kiểm thẻ gọn.
 - Kiểm tra: build OK; `ui-manager-contracts` PASS; đã xem ảnh thẻ ở 1440.
 
-## 2026-11-17 09:30:00 +07:00 — J-C159 — Trang chủ giữ nguyên sau đăng nhập, menu tài khoản, đăng xuất luôn hỏi lại
-- Người thực hiện: Claude, theo yêu cầu của Vy (giống nhóm Hằng: đăng nhập xong vẫn ở trang chủ; bấm tài khoản ra "Tài khoản của tôi" và "Đăng xuất"; đăng xuất phải hỏi chắc chắn).
-- Thay đổi: `web/frontend/src/components/common/AccountMenu.jsx` + `accountMenu.css` (menu: tên/email, "Tài khoản của tôi" → khu làm việc theo vai trò qua `getAuthenticatedHomePath`, "Đăng xuất"); `web/frontend/src/auth/LogoutConfirmDialog.jsx` + `logoutConfirm.css` và `AuthContext.jsx` (`dangXuat` nay mở hộp thoại "Bạn muốn đăng xuất?" với "Ở lại" / "Đăng xuất"; đăng xuất thật chạy sau khi xác nhận), nên mọi nút Đăng xuất của khách, Sale, quản lý, kế toán, admin, trang khám phá đều hỏi lại mà không sửa từng chỗ; `pages/TrangChu.jsx` chỉ đổi 3 chỗ nhỏ (thanh đầu trang dùng `AccountMenu`; đăng nhập/đăng ký xong ở lại trang chủ trừ khi có `?next=`/trang cần quay lại; bỏ import không dùng) để giảm xung đột với bản trang chủ Codex đang sửa. Script `scripts/ui-account-menu.mjs`.
-- Kiểm tra: build OK; `ui-account-menu` PASS ở 1440 và 390 (đăng nhập → ở lại "/", menu, hủy đăng xuất thì giữ phiên, "Tài khoản của tôi" → /khach-hang, xác nhận mới gọi API đăng xuất); đã xem ảnh menu.
-- Lưu ý khi gộp với Codex: nếu Codex đổi `HeaderPublic` hoặc `handleLogin` trong `TrangChu.jsx`, cần giữ `<AccountMenu />` và nhánh "ở lại trang chủ" khi gộp.
-
-## 2026-11-17 10:20:00 +07:00 — J-C160 — Nút chia sẻ phòng; tài khoản dùng thử ở form đăng nhập
-- Người thực hiện: Claude, theo yêu cầu của Vy (làm nút chia sẻ thay vì chỉ thẻ xem trước; tài khoản mẫu để demo như nhóm Hằng).
-- Nút chia sẻ: `web/frontend/src/components/common/ShareRoomButton.jsx` + `shareRoomButton.css`, đặt trong hộp chi tiết phòng của `pages/khamPhaPhong/KhamPhaPhongPage.jsx`: "Chia sẻ lên Facebook" (sharer.php), "Sao chép link" (dán vào Messenger/Zalo), "Chia sẻ qua ứng dụng khác" (chỉ hiện khi trình duyệt có Web Share, chủ yếu điện thoại). Link là `/kham-pha-phong?phong=<mã>` (đã mở sẵn hộp chi tiết, khách xem không cần tài khoản). Giới hạn: ảnh/giá hiện trên thẻ Facebook cần thẻ Open Graph ở máy chủ, chưa làm; chia sẻ trực tiếp vào Messenger cần app Meta nên dùng sao chép link.
-- Tài khoản dùng thử: `components/common/DemoAccounts.jsx` + `demoAccounts.css`, chèn một dòng vào form đăng nhập của `pages/TrangChu.jsx` (khách demo4, demo5, kh0001, kh0002; Sale/Quản lý/Kế toán của CN0002 và CN0003; Admin). Bấm để điền sẵn tên đăng nhập và mật khẩu `123456` (đã kiểm DB, chỉ đọc: toàn bộ tài khoản `nv*`, `kh*`, `demo*` có mật khẩu băm của `123456`). Tắt bằng `VITE_SHOW_DEMO_ACCOUNTS=false`. Khi nộp bài nên quyết định có giữ danh sách này không (mật khẩu chung công khai).
-- Kiểm tra: build OK; `scripts/ui-share-demo.mjs` PASS ở 1440 và 390 (liên kết Facebook trỏ đúng phòng, sao chép link, bấm tài khoản điền đúng form); đã xem ảnh danh sách tài khoản.
-
-## 2026-11-17 11:40:00 +07:00 — J-C161 — Đăng nhập / đăng ký bằng Google (D-048)
-- Người thực hiện: Claude, theo yêu cầu của Vy (dùng tài khoản Google, email làm nội dung đăng ký).
-- Backend: `services/googleAuth.js` (xác thực ID token bằng khóa công khai Google, không thêm thư viện), `services/auth.service.js` (`cauHinhGoogle`, `dangNhapGoogle`, `hoanTatDangKyGoogle`: khách có sẵn thì vào luôn, nhân viên bị từ chối, email mới nhận `profileToken` sống 15 phút rồi bổ sung ngày sinh/giới tính/SĐT; tạo tài khoản qua `dangKy`/`SP_DangKy` hiện có), `controllers/auth.controller.js`, `routes/auth.routes.js` (`GET /auth/google/cau-hinh`, `POST /auth/google`, `POST /auth/google/hoan-tat`), `.env.example` (`GOOGLE_CLIENT_ID`). Test `test/google-auth.test.mjs` (khóa RSA tự tạo: token hợp lệ, giả mạo, sai ứng dụng, hết hạn, chưa xác minh email, đăng nhập, từ chối nhân viên, đăng ký mới).
-- Frontend: `components/common/GoogleAuthSection.jsx` + `googleAuth.css` (nút Google ở tab đăng nhập và đăng ký; form "Hoàn tất đăng ký" vẽ qua portal và chặn nổi bọt submit), `auth/AuthContext.jsx` (`dangNhapGoogle`, `hoanTatGoogle`), `pages/auth/auth.api.js`, `pages/TrangChu.jsx` (hai dòng chèn nút). Script `scripts/ui-google-auth.mjs` (Google và API giả lập).
-- Kiểm tra: backend 117 pass; build OK; `ui-google-auth` PASS ở 1440 và 390 (không cấu hình thì ẩn nút; email mới hoàn tất hồ sơ rồi ở lại trang chủ); `ui-account-menu`, `ui-share-demo`, `ui-customer-invoices`, `ui-customer-residence` PASS. Chưa thử với Google thật vì cần `GOOGLE_CLIENT_ID` do Vy tạo.
-
 ## 2026-11-16 23:46:45 +07:00 — J-058 — Cấu trúc lại trang chủ theo mẫu 23homestay
 
 - Người thực hiện: Codex theo yêu cầu Vy; giờ ghi bằng PowerShell `Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz"` (Asia/Saigon).
@@ -1550,47 +1533,17 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Lượt browser đầu trên dev server5194 bị timeout lúc khởi tạo; build xong đã chạy đầy đủ lại với production preview5195 và pass. Ảnh/report/log ở `web/frontend/.ui-screens/` ignored. Không thay backend5000/checkout tích hợp; bản preview cũ5192 vẫn thuộc nhánh UI trước gộp. Inline style: portal69→69 (có sẵn, không thêm), shared detail0→0.
 - Kết thúc: kiểm diff/check, commit merge bằng NhatVy177, push đúng `origin HEAD:main` theo yêu cầu mới và đối chiếu hash remote; mã commit/kết quả push báo trong phản hồi cuối. Cần khởi động app từ code đã gộp khi muốn chạy runtime main; nghiệp vụ các nhánh chưa merge và A3/Fuji giữ mức bằng chứng trước đó.
 
-## 2026-11-17 13:10:00 +07:00 — J-C162 — Gộp `origin/main` (trang chủ mới, chi tiết phòng dùng chung) vào nhánh tích hợp
-- Người thực hiện: Claude, theo yêu cầu của Vy (Codex vừa gộp trang chủ vào main; chạy lại dự án để Vy kiểm tra).
-- Gộp: `git merge origin/main` vào `integration/d043-d045`. Xung đột tài liệu (`spec/decisions.md`, `journal.md`, `progress.md`, `scope.md`, `web/backend/.env.example`) giữ cả hai phía; D-043..D-048 của nhánh này và D-049..D-052 của main không trùng mã. Xung đột mã: `KhamPhaPhongPage.jsx` bỏ `DetailModal` cũ vì main dùng `RoomDetailView`; `KhachHangPortalPage.jsx` giữ `DepositCountdown`, bỏ các khối main đã chuyển sang `RoomDetailView`.
-- Giữ chức năng của nhánh trên chi tiết phòng dùng chung: `components/rooms/RoomDetailView.jsx` nhận thêm prop tùy chọn (`onRentGroup`, `heartState`, `scheduledMessage`, `profile`, `isInProfile`, `profileBusy`, `onAddToProfile`, `onRemoveFromProfile`) để trang khách vẫn có "Đăng ký thuê theo nhóm", "Quan tâm phòng này", "Đang có lịch xem phòng"; trang công khai không truyền nên giữ nút "Đăng ký thuê ngay". Thêm nút "Chia sẻ" vào tiêu đề chi tiết phòng (dùng chung cho công khai và khách). Main không còn hiện số giường trống ở chi tiết phòng (chỉ nhãn Còn trống / Đang chờ cọc / Hết chỗ), theo quyết định D-052.
-- Cập nhật script: `ui-interested-rooms.mjs` (nút "Đăng ký thuê ngay", nhãn trạng thái, ghi chú mới), `ui-share-demo.mjs` (chi tiết phòng gọi `/trang-chu/phong/<mã>`).
-- Cài lại thư viện (`npm install` frontend và backend) vì main thêm `maplibre-gl` cho bản đồ trang chủ.
-- Kiểm tra sau gộp: backend 119 pass; build OK; `ui-home`, `ui-public-room`, `ui-account-menu`, `ui-share-demo`, `ui-google-auth`, `ui-customer-invoices`, `ui-evidence-print` PASS (preview); `ui-interested-rooms` PASS (dev server).
+## 2026-11-17 09:30:00 +07:00 — J-C159 — Trang chủ giữ nguyên sau đăng nhập, menu tài khoản, đăng xuất luôn hỏi lại
+- Người thực hiện: Claude, theo yêu cầu của Vy (giống nhóm Hằng: đăng nhập xong vẫn ở trang chủ; bấm tài khoản ra "Tài khoản của tôi" và "Đăng xuất"; đăng xuất phải hỏi chắc chắn).
+- Thay đổi: `web/frontend/src/components/common/AccountMenu.jsx` + `accountMenu.css` (menu: tên/email, "Tài khoản của tôi" → khu làm việc theo vai trò qua `getAuthenticatedHomePath`, "Đăng xuất"); `web/frontend/src/auth/LogoutConfirmDialog.jsx` + `logoutConfirm.css` và `AuthContext.jsx` (`dangXuat` nay mở hộp thoại "Bạn muốn đăng xuất?" với "Ở lại" / "Đăng xuất"; đăng xuất thật chạy sau khi xác nhận), nên mọi nút Đăng xuất của khách, Sale, quản lý, kế toán, admin, trang khám phá đều hỏi lại mà không sửa từng chỗ; `pages/TrangChu.jsx` chỉ đổi 3 chỗ nhỏ (thanh đầu trang dùng `AccountMenu`; đăng nhập/đăng ký xong ở lại trang chủ trừ khi có `?next=`/trang cần quay lại; bỏ import không dùng) để giảm xung đột với bản trang chủ Codex đang sửa. Script `scripts/ui-account-menu.mjs`.
+- Kiểm tra: build OK; `ui-account-menu` PASS ở 1440 và 390 (đăng nhập → ở lại "/", menu, hủy đăng xuất thì giữ phiên, "Tài khoản của tôi" → /khach-hang, xác nhận mới gọi API đăng xuất); đã xem ảnh menu.
+- Lưu ý khi gộp với Codex: nếu Codex đổi `HeaderPublic` hoặc `handleLogin` trong `TrangChu.jsx`, cần giữ `<AccountMenu />` và nhánh "ở lại trang chủ" khi gộp.
 
-## 2026-11-17 14:30:00 +07:00 — J-C163 — Dải "Thuê minh bạch" ở trang chủ, số liệu đọc từ chuỗi (D-053)
-- Người thực hiện: Claude, theo yêu cầu của Vy (làm ý "trang độ tin cậy đọc từ chuỗi" ở trang chủ, nói bằng lời khách, không gắn chữ Avalanche).
-- Phát hiện khi thử: RPC công khai của Fuji giới hạn đọc nhật ký 100 khối mỗi lần (thử thật), nên không quét cả chuỗi từ khối deploy (60.882.820) được. Chuyển sang đọc biên lai theo từng mã giao dịch.
-- Backend: `web/backend/integrations/avalanche/publicStats.js` (đọc biên lai từ chuỗi cho các mã giao dịch lấy từ `AvalancheCase`, chỉ giữ sự kiện của đúng contract, giải mã `HandoverProposed/Accepted`, `SettlementProposed/Disputed/Accepted`, gộp số đếm, số tiền hoàn/thu thêm của các bản đối soát đã được đồng ý, danh sách giao dịch gần đây kèm thời gian khối; nhớ biên lai đã đọc, làm mới nền sau 60 giây), `routes/trangChu.routes.js` (`GET /api/trang-chu/minh-bach`, công khai), `test/public-stats.test.mjs` (log mã hóa bằng viem: chỉ tính sự kiện giải mã được của đúng contract, mã giả/log lạ bị bỏ, mỗi biên lai đọc một lần, DB lỗi thì `ready:false`).
-- Frontend: `pages/homeExperience/TrustStrip.jsx` + `trustStrip.css` (dải ba số liệu bằng lời khách; nút "Xem cách kiểm chứng" mở khối có liên kết "Xem bằng chứng" tới Snowtrace và dòng nói rõ là mạng thử nghiệm), chèn một dòng `<TrustStrip />` vào `pages/TrangChu.jsx` trước mục giới thiệu; script `scripts/ui-trust-strip.mjs`.
-- Kiểm tra: backend 122 pass; build OK; `ui-trust-strip` PASS ở 1440 và 390 (hiện khi có số liệu, ẩn khi chưa sẵn sàng/chưa có hồ sơ/lỗi, phần đầu không có thuật ngữ); đã xem ảnh. Đọc thật từ Fuji (chỉ đọc): 6 giao dịch, 2 biên bản được xác nhận, 1 đối soát được đồng ý, thu thêm 2.640.000đ, khớp dữ liệu HD0001/HD0002.
-- Giới hạn: số liệu hiện rất nhỏ (2/1/1); trước khi quay demo nên chạy thêm vài hồ sơ mẫu lên Fuji. Số liệu của cả hệ thống, không theo chi nhánh.
-
-## 2026-11-17 16:00:00 +07:00 — J-C164 — Gom về một thư mục làm việc: `D:\HomeStayDorm`
-- Người thực hiện: Claude, theo yêu cầu của Vy (sắp nộp, không để code ở nhiều chỗ; Codex đã commit xong hôm qua).
-- Việc đã làm: `D:\HomeStayDorm-integ` chuyển sang trạng thái tách rời (detached) tại `6aee7e5` để thư mục gốc `D:\HomeStayDorm` lấy nhánh `integration/d043-d045` (đã chứa toàn bộ `origin/main`). Từ nay làm việc ở `D:\HomeStayDorm`; thư mục `-integ` chỉ còn là bản dự phòng, có thể xóa sau khi Vy kiểm tra xong.
-- Sao sang thư mục gốc (không nằm trong git): `web/backend/.env`, `web/frontend/.env` (bản cũ của gốc lưu thành `.env.bak-before-consolidation`), `web/backend/secrets/` và `web/backend/uploads/` (chứng từ khách tải lên, không ghi đè file có sẵn). Cài lại thư viện cho backend và frontend.
-- Chạy lại từ thư mục gốc: backend cổng 5000 (kết nối HOMEDORM4), frontend cổng 5173; `GET /api/trang-chu/minh-bach` trả số liệu thật từ Fuji.
-- Chưa làm: gộp vào `main` (chờ Vy duyệt Pull Request); xóa `D:\HomeStayDorm-integ`. Hai tiến trình xem thử cũ ở cổng 5192 và 5001 (của thư mục gốc, bản cũ) vẫn đang chạy vì thao tác dừng chúng không được cho phép; Vy tắt tay nếu không cần.
-
-## 2026-11-17 16:20:00 +07:00 — J-C165 — Gộp `integration/d043-d045` vào `main`
-- Người thực hiện: Claude, theo yêu cầu rõ ràng của Vy ("gộp lên main luôn đi").
-- Trước khi đẩy: `origin/main` (`beec69a`) đã nằm trong nhánh tích hợp nên là bước tiến thẳng (fast-forward), không cần commit gộp; không có `.env`, khóa hay thư mục `secrets/` nào được theo dõi trong git; 94 commit đi vào `main`.
-- Kết quả: `git push origin HEAD:main` thành công, `beec69a..b6508ec`; `origin/main` = `b6508ec`. Thư mục `D:\HomeStayDorm` chuyển sang nhánh `main`, đồng bộ với remote.
-- Lưu ý còn mở: commit sớm `b449df8` trong lịch sử có dòng đồng tác giả "Co-Authored-By" (đã đẩy từ trước và nay nằm trong `main`); sửa phải ghi lại lịch sử và đẩy ép nên chưa làm, chờ Vy quyết.
-- Việc còn lại trước khi nộp: dán `GOOGLE_CLIENT_ID`, tắt cài đặt demo, kiểm README không có thông tin cá nhân, chạy thêm hồ sơ mẫu lên Fuji, quay demo.
-
-## 2026-11-17 16:50:00 +07:00 — J-C166 — Mũi tên menu tài khoản bị lệch
-- Người thực hiện: Claude, theo phản ánh của Vy (mũi tên cạnh tên tài khoản nhìn lệch xuống).
-- Nguyên nhân: mũi tên là ký tự chữ "⌄" nên bị lệch theo đường cơ sở của chữ, không canh giữa với tên.
-- Sửa: `web/frontend/src/components/common/AccountMenu.jsx` (dùng biểu tượng SVG), `accountMenu.css`.
-- Kiểm tra: build OK; `ui-account-menu` PASS; đã xem ảnh, mũi tên canh giữa, lật lên khi mở menu.
-
-## 2026-11-17 17:30:00 +07:00 — J-C167 — Mở khóa "Hóa đơn & thanh toán"; bỏ khoảng trắng bên phải ở Khám phá phòng
-- Người thực hiện: Claude, theo phản ánh của Vy (Lịch sử đặt cọc mở mà Hóa đơn & thanh toán còn khóa; trang khám phá dư khoảng trống lớn bên phải).
-- Sửa 1: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (`getNavLocks`): `dat-coc` không còn khóa khi chưa có phiếu cọc; tab trống thì hiện "Chưa có phiếu cọc hoặc hóa đơn nào" như tab Lịch sử đặt cọc.
-- Sửa 2: cột phải của trang Khám phá phòng vẫn được dựng (rộng 340px, rỗng) khi khách đã mở hồ sơ hoặc đã có lịch xem, nên chừa khoảng trắng lớn; nay chỉ dựng khi có nội dung và lưới chuyển sang một cột (`kh-shell-grid--single` trong `khachHangPortal.css`).
-- Kiểm tra: build OK; `ui-customer-invoices`, `ui-customer-deposit-history`, `ui-customer-residence`, `ui-interested-rooms` PASS; đã xem ảnh trang khám phá có hồ sơ mở ở 1440.
+## 2026-11-17 10:20:00 +07:00 — J-C160 — Nút chia sẻ phòng; tài khoản dùng thử ở form đăng nhập
+- Người thực hiện: Claude, theo yêu cầu của Vy (làm nút chia sẻ thay vì chỉ thẻ xem trước; tài khoản mẫu để demo như nhóm Hằng).
+- Nút chia sẻ: `web/frontend/src/components/common/ShareRoomButton.jsx` + `shareRoomButton.css`, đặt trong hộp chi tiết phòng của `pages/khamPhaPhong/KhamPhaPhongPage.jsx`: "Chia sẻ lên Facebook" (sharer.php), "Sao chép link" (dán vào Messenger/Zalo), "Chia sẻ qua ứng dụng khác" (chỉ hiện khi trình duyệt có Web Share, chủ yếu điện thoại). Link là `/kham-pha-phong?phong=<mã>` (đã mở sẵn hộp chi tiết, khách xem không cần tài khoản). Giới hạn: ảnh/giá hiện trên thẻ Facebook cần thẻ Open Graph ở máy chủ, chưa làm; chia sẻ trực tiếp vào Messenger cần app Meta nên dùng sao chép link.
+- Tài khoản dùng thử: `components/common/DemoAccounts.jsx` + `demoAccounts.css`, chèn một dòng vào form đăng nhập của `pages/TrangChu.jsx` (khách demo4, demo5, kh0001, kh0002; Sale/Quản lý/Kế toán của CN0002 và CN0003; Admin). Bấm để điền sẵn tên đăng nhập và mật khẩu `123456` (đã kiểm DB, chỉ đọc: toàn bộ tài khoản `nv*`, `kh*`, `demo*` có mật khẩu băm của `123456`). Tắt bằng `VITE_SHOW_DEMO_ACCOUNTS=false`. Khi nộp bài nên quyết định có giữ danh sách này không (mật khẩu chung công khai).
+- Kiểm tra: build OK; `scripts/ui-share-demo.mjs` PASS ở 1440 và 390 (liên kết Facebook trỏ đúng phòng, sao chép link, bấm tài khoản điền đúng form); đã xem ảnh danh sách tài khoản.
 
 ## 2026-11-17 10:45:05 +07:00 — J-C168 — Đăng nhập bằng email, quên mật khẩu OTP, ảnh đại diện và đổi mật khẩu, mục Dịch vụ, bỏ thanh cuộn trong form
 - Người thực hiện: Claude, theo yêu cầu của Vy (làm giống chị Hằng; đổi "Tên đăng nhập" thành email; nút Google đổi chữ; form không cuộn bên trong). Quyết định: D-054. Làm trên nhánh `feat/email-login-profile-home`.
@@ -1601,6 +1554,20 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Đính chính: `DemoAccounts.jsx` điền mật khẩu `123456` là sai; dữ liệu seed là `123` (mã băm A665A459…). Đã sửa thành `123`; ghi chú J-C159/J-C160 về "123456" là sai. `scripts/ui-share-demo.mjs` sửa theo.
 - Kiểm tra: backend `npm test` 126 pass/0 fail (4 test mới); chạy thật trên backend 5000 với HOMEDORM4: đăng nhập `kh0001` bằng tên và bằng email (viết hoa) đều 200, quên mật khẩu với email lạ trả 404 đúng thông điệp, tải/xem/xóa ảnh đại diện 200 và file phục vụ đúng `image/png`; ảnh sai loại bị từ chối 400. Chưa chạy đổi mật khẩu và gửi OTP thật trên DB (tránh đổi mật khẩu tài khoản mẫu); luồng này có test tự động với DB giả. Frontend: build OK; `ui-email-auth` (mới), `ui-account-menu`, `ui-share-demo`, `ui-google-auth`, `ui-trust-strip`, `ui-shell` PASS (ui-shell bỏ qua tab "Khám phá phòng" vì nút này nay rời cổng về trang chủ).
 - Còn lại: kiểm bằng mắt trang hồ sơ có ảnh/đổi mật khẩu ở trình duyệt thật; mailer đang ở chế độ dev-log nếu chưa có SMTP (OTP in ra log backend, hoặc gửi về `MAIL_REDIRECT_TO`); không tự đẩy `main`.
+
+## 2026-11-17 11:40:00 +07:00 — J-C161 — Đăng nhập / đăng ký bằng Google (D-048)
+- Người thực hiện: Claude, theo yêu cầu của Vy (dùng tài khoản Google, email làm nội dung đăng ký).
+- Backend: `services/googleAuth.js` (xác thực ID token bằng khóa công khai Google, không thêm thư viện), `services/auth.service.js` (`cauHinhGoogle`, `dangNhapGoogle`, `hoanTatDangKyGoogle`: khách có sẵn thì vào luôn, nhân viên bị từ chối, email mới nhận `profileToken` sống 15 phút rồi bổ sung ngày sinh/giới tính/SĐT; tạo tài khoản qua `dangKy`/`SP_DangKy` hiện có), `controllers/auth.controller.js`, `routes/auth.routes.js` (`GET /auth/google/cau-hinh`, `POST /auth/google`, `POST /auth/google/hoan-tat`), `.env.example` (`GOOGLE_CLIENT_ID`). Test `test/google-auth.test.mjs` (khóa RSA tự tạo: token hợp lệ, giả mạo, sai ứng dụng, hết hạn, chưa xác minh email, đăng nhập, từ chối nhân viên, đăng ký mới).
+- Frontend: `components/common/GoogleAuthSection.jsx` + `googleAuth.css` (nút Google ở tab đăng nhập và đăng ký; form "Hoàn tất đăng ký" vẽ qua portal và chặn nổi bọt submit), `auth/AuthContext.jsx` (`dangNhapGoogle`, `hoanTatGoogle`), `pages/auth/auth.api.js`, `pages/TrangChu.jsx` (hai dòng chèn nút). Script `scripts/ui-google-auth.mjs` (Google và API giả lập).
+- Kiểm tra: backend 117 pass; build OK; `ui-google-auth` PASS ở 1440 và 390 (không cấu hình thì ẩn nút; email mới hoàn tất hồ sơ rồi ở lại trang chủ); `ui-account-menu`, `ui-share-demo`, `ui-customer-invoices`, `ui-customer-residence` PASS. Chưa thử với Google thật vì cần `GOOGLE_CLIENT_ID` do Vy tạo.
+
+## 2026-11-17 13:10:00 +07:00 — J-C162 — Gộp `origin/main` (trang chủ mới, chi tiết phòng dùng chung) vào nhánh tích hợp
+- Người thực hiện: Claude, theo yêu cầu của Vy (Codex vừa gộp trang chủ vào main; chạy lại dự án để Vy kiểm tra).
+- Gộp: `git merge origin/main` vào `integration/d043-d045`. Xung đột tài liệu (`spec/decisions.md`, `journal.md`, `progress.md`, `scope.md`, `web/backend/.env.example`) giữ cả hai phía; D-043..D-048 của nhánh này và D-049..D-052 của main không trùng mã. Xung đột mã: `KhamPhaPhongPage.jsx` bỏ `DetailModal` cũ vì main dùng `RoomDetailView`; `KhachHangPortalPage.jsx` giữ `DepositCountdown`, bỏ các khối main đã chuyển sang `RoomDetailView`.
+- Giữ chức năng của nhánh trên chi tiết phòng dùng chung: `components/rooms/RoomDetailView.jsx` nhận thêm prop tùy chọn (`onRentGroup`, `heartState`, `scheduledMessage`, `profile`, `isInProfile`, `profileBusy`, `onAddToProfile`, `onRemoveFromProfile`) để trang khách vẫn có "Đăng ký thuê theo nhóm", "Quan tâm phòng này", "Đang có lịch xem phòng"; trang công khai không truyền nên giữ nút "Đăng ký thuê ngay". Thêm nút "Chia sẻ" vào tiêu đề chi tiết phòng (dùng chung cho công khai và khách). Main không còn hiện số giường trống ở chi tiết phòng (chỉ nhãn Còn trống / Đang chờ cọc / Hết chỗ), theo quyết định D-052.
+- Cập nhật script: `ui-interested-rooms.mjs` (nút "Đăng ký thuê ngay", nhãn trạng thái, ghi chú mới), `ui-share-demo.mjs` (chi tiết phòng gọi `/trang-chu/phong/<mã>`).
+- Cài lại thư viện (`npm install` frontend và backend) vì main thêm `maplibre-gl` cho bản đồ trang chủ.
+- Kiểm tra sau gộp: backend 119 pass; build OK; `ui-home`, `ui-public-room`, `ui-account-menu`, `ui-share-demo`, `ui-google-auth`, `ui-customer-invoices`, `ui-evidence-print` PASS (preview); `ui-interested-rooms` PASS (dev server).
 
 ## 2026-11-17 13:37:14 +07:00 — J-C169 — Thiết kế lại mục "Phòng trống tiêu biểu" theo mẫu của Hằng
 - Người thực hiện: Claude, theo yêu cầu nhắc lại của Vy (làm mục phòng và dịch vụ giống chị Hằng; J-C168 mới thêm mục Dịch vụ và đổi tên tiêu đề). Tiếp D-054.
@@ -1613,6 +1580,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Frontend mới: `components/publicSite/PublicLayout.jsx` + css (đầu trang chung cho trang công khai), `pages/dichVu/DichVuPage.jsx` + css (thống kê, tìm kiếm, lọc loại/khoảng giá/hình thức phí, thẻ dịch vụ; nhóm và mô tả suy ra từ tên dịch vụ), `pages/danhSachPhong/DanhSachPhongPage.jsx` + css (tiêu đề + số phòng, nút lọc theo chi nhánh, lưới 4 cột dùng lại thẻ phòng của trang chủ, bấm vào mở chi tiết ở `/kham-pha-phong?phong=`).
 - Sửa: `App.jsx` (route `/phong`, `/dich-vu`), `pages/TrangChu.jsx` (menu thêm "Dịch vụ"; "Xem tất cả phòng" đi `/phong`; `/?auth=login|register` mở form đăng nhập/đăng ký cho nút ở trang con), `homeExperience/ServicesShowcase.jsx` (+ liên kết "Xem bảng giá dịch vụ").
 - Kiểm tra: backend 126 pass; build OK; `ui-public-pages` (mới), `ui-email-auth`, `ui-trust-strip`, `ui-shell` PASS; đã xem ảnh 1440px của hai trang. Bảng `DichVu` hiện chỉ có 5 dịch vụ (Điện, Nước, Wifi, Gửi xe, Vệ sinh) nên trang dịch vụ có 5 thẻ. Chưa xem ảnh 390px.
+
+## 2026-11-17 14:30:00 +07:00 — J-C163 — Dải "Thuê minh bạch" ở trang chủ, số liệu đọc từ chuỗi (D-053)
+- Người thực hiện: Claude, theo yêu cầu của Vy (làm ý "trang độ tin cậy đọc từ chuỗi" ở trang chủ, nói bằng lời khách, không gắn chữ Avalanche).
+- Phát hiện khi thử: RPC công khai của Fuji giới hạn đọc nhật ký 100 khối mỗi lần (thử thật), nên không quét cả chuỗi từ khối deploy (60.882.820) được. Chuyển sang đọc biên lai theo từng mã giao dịch.
+- Backend: `web/backend/integrations/avalanche/publicStats.js` (đọc biên lai từ chuỗi cho các mã giao dịch lấy từ `AvalancheCase`, chỉ giữ sự kiện của đúng contract, giải mã `HandoverProposed/Accepted`, `SettlementProposed/Disputed/Accepted`, gộp số đếm, số tiền hoàn/thu thêm của các bản đối soát đã được đồng ý, danh sách giao dịch gần đây kèm thời gian khối; nhớ biên lai đã đọc, làm mới nền sau 60 giây), `routes/trangChu.routes.js` (`GET /api/trang-chu/minh-bach`, công khai), `test/public-stats.test.mjs` (log mã hóa bằng viem: chỉ tính sự kiện giải mã được của đúng contract, mã giả/log lạ bị bỏ, mỗi biên lai đọc một lần, DB lỗi thì `ready:false`).
+- Frontend: `pages/homeExperience/TrustStrip.jsx` + `trustStrip.css` (dải ba số liệu bằng lời khách; nút "Xem cách kiểm chứng" mở khối có liên kết "Xem bằng chứng" tới Snowtrace và dòng nói rõ là mạng thử nghiệm), chèn một dòng `<TrustStrip />` vào `pages/TrangChu.jsx` trước mục giới thiệu; script `scripts/ui-trust-strip.mjs`.
+- Kiểm tra: backend 122 pass; build OK; `ui-trust-strip` PASS ở 1440 và 390 (hiện khi có số liệu, ẩn khi chưa sẵn sàng/chưa có hồ sơ/lỗi, phần đầu không có thuật ngữ); đã xem ảnh. Đọc thật từ Fuji (chỉ đọc): 6 giao dịch, 2 biên bản được xác nhận, 1 đối soát được đồng ý, thu thêm 2.640.000đ, khớp dữ liệu HD0001/HD0002.
+- Giới hạn: số liệu hiện rất nhỏ (2/1/1); trước khi quay demo nên chạy thêm vài hồ sơ mẫu lên Fuji. Số liệu của cả hệ thống, không theo chi nhánh.
 
 ## 2026-11-17 14:47:24 +07:00 — J-C171 — Danh mục dịch vụ đủ 15 mục có chi tiết; cổng khách bắt đầu từ "Thông tin cá nhân"
 - Người thực hiện: Claude, theo yêu cầu của Vy (làm y chang chị Hằng, kể cả cách sắp xếp; dịch vụ còn thiếu thì thêm vào DB; bấm vào thẻ có xem chi tiết; khách đăng nhập vào thì tab đầu là thông tin cá nhân, rồi thông tin cư trú, rồi khám phá phòng nhảy sang trang phòng của trang chủ).
@@ -1631,11 +1606,31 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Menu tài khoản: `components/common/ShellAccountMenu.jsx` (mới) dùng trong `components/common/WorkspaceShell.jsx` cho mọi vai trò (khách, sale, quản lý, kế toán, admin): bấm tên mới xổ ra "Thông tin cá nhân" và "Đăng xuất" (vẫn hỏi lại trước khi đăng xuất), thay cho nút đăng xuất lộ sẵn. `AccountMenu.jsx` và menu mới hiện ảnh đại diện nếu có (`accountMenu.css`).
 - Kiểm tra: build OK; `ui-customer-profile` (mới), `ui-shell`, `ui-account-menu`, `ui-email-auth`, `ui-public-pages`, `ui-home`, `ui-share-demo` PASS; đã xem ảnh cổng khách ở 1440px (menu xổ xuống, thông tin trong thẻ ảnh đại diện). Chưa xem ảnh 390px và chưa chạy lại các test của trang nhân viên ngoài `ui-shell`.
 
+## 2026-11-17 16:00:00 +07:00 — J-C164 — Gom về một thư mục làm việc: `D:\HomeStayDorm`
+- Người thực hiện: Claude, theo yêu cầu của Vy (sắp nộp, không để code ở nhiều chỗ; Codex đã commit xong hôm qua).
+- Việc đã làm: `D:\HomeStayDorm-integ` chuyển sang trạng thái tách rời (detached) tại `6aee7e5` để thư mục gốc `D:\HomeStayDorm` lấy nhánh `integration/d043-d045` (đã chứa toàn bộ `origin/main`). Từ nay làm việc ở `D:\HomeStayDorm`; thư mục `-integ` chỉ còn là bản dự phòng, có thể xóa sau khi Vy kiểm tra xong.
+- Sao sang thư mục gốc (không nằm trong git): `web/backend/.env`, `web/frontend/.env` (bản cũ của gốc lưu thành `.env.bak-before-consolidation`), `web/backend/secrets/` và `web/backend/uploads/` (chứng từ khách tải lên, không ghi đè file có sẵn). Cài lại thư viện cho backend và frontend.
+- Chạy lại từ thư mục gốc: backend cổng 5000 (kết nối HOMEDORM4), frontend cổng 5173; `GET /api/trang-chu/minh-bach` trả số liệu thật từ Fuji.
+- Chưa làm: gộp vào `main` (chờ Vy duyệt Pull Request); xóa `D:\HomeStayDorm-integ`. Hai tiến trình xem thử cũ ở cổng 5192 và 5001 (của thư mục gốc, bản cũ) vẫn đang chạy vì thao tác dừng chúng không được cho phép; Vy tắt tay nếu không cần.
+
 ## 2026-11-17 16:04:59 +07:00 — J-C173 — Chi tiết phòng chỉ liệt kê dịch vụ chính; sửa chữ "lần"; trả lại "Đăng ký thuê theo nhóm"; nút quay lại chỉ có mũi tên
 - Người thực hiện: Claude, theo phản ánh của Vy (nút quay lại còn biểu tượng tròn; chi phí dịch vụ ước tính liệt kê cả 15 dịch vụ và chữ "Lần" hiện thành "l?n"; mục đăng ký theo nhóm biến mất).
 - **Đã chạy lại lên HOMEDORM4:** `npm run services-catalog:db:migrate` (bản cập nhật, chạy lại vẫn 15 dịch vụ). Nguyên nhân chữ "l?n": cột `DonViTinh` là VARCHAR Latin1 nên không lưu được "ầ" (lỗi của J-C171). Không đổi kiểu cột (nhiều thủ tục và bảng `ChiTietHoaDon` dùng VARCHAR); đổi đơn vị sang chữ lưu được: Giặt sấy quần áo `kg` (6.000đ/kg), Vệ sinh máy lạnh `máy` (150.000đ), Đổi nệm cao su non `cái` (500.000đ). "Vệ sinh" chuyển sang nhóm Thiết yếu. Thủ tục `SP_KhachMoi_ChiTietPhong` (cũng sửa file `database/SP_DKyThue/khach-moi.sql`) chỉ trả dịch vụ đang cung cấp thuộc nhóm Thiết yếu: Điện, Nước, Wifi, Gửi xe, Vệ sinh. Đã kiểm tra `GET /api/trang-chu/phong/P101` trả đúng 5 dịch vụ.
 - Frontend: `components/rooms/RoomDetailView.jsx` (bỏ biểu tượng tròn ở nút "← Quay lại khám phá phòng"); `pages/khamPhaPhong/KhamPhaPhongPage.jsx` (chi tiết công khai có nút "Đăng ký thuê theo nhóm", chuyển sang `/khach-hang?tab=kham-pha&phong=…&dangKy=nhom`, giữ phòng khi phải đăng nhập); `pages/khachHang/KhachHangPortalPage.jsx` (`dangKy=nhom` mở thẳng form thuê theo nhóm). Nguyên nhân mất mục nhóm: J-C168/J-C170 đổi "Khám phá phòng" của khách sang trang công khai, nơi trước đó không có nút này.
 - Kiểm tra: backend 126 pass; build OK; `ui-public-room` (thêm kiểm nút nhóm và nút quay lại không có biểu tượng), `ui-customer-profile`, `ui-home`, `ui-public-pages` PASS. Chưa bấm thử form thuê theo nhóm bằng trình duyệt thật với backend.
+
+## 2026-11-17 16:05:55 +07:00 — J-X084 — Nhà 3D khớp số tầng và số phòng từng chi nhánh
+
+- Người thực hiện: Codex theo yêu cầu Vy sửa nhà3D trang chủ: chi nhánh có phòng P4xx thì phải có4 tầng, số phòng/tầng theo đúng từng chi nhánh. D-055 bổ sung D-050/D-052, thay mô hình cố định2 tầng/2 phòng mỗi tầng; không đổi nghiệp vụ thuê.
+- Khảo sát: fetch đúng origin `NhatVy177/homestay_unihack`; root main sạch ở `485a47a`. Tạo nhánh `fix/home-3d-branch-layout`/worktree `D:\HomeStayDorm-house-layout` từ origin/main. Kiểm schema Phong/ChiNhanh bằng SELECT metadata: chưa có cột tầng. Tên hiển thị khác mã nội bộ (ví dụ tên P203, mã P106), nên ưu tiên trường tầng rõ ràng nếu có, sau đó tên Pxxx; các tên thử nghiệm không đánh số không lấy mã P9xx để bịa tầng9.
+- File nguồn: `web/frontend/src/pages/homeExperience/houseLayout.js` mới — suy tầng/khử trùng/sắp số phòng, tầng trung gian rỗng, phân nhóm chưa rõ tầng và kích thước lưới. `HouseModel.js` mới — hình học theo đúng tầng/phòng, mỗi phòng một ô/nội thất/nhãn, cửa sổ theo phòng, mái/bệ/cây/bóng theo kích thước. `HomeScenes.jsx` — HouseScene nhận layout, mở/gộp tất cả tầng, hiện nhãn khi mở, tự căn camera theo kích thước/aspect, giữ orbit/reduced-motion/viewport gating, giải phóng GPU lúc đổi chi nhánh. CurvedGallery giữ nguyên hành vi.
+- `HomeExperience.jsx` — memo layout từng chi nhánh, tổng tầng/phòng, bộ chọn tầng/nhóm chưa rõ, toàn bộ nút phòng thay slice4, dùng mã phòng mở chi tiết, reset chọn tầng khi chuyển chi nhánh. `experience.css` — trình bày số đếm, nhóm tầng/chọn/empty/disabled bằng CSS thường, không thêm thư viện/font. Inline style: HomeExperience1→1 (biến delay có sẵn), HomeScenes0→0, file mới0.
+- Kiểm helper: `scripts/house-layout.test.mjs` mới, 3 pass — tên khác mã, explicit floor0/3, tên P1001 tầng10, sparse floor4 với6 phòng, dedupe, chi nhánh1 tầng riêng, unknown/empty không tạo nhà2 tầng. `scripts/ui-house-layout.mjs` mới pass1440/390:4→2→1 tầng, tầng3 rỗng, đầy đủ6 phòng tầng4, unknown/empty, expansion thay ảnh render, room-ID navigation và không tràn ngang; 0 API ghi/0 pageerror. Report/ảnh ignored ở `.ui-screens/house-layout/`.
+- Điều chỉnh test cũ: `scripts/ui-home.mjs` và `ui-home-effects.mjs` dùng tên phòng Pxxx có tầng như dữ liệu thật; layout smoke không đợi canvas nhà khi danh sách rỗng/chưa rõ tầng. `scripts/avalanche-smoke.mjs` giới hạn nút File kiểm chứng trong thông báo biên bản đã xác nhận: main hiện có hai nút cùng tên cho biên bản/đối soát, selector chung bị strict-mode; chỉ sửa locator, không đổi source xác nhận hay che kiểm tra.
+- Kiểm mới cuối: build frontend pass; smoke Avalanche UI pass Verify/D-017/D-018/D-023/D-024; ui-home pass1440/1024/768/390/320 + empty/error; ui-home-effects pass cả bật/giảm chuyển động, gồm kéo gallery/nhà, mở/gộp/chuyển chi nhánh, map và liên hệ. Chỉ frontend thay nên không chạy lại backend/blockchain hoặc coi kết quả cũ là kiểm mới. Lần build đầu thiếu viem do worktree chưa cài dependencies package local blockchain, đã npm ci theo lockfile ở frontend/blockchain và build lại pass (cảnh báo dependencies/chunk lớn còn).
+- Kiểm dữ liệu thật chỉ đọc: GET danh sách public44 phòng khớp SELECT44 danh mục. Quận1 có3/3/0/6 phòng tầng1/2/3/4 +8 chưa rõ tầng; Bình Thạnh3/3/0/6 +0 chưa rõ; Thủ Đức3/3/0/4 +2 chưa rõ. Browser live tại5200 đối chiếu cả3 chi nhánh ở1440/390, số đếm/lists/canvas khớp,0 API ghi/JS exception/tràn ngang. Đã xem ảnh `live-closed-1440.png` và `live-open-390.png`. Không đăng nhập/tạo hồ sơ/chạy migration/ghi DB/Fuji.
+- Hồ sơ: `spec/decisions.md` D-055, `spec/scope.md`, `hackathon/plan.md` cập nhật cùng phạm vi; `spec/luong-tong-hop.md` phản ánh mô hình đúng tầng/phòng; `spec/progress.md` cập nhật tại chỗ trạng thái hiện tại và bản xem. Giữ lịch sử, không tạo plan song song.
+- Bản xem: `http://localhost:5200/#gioi-thieu`, production preview session73330, GET backend5000 hiện có. Không thay app5173 hoặc server của chị Hằng3000/4000. Commit NhatVy177/push nhánh sửa, báo hash cuối; chờ Vy review/merge, không tự push main đợt này. Cần bổ sung tầng cho các phòng chưa rõ từ nguồn có thẩm quyền nếu muốn đưa chúng vào hình học, không tự sửa dữ liệu thử nghiệm.
 
 ## 2026-11-17 16:19:40 +07:00 — J-C174 — Bỏ trang khám phá phòng cũ; mọi lối "Khám phá phòng" đi về trang phòng của trang chủ
 - Người thực hiện: Claude, theo yêu cầu của Vy (xóa hẳn địa chỉ `/kham-pha-phong`; bất cứ chỗ nào có chữ "khám phá phòng" cũng đi về phòng ở trang chủ).
@@ -1644,6 +1639,42 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Test sửa theo địa chỉ mới: `ui-public-room.mjs` (có thêm kiểm liên kết cũ chuyển hướng), `ui-home.mjs`, `ui-share-demo.mjs`, `ui-public-pages.mjs`.
 - Kiểm tra: build OK; `ui-public-room`, `ui-home`, `ui-share-demo`, `ui-public-pages`, `ui-customer-profile`, `ui-email-auth`, `ui-shell` PASS (fixture API). Chưa xem ảnh trang chi tiết phòng mới ở 390px và chưa thử lọc từ ô tìm phòng với backend thật.
 
+## 2026-11-17 16:20:00 +07:00 — J-C165 — Gộp `integration/d043-d045` vào `main`
+- Người thực hiện: Claude, theo yêu cầu rõ ràng của Vy ("gộp lên main luôn đi").
+- Trước khi đẩy: `origin/main` (`beec69a`) đã nằm trong nhánh tích hợp nên là bước tiến thẳng (fast-forward), không cần commit gộp; không có `.env`, khóa hay thư mục `secrets/` nào được theo dõi trong git; 94 commit đi vào `main`.
+- Kết quả: `git push origin HEAD:main` thành công, `beec69a..b6508ec`; `origin/main` = `b6508ec`. Thư mục `D:\HomeStayDorm` chuyển sang nhánh `main`, đồng bộ với remote.
+- Lưu ý còn mở: commit sớm `b449df8` trong lịch sử có dòng đồng tác giả "Co-Authored-By" (đã đẩy từ trước và nay nằm trong `main`); sửa phải ghi lại lịch sử và đẩy ép nên chưa làm, chờ Vy quyết.
+- Việc còn lại trước khi nộp: dán `GOOGLE_CLIENT_ID`, tắt cài đặt demo, kiểm README không có thông tin cá nhân, chạy thêm hồ sơ mẫu lên Fuji, quay demo.
+
 ## 2026-11-17 16:49:36 +07:00 — J-C175 — Nút "Xem các phòng" trên bản đồ còn trỏ về trang cũ
 - Người thực hiện: Claude, theo phản ánh của Vy (bấm "Xem các phòng" ở bản đồ vẫn ra trang khám phá phòng đã bỏ). Sót của J-C174: dòng trong `pages/homeExperience/HomeExperience.jsx` vẫn dùng `/kham-pha-phong?khuVuc=`; nay đi `/phong?khuVuc=…`. Rà lại toàn bộ `web/frontend/src`: không còn liên kết nào tới `/kham-pha-phong` ngoài đường chuyển hướng cũ.
 - Test: `scripts/ui-home.mjs` kiểm thêm đường dẫn sau khi bấm nút này (trước đây chỉ kiểm tham số nên không bắt được); `ui-home` PASS ở 1440/1024/768/390.
+
+## 2026-11-17 16:50:00 +07:00 — J-C166 — Mũi tên menu tài khoản bị lệch
+- Người thực hiện: Claude, theo phản ánh của Vy (mũi tên cạnh tên tài khoản nhìn lệch xuống).
+- Nguyên nhân: mũi tên là ký tự chữ "⌄" nên bị lệch theo đường cơ sở của chữ, không canh giữa với tên.
+- Sửa: `web/frontend/src/components/common/AccountMenu.jsx` (dùng biểu tượng SVG), `accountMenu.css`.
+- Kiểm tra: build OK; `ui-account-menu` PASS; đã xem ảnh, mũi tên canh giữa, lật lên khi mở menu.
+
+## 2026-11-17 16:51:50 +07:00 — J-X086 — Bỏ nhãn tầng trên mô hình nhà
+
+- Người thực hiện: Codex theo yêu cầu Vy bỏ chữ tầng trên hình nhà3D. Tiếp tục đúng nhánh review `fix/home-3d-branch-layout` từ `ce03142`, worktree riêng `D:\HomeStayDorm-house-layout`; không động vào các thay đổi đang dở của checkout root/main.
+- File `web/frontend/src/pages/homeExperience/HouseModel.js`: bỏ lời gọi tạo sprite nhãn tên tầng trên từng mặt nhà. Giữ nhãn tên phòng chỉ hiện khi mở, bộ chọn tầng/số đếm phía dưới và toàn bộ hình học/xoay/mở/gộp. Đây là tinh chỉnh trình bày D-055, không đổi quyết định tính tầng, DB hoặc nghiệp vụ.
+- Hồ sơ: `spec/scope.md`, `hackathon/plan.md` ghi yêu cầu nhãn tầng; `spec/progress.md` cập nhật trạng thái tại chỗ và dữ liệu DB43 phòng đã dọn ở D-056/nhánh riêng `e30296a`; `spec/journal.md` ghi đợt này. Không merge nhánh bảo trì hoặc main vào đây.
+- Kiểm mới: frontend build pass (cảnh báo dependencies/chunk lớn còn); browser thật5200→5000 ở1440/390 pass, theo dõi CanvasRenderingContext2D.fillText xác nhận0 chữTầng trên hình và vẫn có nhãnPhòng,4 nút chọn tầng bên dưới, mở/gộp được,0 pageerror/tràn ngang; đã xem ảnh mobile đóng. Ảnh `.ui-screens/house-layout/no-floor-labels-{closed,open}-{1440,390}.png` ignored. Inline style HouseModel0→0. Không viết testfile mới cho việc xóa một nhãn; không chạy backend/blockchain hoặc ghi DB.
+- Build preview5200 đã phục vụ bản mới; smoke `npm run test:avalanche-ui` pass Verify/D-017/D-018/D-023/D-024, không browser exception. Commit NhatVy177/push nhánh review, không tự merge main; hash/kết quả báo cuối.
+
+## 2026-11-17 17:30:00 +07:00 — J-C167 — Mở khóa "Hóa đơn & thanh toán"; bỏ khoảng trắng bên phải ở Khám phá phòng
+- Người thực hiện: Claude, theo phản ánh của Vy (Lịch sử đặt cọc mở mà Hóa đơn & thanh toán còn khóa; trang khám phá dư khoảng trống lớn bên phải).
+- Sửa 1: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (`getNavLocks`): `dat-coc` không còn khóa khi chưa có phiếu cọc; tab trống thì hiện "Chưa có phiếu cọc hoặc hóa đơn nào" như tab Lịch sử đặt cọc.
+- Sửa 2: cột phải của trang Khám phá phòng vẫn được dựng (rộng 340px, rỗng) khi khách đã mở hồ sơ hoặc đã có lịch xem, nên chừa khoảng trắng lớn; nay chỉ dựng khi có nội dung và lưới chuyển sang một cột (`kh-shell-grid--single` trong `khachHangPortal.css`).
+- Kiểm tra: build OK; `ui-customer-invoices`, `ui-customer-deposit-history`, `ui-customer-residence`, `ui-interested-rooms` PASS; đã xem ảnh trang khám phá có hồ sơ mở ở 1440.
+
+## 2026-11-17 17:01:25 +07:00 — J-X087 — Gộp nhà3D và bỏ nhãn tầng vào main theo yêu cầu Vy
+
+- Người thực hiện: Codex. Vy hỏi “ủa bạn sửa đâu á, push lên main ch”; đã nói rõ sửa ở `fix/home-3d-branch-layout` và thực hiện gộp/push main theo yêu cầu mới. Quyền này thay việc chờ Vy tự merge ghi cuối J-X086 cho nhánh nhà3D đợt này.
+- Git/code: fetch đúngorigin `NhatVy177/homestay_unihack`, root main sạch ở `f9954b6`; tạo nhánh `integration/house-main`/worktree `D:\HomeStayDorm-house-main` từorigin/main, merge no-ff `origin/fix/home-3d-branch-layout` ở `f6f8dc5` (gồm `ce03142`). Gộp phần dựng số tầng/phòng D-055, nhà không có nhãnTầng J-X086, helper/3D/UI/CSS và test liên quan. Không gộp SQLbranch `chore/room-catalog-cleanup`, không chạy lại ghiDB đã xong J-X085.
+- Giữ cập nhật main: chi tiết `/phong/<id>` và tìm/bản đồ `/phong?khuVuc=...` củaJ-C174/J-C175; `HomeExperience.jsx`/`ui-home.mjs` tự gộp sạch. Sửa `scripts/ui-house-layout.mjs` kiểm pathname `/phong/P400` thay query cũ, theo route mới. `spec/luong-tong-hop.md` cập nhật liên kết chi tiết mới. Xung đột journal giữ đủ mục main+UI, sắp các mục timestamp theo thời gian; scope/plan/decisions giữ nội dung hai bên. `spec/progress.md` ghi trạng thái gộp hiện tại và dữ liệu DB/nhánh SQL riêng.
+- Dependencies: lockfile frontend/package blockchain hai nhánh giống nhau; tái dùng node_modules local bằng junction ignored. Build song song đầu lỗi Windows VirtualAlloc8192 errno1455/out-of-memory ởesbuild, npm.ps1 NullReference ởlượt smoke; chạy tuần tự GOMAXPROCS2 và gọiNode trực tiếp, không đổi source cấu hình. Frontend build lại pass (cảnh báo dependency/chunk lớn còn).
+- Kiểm mới: helper3 pass; ui-house-layout pass1440/390:4→2→1→empty→unknown, count/full list/expand, roomID mở route mới; ui-home pass1440/1024/768/390/320 +empty/error và khẳng định nút bản đồ mở/phong. Fixture0APIghi/pageerror, không tràn ngang. Smoke xác nhận chạy bằngNode trực tiếp pass Verify/D-017/D-018/D-023/D-024, không browser exception; backend/blockchain/SQL/Fuji không thay và không chạy lại.
+- Kết thúc: kiểm diff, commit merge bằngNhatVy177, push đúngmain vàls-remote xác nhậnhash; sau đó fast-forward checkoutgốc khi vẫn sạch/main để server5173 tải code mới. Bản kiểm production5201 dùng sourcegộp, bản5200 vẫn thuộc nhánh review. Hash/kết quả push và cập nhật local báo phản hồi cuối.

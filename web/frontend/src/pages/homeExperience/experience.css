@@ -103,6 +103,13 @@
 .hx-house-fallback { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 160px; color: var(--tc-primary); }
 .hx-house-fallback span { font-size: 12px; }
 .hx-house-rooms { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; }
+.hx-house-toolbar p.hx-house-summary { margin-top: var(--space-2); color: var(--tc-primary); font-weight: 600; }
+.hx-house-floors { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: center; margin-bottom: var(--space-3); }
+.tc-page .hx-house-floors button { display: flex; gap: var(--space-2); align-items: center; border: 1px solid var(--tc-border); border-radius: var(--radius-lg); padding: var(--space-2) var(--space-3); background: var(--tc-surface); color: var(--tc-primary); font-size: .75rem; }
+.tc-page .hx-house-floors button[aria-pressed='true'] { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary, white); }
+.hx-house-floors button span { font-size: inherit; opacity: .8; white-space: nowrap; }
+.hx-house-empty { margin: var(--space-2) 0; color: var(--tc-on-surface-m); font-size: .875rem; }
+.tc-page .hx-house-expand:disabled { opacity: .5; cursor: default; }
 .tc-page .hx-house-rooms button { display: flex; align-items: center; gap: 7px; background: white; border: 1px solid var(--tc-border); padding: 9px 13px; border-radius: 20px; font-size: 11px; }
 .hx-house-rooms span { color: var(--tc-on-surface-m); }
 .hx-house-rooms .ui-icon { width: 14px; height: 14px; }

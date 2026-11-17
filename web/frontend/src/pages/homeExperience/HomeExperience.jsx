@@ -1,7 +1,8 @@
-import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '../../components/common/Icon.jsx';
 import { CONTACT_PHONE, groupBranches, imageFallback, imageFor, money, priceFor, unitFor } from './homeData.js';
+import { buildBranchLayout } from './houseLayout.js';
 import './experience.css';
 
 const CurvedGallery = lazy(() => import('./HomeScenes.jsx').then(module => ({ default: module.CurvedGallery })));
@@ -112,11 +113,16 @@ export function RoomCard({ room, onViewDetail, index = 0 }) {
 }
 
 export function AboutSection({ rooms, branches, roomTypes, onViewDetail }) {
-  const groups = groupBranches(rooms, branches);
+  const groups = useMemo(() => groupBranches(rooms, branches).map(group => ({ ...group, layout: buildBranchLayout(group.rooms) })), [rooms, branches]);
   const [index, setIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
+  const [floorChoice, setFloorChoice] = useState(null);
   const [ref, near] = useNearScreen();
   const selected = groups[index % Math.max(groups.length, 1)];
+  const layout = selected?.layout;
+  const currentFloor = floorChoice === 'unknown' ? null : layout?.floors.find(floor => floor.number === floorChoice) || layout?.floors.find(floor => floor.rooms.length);
+  const listedRooms = floorChoice === 'unknown' || !layout?.floors.length ? layout?.unassigned : currentFloor?.rooms;
+  function changeBranch(next) { setIndex(next); setFloorChoice(null); }
   return <section className="hx-section hx-about-section" id="gioi-thieu" ref={ref}>
     <div className="tc-container hx-about-grid">
       <div className="hx-about-copy"><Reveal kind="text"><h2>Về HomestayDorm</h2></Reveal><Reveal delay={150}><span className="hx-heading-line" /></Reveal>
@@ -125,12 +131,13 @@ export function AboutSection({ rooms, branches, roomTypes, onViewDetail }) {
         <Reveal delay={430}><a href="#phong-noi-bat" className="hx-inline-link">Khám phá các phòng <Icon name="arrow_forward" /></a></Reveal>
       </div>
       <Reveal className="hx-house-panel" delay={220}>
-        <div className="hx-house-toolbar"><div><h3>{selected?.name || 'HomestayDorm'}</h3><p>{selected?.address || 'Không gian homestay & dorm'}</p></div><div><button type="button" aria-label="Chi nhánh trước" disabled={groups.length < 2} onClick={() => setIndex(current => (current + groups.length - 1) % groups.length)}><Icon name="chevron_left" /></button><button type="button" aria-label="Chi nhánh tiếp theo" disabled={groups.length < 2} onClick={() => setIndex(current => (current + 1) % groups.length)}><Icon name="chevron_right" /></button></div></div>
-        <button className="hx-house-expand" type="button" aria-expanded={expanded} onClick={() => setExpanded(current => !current)}><Icon name="apartment" />{expanded ? 'Gộp lại' : 'Mở các căn'}</button>
-        <Suspense fallback={<div className="hx-house-loading"><Icon name="home" /></div>}>{near && <HouseScene expanded={expanded} variant={index} />}</Suspense>
-        <div className="hx-house-rooms">{selected?.rooms.slice(0, 4).map(room => <button type="button" key={room.MaPhong} onClick={() => onViewDetail(room)}>{room.TenPhong}<span>{money(priceFor(room))}</span><Icon name="arrow_forward" /></button>)}</div>
-        <div className="hx-house-dots">{groups.map((group, i) => <button key={group.name} type="button" aria-label={`Xem ${group.name}`} aria-pressed={index === i} onClick={() => setIndex(i)} />)}</div>
-        <small className="hx-house-caption">Mô hình minh họa · Kéo để xoay, bấm “Mở các căn” để khám phá.</small>
+        <div className="hx-house-toolbar"><div><h3>{selected?.name || 'HomestayDorm'}</h3><p>{selected?.address || 'Không gian homestay & dorm'}</p><p className="hx-house-summary" aria-live="polite">{layout?.floorCount ? `${layout.floorCount} tầng · ${layout.roomCount} phòng` : layout?.roomCount ? `${layout.roomCount} phòng · Chưa có thông tin tầng` : 'Chưa có dữ liệu phòng'}</p></div><div><button type="button" aria-label="Chi nhánh trước" disabled={groups.length < 2} onClick={() => changeBranch((index + groups.length - 1) % groups.length)}><Icon name="chevron_left" /></button><button type="button" aria-label="Chi nhánh tiếp theo" disabled={groups.length < 2} onClick={() => changeBranch((index + 1) % groups.length)}><Icon name="chevron_right" /></button></div></div>
+        <button className="hx-house-expand" type="button" aria-expanded={expanded} disabled={!layout?.floorCount} onClick={() => setExpanded(current => !current)}><Icon name="apartment" />{expanded ? 'Gộp lại' : 'Mở các căn'}</button>
+        <Suspense fallback={<div className="hx-house-loading"><Icon name="home" /></div>}>{near && layout && <HouseScene expanded={expanded} variant={index} layout={layout} selectedFloor={currentFloor?.number} />}</Suspense>
+        <div className="hx-house-floors" role="group" aria-label="Chọn tầng xem phòng">{layout?.floors.map(floor => <button type="button" key={floor.number} aria-pressed={floorChoice !== 'unknown' && currentFloor?.number === floor.number} onClick={() => setFloorChoice(floor.number)}>{floor.name}<span>{floor.rooms.length} phòng</span></button>)}{layout?.unassigned.length > 0 && <button type="button" aria-pressed={floorChoice === 'unknown' || !layout.floorCount} onClick={() => setFloorChoice('unknown')}>Chưa rõ tầng<span>{layout.unassigned.length} phòng</span></button>}</div>
+        <div className="hx-house-rooms" aria-live="polite">{listedRooms?.map(room => <button type="button" key={room.MaPhong} onClick={() => onViewDetail(room)}>{room.TenPhong}<span>{money(priceFor(room))}</span><Icon name="arrow_forward" /></button>)}{currentFloor && listedRooms?.length === 0 && <p className="hx-house-empty">Chưa có phòng {currentFloor.name.toLocaleLowerCase('vi-VN')} trong danh sách.</p>}</div>
+        <div className="hx-house-dots">{groups.map((group, i) => <button key={group.name} type="button" aria-label={`Xem ${group.name}`} aria-pressed={index === i} onClick={() => changeBranch(i)} />)}</div>
+        <small className="hx-house-caption">Số tầng/phòng theo danh sách chi nhánh; bố trí nội thất minh họa. Kéo để xoay, bấm “Mở các căn” để khám phá.{layout?.unassigned.length > 0 && ` ${layout.unassigned.length} phòng chưa rõ tầng được liệt kê riêng.`}</small>
       </Reveal>
     </div>
   </section>;
