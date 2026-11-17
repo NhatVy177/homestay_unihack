@@ -104,7 +104,7 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
   return (
     <section className="kh-detail-view">
       <button className="kh-detail-back" type="button" onClick={onBack}>
-        <Icon name="explore" />← Quay lại khám phá phòng
+        ← Quay lại khám phá phòng
       </button>
 
       <div className="kh-detail-header">

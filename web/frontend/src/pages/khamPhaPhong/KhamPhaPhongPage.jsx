@@ -479,9 +479,9 @@ export default function KhamPhaPhongPage() {
     setActiveFilters(DEFAULT_FILTERS);
   }
 
-  function goRegister() {
+  function goRegister(mode = '1') {
     const target = selectedRoom?.maPhong
-      ? `/khach-hang?tab=kham-pha&phong=${encodeURIComponent(selectedRoom.maPhong)}&dangKy=1`
+      ? `/khach-hang?tab=kham-pha&phong=${encodeURIComponent(selectedRoom.maPhong)}&dangKy=${mode === 'nhom' ? 'nhom' : '1'}`
       : '/khach-hang';
     if (user) navigate(user.vaiTro === 'KhachHang' ? target : getAuthenticatedHomePath(user));
     else navigate(`/?next=${encodeURIComponent(target)}`);
@@ -539,7 +539,7 @@ export default function KhamPhaPhongPage() {
             <section className="kp-public-detail" aria-label="Chi tiết phòng">
               {detailLoading ? <div className="kp-loading" role="status"><span /><p>Đang tải chi tiết phòng...</p></div>
                 : detailError ? <div className="kp-detail-error" role="alert"><h1>Chưa thể mở phòng</h1><p>{detailError}</p><button className="kp-btn kp-btn-soft" type="button" onClick={closeDetail}>Quay lại khám phá phòng</button><button className="kp-btn kp-btn-primary" type="button" onClick={() => setDetailAttempt(value => value + 1)}>Thử lại</button></div>
-                : selectedRoom && <RoomDetailView key={selectedRoom.maPhong} phong={selectedRoom} onBack={closeDetail} onRent={goRegister} />}
+                : selectedRoom && <RoomDetailView key={selectedRoom.maPhong} phong={selectedRoom} onBack={closeDetail} onRent={() => goRegister()} onRentGroup={() => goRegister('nhom')} />}
             </section>
           ) : <div className="kp-grid">
             <section className="kp-content" aria-label="Danh sách phòng khám phá">
@@ -607,7 +607,7 @@ export default function KhamPhaPhongPage() {
                           key={room.maPhong}
                           room={room}
                           onViewDetail={openDetail}
-                          onRegister={goRegister}
+                          onRegister={() => goRegister()}
                         />
                       ))}
                     </div>

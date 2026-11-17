@@ -192,6 +192,7 @@ BEGIN
         dv.DonGia AS donGia,
         dv.DonViTinh AS donViTinh
     FROM dbo.DichVu AS dv
+    WHERE dv.TrangThai = N'Đang cung cấp' AND dv.Nhom = N'Thiết yếu' -- chỉ dịch vụ chính; cột thêm bởi services-catalog:db:migrate
     ORDER BY dv.TenDichVu;
 END;
 GO

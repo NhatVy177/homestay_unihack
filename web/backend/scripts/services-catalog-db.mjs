@@ -16,22 +16,39 @@ export const EXISTING = [
   ['Nước', 'Thiết yếu', 'Tiền nước sinh hoạt tính theo chỉ số đồng hồ riêng của phòng.'],
   ['Wifi', 'Thiết yếu', 'Internet tốc độ cao không giới hạn dung lượng.'],
   ['Gửi xe', 'Thiết yếu', 'Phí giữ xe máy hàng tháng tại bãi xe của tòa nhà.'],
-  ['Vệ sinh', 'Tiện ích', 'Dọn dẹp, giữ vệ sinh khu vực chung định kỳ hằng tháng.'],
+  ['Vệ sinh', 'Thiết yếu', 'Dọn dẹp, giữ vệ sinh khu vực chung định kỳ hằng tháng.'],
 ];
 
+// Cột DonViTinh là VARCHAR (Latin1) nên không lưu được chữ như "lần": đơn vị chỉ dùng chữ lưu được (kg, máy, cái, bình, tháng).
 // [tên, nhóm, mô tả, đơn vị tính, đơn giá, trạng thái]
 export const NEW_SERVICES = [
   ['Rác sinh hoạt', 'Tiện ích', 'Phí thu gom rác sinh hoạt hằng ngày.', 'tháng', 30000, ACTIVE],
-  ['Giặt sấy quần áo', 'Tiện ích', 'Giặt và sấy khô quần áo theo cân (tối đa 5kg mỗi lần).', 'lần', 30000, ACTIVE],
-  ['Vệ sinh máy lạnh', 'Tiện ích', 'Vệ sinh, bơm gas và bảo trì máy lạnh định kỳ.', 'lần', 150000, ACTIVE],
+  ['Giặt sấy quần áo', 'Tiện ích', 'Giặt và sấy khô quần áo, tính theo cân.', 'kg', 6000, ACTIVE],
+  ['Vệ sinh máy lạnh', 'Tiện ích', 'Vệ sinh, bơm gas và bảo trì máy lạnh định kỳ, tính theo máy.', 'máy', 150000, ACTIVE],
   ['Gửi xe ô tô', 'Tiện ích', 'Giữ xe ô tô dưới hầm (đang tạm ngưng do hết chỗ).', 'tháng', 1500000, 'Tạm ngưng'],
   ['Thuê tủ lạnh mini', 'Tiện nghi', 'Cho thuê tủ lạnh mini 90L trang bị riêng cho phòng.', 'tháng', 200000, ACTIVE],
   ['Nước tinh khiết 20L', 'Tiện nghi', 'Giao nước uống đóng bình tinh khiết 20 lít đến tận phòng.', 'bình', 45000, ACTIVE],
-  ['Đổi nệm cao su non', 'Tiện nghi', 'Nâng cấp từ nệm mút thông thường sang nệm cao su non êm ái hơn.', 'lần', 500000, 'Sắp ra mắt'],
+  ['Đổi nệm cao su non', 'Tiện nghi', 'Nâng cấp từ nệm mút thông thường sang nệm cao su non êm ái hơn, tính theo nệm.', 'cái', 500000, 'Sắp ra mắt'],
   ['Gói dọn phòng định kỳ', 'Tiện nghi', 'Dọn phòng 2 lần mỗi tuần xuyên suốt 1 tháng.', 'tháng', 350000, 'Sắp ra mắt'],
   ['Phòng Gym / Fitness', 'Cao cấp', 'Sử dụng không giới hạn phòng tập Gym ở tầng trệt tòa nhà (giá mỗi người).', 'tháng', 300000, 'Sắp ra mắt'],
   ['Hồ bơi chân mây', 'Cao cấp', 'Đặc quyền sử dụng hồ bơi trên sân thượng (giá mỗi người).', 'tháng', 500000, 'Sắp ra mắt'],
 ];
+
+// Bản đầu của đợt này đã ghi nhầm đơn vị "lần" thành "l?n"; sửa các dòng đó theo danh sách hiện hành (không đụng dòng khác).
+export const FIX_LOST_UNITS = `
+UPDATE dbo.DichVu SET DonViTinh = N'kg', DonGia = 6000, MoTa = N'Giặt và sấy khô quần áo, tính theo cân.' WHERE TenDichVu = N'Giặt sấy quần áo' AND DonViTinh LIKE '%?%';
+UPDATE dbo.DichVu SET DonViTinh = N'máy', MoTa = N'Vệ sinh, bơm gas và bảo trì máy lạnh định kỳ, tính theo máy.' WHERE TenDichVu = N'Vệ sinh máy lạnh' AND DonViTinh LIKE '%?%';
+UPDATE dbo.DichVu SET DonViTinh = N'cái', MoTa = N'Nâng cấp từ nệm mút thông thường sang nệm cao su non êm ái hơn, tính theo nệm.' WHERE TenDichVu = N'Đổi nệm cao su non' AND DonViTinh LIKE '%?%';`;
+
+// Chi tiết phòng chỉ liệt kê dịch vụ chính (đang cung cấp, nhóm Thiết yếu). Sửa thủ tục hiện có bằng cách thay đúng đoạn lấy dịch vụ.
+export const ROOM_DETAIL_SERVICES = `
+DECLARE @def NVARCHAR(MAX) = OBJECT_DEFINITION(OBJECT_ID(N'dbo.SP_KhachMoi_ChiTietPhong'));
+IF @def IS NOT NULL AND CHARINDEX(N'dv.Nhom = N''Thiết yếu''', @def) = 0 AND CHARINDEX(N'FROM dbo.DichVu AS dv', @def) > 0
+BEGIN
+  SET @def = REPLACE(@def, N'FROM dbo.DichVu AS dv', N'FROM dbo.DichVu AS dv WHERE dv.TrangThai = N''Đang cung cấp'' AND dv.Nhom = N''Thiết yếu''');
+  SET @def = STUFF(@def, 1, CHARINDEX(N'PROCEDURE', @def) + LEN(N'PROCEDURE') - 1, N'ALTER PROCEDURE'); -- bỏ mọi khoảng trắng/CREATE phía trước
+  EXEC sys.sp_executesql @def;
+END`;
 
 export const CONTRACT_SERVICE_LIST = `
 CREATE OR ALTER PROCEDURE dbo.SP_LayDanhSachDichVu
@@ -70,7 +87,7 @@ async function main() {
     await pool.request().batch(ADD_COLUMNS);
     for (const [name, group, text] of EXISTING) {
       await pool.request().input('n', sql.NVarChar(100), name).input('g', sql.NVarChar(30), group).input('t', sql.NVarChar(300), text)
-        .query('UPDATE dbo.DichVu SET Nhom = ISNULL(Nhom, @g), MoTa = ISNULL(MoTa, @t) WHERE TenDichVu = @n');
+        .query('UPDATE dbo.DichVu SET Nhom = @g, MoTa = ISNULL(MoTa, @t) WHERE TenDichVu = @n');
     }
     for (const [name, group, text, unit, price, status] of NEW_SERVICES) {
       await pool.request().input('n', sql.NVarChar(100), name).input('g', sql.NVarChar(30), group).input('t', sql.NVarChar(300), text)
@@ -81,7 +98,9 @@ BEGIN
   INSERT INTO dbo.DichVu (MaDichVu, TenDichVu, DonViTinh, DonGia, Nhom, MoTa, TrangThai) VALUES (@ma, @n, @u, @p, @g, @t, @s);
 END`);
     }
+    await pool.request().batch(FIX_LOST_UNITS);
     await pool.request().batch(CONTRACT_SERVICE_LIST);
+    await pool.request().batch(ROOM_DETAIL_SERVICES);
   }
   const columns = (await pool.request().query("SELECT COUNT(*) AS c FROM sys.columns WHERE object_id = OBJECT_ID(N'dbo.DichVu') AND name IN (N'Nhom', N'MoTa', N'TrangThai')")).recordset[0].c;
   const total = columns === 3 ? (await pool.request().query('SELECT COUNT(*) AS c, SUM(CASE WHEN TrangThai = N\'' + ACTIVE + '\' THEN 1 ELSE 0 END) AS a FROM dbo.DichVu')).recordset[0] : null;

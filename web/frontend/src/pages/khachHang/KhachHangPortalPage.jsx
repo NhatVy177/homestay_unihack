@@ -842,13 +842,13 @@ export default function KhachHangPortalPage() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const roomId = params.get('phong');
-    if (loading || !overview || params.get('dangKy') !== '1' || !roomId || incomingRoomHandled.current === roomId) return;
+    if (loading || !overview || !['1', 'nhom'].includes(params.get('dangKy')) || !roomId || incomingRoomHandled.current === roomId) return;
     let active = true;
     khachMoiApi.getChiTietPhong(roomId).then(({ data }) => {
       if (!active) return;
       incomingRoomHandled.current = roomId;
       setActiveTab('kham-pha');
-      openRentForm(normalizeRoomDetail(data));
+      openRentForm(normalizeRoomDetail(data), params.get('dangKy') === 'nhom' ? { group: true } : {});
       params.delete('phong'); params.delete('dangKy');
       navigate({ pathname: location.pathname, search: `?${params.toString()}` }, { replace: true });
     }).catch(requestError => {

@@ -70,6 +70,9 @@ try {
     await detailReady(page);
     await page.goBack(); assert.equal(new URL(page.url()).searchParams.has('phong'), false);
     await page.goForward(); await detailReady(page);
+    // Nút đăng ký theo nhóm có ở trang chi tiết công khai và giữ lại phòng đã chọn khi đăng nhập.
+    assert.equal(await page.getByRole('button', { name: 'Đăng ký thuê theo nhóm' }).count(), 1);
+    assert.equal(await page.getByText('Quay lại khám phá phòng').locator('svg').count(), 0, 'nút quay lại chỉ có mũi tên, không có biểu tượng tròn');
     await page.getByRole('button', { name: 'Đăng ký thuê ngay', exact: true }).click();
     const next = new URL(page.url()).searchParams.get('next');
     assert.equal(next, '/khach-hang?tab=kham-pha&phong=P101&dangKy=1');
