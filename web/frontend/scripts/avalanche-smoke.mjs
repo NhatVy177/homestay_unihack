@@ -106,7 +106,8 @@ try {
   };
   await openAs(uiUser);
   await page.getByText('Bạn đã xác nhận biên bản lúc 09:30, 06/11/2026', { exact: false }).waitFor();
-  await page.getByRole('button', { name: 'File kiểm chứng (.json)' }).waitFor();
+  // Both handover and settlement now offer evidence downloads; check the saved handover specifically.
+  await page.locator('.xn-saved').filter({ hasText: 'Bạn đã xác nhận biên bản' }).getByRole('button', { name: 'File kiểm chứng (.json)' }).waitFor();
   assert.equal(await page.locator('.xn-tech').count(), 0);
   assert.equal((await page.locator('.xn-card').textContent()).includes('0x'), false);
   await capture('03-khach-da-xac-nhan.png');

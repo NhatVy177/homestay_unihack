@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { imageFallback } from './homeData.js';
+import { createHouseModel, FLOOR_HEIGHT, FLOOR_GAP } from './HouseModel.js';
 
 function release(scene, renderer) {
   scene.traverse(object => {
@@ -142,19 +143,20 @@ export function CurvedGallery({ photos }) {
   return <div ref={host} className="hx-curved-gallery" role="region" tabIndex={0} aria-label="Dải ảnh cong: kéo ngang hoặc dùng phím mũi tên để xem">{fallback && <div className="hx-gallery-fallback">{photos.map(photo => <img key={photo} src={photo} alt="Không gian phòng" onError={imageFallback} />)}</div>}</div>;
 }
 
-export function HouseScene({ expanded, variant }) {
+export function HouseScene({ expanded, variant, layout, selectedFloor }) {
   const host = useRef(null);
-  const state = useRef({ expanded, variant });
+  const state = useRef({ expanded, variant, selectedFloor });
   const [fallback, setFallback] = useState(false);
-  useEffect(() => { state.current = { expanded, variant }; }, [expanded, variant]);
+  useEffect(() => { state.current = { expanded, variant, selectedFloor }; }, [expanded, variant, selectedFloor]);
   useEffect(() => {
     const element = host.current;
+    if (!layout.floorCount) return;
     let renderer;
+    setFallback(false);
     try { renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true }); }
     catch { setFallback(true); return; }
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(35, 1, .1, 100);
-    camera.position.set(7.6, 5.8, 10.5);
+    const camera = new THREE.PerspectiveCamera(35, 1, .1, 500);
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.7));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -163,93 +165,73 @@ export function HouseScene({ expanded, variant }) {
     renderer.domElement.setAttribute('aria-hidden', 'true');
     element.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 2.0, 0);
     controls.enableDamping = true; controls.enablePan = false; controls.enableZoom = false;
     controls.minPolarAngle = .4; controls.maxPolarAngle = Math.PI / 2.1;
     scene.add(new THREE.AmbientLight(0xfff5e6, 2.0));
+    const model = createHouseModel(scene, layout);
+    const { building, floors, roof, outerWalls, roomLabels, floorSlabs, radius } = model;
+    for (const wall of outerWalls) wall.material.transparent = true;
     const sun = new THREE.DirectionalLight(0xfff7e7, 3.5);
-    sun.position.set(-4, 9, 6); sun.castShadow = true;
+    const maxHeight = layout.floorCount * (FLOOR_HEIGHT + FLOOR_GAP) + 2;
+    sun.position.set(-radius, maxHeight + 4, radius * 2); sun.castShadow = true;
     sun.shadow.mapSize.set(1024, 1024);
-    sun.shadow.camera.left = -7; sun.shadow.camera.right = 7;
-    sun.shadow.camera.top = 8; sun.shadow.camera.bottom = -7;
-    sun.shadow.bias = -.001;
+    sun.shadow.camera.left = -radius * 2; sun.shadow.camera.right = radius * 2;
+    sun.shadow.camera.top = maxHeight; sun.shadow.camera.bottom = -radius * 2;
+    sun.shadow.camera.far = maxHeight + radius * 8; sun.shadow.bias = -.001;
     scene.add(sun);
-    const building = new THREE.Group(); scene.add(building);
-    const colors = { wall: 0xe8d5b6, trim: 0xf6e9ce, wood: 0x8c7355, roof: 0x4a6549, glass: 0x9dc7d1, green: 0x7a9870 };
-    function material(color, extra = {}) { return new THREE.MeshStandardMaterial({ color, roughness: .85, ...extra }); }
-    function box(parent, size, position, color, extra = {}) {
-      const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material(color, extra));
-      mesh.position.set(...position); mesh.castShadow = true; mesh.receiveShadow = true; parent.add(mesh); return mesh;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const target = new THREE.Vector3();
+    const offset = new THREE.Vector3();
+    function frameHouse(opened, ease) {
+      const height = .24 + layout.floorCount * FLOOR_HEIGHT + (opened ? layout.floorCount * FLOOR_GAP : 0) + 1.1;
+      const y = height / 2;
+      const deltaY = (y - controls.target.y) * ease;
+      controls.target.y += deltaY; camera.position.y += deltaY;
+      const vertical = THREE.MathUtils.degToRad(camera.fov / 2);
+      const horizontal = Math.atan(Math.tan(vertical) * camera.aspect);
+      // Fit the entire building, including raised roof, for tall branches and narrow screens.
+      const distance = 1.12 * Math.max((height + layout.depth * .35) / (2 * Math.tan(vertical)),
+        (layout.width + layout.depth * .65 + 1.3) / (2 * Math.tan(horizontal))) + layout.depth * .5;
+      offset.copy(camera.position).sub(controls.target).normalize().multiplyScalar(distance);
+      target.copy(controls.target).add(offset); camera.position.lerp(target, ease);
     }
-    const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(3.6, 3.75, .18, 64), material(0xe8d2ad));
-    pedestal.scale.z = .72; pedestal.position.y = .08; pedestal.receiveShadow = true; scene.add(pedestal);
-    const floors = [];
-    const outerWalls = [];
-    for (let level = 0; level < 2; level++) {
-      const floor = new THREE.Group(); floor.position.y = .24 + level * 1.7; building.add(floor); floors.push(floor);
-      box(floor, [4.9, .16, 3.5], [0, 0, 0], colors.trim);
-      box(floor, [4.7, 1.55, .12], [0, .8, -1.6], colors.wall);
-      box(floor, [.12, 1.55, 3.2], [-2.3, .8, 0], colors.wall);
-      outerWalls.push(box(floor, [.12, 1.55, 3.2], [2.3, .8, 0], colors.wall, { transparent: true }));
-      outerWalls.push(box(floor, [4.7, 1.55, .12], [0, .8, 1.6], colors.wall, { transparent: true }));
-      box(floor, [.08, 1.45, 3], [0, .75, 0], colors.trim);
-      // Two furnished rooms per floor, revealed when the house opens.
-      for (const x of [-1.15, 1.15]) {
-        box(floor, [1.45, .25, 1.8], [x, .22, -.1], colors.wood);
-        box(floor, [1.38, .2, 1.72], [x, .43, -.1], 0xf6f0e6);
-        box(floor, [1.4, .06, .95], [x, .57, .25], level ? 0x9eae9a : 0xb3bccc);
-        box(floor, [.55, .12, .32], [x, .59, -.7], 0xffffff);
-        box(floor, [.55, .55, .45], [x - .76, .35, -.65], colors.wood);
-      }
-      for (let i = 0; i < 4; i++) {
-        const x = -1.75 + i * 1.17;
-        if (!level && i === 2) continue;
-        box(floor, [.66, 1.06, .08], [x, .9, 1.69], colors.trim);
-        box(floor, [.5, .9, .06], [x, .9, 1.75], colors.glass, { metalness: .1, roughness: .3 });
-        box(floor, [.025, .9, .035], [x, .9, 1.8], 0xfaf3e5);
-        box(floor, [.5, .025, .035], [x, .9, 1.8], 0xfaf3e5);
-        for (const side of [-1, 1]) box(floor, [.13, 1.0, .05], [x + side * .4, .9, 1.72], colors.green);
-        box(floor, [.76, .08, .2], [x, .35, 1.74], colors.wood);
-      }
+    function resize() {
+      camera.aspect = element.clientWidth / Math.max(element.clientHeight, 1);
+      camera.updateProjectionMatrix(); renderer.setSize(element.clientWidth, element.clientHeight);
+      frameHouse(state.current.expanded, 1); controls.update();
     }
-    box(floors[0], [.65, 1.3, .12], [.59, .69, 1.72], colors.wood);
-    box(floors[0], [.52, .62, .03], [.59, .96, 1.81], colors.glass);
-    box(floors[0], [.08, .08, .08], [.8, .55, 1.83], 0xd4b67c);
-    box(building, [1.0, .15, .45], [.59, .2, 1.9], colors.trim);
-    const roof = new THREE.Group(); roof.position.y = 3.62; building.add(roof);
-    const roofShape = new THREE.Shape(); roofShape.moveTo(-1.9, 0); roofShape.lineTo(0, 1.1); roofShape.lineTo(1.9, 0); roofShape.closePath();
-    const roofMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(roofShape, { depth: 5.1, bevelEnabled: false }), material(colors.roof));
-    roofMesh.rotation.y = Math.PI / 2; roofMesh.position.x = -2.55; roofMesh.castShadow = true; roof.add(roofMesh);
-    box(roof, [5.3, .12, .12], [0, 1.12, 0], 0x3d553c);
-    for (const x of [-2.9, 2.9]) {
-      const tree = new THREE.Group(); tree.position.set(x, .2, 1.1); scene.add(tree);
-      box(tree, [.12, .6, .12], [0, .3, 0], colors.wood);
-      const crown = new THREE.Mesh(new THREE.DodecahedronGeometry(.44, 1), material(colors.green)); crown.position.y = .9; crown.scale.y = 1.2; crown.castShadow = true; tree.add(crown);
-    }
-    const shadow = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.ShadowMaterial({ opacity: .12 }));
-    shadow.rotation.x = -Math.PI / 2; shadow.position.y = -.03; shadow.receiveShadow = true; scene.add(shadow);
-    function resize() { camera.aspect = element.clientWidth / element.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(element.clientWidth, element.clientHeight); }
+    controls.target.set(0, 2, 0); camera.position.set(7.6, 7.8, 10.5);
     const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(element); resize();
     let visible = false;
     const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }); observer.observe(element);
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     let frame;
     function animate() {
       frame = requestAnimationFrame(animate);
       if (!visible || document.hidden) return;
-      const opened = state.current.expanded;
+      const { expanded: opened, variant: currentVariant, selectedFloor: activeFloor } = state.current;
       const ease = reduced.matches ? 1 : .085;
-      floors[1].position.y += ((opened ? 2.85 : 1.94) - floors[1].position.y) * ease;
-      roof.position.y += ((opened ? 5.25 : 3.62) - roof.position.y) * ease;
-      for (const wall of outerWalls) wall.material.opacity += ((opened ? .12 : 1) - wall.material.opacity) * ease;
-      const angle = -.12 + (state.current.variant % 3) * .15;
-      building.rotation.y += (angle - building.rotation.y) * ease;
-      controls.target.y += ((opened ? 2.7 : 2.0) - controls.target.y) * ease;
-      controls.update(); renderer.render(scene, camera);
+      floors.forEach((floor, index) => {
+        const destination = .24 + index * (FLOOR_HEIGHT + (opened ? FLOOR_GAP : 0));
+        floor.position.y += (destination - floor.position.y) * ease;
+        floorSlabs[index].material.color.setHex(layout.floors[index].number === activeFloor ? 0xe4c99d : 0xf6e9ce);
+      });
+      const roofY = .24 + layout.floorCount * (FLOOR_HEIGHT + (opened ? FLOOR_GAP : 0));
+      roof.position.y += (roofY - roof.position.y) * ease;
+      for (const wall of outerWalls) wall.material.opacity += ((opened ? .08 : 1) - wall.material.opacity) * ease;
+      for (const label of roomLabels) label.visible = opened;
+      building.rotation.y += ((-.12 + (currentVariant % 3) * .15) - building.rotation.y) * ease;
+      frameHouse(opened, ease); controls.update(); renderer.render(scene, camera);
       element.dataset.expanded = String(opened);
     }
     element.dataset.ready = 'true'; frame = requestAnimationFrame(animate);
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); resizeObserver.disconnect(); controls.dispose(); release(scene, renderer); delete element.dataset.ready; };
-  }, []);
-  return <div ref={host} className="hx-house-scene" role="img" aria-label="Mô hình nhà 3D, kéo để xoay">{fallback && <div className="hx-house-fallback">⌂<span>Mô hình nhà · Trình duyệt hiện chưa hỗ trợ 3D.</span></div>}</div>;
+    return () => {
+      cancelAnimationFrame(frame); observer.disconnect(); resizeObserver.disconnect(); controls.dispose();
+      release(scene, renderer); renderer.forceContextLoss(); delete element.dataset.ready; delete element.dataset.expanded;
+    };
+  }, [layout]);
+  return <div ref={host} className="hx-house-scene" role="img"
+    data-floor-count={layout.floorCount} data-room-count={layout.modeledRoomCount}
+    aria-label={`Mô hình nhà 3D ${layout.floorCount} tầng, ${layout.modeledRoomCount} phòng đã xác định tầng, kéo để xoay`}>
+    {(!layout.floorCount || fallback) && <div className="hx-house-fallback"><span>{!layout.floorCount ? 'Chưa có thông tin tầng để dựng mô hình. Xem danh sách phòng bên dưới.' : 'Trình duyệt hiện chưa hỗ trợ 3D. Xem các tầng và phòng bên dưới.'}</span></div>}
+  </div>;
 }

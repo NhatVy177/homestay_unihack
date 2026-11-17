@@ -140,6 +140,12 @@ Mức bám mẫu và danh sách mục bên dưới được **D-050 thay thế**
 - Dữ liệu từ các API public hiện có: nổi bật + khám phá + bộ lọc, gộp theo mã phòng và chỉ hiển thị tối đa 6 ở mục nổi bật; thống kê có nhãn đúng tập dữ liệu. Giữ query `khuVuc`, `loaiPhong`, `mucGiaToiDa`, `phong`, form và xử lý tài khoản; không thêm control ngày/giờ không có nghiệp vụ hỗ trợ. Mô hình nhà ghi rõ minh họa; map dùng địa chỉ/tên chi nhánh từ API, điểm khu vực tham khảo từ OpenStreetMap, không giả tọa độ tòa nhà. Không sao chép giá/phòng/tài khoản liên hệ của 23homestay.
 - Kiểm tra bố cục 1440/1024/768/390/320px, cả trạng thái rỗng/lỗi; danh sách chi nhánh mobile cuộn trong panel. Kiểm riêng chuyển động bật/giảm bằng browser: autoplay/pause, transform, gallery drag/phím, render nhà trước/sau mở và xoay, chọn chi nhánh/3D map, modal tài khoản/tư vấn/thông tin. Fixture map dùng style nền riêng để kiểm tương tác ổn định; kiểm thêm OpenFreeMap thật bằng lượt đọc public, phân biệt hai nguồn kết quả.
 
+### Nhà 3D theo tầng/phòng từng chi nhánh — D-055 / J-X084
+
+- Dữ liệu phòng public hiện hành được nhóm riêng theo chi nhánh, dedupe theo mã phòng. Ưu tiên trường tầng rõ ràng, sau đó số Pxxx trong tên phòng hiển thị; mã nội bộ chỉ dùng để mở chi tiết hoặc suy tầng khi không có tên. Không đổi API/DB; danh sách public đã đối chiếu đủ 44 phòng hiện có bằng SELECT chỉ đọc.
+- Mô hình có đủ tầng đến tầng cao nhất (P4xx → tầng4), giữ tầng trung gian chưa có phòng và phân ô/nội thất đúng số phòng từng tầng; mái, bệ, bóng và camera co giãn theo kích thước. Mở/gộp tác động mọi tầng; đổi chi nhánh dựng lại nhà, dọn GPU cũ. Có chọn tầng/số đếm và toàn bộ nút phòng theo tầng, gồm nhóm Chưa rõ tầng; không tự đặt tầng cho phòng thử nghiệm chưa đánh số. Nội thất và hình dáng tiếp tục ghi rõ minh họa.
+- Nghiệm thu: chi nhánh fixture 4→2→1 tầng, tầng rỗng xen kẽ, 6 phòng cùng tầng, ID khác tên, chưa có phòng/chưa rõ tầng, mở/gộp và chuyển chi nhánh; 1440/390px và chế độ giảm chuyển động. Kiểm lại homepage 5 kích thước, hiệu ứng bật/giảm, build/smoke xác nhận; đọc public thật và đối chiếu số lượng ở 3 chi nhánh. Không gửi API ghi hoặc chạy migration/Fuji.
+
 ### Tinh chỉnh gallery và liên hệ — D-051 / J-060
 
 - Gallery tự chạy phải → trái; ảnh hai rìa tiến gần người xem, lớn hơn giữa, mép trên/dưới xéo tạo cảm giác đổ xuống theo ảnh Vy gửi. Chiều cao co giãn trên màn lớn, giữ 280px ở mobile; vẫn kéo/phím/quán tính, không tự chạy khi giảm chuyển động, không tràn ngang toàn trang.

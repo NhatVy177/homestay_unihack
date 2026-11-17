@@ -8,7 +8,7 @@ const base = process.env.UI_BASE_URL || 'http://127.0.0.1:5191';
 const output = resolve('.ui-screens/home-effects/motion');
 await mkdir(output, { recursive: true });
 const branches = ['HomeDorm Quận 1', 'HomeDorm Bình Thạnh', 'HomeDorm Thủ Đức'];
-const rooms = Array.from({ length: 6 }, (_, index) => ({ MaPhong: `UI-${index + 1}`, TenPhong: `Phòng UI ${index + 1}`, TenChiNhanh: branches[index % 3], MaLoaiPhong: 'LP0002', TenLoaiPhong: 'Phòng 2 người', GiaThueTheoGiuong: 2200000, SucChuaToiDa: 2 }));
+const rooms = Array.from({ length: 6 }, (_, index) => ({ MaPhong: `UI-${index + 1}`, TenPhong: `Phòng P${Math.floor(index / 3) + 1}01`, TenChiNhanh: branches[index % 3], MaLoaiPhong: 'LP0002', TenLoaiPhong: 'Phòng 2 người', GiaThueTheoGiuong: 2200000, SucChuaToiDa: 2 }));
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true, args: ['--enable-unsafe-swiftshader'] });
 const results = [];
 const digest = buffer => createHash('sha256').update(buffer).digest('hex');

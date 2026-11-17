@@ -73,6 +73,9 @@ Trạng thái hồ sơ (`PhieuDangKy`): Chờ tiếp nhận → **Đã tiếp nh
 
 ### 3.1 Giai đoạn 1: Đăng ký và xem phòng (D-026, D-042)
 
+D-055: nhà 3D ở giới thiệu trang chủ dùng số tầng/phòng của từng chi nhánh từ danh sách public; số phòng hiển thị P4xx là tầng4, không dùng mã nội bộ khác tên để đoán sai tầng. Các phòng chưa rõ tầng được liệt kê riêng; bố trí/nội thất vẫn minh họa. Bộ chọn tầng mở đầy đủ phòng, click tiếp tục dùng GET/route chi tiết và quy tắc D-042/D-052 hiện có.
+
+
 Trang chủ công khai theo D-049 → D-051 (bố cục/hiệu ứng, gallery phải → trái, liên hệ 0795749721). Trước đăng nhập, khách bấm Xem phòng để đọc cùng chi tiết thư viện ảnh/tiện nghi/giá dịch vụ với portal tại `/kham-pha-phong?phong=...` (D-052/F-16); GET public chỉ trả dữ liệu giới thiệu. Đăng ký giữ phòng qua đăng nhập và mở form cũ, không tự gửi hồ sơ. Quy tắc D-042 về hết chỗ/chờ cọc và khóa đăng ký vẫn áp dụng sau gộp J-X083.
 
 
