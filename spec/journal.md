@@ -1565,3 +1565,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Frontend: `pages/homeExperience/TrustStrip.jsx` + `trustStrip.css` (dải ba số liệu bằng lời khách; nút "Xem cách kiểm chứng" mở khối có liên kết "Xem bằng chứng" tới Snowtrace và dòng nói rõ là mạng thử nghiệm), chèn một dòng `<TrustStrip />` vào `pages/TrangChu.jsx` trước mục giới thiệu; script `scripts/ui-trust-strip.mjs`.
 - Kiểm tra: backend 122 pass; build OK; `ui-trust-strip` PASS ở 1440 và 390 (hiện khi có số liệu, ẩn khi chưa sẵn sàng/chưa có hồ sơ/lỗi, phần đầu không có thuật ngữ); đã xem ảnh. Đọc thật từ Fuji (chỉ đọc): 6 giao dịch, 2 biên bản được xác nhận, 1 đối soát được đồng ý, thu thêm 2.640.000đ, khớp dữ liệu HD0001/HD0002.
 - Giới hạn: số liệu hiện rất nhỏ (2/1/1); trước khi quay demo nên chạy thêm vài hồ sơ mẫu lên Fuji. Số liệu của cả hệ thống, không theo chi nhánh.
+
+## 2026-11-17 16:00:00 +07:00 — J-C164 — Gom về một thư mục làm việc: `D:\HomeStayDorm`
+- Người thực hiện: Claude, theo yêu cầu của Vy (sắp nộp, không để code ở nhiều chỗ; Codex đã commit xong hôm qua).
+- Việc đã làm: `D:\HomeStayDorm-integ` chuyển sang trạng thái tách rời (detached) tại `6aee7e5` để thư mục gốc `D:\HomeStayDorm` lấy nhánh `integration/d043-d045` (đã chứa toàn bộ `origin/main`). Từ nay làm việc ở `D:\HomeStayDorm`; thư mục `-integ` chỉ còn là bản dự phòng, có thể xóa sau khi Vy kiểm tra xong.
+- Sao sang thư mục gốc (không nằm trong git): `web/backend/.env`, `web/frontend/.env` (bản cũ của gốc lưu thành `.env.bak-before-consolidation`), `web/backend/secrets/` và `web/backend/uploads/` (chứng từ khách tải lên, không ghi đè file có sẵn). Cài lại thư viện cho backend và frontend.
+- Chạy lại từ thư mục gốc: backend cổng 5000 (kết nối HOMEDORM4), frontend cổng 5173; `GET /api/trang-chu/minh-bach` trả số liệu thật từ Fuji.
+- Chưa làm: gộp vào `main` (chờ Vy duyệt Pull Request); xóa `D:\HomeStayDorm-integ`. Hai tiến trình xem thử cũ ở cổng 5192 và 5001 (của thư mục gốc, bản cũ) vẫn đang chạy vì thao tác dừng chúng không được cho phép; Vy tắt tay nếu không cần.
