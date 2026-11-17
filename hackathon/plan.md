@@ -330,3 +330,5 @@ Các phụ thuộc còn lại: chốt nghiệp vụ cọc với Vy; quyền truy
 **J-X086 (17/11):** theo yêu cầu Vy, bỏ nhãn tầng trên mô hình nhà3D; bộ chọn tầng bên dưới và nhãn tên phòng khi mở giữ nguyên. Không đổi hình học/dữ liệu tầng/phòng hoặc nghiệp vụ.
 
 **J-X088 (17/11):** theo yêu cầu Vy, hồ sơ khách/nhân viên dùng cây bút chồng góc ảnh để chỉnh ảnh; bỏ nút chữ Đổi ảnh/Xóa ảnh và dòng hướng dẫn PNG/JPG/WebP2MB. Giữ kiểm tra file, báo lỗi/kết quả, API cập nhật và đổi mật khẩu; không sửa backend/DB. Kiểm keyboard/filechooser/upload fixture và1440/390px, build/smoke.
+
+**J-X090 (17/11):** thêm nút Quay lại cho trường hợp khách vào danh sách phòng từ tab Khám phá phòng; nhớ activeTab của cổng, trở về bằng URLtab. Truyền nguồn qua routerstate và giữ khi xóa tìm kiếm/xem chi tiết/trở về, hoạt động sau reload. Nguồn công khai/trực tiếp không có nút này. Dùng button/icon/CSS token hiện có, kiểm1440/390 và luồng điều hướng, không đổi nghiệp vụ/DB.

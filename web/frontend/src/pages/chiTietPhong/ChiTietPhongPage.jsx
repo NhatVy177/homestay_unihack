@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { httpClient } from '../../api/httpClient.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { getAuthenticatedHomePath } from '../../auth/auth.routes.js';
@@ -14,6 +14,8 @@ import './chiTietPhong.css';
 export default function ChiTietPhongPage() {
   const { maPhong } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const backToRooms = () => navigate('/phong', { state: location.state });
   const { user } = useAuth();
   const [room, setRoom] = useState(null), [error, setError] = useState(''), [loading, setLoading] = useState(true), [attempt, setAttempt] = useState(0);
 
@@ -38,9 +40,9 @@ export default function ChiTietPhongPage() {
     <div className="pl-wrap ctp">
       {loading && <div className="kp-loading" role="status"><span /><p>Đang tải chi tiết phòng...</p></div>}
       {error && <div className="kp-detail-error" role="alert"><h1>Chưa thể mở phòng</h1><p>{error}</p>
-        <button className="kp-btn kp-btn-soft" type="button" onClick={() => navigate('/phong')}>Quay lại khám phá phòng</button>
+        <button className="kp-btn kp-btn-soft" type="button" onClick={backToRooms}>Quay lại khám phá phòng</button>
         <button className="kp-btn kp-btn-primary" type="button" onClick={() => setAttempt((value) => value + 1)}>Thử lại</button></div>}
-      {room && <RoomDetailView key={room.maPhong} phong={room} onBack={() => navigate('/phong')} onRent={() => goRegister()} onRentGroup={() => goRegister('nhom')} />}
+      {room && <RoomDetailView key={room.maPhong} phong={room} onBack={backToRooms} onRent={() => goRegister()} onRentGroup={() => goRegister('nhom')} />}
     </div>
   </PublicLayout>;
 }

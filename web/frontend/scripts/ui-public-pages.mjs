@@ -29,6 +29,7 @@ try {
     await page.locator('#phong-noi-bat').getByRole('button', { name: /Xem tất cả phòng/ }).click();
     await page.waitForURL('**/phong');
     await page.getByRole('heading', { name: 'Danh sách phòng' }).waitFor();
+    assert.equal(await page.locator('.dsp-back').count(), 0, 'không có nút trở về cổng khách khi mở từ trang chủ');
     assert.equal(await page.locator('.hx-room-card').count(), 3);
     assert.match(await page.locator('.dsp-head').innerText(), /3 phòng/);
     await page.getByRole('button', { name: 'Quận 7' }).click();

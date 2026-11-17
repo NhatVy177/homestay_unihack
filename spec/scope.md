@@ -162,3 +162,5 @@ Hóa đơn định kỳ (J-C145, 2026-11-16): kế toán có tab "Hóa đơn đ�
 **Tinh chỉnh J-X086:** nhà3D không vẽ nhãn “Tầng …” trên hình nhà; giữ tên phòng khi mở và bộ chọn tầng/số phòng bên dưới. Chỉ đổi trình bày, giữ dữ liệu/số tầng/phòng của D-055.
 
 **Ảnh đại diện J-X088 (bổ sung trình bày D-054):** hồ sơ dùng chung hiển thị nút cây bút ngay góc ảnh để chọn/cập nhật ảnh. Bỏ hai nút chữ Đổi ảnh/Xóa ảnh và dòng hướng dẫn định dạng/dung lượng; giữ giới hạn PNG/JPG/WebP2MB và báo lỗi khi file không hợp lệ, trạng thái đang tải/kết quả. Backend/API/quyền và form đổi mật khẩu không đổi.
+
+**Quay lại từ danh sách phòng J-X090:** mở `/phong` bằng tab Khám phá phòng trong cổng khách có nút “Quay lại” ở trên tiêu đề, trở về đúng tab khách vừa xem. Dấu nguồn nằm trong routerstate, giữ qua tải lại, xóa bộ lọc và vòng danh sách→chi tiết→danh sách (kể cả nút trở về ở trạng thái lỗi chi tiết). Vào danh sách trực tiếp hoặc từ trang chủ không hiện nút trở về cổng; không đổi API/DB/quy tắc thuê.
