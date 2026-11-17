@@ -139,9 +139,12 @@ BEGIN
         COALESCE(lp.GiaThueNguyenPhong, lp.GiaThueTheoGiuong * lp.SucChuaToiDa) AS giaNguyenPhong,
         COALESCE(lp.GiaThueNguyenPhong, lp.GiaThueTheoGiuong * lp.SucChuaToiDa) AS giaThueNguyenPhong,
         COALESCE(lp.GiaThueTheoGiuong, lp.GiaThueNguyenPhong) AS giaThue,
-        CASE
-            WHEN TRY_CONVERT(INT, SUBSTRING(p.MaPhong, 2, 1)) IS NULL THEN NULL
-            ELSE TRY_CONVERT(INT, SUBSTRING(p.MaPhong, 2, 1))
+        CASE -- D-056: floor from display number, not branch-based database ID.
+            WHEN PATINDEX(N'%P[0-9][0-9][0-9]%', UPPER(p.TenPhong))=0 THEN NULL
+            ELSE COALESCE(
+                TRY_CONVERT(INT,SUBSTRING(p.TenPhong,PATINDEX(N'%P[0-9][0-9][0-9]%',UPPER(p.TenPhong))+1,4)),
+                TRY_CONVERT(INT,SUBSTRING(p.TenPhong,PATINDEX(N'%P[0-9][0-9][0-9]%',UPPER(p.TenPhong))+1,3))
+            ) / 100
         END AS tang,
         (
             SELECT COUNT(*)

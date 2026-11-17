@@ -152,3 +152,9 @@ Kiểm thử cần phủ sai quyền/chữ ký, replay/hết hạn/sai domain, s
 Hóa đơn định kỳ (J-C145, 2026-11-16): kế toán có tab "Hóa đơn định kỳ" theo màn của nhóm Hằng: chọn hợp đồng hiệu lực trong chi nhánh, chốt chỉ số điện nước theo phòng (ghép giường chia theo số giường thuê), cộng tiền phòng, dịch vụ đã đăng ký và phí phát sinh đã xác nhận (bảng mới `PhiPhatSinh`) thành hóa đơn tháng; danh sách theo kỳ, ngăn chi tiết, thu tiền (tiền mặt/chuyển khoản), in. Hạn thanh toán ngày 10 tháng sau kỳ, tối thiểu 7 ngày từ lúc lập. Ngoài chain.
 
 **Tích hợp J-X083 (17/11):** chi tiết phòng dùng chung và public giữ quy tắc D-042: khóa nút Hết chỗ, cho quan tâm phòng Đang chờ cọc kèm ghi chú. DTO public chỉ thêm nhãn khả dụng, không trả dữ liệu khách/giá vốn. Gộp theo yêu cầu mới của Vy, không đổi nghiệp vụ hoặc chạy migration SQL.
+
+### Danh mục phòng sau dọn test và thêm tầng3 — D-056 / J-X085
+
+- HOMEDORM4 không còn các phòng tên test/thử nghiệm đã rà (P921–P928/P941–P942); chỉ xóa bản ghi phòng và giường trống không còn tham chiếu, không cascade sang hồ sơ thuê. Tạo P301/P302/P303 hiển thị tại CN0001/CN0002/CN0003, mỗi chi nhánh thêm loại4/6/VIP2 người theo tầng2 (12 giường mới/chi nhánh), phòng/giường Trống. Không gán ảnh thật hoặc tài sản kiểm kê chưa xác minh.
+- Kết quả hiện hành: Quận1 và Bình Thạnh mỗi nơi15 phòng, số theo tầng1/2/3/4 là3/3/3/6; Thủ Đức13 phòng theo3/3/3/4. Tổng43 phòng, không còn nhóm chưa rõ tầng trong danh mục hiện tại. API chi tiết tính tầng theo tên phòng Pxxx, nên các ID nội bộ P107/P207/P307 đều trả tầng3 cho phòng P301.
+- Chạy bằng `room-catalog:db:check`, `room-catalog:db:dry-run`, `room-catalog:db:migrate`; SQL/runner có snapshot ngoàiGit trước ghi, SERIALIZABLE transaction, chặn tên/chi nhánh/trạng thái thay đổi hoặc tham chiếu, chặn mã mới trùng, hash phần không liên quan và chạy lại0 thay đổi. Dữ liệu đã áp dụng thật theo yêu cầu Vy; frontend nhà3D vẫn nằm trên nhánh D-055 riêng, không tự merge main.

@@ -5,6 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "room-catalog:db:check": "node scripts/room-catalog-db.mjs check",
+    "room-catalog:db:dry-run": "node scripts/room-catalog-db.mjs dry-run",
+    "room-catalog:db:migrate": "node scripts/room-catalog-db.mjs migrate",
     "dev": "nodemon index.js",
     "start": "node index.js",
     "avalanche:db:check": "node scripts/avalanche-db.mjs check",

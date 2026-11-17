@@ -324,3 +324,5 @@ Các phụ thuộc còn lại: chốt nghiệp vụ cọc với Vy; quyền truy
 - 04/11, bản hợp nhất: chưa ghi “BTC chấm toàn bộ sản phẩm” hoặc lịch workshop/office hours thành sự thật khi thiếu nguồn trực tiếp. Hai tiêu chí kỹ thuật/tích hợp vẫn được ưu tiên.
 
 **Tích hợp J-X083 (17/11):** chi tiết phòng dùng chung và public giữ quy tắc D-042: khóa nút Hết chỗ, cho quan tâm phòng Đang chờ cọc kèm ghi chú. DTO public chỉ thêm nhãn khả dụng, không trả dữ liệu khách/giá vốn. Gộp theo yêu cầu mới của Vy, không đổi nghiệp vụ hoặc chạy migration SQL.
+
+**Danh mục phòng D-056 / J-X085 (17/11):** Vy yêu cầu dọn toàn bộ phòng test trong HOMEDORM4 và thêm phòng tầng3. Bảo trì có backup/transaction, chỉ xóa10 phòng test đã rà cùng16 giường trống, thêmP301/P302/P303 ở mỗi chi nhánh với36 giường mới; mã nội bộ khác tên hiển thị. Chi tiết phòng suy tầng theo tên để khớp mô hình D-055. Đã áp dụng và kiểm dry-run/rollback, idempotence, GET/public detail và browser1440/390; dữ liệu ngoài phạm vi giữ nguyên, không xóa hồ sơ thuê hoặc thay giá loại phòng. Đây là dọn/bổ sung danh mục Web2, không phải nghiệm thu Fuji. Chi tiết lệnh/backup/bằng chứng tại spec/progress và J-X085.

@@ -73,6 +73,9 @@ Trạng thái hồ sơ (`PhieuDangKy`): Chờ tiếp nhận → **Đã tiếp nh
 
 ### 3.1 Giai đoạn 1: Đăng ký và xem phòng (D-026, D-042)
 
+D-056: danh mục HOMEDORM4 đã dọn10 phòng test và bổ sungP301/P302/P303 ở cả3 chi nhánh (43 phòng tổng). Tầng3 có3 phòng mỗi chi nhánh; chi tiết API tính tầng theo tên hiển thị, mã nội bộ chỉ dùng xử lý/link. Không đổi quyền/quy trình đăng ký/giữ chỗ; phòng mới/giường mới bắt đầu Trống.
+
+
 Trang chủ công khai theo D-049 → D-051 (bố cục/hiệu ứng, gallery phải → trái, liên hệ 0795749721). Trước đăng nhập, khách bấm Xem phòng để đọc cùng chi tiết thư viện ảnh/tiện nghi/giá dịch vụ với portal tại `/kham-pha-phong?phong=...` (D-052/F-16); GET public chỉ trả dữ liệu giới thiệu. Đăng ký giữ phòng qua đăng nhập và mở form cũ, không tự gửi hồ sơ. Quy tắc D-042 về hết chỗ/chờ cọc và khóa đăng ký vẫn áp dụng sau gộp J-X083.
 
 
