@@ -1,12 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { httpClient } from '../../api/httpClient.js';
+import { Icon } from '../../components/common/Icon.jsx';
 import './trustStrip.css';
 
 // Dải "Thuê minh bạch" trên trang chủ. Số liệu lấy từ biên lai giao dịch trên chuỗi (máy chủ đọc lại từ Avalanche), nhưng lời lẽ
-// dành cho người đi thuê: không nói thuật ngữ ở phần đầu. Chi tiết kiểm chứng nằm trong khối thu gọn bên dưới.
+// dành cho người đi thuê. Phần mở rộng là "Hoạt động gần đây" như trang thuê nhà thường có; liên kết bản gốc chỉ là biểu tượng nhỏ
+// và tên mạng lưu trữ nằm ở chú thích cuối khối (D-058).
 const money = (value) => `${Number(value).toLocaleString('vi-VN')}đ`;
-const when = (iso) => (iso ? new Date(iso).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '');
+const ACTIVITY = {
+  HandoverProposed: 'Bàn giao phòng',
+  HandoverAccepted: 'Khách xác nhận biên bản bàn giao',
+  SettlementProposed: 'Gửi đối soát tiền cọc cho khách',
+  SettlementDisputed: 'Khách phản hồi bản đối soát',
+  SettlementAccepted: 'Khách đồng ý đối soát tiền cọc',
+};
+export function timeAgo(iso, now = Date.now()) {
+  if (!iso) return '';
+  const minutes = Math.max(0, Math.round((now - new Date(iso).getTime()) / 60000));
+  if (minutes < 1) return 'vừa xong';
+  if (minutes < 60) return `${minutes} phút trước`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} giờ trước`;
+  const days = Math.round(hours / 24);
+  if (days < 30) return `${days} ngày trước`;
+  return new Date(iso).toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+}
 
 export default function TrustStrip() {
   const [data, setData] = useState(null), [open, setOpen] = useState(false);
@@ -23,6 +42,7 @@ export default function TrustStrip() {
     data.acceptedWithoutDispute > 0 && { value: data.acceptedWithoutDispute, label: 'đồng ý ngay, không cần chỉnh sửa' },
     Number(data.refundVnd) > 0 && { value: money(data.refundVnd), label: 'tiền cọc hoàn lại theo đối soát đã đồng ý' },
   ].filter(Boolean).slice(0, 3);
+  const recent = data.recent || [];
   return <section className="ts" id="minh-bach" aria-labelledby="ts-title">
     <div className="ts-inner">
       <div className="ts-head">
@@ -32,19 +52,22 @@ export default function TrustStrip() {
       <dl className="ts-stats">
         {stats.map((item) => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}
       </dl>
-      <button type="button" className="ts-toggle" aria-expanded={open} aria-controls="ts-proof" onClick={() => setOpen((value) => !value)}>
-        {open ? 'Thu gọn' : 'Xem cách kiểm chứng'}
-      </button>
-      {open && <div className="ts-proof" id="ts-proof">
-        <p>Bạn luôn giữ một bản biên bản của mình. Ai cũng có thể đối chiếu bản đó với hồ sơ đã lưu để biết nó có bị chỉnh sửa hay không, kể cả khi không đăng nhập.
-          {' '}<Link to="/kiem-chung-avalanche">Kiểm tra một biên bản</Link></p>
-        {data.recent?.length > 0 && <ul className="ts-list" aria-label="Hồ sơ gần đây">
-          {data.recent.map((item) => <li key={item.hash}>
-            <span>{item.label}</span><small>{when(item.at)}</small>
-            {data.explorer && <a href={`${data.explorer}/tx/${item.hash}`} target="_blank" rel="noreferrer">Xem bằng chứng</a>}
+      {recent.length > 0 && <button type="button" className="ts-toggle" aria-expanded={open} aria-controls="ts-activity" onClick={() => setOpen((value) => !value)}>
+        {open ? 'Thu gọn' : 'Xem hoạt động gần đây'}
+      </button>}
+      {open && <div className="ts-activity" id="ts-activity">
+        <h3>Hoạt động gần đây</h3>
+        <ul className="ts-list">
+          {recent.map((item) => <li key={item.hash}>
+            <span className="ts-check" aria-hidden="true"><Icon name="check" /></span>
+            <span className="ts-what"><strong>{item.type === 'HandoverProposed' && item.room ? `Bàn giao ${item.room.replace(/^Phòng /, 'phòng ')}` : (ACTIVITY[item.type] || item.label)}</strong>
+              <small>{[item.type !== 'HandoverProposed' ? item.room : null, timeAgo(item.at)].filter(Boolean).join(' · ')}</small></span>
+            {data.explorer && <a className="ts-source" href={`${data.explorer}/tx/${item.hash}`} target="_blank" rel="noreferrer"
+              aria-label={`Mở bản gốc: ${ACTIVITY[item.type] || item.label}`} title="Mở bản gốc đã lưu"><Icon name="arrow_forward" /></a>}
           </li>)}
-        </ul>}
-        <p className="ts-note">Hồ sơ được ghi trên {data.network || 'Avalanche'}. Đây là mạng thử nghiệm dùng cho bản demo; các số liệu được máy chủ đọc lại từ biên lai giao dịch trên chuỗi.</p>
+        </ul>
+        <p className="ts-own">Bạn luôn giữ một bản biên bản của mình và có thể đối chiếu bất cứ lúc nào, kể cả khi không đăng nhập. <Link to="/kiem-chung-avalanche">Kiểm tra một biên bản →</Link></p>
+        <p className="ts-note">Bản gốc được lưu trên mạng {data.network || 'Avalanche'}, không ai sửa được.</p>
       </div>}
     </div>
   </section>;

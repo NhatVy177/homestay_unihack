@@ -1690,3 +1690,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Khôi phục đúng bản ở `068563a`: `web/frontend/src/pages/homeExperience/TrustStrip.jsx`, `trustStrip.css`, `web/frontend/scripts/ui-trust-strip.mjs`; `pages/TrangChu.jsx` gắn lại `<TrustStrip />` sau mục Dịch vụ. Giữ nhãn ô đăng nhập "Tên hoặc email đăng nhập". Quyết định: D-058 (thay D-057).
 - Kiểm tra: build OK; `ui-trust-strip`, `ui-home` PASS.
 - Còn lại: chờ Vy chọn cách trình bày mới cho dải này rồi mới sửa.
+
+## 2026-11-17 20:42:47 +07:00 — J-C178 — Làm lại phần mở rộng dải minh bạch thành "Hoạt động gần đây"
+- Người thực hiện: Claude; Vy chọn phương án "Hoạt động gần đây" (D-059) sau khi Claude hỏi bằng 3 phương án có hình minh họa.
+- Backend: `integrations/avalanche/publicStats.js` — `hashesFromCases` trả `{ hash, room }` (tên phòng tra từ `AvalancheCase.ContractId` → `HopDongThue.MaPhieuCoc` → `ChiTietDatCoc` → `Phong`), bộ đọc nhận cả chuỗi lẫn đối tượng và thêm `room` vào từng mục `recent`; `test/public-stats.test.mjs` thêm 1 test. Đã gọi thật `GET /api/trang-chu/minh-bach`: 6 hoạt động gắn đúng Phòng P103 và Phòng P202.
+- Frontend: `pages/homeExperience/TrustStrip.jsx` + `trustStrip.css` (nút "Xem hoạt động gần đây"; dòng có dấu tick, việc, phòng, "x ngày trước"; mũi tên nhỏ mở bản gốc; câu "Bạn luôn giữ một bản biên bản…" và liên kết "Kiểm tra một biên bản →"; chú thích nhỏ "Bản gốc được lưu trên mạng Avalanche Fuji (mạng thử nghiệm), không ai sửa được."); `scripts/ui-trust-strip.mjs` sửa theo.
+- Kiểm tra: backend 127 pass/0 fail; build OK; `ui-trust-strip` PASS; đã xem ảnh với dữ liệu thật ở 1440px và 390px.

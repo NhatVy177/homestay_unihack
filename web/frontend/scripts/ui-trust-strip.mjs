@@ -9,7 +9,7 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 const hash = (n) => `0x${String(n).padStart(64, 'a')}`;
 const ready = { ready: true, updatedAt: '2026-11-17T04:00:00Z', transactions: 6, handoversPublished: 12, handoversConfirmed: 12, settlementsSent: 10, settlementsAccepted: 9, acceptedWithoutDispute: 7, disputes: 2,
   refundVnd: '48000000', topUpVnd: '5000000', explorer: 'https://testnet.snowtrace.io', network: 'Avalanche Fuji (mạng thử nghiệm)',
-  recent: [{ type: 'SettlementAccepted', label: 'Khách đồng ý đối soát tiền cọc', hash: hash(1), blockNumber: '1', at: '2026-11-17T03:00:00Z' }, { type: 'HandoverAccepted', label: 'Khách xác nhận biên bản bàn giao', hash: hash(2), blockNumber: '2', at: '2026-11-16T03:00:00Z' }] };
+  recent: [{ type: 'SettlementAccepted', label: 'Khách đồng ý đối soát tiền cọc', room: 'Phòng P101', hash: hash(1), blockNumber: '1', at: '2026-11-17T03:00:00Z' }, { type: 'HandoverProposed', label: 'Bàn giao phòng được phát hành', room: 'Phòng P202', hash: hash(2), blockNumber: '2', at: '2026-11-16T03:00:00Z' }] };
 try {
   for (const width of [1440, 390]) {
     for (const mode of ['ready', 'not-ready', 'empty', 'error']) {
@@ -40,13 +40,18 @@ try {
       assert.match(text, /Thuê minh bạch, cọc rõ ràng/);
       assert.match(text, /12\s*biên bản bàn giao đã được khách xác nhận|biên bản bàn giao đã được khách xác nhận/);
       assert.doesNotMatch(text, /Avalanche|Fuji|blockchain|mã băm/i, 'phần đầu không nói thuật ngữ');
-      assert.equal(await page.locator('#ts-proof').count(), 0, 'khối kiểm chứng đóng sẵn');
+      assert.equal(await page.locator('#ts-activity').count(), 0, 'khối hoạt động đóng sẵn');
       await page.screenshot({ path: `${folder}/strip-${width}.png` });
-      await strip.getByRole('button', { name: 'Xem cách kiểm chứng' }).click();
-      const proof = page.locator('#ts-proof');
+      await strip.getByRole('button', { name: 'Xem hoạt động gần đây' }).click();
+      const proof = page.locator('#ts-activity');
       await proof.waitFor();
-      assert.match(await proof.innerText(), /Avalanche Fuji \(mạng thử nghiệm\)/);
-      const links = await proof.getByRole('link', { name: 'Xem bằng chứng' }).evaluateAll((els) => els.map((el) => el.href));
+      const activity = await proof.innerText();
+      assert.match(activity, /Hoạt động gần đây/);
+      assert.match(activity, /Khách đồng ý đối soát tiền cọc\s*Phòng P101 · \d+ (phút|giờ|ngày) trước|Khách đồng ý đối soát tiền cọc\s*Phòng P101/);
+      assert.match(activity, /Bàn giao phòng P202/);
+      assert.doesNotMatch(activity, /bằng chứng/i, 'không dùng chữ bằng chứng');
+      assert.match(await proof.locator('.ts-note').innerText(), /Avalanche Fuji \(mạng thử nghiệm\)/);
+      const links = await proof.getByRole('link', { name: /Mở bản gốc/ }).evaluateAll((els) => els.map((el) => el.href));
       assert.deepEqual(links, [`https://testnet.snowtrace.io/tx/${hash(1)}`, `https://testnet.snowtrace.io/tx/${hash(2)}`]);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width);
       await page.screenshot({ path: `${folder}/proof-${width}.png` });

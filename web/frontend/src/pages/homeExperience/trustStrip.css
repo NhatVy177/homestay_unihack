@@ -8,11 +8,20 @@
 .ts-stats dt { font-size: 14px; color: var(--color-text-muted, #5E655C); }
 .ts-toggle { min-height: 44px; padding: 0 22px; border: 1px solid var(--color-primary, #4A6549); border-radius: 999px; background: transparent; font: inherit; font-weight: 600; color: var(--color-primary, #4A6549); cursor: pointer; }
 .ts-toggle:hover { background: var(--color-surface, #fff); }
-.ts-proof { width: min(760px, 100%); display: grid; gap: 14px; padding: 20px; border-radius: var(--radius-lg, 20px); background: var(--color-surface, #fff); text-align: left; font-size: 14px; line-height: 1.6; color: var(--color-text, #191C1A); }
-.ts-proof p { margin: 0; }
-.ts-proof a { color: var(--color-primary, #4A6549); font-weight: 600; }
-.ts-list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
-.ts-list li { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--color-border, #E0E3DF); }
-.ts-list small { color: var(--color-text-muted, #5E655C); }
-.ts-note { font-size: 12px; color: var(--color-text-muted, #5E655C); }
-@media (max-width: 640px) { .ts { padding: 40px 0; } .ts-list li { grid-template-columns: 1fr; gap: 2px; } }
+.ts-activity { width: min(680px, 100%); display: grid; gap: 14px; padding: 24px; border-radius: var(--radius-lg, 20px); background: var(--color-surface, #fff); text-align: left; color: var(--color-text, #191C1A); }
+.ts-activity h3 { margin: 0; font-size: 16px; }
+.ts-list { display: grid; margin: 0; padding: 0; list-style: none; }
+.ts-list li { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--color-border, #E0E3DF); }
+.ts-list li:last-child { border-bottom: 0; }
+.ts-check { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--color-primary-soft, #E8EDE7); color: var(--color-primary, #4A6549); }
+.ts-check svg, .ts-check .ui-icon { width: 16px; height: 16px; }
+.ts-what { display: grid; gap: 2px; min-width: 0; }
+.ts-what strong { font-size: 15px; font-weight: 600; }
+.ts-what small { font-size: 13px; color: var(--color-text-muted, #5E655C); }
+.ts-source { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; color: var(--color-text-muted, #5E655C); }
+.ts-source:hover { background: var(--color-surface-alt, #F1F4F0); color: var(--color-primary, #4A6549); }
+.ts-source svg, .ts-source .ui-icon { width: 16px; height: 16px; transform: rotate(-45deg); }
+.ts-own { margin: 4px 0 0; font-size: 14px; line-height: 1.6; color: var(--color-text-muted, #5E655C); }
+.ts-own a { color: var(--color-primary, #4A6549); font-weight: 600; }
+.ts-note { margin: 0; font-size: 12px; color: var(--color-text-muted, #5E655C); }
+@media (max-width: 640px) { .ts { padding: 40px 0; } .ts-activity { padding: 18px; } }

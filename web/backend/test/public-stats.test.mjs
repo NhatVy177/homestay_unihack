@@ -79,3 +79,13 @@ test('not ready when no receipt could be read yet; summarize handles an empty ch
   assert.deepEqual(await failing.snapshot(), { ready: false });
   assert.deepEqual(summarize([]), { handoversPublished: 0, handoversConfirmed: 0, settlementsSent: 0, settlementsAccepted: 0, acceptedWithoutDispute: 0, disputes: 0, refundVnd: '0', topUpVnd: '0' });
 });
+
+test('recent items carry the room name supplied with each transaction hash', async () => {
+  const listed = LOGS.map((l, i) => ({ hash: l.transactionHash, room: i < 3 ? 'Phòng P101' : 'Phòng P202' }));
+  const reader = createStatsReader({ client: fakeClient(), address: ADDRESS, listHashes: () => listed });
+  const snap = await reader.snapshot({ recent: 9 });
+  assert.equal(snap.recent.find((item) => item.blockNumber === '5003').room, 'Phòng P202');
+  assert.equal(snap.recent.find((item) => item.blockNumber === '6').room, 'Phòng P101');
+  const plain = await createStatsReader({ client: fakeClient(), address: ADDRESS, listHashes: hashesOf() }).snapshot();
+  assert.equal(plain.recent[0].room, null, 'không có tên phòng thì để trống');
+});

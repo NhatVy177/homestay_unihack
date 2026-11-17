@@ -39,6 +39,7 @@ export function summarize(events) {
 
 export function createStatsReader({ client, address, listHashes, now = () => Date.now(), staleMs = 60 * 1000 }) {
   const byHash = new Map(); // mã giao dịch đã đọc xong -> các sự kiện hợp lệ của nó
+  const rooms = new Map(); // mã giao dịch -> tên phòng (chỉ để hiển thị, lấy từ cơ sở dữ liệu)
   const stamps = new Map();
   let updatedAt = null, running = null;
 
@@ -54,7 +55,10 @@ export function createStatsReader({ client, address, listHashes, now = () => Dat
   }
 
   async function sync() {
-    const hashes = [...new Set((await listHashes()).map((h) => String(h).toLowerCase()))].filter((h) => /^0x[0-9a-f]{64}$/.test(h));
+    // Mỗi mục là mã giao dịch hoặc { hash, room }.
+    const listed = (await listHashes()).map((item) => (typeof item === 'string' ? { hash: item } : item));
+    for (const item of listed) if (item.room) rooms.set(String(item.hash).toLowerCase(), item.room);
+    const hashes = [...new Set(listed.map((item) => String(item.hash).toLowerCase()))].filter((h) => /^0x[0-9a-f]{64}$/.test(h));
     const fresh = hashes.filter((h) => !byHash.has(h));
     const results = await Promise.all(fresh.map(async (h) => [h, await readReceipt(h)]));
     for (const [h, events] of results) if (events) byHash.set(h, events);
@@ -81,7 +85,7 @@ export function createStatsReader({ client, address, listHashes, now = () => Dat
       const events = [...byHash.values()].flat();
       const latest = [...events].sort((a, b) => (a.blockNumber === b.blockNumber ? Number(b.logIndex - a.logIndex) : Number(b.blockNumber - a.blockNumber))).slice(0, recent);
       const items = await Promise.all(latest.map(async (e) => ({
-        type: e.name, label: TYPES[e.name], hash: e.hash, blockNumber: e.blockNumber.toString(),
+        type: e.name, label: TYPES[e.name], hash: e.hash, room: rooms.get(e.hash) || null, blockNumber: e.blockNumber.toString(),
         at: await timestamp(e.blockNumber).then((ms) => new Date(ms).toISOString()).catch(() => null),
       })));
       return { ready: true, updatedAt: new Date(updatedAt).toISOString(), transactions: byHash.size, ...summarize(events), recent: items };
@@ -91,15 +95,22 @@ export function createStatsReader({ client, address, listHashes, now = () => Dat
 
 // Danh sách mã giao dịch lấy từ các hồ sơ xác nhận đã lưu (chỉ để biết cần đọc biên lai nào).
 // Chỉ lấy các đối tượng biên lai (có hash và số khối), bỏ qua mã băm nội dung và giao dịch chưa được xác nhận.
+// Kèm tên phòng của hợp đồng (qua phiếu cọc) để trang chủ ghi "Phòng P101"; không lấy tên hay thông tin của khách.
 export async function hashesFromCases(query) {
-  const rows = (await query('SELECT Data FROM dbo.AvalancheCase')).recordset || [];
+  const rows = (await query(`SELECT c.Data, ph.TenPhong AS tenPhong FROM dbo.AvalancheCase c
+    LEFT JOIN dbo.HopDongThue h ON h.MaHopDong = c.ContractId
+    OUTER APPLY (SELECT TOP 1 d.MaPhong FROM dbo.ChiTietDatCoc d WHERE d.MaPhieuDatCoc = h.MaPhieuCoc ORDER BY d.MaPhong) r
+    LEFT JOIN dbo.Phong ph ON ph.MaPhong = r.MaPhong`)).recordset || [];
   const found = [];
-  const walk = (node) => {
-    if (!node || typeof node !== 'object') return;
-    if (typeof node.hash === 'string' && /^0x[0-9a-fA-F]{64}$/.test(node.hash) && node.blockNumber !== undefined) found.push(node.hash);
-    for (const value of Object.values(node)) walk(value);
-  };
-  for (const row of rows) { try { walk(JSON.parse(row.Data || '{}')); } catch { /* hồ sơ hỏng thì bỏ qua */ } }
+  for (const row of rows) {
+    const room = row.tenPhong || null;
+    const walk = (node) => {
+      if (!node || typeof node !== 'object') return;
+      if (typeof node.hash === 'string' && /^0x[0-9a-fA-F]{64}$/.test(node.hash) && node.blockNumber !== undefined) found.push({ hash: node.hash, room });
+      for (const value of Object.values(node)) walk(value);
+    };
+    try { walk(JSON.parse(row.Data || '{}')); } catch { /* hồ sơ hỏng thì bỏ qua */ }
+  }
   return found;
 }
 
