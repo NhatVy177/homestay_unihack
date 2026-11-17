@@ -31,7 +31,6 @@ export function createHouseModel(scene, layout) {
     outerWalls.push(box(floor, [.1, 1.48, depth], [-width / 2, .8, 0], colors.wall, { transparent: true }));
     outerWalls.push(box(floor, [.1, 1.48, depth], [width / 2, .8, 0], colors.wall, { transparent: true }));
     outerWalls.push(box(floor, [width, 1.48, .1], [0, .8, depth / 2], colors.wall, { transparent: true }));
-    label(floor, data.name, [0, 1.4, depth / 2 + .15], .8);
     data.rooms.forEach((room, index) => {
       const col = index % columns, row = Math.floor(index / columns);
       const x = (col - (columns - 1) / 2) * 1.7, z = ((rows - 1) / 2 - row) * 2.2;

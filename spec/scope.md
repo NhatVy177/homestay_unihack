@@ -158,3 +158,5 @@ Kiểm thử cần phủ sai quyền/chữ ký, replay/hết hạn/sai domain, s
 Hóa đơn định kỳ (J-C145, 2026-11-16): kế toán có tab "Hóa đơn định kỳ" theo màn của nhóm Hằng: chọn hợp đồng hiệu lực trong chi nhánh, chốt chỉ số điện nước theo phòng (ghép giường chia theo số giường thuê), cộng tiền phòng, dịch vụ đã đăng ký và phí phát sinh đã xác nhận (bảng mới `PhiPhatSinh`) thành hóa đơn tháng; danh sách theo kỳ, ngăn chi tiết, thu tiền (tiền mặt/chuyển khoản), in. Hạn thanh toán ngày 10 tháng sau kỳ, tối thiểu 7 ngày từ lúc lập. Ngoài chain.
 
 **Tích hợp J-X083 (17/11):** chi tiết phòng dùng chung và public giữ quy tắc D-042: khóa nút Hết chỗ, cho quan tâm phòng Đang chờ cọc kèm ghi chú. DTO public chỉ thêm nhãn khả dụng, không trả dữ liệu khách/giá vốn. Gộp theo yêu cầu mới của Vy, không đổi nghiệp vụ hoặc chạy migration SQL.
+
+**Tinh chỉnh J-X086:** nhà3D không vẽ nhãn “Tầng …” trên hình nhà; giữ tên phòng khi mở và bộ chọn tầng/số phòng bên dưới. Chỉ đổi trình bày, giữ dữ liệu/số tầng/phòng của D-055.
