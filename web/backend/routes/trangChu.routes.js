@@ -21,7 +21,7 @@ router.get('/minh-bach', async (req, res) => {
     const reader = sharedStatsReader(process.env, { query: executeQuery });
     if (!reader) return res.json({ ready: false });
     res.set('Cache-Control', 'public, max-age=60');
-    res.json({ ...(await reader.snapshot()), explorer: process.env.AVALANCHE_CHAIN_ID === '43113' || !process.env.AVALANCHE_CHAIN_ID ? 'https://testnet.snowtrace.io' : null, network: 'Avalanche Fuji (mạng thử nghiệm)' });
+    res.json({ ...(await reader.snapshot({ recent: 30 })), explorer: process.env.AVALANCHE_CHAIN_ID === '43113' || !process.env.AVALANCHE_CHAIN_ID ? 'https://testnet.snowtrace.io' : null, network: 'Avalanche Fuji (mạng thử nghiệm)' });
   } catch { res.json({ ready: false }); }
 });
 // Bảng giá dịch vụ công khai (chỉ tên, đơn vị, đơn giá) cho trang Dịch vụ.

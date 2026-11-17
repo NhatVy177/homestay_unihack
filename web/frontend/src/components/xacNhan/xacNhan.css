@@ -56,3 +56,6 @@
 .xn-card.is-bare .xn-doc { gap: 8px; }
 .xn-card.is-bare .xn-doc { flex-direction: row; flex-wrap: wrap; align-items: center; column-gap: 16px; }
 .xn-card.is-bare .xn-doc > .xn-form, .xn-card.is-bare .xn-doc > .xn-alert, .xn-card.is-bare .xn-doc > p { flex-basis: 100%; }
+.xn-verify { display: inline-flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+.xn-verify-ok { font-size: 13px; font-weight: 600; color: var(--color-primary, #4A6549); }
+.xn-verify-bad { font-size: 13px; font-weight: 600; color: var(--color-danger, #B04B4B); }

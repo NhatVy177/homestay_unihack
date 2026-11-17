@@ -10,6 +10,7 @@ import { checkSnapshot, downloadEvidence } from '../../lib/avalanche/evidence.js
 import { printHandoverEvidence, printSettlementEvidence } from '../../lib/avalanche/evidencePrint.js';
 import { avalancheApi, dateTime, errorMessage, privyAppId, rpcUrl, trustedDeployment } from '../../lib/avalanche/api.js';
 import { emailNotice, receiptTime } from './receiptDisplay.js';
+import VerifyNow from './VerifyNow.jsx';
 import './xacNhan.css';
 const AccountSignerProvider = privyAppId ? lazy(() => import('./AccountSignerProvider.jsx')) : null;
 const recordedAt = receipt => {
@@ -150,8 +151,8 @@ function TenantCase({ c, signer, reload, show = 'all', onChanged }) {
       <strong>✅ Bạn đã xác nhận biên bản{recordedAt(c.handover.confirmationReceipt)}. Biên bản đã được lưu và không thể chỉnh sửa.</strong>
       <div className="xn-actions"><button type="button" className="xn-link" onClick={() => downloadEvidence(c.handover, `ban-giao-${c.contractId}.json`)}>File kiểm chứng (.json)</button>
         <button type="button" className="xn-link" onClick={() => { if (!printHandoverEvidence(c.handover)) setError('Trình duyệt đang chặn cửa sổ in. Vui lòng cho phép cửa sổ bật lên rồi thử lại.'); }}>Tải bản PDF dễ đọc</button>
-        <a href="/kiem-chung-avalanche" target="_blank" rel="noreferrer">Kiểm tra biên bản</a></div>
-      <span className="xn-muted">Tải file bản lưu lên để tự kiểm tra biên bản chưa bị sửa.</span>
+        <VerifyNow evidence={c.handover} label="Kiểm tra biên bản ngay" /></div>
+      <span className="xn-muted">Bấm “Kiểm tra biên bản ngay” để đối chiếu bản này với bản đã lưu. Muốn tự kiểm tra bằng file, <a href="/kiem-chung-avalanche" target="_blank" rel="noreferrer">tải file lên trang kiểm tra</a>.</span>
     </div>}
     </>}
     {show !== 'handover' && latest && <section className="xn-doc">
@@ -178,8 +179,8 @@ function TenantCase({ c, signer, reload, show = 'all', onChanged }) {
         <strong>✅ {latest.bundle.confirmationReceipt ? 'Bạn đã đồng ý bảng đối soát' : 'Bạn đã gửi phản hồi cho bảng đối soát'} phiên bản {latest.bundle.version}{recordedAt(latest.bundle.confirmationReceipt || latest.disputeReceipt)}. Bản lưu đã được ghi nhận.</strong>
         <div className="xn-actions"><button type="button" className="xn-link" onClick={() => { if (!printSettlementEvidence(latest.bundle, c.contractId)) setError('Trình duyệt đang chặn cửa sổ in. Hãy cho phép cửa sổ bật lên rồi thử lại.'); }}>Tải bản PDF đối soát</button>
           <button type="button" className="xn-link" onClick={() => downloadEvidence({ ...latest.bundle, dispute: latest.dispute, disputeReceipt: latest.disputeReceipt }, `doi-soat-${c.contractId}-v${latest.bundle.version}.json`)}>File kiểm chứng (.json)</button>
-          <a href="/kiem-chung-avalanche" target="_blank" rel="noreferrer">Kiểm tra đối soát</a></div>
-        <span className="xn-muted">Tải file bản lưu lên để tự kiểm tra đối soát chưa bị sửa.</span>
+          <VerifyNow evidence={{ ...latest.bundle, dispute: latest.dispute, disputeReceipt: latest.disputeReceipt }} label="Kiểm tra đối soát ngay" /></div>
+        <span className="xn-muted">Bấm “Kiểm tra đối soát ngay” để đối chiếu bản này với bản đã lưu. Muốn tự kiểm tra bằng file, <a href="/kiem-chung-avalanche" target="_blank" rel="noreferrer">tải file lên trang kiểm tra</a>.</span>
       </div>}
       {show !== 'settlement' && <p className="xn-muted">Đồng ý đối soát không có nghĩa là đã nhận tiền; việc hoàn/thu tiền thực hiện theo quy trình thanh toán của HomeStayDorm.</p>}
       {!latest.bundle.confirmationReceipt && !latest.disputeReceipt && <div className="xn-actions"><button type="button" className="xn-link" onClick={() => { if (!printSettlementEvidence(latest.bundle, c.contractId)) setError('Trình duyệt đang chặn cửa sổ in. Hãy cho phép cửa sổ bật lên rồi thử lại.'); }}>Tải bản PDF đối soát</button>

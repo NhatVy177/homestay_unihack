@@ -9,7 +9,12 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 const hash = (n) => `0x${String(n).padStart(64, 'a')}`;
 const ready = { ready: true, updatedAt: '2026-11-17T04:00:00Z', transactions: 6, handoversPublished: 12, handoversConfirmed: 12, settlementsSent: 10, settlementsAccepted: 9, acceptedWithoutDispute: 7, disputes: 2,
   refundVnd: '48000000', topUpVnd: '5000000', explorer: 'https://testnet.snowtrace.io', network: 'Avalanche Fuji (mạng thử nghiệm)',
-  recent: [{ type: 'SettlementAccepted', label: 'Khách đồng ý đối soát tiền cọc', room: 'Phòng P101', hash: hash(1), blockNumber: '1', at: '2026-11-17T03:00:00Z' }, { type: 'HandoverProposed', label: 'Bàn giao phòng được phát hành', room: 'Phòng P202', hash: hash(2), blockNumber: '2', at: '2026-11-16T03:00:00Z' }] };
+  recent: [
+    { type: 'SettlementAccepted', room: 'Phòng P101', hash: hash(1), blockNumber: '9', at: '2026-11-17T03:00:00Z' },
+    { type: 'SettlementProposed', room: 'Phòng P101', hash: hash(2), blockNumber: '8', at: '2026-11-16T03:00:00Z' },
+    { type: 'HandoverProposed', room: 'Phòng P202', hash: hash(3), blockNumber: '7', at: '2026-11-15T03:00:00Z' },
+    { type: 'HandoverAccepted', room: 'Phòng P303', hash: hash(4), blockNumber: '6', at: '2026-11-14T03:00:00Z' },
+    { type: 'HandoverProposed', room: 'Phòng P404', hash: hash(5), blockNumber: '5', at: '2026-11-13T03:00:00Z' }] };
 try {
   for (const width of [1440, 390]) {
     for (const mode of ['ready', 'not-ready', 'empty', 'error']) {
@@ -47,12 +52,15 @@ try {
       await proof.waitFor();
       const activity = await proof.innerText();
       assert.match(activity, /Hoạt động gần đây/);
-      assert.match(activity, /Khách đồng ý đối soát tiền cọc\s*Phòng P101 · \d+ (phút|giờ|ngày) trước|Khách đồng ý đối soát tiền cọc\s*Phòng P101/);
-      assert.match(activity, /Bàn giao phòng P202/);
-      assert.doesNotMatch(activity, /bằng chứng/i, 'không dùng chữ bằng chứng');
-      assert.match(await proof.locator('.ts-note').innerText(), /Avalanche Fuji \(mạng thử nghiệm\)/);
+      assert.equal(await proof.locator('.ts-list li').count(), 3, 'tối đa 3 phòng, mỗi phòng một dòng');
+      assert.match(activity, /Phòng P101\s*Đã bàn giao và đối soát tiền cọc xong/);
+      assert.match(activity, /Phòng P202\s*Đã lập biên bản bàn giao, chờ khách xác nhận/);
+      assert.match(activity, /Phòng P303\s*Khách đã xác nhận biên bản bàn giao/);
+      assert.doesNotMatch(activity, /P404/, 'phòng thứ 4 không hiện');
+      assert.equal((activity.match(/Phòng P101/g) || []).length, 1, 'mỗi phòng chỉ một dòng');
+      assert.doesNotMatch(activity, /bằng chứng|Avalanche|Fuji|chuỗi/i, 'không nhắc công nghệ ở trang chủ');
       const links = await proof.getByRole('link', { name: /Mở bản gốc/ }).evaluateAll((els) => els.map((el) => el.href));
-      assert.deepEqual(links, [`https://testnet.snowtrace.io/tx/${hash(1)}`, `https://testnet.snowtrace.io/tx/${hash(2)}`]);
+      assert.deepEqual(links, [`https://testnet.snowtrace.io/tx/${hash(1)}`, `https://testnet.snowtrace.io/tx/${hash(3)}`, `https://testnet.snowtrace.io/tx/${hash(4)}`]);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width);
       await page.screenshot({ path: `${folder}/proof-${width}.png` });
       assert.deepEqual(errors, []);
