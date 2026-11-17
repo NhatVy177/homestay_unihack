@@ -1313,7 +1313,7 @@ export default function KhachHangPortalPage() {
 
   function renderLocked(tab) {
     return (
-      <Empty title="Chức năng đang khóa" action={<button className="kp-btn kp-btn-primary" type="button" onClick={() => goTo('kham-pha')}>Khám phá phòng</button>}>
+      <Empty title="Chức năng đang khóa" action={<button className="kp-btn kp-btn-primary" type="button" onClick={() => navigate('/phong')}>Khám phá phòng</button>}>
         {getLockedMessage(tab)}
       </Empty>
     );

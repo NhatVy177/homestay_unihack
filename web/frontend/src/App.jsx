@@ -4,7 +4,7 @@ import { useAuth } from './auth/AuthContext.jsx';
 import { getAuthenticatedHomePath } from './auth/auth.routes.js';
 
 import TrangChu from './pages/TrangChu.jsx';
-import KhamPhaPhongPage from './pages/khamPhaPhong/KhamPhaPhongPage.jsx';
+import ChiTietPhongPage from './pages/chiTietPhong/ChiTietPhongPage.jsx';
 import DanhSachPhongPage from './pages/danhSachPhong/DanhSachPhongPage.jsx';
 import DichVuPage from './pages/dichVu/DichVuPage.jsx';
 import KhachHangPortalPage from './pages/khachHang/KhachHangPortalPage.jsx';
@@ -18,6 +18,16 @@ const ThanhToanMoPhongPage = lazy(() => import('./pages/thanhToanMoPhong/ThanhTo
 
 function LoadingScreen() {
   return <div className="auth-loading">Đang kiểm tra phiên đăng nhập...</div>;
+}
+
+// Trang khám phá phòng cũ đã bỏ: liên kết cũ đi về trang phòng (có mã phòng thì vào thẳng chi tiết phòng đó).
+function LegacyExploreRedirect() {
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const room = params.get('phong');
+  if (room) return <Navigate to={`/phong/${encodeURIComponent(room)}`} replace />;
+  params.delete('phong');
+  return <Navigate to={`/phong${params.toString() ? `?${params.toString()}` : ''}`} replace />;
 }
 
 function ProtectedRoute({ children }) {
@@ -60,7 +70,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<TrangChu />} />
-      <Route path="/kham-pha-phong" element={<KhamPhaPhongPage />} />
+      <Route path="/kham-pha-phong" element={<LegacyExploreRedirect />} />
+      <Route path="/phong/:maPhong" element={<ChiTietPhongPage />} />
       <Route path="/phong" element={<DanhSachPhongPage />} />
       <Route path="/dich-vu" element={<DichVuPage />} />
       <Route path="/ho-so-xac-nhan" element={<ProtectedRoute><Suspense fallback={<LoadingScreen />}><AvalanchePortal /></Suspense></ProtectedRoute>} />

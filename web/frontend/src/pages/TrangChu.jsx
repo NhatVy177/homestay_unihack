@@ -411,7 +411,7 @@ function HeroSection() {
     if (search.area) params.set('khuVuc', search.area);
     if (search.type) params.set('loaiPhong', search.type);
     if (search.price) params.set('mucGiaToiDa', search.price);
-    navigate(`/kham-pha-phong${params.toString() ? `?${params.toString()}` : ''}`);
+    navigate(`/phong${params.toString() ? `?${params.toString()}` : ''}`);
   }
 
   return (
@@ -563,7 +563,7 @@ export default function TrangChu() {
   const switchMode = useCallback((mode) => setAuthModal(mode), []);
   const viewRoomDetail = useCallback((room) => {
     if (!room?.MaPhong) return;
-    navigate(`/kham-pha-phong?phong=${encodeURIComponent(room.MaPhong)}`);
+    navigate(`/phong/${encodeURIComponent(room.MaPhong)}`);
   }, [navigate]);
 
   useEffect(() => {

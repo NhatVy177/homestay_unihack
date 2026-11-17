@@ -50,7 +50,7 @@ try {
     const { context, page, errors, writes } = await contextFor(width);
     await page.goto(base, { waitUntil: 'domcontentloaded' });
     await page.locator('.tc-room-cta').first().click();
-    assert.equal(new URL(page.url()).searchParams.get('phong'), 'P101');
+    assert.equal(new URL(page.url()).pathname, '/phong/P101');
     await detailReady(page);
     assert.equal(await page.locator('.kp-modal-backdrop').count(), 0, 'detail must be a full view, not the old summary modal');
     await page.evaluate(async () => { for (const image of document.querySelectorAll('.kh-detail-view img')) { image.loading = 'eager'; await image.decode().catch(() => {}); } await document.fonts.ready; });
@@ -65,10 +65,10 @@ try {
     await page.keyboard.press('ArrowLeft'); assert.equal(await lightbox.locator('img').getAttribute('src'), firstImage);
     await page.keyboard.press('Escape'); assert.equal(await lightbox.count(), 0);
     await page.getByRole('button', { name: '← Quay lại khám phá phòng', exact: false }).click();
-    assert.equal(new URL(page.url()).searchParams.has('phong'), false);
-    await page.locator('.kp-room-card').first().getByRole('button', { name: 'Xem chi tiết', exact: true }).click();
+    assert.equal(new URL(page.url()).pathname, '/phong', 'quay lại về trang danh sách phòng');
+    await page.locator('.hx-room-card').first().getByRole('button', { name: 'Xem ngay', exact: true }).click();
     await detailReady(page);
-    await page.goBack(); assert.equal(new URL(page.url()).searchParams.has('phong'), false);
+    await page.goBack(); assert.equal(new URL(page.url()).pathname, '/phong');
     await page.goForward(); await detailReady(page);
     // Nút đăng ký theo nhóm có ở trang chi tiết công khai và giữ lại phòng đã chọn khi đăng nhập.
     assert.equal(await page.getByRole('button', { name: 'Đăng ký thuê theo nhóm' }).count(), 1);
@@ -85,7 +85,7 @@ try {
     for (const status of ['Hết chỗ', 'Đang chờ cọc']) {
       room.trangThaiQuanTam = status;
       const { context, page, errors, writes } = await contextFor(width);
-      await page.goto(`${base}/kham-pha-phong?phong=P101`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${base}/phong/P101`, { waitUntil: 'domcontentloaded' });
       await detailReady(page);
       const button = page.locator('.kh-detail-register');
       assert.equal(await button.isDisabled(), status === 'Hết chỗ');
@@ -104,7 +104,7 @@ try {
     await page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết', exact: true }).click();
     await detailReady(page);
     await page.screenshot({ path: resolve(output, 'customer-shared-view.png'), fullPage: true });
-    await page.goto(`${base}/kham-pha-phong?phong=P101`, { waitUntil: 'domcontentloaded' }); await detailReady(page);
+    await page.goto(`${base}/phong/P101`, { waitUntil: 'domcontentloaded' }); await detailReady(page);
     await page.getByRole('button', { name: 'Đăng ký thuê ngay', exact: true }).click();
     await page.getByRole('heading', { name: 'Đăng ký thuê phòng', exact: true }).waitFor();
     assert.equal(await page.locator('.kh-room-card.selected h3').innerText(), room.tenPhong);
@@ -126,19 +126,21 @@ try {
   }
   {
     const { context, page, errors, writes } = await contextFor(390);
-    await page.goto(`${base}/kham-pha-phong?phong=Z999`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${base}/phong/Z999`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('alert').waitFor();
     assert.equal(await page.locator('.kh-detail-view').count(), 0);
     responseMode = 'error';
-    await page.goto(`${base}/kham-pha-phong?phong=P101`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${base}/phong/P101`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('alert').waitFor();
     responseMode = 'ok'; await page.getByRole('button', { name: 'Thử lại', exact: true }).click(); await detailReady(page);
+    // Liên kết cũ /kham-pha-phong?phong=<mã> chuyển về chi tiết phòng, bỏ qua bộ lọc cũ.
     await page.goto(`${base}/kham-pha-phong?khuVuc=__empty__&phong=P101`, { waitUntil: 'domcontentloaded' });
     await detailReady(page);
+    assert.equal(new URL(page.url()).pathname, '/phong/P101');
     assert.equal(await page.locator('.kh-detail-title').innerText(), room.tenPhong, 'direct detail must not depend on filtered room results');
     responseMode = 'slow';
-    await page.goto(`${base}/kham-pha-phong?phong=P101`, { waitUntil: 'domcontentloaded' });
-    await page.evaluate(() => { history.pushState({}, '', '/kham-pha-phong?phong=P102'); dispatchEvent(new PopStateEvent('popstate')); });
+    await page.goto(`${base}/phong/P101`, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => { history.pushState({}, '', '/phong/P102'); dispatchEvent(new PopStateEvent('popstate')); });
     await page.getByRole('heading', { name: 'Phòng UI 102', exact: true }).waitFor();
     await page.waitForTimeout(1000);
     assert.equal(await page.locator('.kh-detail-title').innerText(), 'Phòng UI 102', 'a stale response must not replace the current room');

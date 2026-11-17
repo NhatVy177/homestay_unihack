@@ -38,7 +38,7 @@ try {
     assert.equal(await page.getByText('Lịch', { exact: true }).count(), 0, 'không có tab Lịch');
     await page.screenshot({ path: `${folder}/phong-${width}.png` });
     await page.locator('.hx-room-card .hx-room-view').first().click();
-    await page.waitForURL('**/kham-pha-phong?phong=P3');
+    await page.waitForURL('**/phong/P3');
     await page.goto(`${base}/dich-vu`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('heading', { name: 'Dịch vụ & tiện ích' }).waitFor();
     assert.equal(await page.locator('.dv-card').count(), 4);

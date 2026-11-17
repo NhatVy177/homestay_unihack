@@ -111,13 +111,13 @@ try {
     }
     await page.getByRole('button', { name: 'Tìm kiếm', exact: true }).click();
     let url = new URL(page.url());
-    assert.equal(url.pathname, '/kham-pha-phong');
+    assert.equal(url.pathname, '/phong');
     assert.equal(url.searchParams.get('khuVuc'), 'Thủ Đức');
     assert.equal(url.searchParams.get('loaiPhong'), 'Phòng 4 người');
     assert.equal(url.searchParams.get('mucGiaToiDa'), '2000000');
     await page.goto(base);
     await page.locator('.tc-room-cta').first().click();
-    assert.equal(new URL(page.url()).searchParams.get('phong'), 'UI-1');
+    assert.equal(new URL(page.url()).pathname, '/phong/UI-1');
     await page.goto(base);
     await page.locator('.hx-map-item').filter({ hasText: 'Bình Thạnh' }).click();
     await page.locator('.hx-map-detail').getByRole('button', { name: 'Xem các phòng', exact: true }).click();

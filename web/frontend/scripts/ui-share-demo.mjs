@@ -21,12 +21,12 @@ try {
     });
     const page = await ctx.newPage();
     page.on('pageerror', (e) => errors.push(e.message));
-    await page.goto(`${base}/kham-pha-phong?phong=P103`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${base}/phong/P103`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Chia sẻ', exact: true }).click();
     const fb = page.getByRole('menuitem', { name: 'Chia sẻ lên Facebook' });
     const href = await fb.getAttribute('href');
     assert.match(href, /^https:\/\/www\.facebook\.com\/sharer\/sharer\.php\?u=/);
-    assert.ok(decodeURIComponent(href).includes('/kham-pha-phong?phong=P103'), 'link trỏ đúng phòng');
+    assert.ok(decodeURIComponent(href).includes('/phong/P103'), 'link trỏ đúng phòng');
     await page.getByRole('menuitem', { name: /Sao chép link/ }).click();
     await page.getByRole('menuitem', { name: 'Đã sao chép link' }).waitFor();
     await page.screenshot({ path: `${folder}/share-${width}.png` });

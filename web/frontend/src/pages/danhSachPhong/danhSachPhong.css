@@ -7,3 +7,4 @@
 .dsp-chip:hover { background: var(--tc-surface-low, #F1F3EF); }
 .dsp-chip.is-active { background: var(--tc-primary); border-color: var(--tc-primary); color: #fff; font-weight: 600; }
 .dsp-empty { padding: 40px 0; text-align: center; color: var(--tc-on-surface-m, #5E655C); }
+.dsp-clear { padding: 0; border: 0; background: none; font: inherit; font-weight: 700; color: var(--tc-primary); cursor: pointer; text-decoration: underline; }

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import './shareRoomButton.css';
 
 // Nút chia sẻ phòng: Facebook, sao chép link (dán vào Messenger/Zalo), hoặc chia sẻ của điện thoại.
-// Link mở thẳng hộp chi tiết phòng ở /kham-pha-phong?phong=<mã>, khách xem không cần tài khoản.
-export const roomShareUrl = (maPhong) => `${window.location.origin}/kham-pha-phong?phong=${encodeURIComponent(maPhong)}`;
+// Link mở thẳng hộp chi tiết phòng ở /phong/<mã>, khách xem không cần tài khoản.
+export const roomShareUrl = (maPhong) => `${window.location.origin}/phong/${encodeURIComponent(maPhong)}`;
 
 export default function ShareRoomButton({ room }) {
   // room: { maPhong, tenPhong }; link luôn trỏ về trang khám phá công khai của phòng đó.
