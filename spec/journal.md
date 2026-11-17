@@ -1585,3 +1585,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Nguyên nhân: mũi tên là ký tự chữ "⌄" nên bị lệch theo đường cơ sở của chữ, không canh giữa với tên.
 - Sửa: `web/frontend/src/components/common/AccountMenu.jsx` (dùng biểu tượng SVG), `accountMenu.css`.
 - Kiểm tra: build OK; `ui-account-menu` PASS; đã xem ảnh, mũi tên canh giữa, lật lên khi mở menu.
+
+## 2026-11-17 17:30:00 +07:00 — J-C167 — Mở khóa "Hóa đơn & thanh toán"; bỏ khoảng trắng bên phải ở Khám phá phòng
+- Người thực hiện: Claude, theo phản ánh của Vy (Lịch sử đặt cọc mở mà Hóa đơn & thanh toán còn khóa; trang khám phá dư khoảng trống lớn bên phải).
+- Sửa 1: `web/frontend/src/pages/khachHang/KhachHangPortalPage.jsx` (`getNavLocks`): `dat-coc` không còn khóa khi chưa có phiếu cọc; tab trống thì hiện "Chưa có phiếu cọc hoặc hóa đơn nào" như tab Lịch sử đặt cọc.
+- Sửa 2: cột phải của trang Khám phá phòng vẫn được dựng (rộng 340px, rỗng) khi khách đã mở hồ sơ hoặc đã có lịch xem, nên chừa khoảng trắng lớn; nay chỉ dựng khi có nội dung và lưới chuyển sang một cột (`kh-shell-grid--single` trong `khachHangPortal.css`).
+- Kiểm tra: build OK; `ui-customer-invoices`, `ui-customer-deposit-history`, `ui-customer-residence`, `ui-interested-rooms` PASS; đã xem ảnh trang khám phá có hồ sơ mở ở 1440.

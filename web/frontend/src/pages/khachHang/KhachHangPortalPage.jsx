@@ -604,7 +604,7 @@ function getNavLocks(state = {}) {
     'kham-pha': false,
     'ho-so': false,
     'lich-xem': false,
-    'dat-coc': !hasDeposit,
+    'dat-coc': false, // Hóa đơn & thanh toán luôn mở (trống thì báo chưa có hóa đơn), như Lịch sử đặt cọc
     'lich-su-coc': false,
     'cu-tru': !hasDeposit,
     'hop-dong': !hasContract,
@@ -1320,7 +1320,7 @@ export default function KhachHangPortalPage() {
   function renderExplore() {
     return (
       <section className="kh-explore-view">
-        <div className="kh-shell-grid">
+        <div className={`kh-shell-grid${openProfile || scheduledProfile ? ' kh-shell-grid--single' : ''}`}>
           <div className="kh-left-content">
             {scheduledProfile && (
               <div className="kh-profile-banner kh-profile-banner--scheduled" role="status">
@@ -1404,8 +1404,8 @@ export default function KhachHangPortalPage() {
             )}
           </div>
 
-          <aside className="kh-rightbar">
-            {!openProfile && !scheduledProfile && (
+          {/* Có hồ sơ đang mở hoặc đã có lịch xem thì cột phải trống: không dựng cột (tránh khoảng trắng lớn bên phải). */}
+          {!openProfile && !scheduledProfile && <aside className="kh-rightbar">
             <article className="kh-rent-help">
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', marginBottom: '16px' }}>
                 <Icon name="support" />Bạn muốn thuê phòng?
@@ -1419,8 +1419,7 @@ export default function KhachHangPortalPage() {
                 </button>
               </div>
             </article>
-            )}
-          </aside>
+          </aside>}
         </div>
       </section>
     );

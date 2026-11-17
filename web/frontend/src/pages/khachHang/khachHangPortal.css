@@ -74,6 +74,10 @@
   max-width: 1280px;
 }
 
+.kh-shell-grid--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .kh-left-content,
 .kh-rightbar {
   display: flex;
