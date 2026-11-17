@@ -5,7 +5,6 @@ import AccountMenu from '../components/common/AccountMenu.jsx';
 import DemoAccounts from '../components/common/DemoAccounts.jsx';
 import GoogleAuthSection from '../components/common/GoogleAuthSection.jsx';
 import ForgotPasswordForm from '../components/common/ForgotPasswordForm.jsx';
-import TrustStrip from './homeExperience/TrustStrip.jsx';
 import ServicesShowcase from './homeExperience/ServicesShowcase.jsx';
 import { safeNextPath } from '../auth/returnPath.js';
 import { httpClient } from '../api/httpClient.js';
@@ -118,11 +117,11 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
                 <p>Đăng nhập để quản lý thuê phòng của bạn.</p>
               </div>
               <label className="tc-form-field">
-                <span>Email đăng nhập</span>
+                <span>Tên hoặc email đăng nhập</span>
                 <span className="ui-field-control">
-                  <Icon name="mail" />
+                  <Icon name="person" />
                   <input name="tenDangNhap" value={loginForm.tenDangNhap} onChange={updateLogin}
-                    placeholder="ban@example.com" required autoComplete="username" />
+                    placeholder="Tên đăng nhập hoặc email" required autoComplete="username" />
                 </span>
               </label>
               <label className="tc-form-field">
@@ -620,7 +619,6 @@ export default function TrangChu() {
         </section>
 
         <ServicesShowcase />
-        <TrustStrip />
         <AboutSection rooms={catalog} branches={branches} roomTypes={roomTypes} onViewDetail={viewRoomDetail} />
         <LocationSection rooms={catalog} branches={branches} />
         <ContactSection />

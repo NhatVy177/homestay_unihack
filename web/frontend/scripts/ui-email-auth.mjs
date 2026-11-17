@@ -32,8 +32,7 @@ try {
     await page.getByRole('button', { name: /^Đăng nhập$/ }).first().click();
     const dialog = page.getByRole('dialog');
     await dialog.waitFor();
-    assert.match(await dialog.innerText(), /Email đăng nhập/);
-    assert.doesNotMatch(await dialog.innerText(), /Tên đăng nhập/);
+    assert.match(await dialog.innerText(), /Tên hoặc email đăng nhập/);
     const inner = await dialog.evaluate((el) => ({ overflowY: getComputedStyle(el).overflowY, scrolls: el.scrollHeight > el.clientHeight + 1 }));
     assert.ok(inner.overflowY !== 'auto' && inner.overflowY !== 'scroll' && !inner.scrolls, 'khung đăng nhập không có thanh cuộn bên trong');
     await page.screenshot({ path: `${folder}/login-${width}.png` });
@@ -49,8 +48,8 @@ try {
     await dialog.getByText('Mã OTP không đúng.').waitFor();
     await dialog.getByLabel('Mã OTP').fill('123456');
     await dialog.getByRole('button', { name: 'Đặt lại mật khẩu' }).click();
-    await dialog.getByLabel('Email đăng nhập').waitFor();
-    assert.equal(await dialog.getByLabel('Email đăng nhập').inputValue(), 'khach@example.com', 'quay lại đăng nhập với email đã nhập');
+    await dialog.getByLabel('Tên hoặc email đăng nhập').waitFor();
+    assert.equal(await dialog.getByLabel('Tên hoặc email đăng nhập').inputValue(), 'khach@example.com', 'quay lại đăng nhập với email đã nhập');
     assert.deepEqual(calls.at(-1)[1], { email: 'khach@example.com', otp: '123456', matKhauMoi: 'matkhau1' });
     await dialog.getByRole('button', { name: 'Đăng ký', exact: true }).click();
     assert.equal(await dialog.getByText('Tên đăng nhập').count(), 0, 'đăng ký không còn ô tên đăng nhập');
