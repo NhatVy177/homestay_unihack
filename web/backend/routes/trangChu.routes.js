@@ -24,6 +24,14 @@ router.get('/minh-bach', async (req, res) => {
     res.json({ ...(await reader.snapshot()), explorer: process.env.AVALANCHE_CHAIN_ID === '43113' || !process.env.AVALANCHE_CHAIN_ID ? 'https://testnet.snowtrace.io' : null, network: 'Avalanche Fuji (mạng thử nghiệm)' });
   } catch { res.json({ ready: false }); }
 });
+// Bảng giá dịch vụ công khai (chỉ tên, đơn vị, đơn giá) cho trang Dịch vụ.
+router.get('/dich-vu', async (req, res, next) => {
+  try {
+    const { recordset } = await executeQuery('SELECT MaDichVu AS maDichVu, TenDichVu AS tenDichVu, DonViTinh AS donViTinh, DonGia AS donGia FROM dbo.DichVu ORDER BY MaDichVu');
+    res.set('Cache-Control', 'public, max-age=60');
+    res.json({ data: recordset.map((row) => ({ ...row, donGia: Number(row.donGia) })) });
+  } catch (error) { next(error); }
+});
 router.get('/loai-phong', getLoaiPhong);
 router.get('/kham-pha-phong/bo-loc', getBoLocKhamPhaPhong);
 router.get('/kham-pha-phong', getPhongKhamPha);

@@ -14,3 +14,6 @@
 .sv-item p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--color-text-muted, #5E655C); }
 @media (max-width: 860px) { .sv { padding: 48px 0; } .sv-inner { grid-template-columns: 1fr; gap: 28px; } .sv-photo { aspect-ratio: 16 / 10; } }
 @media (max-width: 560px) { .sv-grid { grid-template-columns: 1fr; } }
+.sv-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--color-primary, #4A6549); }
+.sv-link svg { width: 16px; height: 16px; transition: transform .3s; }
+.sv-link:hover svg { transform: translateX(4px); }

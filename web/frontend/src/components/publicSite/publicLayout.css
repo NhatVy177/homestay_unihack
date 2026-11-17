@@ -1,0 +1,6 @@
+.pl-main { min-height: 70vh; padding: 96px 0 64px; }
+.pl-wrap { width: min(1216px, calc(100% - 48px)); margin: 0 auto; }
+.pl-footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; width: min(1216px, calc(100% - 48px)); margin: 0 auto; padding: 24px 0 40px; border-top: 1px solid var(--tc-border-light, #E0E3DF); font-size: 13.5px; color: var(--tc-on-surface-m, #5E655C); }
+.pl-footer p { margin: 0; }
+.pl-footer a { color: var(--tc-primary); font-weight: 600; }
+@media (max-width: 640px) { .pl-main { padding-top: 84px; } .pl-wrap { width: calc(100% - 32px); } }

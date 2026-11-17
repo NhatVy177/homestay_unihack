@@ -1,0 +1,9 @@
+.dsp-head { margin-bottom: 24px; }
+.dsp-head h1 { display: flex; align-items: center; gap: 14px; margin: 0 0 6px; font-family: var(--hx-display, inherit); font-size: clamp(30px, 4vw, 42px); color: var(--tc-on-surface, #191C1A); }
+.dsp-head h1 svg { width: 36px; height: 36px; color: var(--tc-primary); }
+.dsp-head p { margin: 0; font-size: 17px; color: var(--tc-on-surface-m, #5E655C); }
+.dsp-chips { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; }
+.dsp-chip { min-height: 44px; padding: 0 22px; border: 1px solid var(--tc-border-light, #E0E3DF); border-radius: 999px; background: #fff; font: inherit; font-size: 15px; color: var(--tc-on-surface, #191C1A); cursor: pointer; box-shadow: 0 1px 3px #191c1a14; transition: background .2s, color .2s; }
+.dsp-chip:hover { background: var(--tc-surface-low, #F1F3EF); }
+.dsp-chip.is-active { background: var(--tc-primary); border-color: var(--tc-primary); color: #fff; font-weight: 600; }
+.dsp-empty { padding: 40px 0; text-align: center; color: var(--tc-on-surface-m, #5E655C); }

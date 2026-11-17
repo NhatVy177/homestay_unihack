@@ -1,0 +1,35 @@
+.dv-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; margin-bottom: 28px; }
+.dv-head h1 { margin: 0 0 8px; font-family: var(--hx-display, inherit); font-size: clamp(30px, 4vw, 42px); color: var(--tc-primary); }
+.dv-head p { margin: 0; max-width: 560px; font-size: 16px; line-height: 1.6; color: var(--tc-on-surface-m, #5E655C); }
+.dv-stats { display: flex; gap: 16px; flex-wrap: wrap; }
+.dv-stats > div { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 20px; background: var(--tc-surface-low, #F1F3EF); border: 1px solid var(--tc-border-light, #E0E3DF); }
+.dv-stat-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--tc-primary); color: #fff; }
+.dv-stat-icon svg, .dv-stat-icon .ui-icon { width: 22px; height: 22px; }
+.dv-stats small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--tc-on-surface-m, #5E655C); }
+.dv-stats strong { font-size: 17px; color: var(--tc-primary); }
+.dv-filters { display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)) auto; gap: 16px; align-items: end; padding: 24px; margin-bottom: 28px; border-radius: 24px; background: var(--tc-surface-low, #F1F3EF); border: 1px solid var(--tc-border-light, #E0E3DF); }
+.dv-filters label { display: grid; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--tc-on-surface-m, #5E655C); }
+.dv-filters select, .dv-input { min-height: 48px; border: 1px solid var(--tc-border-light, #E0E3DF); border-radius: 14px; background: #fff; font: inherit; font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--tc-on-surface, #191C1A); }
+.dv-filters select { padding: 0 14px; }
+.dv-input { display: flex; align-items: center; gap: 10px; padding: 0 14px; font-weight: 400; }
+.dv-input svg { width: 18px; height: 18px; flex: none; color: var(--tc-on-surface-m, #5E655C); }
+.dv-input input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: inherit; }
+.dv-clear { min-height: 48px; padding: 0 22px; border: 0; border-radius: 14px; background: var(--tc-primary); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.dv-clear:disabled { opacity: .5; cursor: default; }
+.dv-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.dv-card { display: grid; gap: 6px; padding: 28px; border-radius: 24px; background: #fff; border: 1px solid var(--tc-border-light, #E0E3DF); transition: box-shadow .25s, transform .25s; }
+.dv-card:hover { box-shadow: 0 12px 32px #191c1a15; transform: translateY(-2px); }
+.dv-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.dv-icon { width: 60px; height: 60px; display: grid; place-items: center; border-radius: 18px; background: var(--tc-primary-soft, #D5E8D3); color: var(--tc-primary); }
+.dv-icon svg, .dv-icon .ui-icon { width: 28px; height: 28px; }
+.dv-tag { padding: 6px 16px; border-radius: 999px; background: var(--tc-primary); color: #fff; font-size: 13px; font-weight: 700; }
+.dv-group { font-size: 13px; font-weight: 700; color: var(--tc-on-surface-m, #5E655C); }
+.dv-card h2 { margin: 0; font-size: 22px; color: var(--tc-on-surface, #191C1A); }
+.dv-card p { margin: 0 0 14px; font-size: 15px; line-height: 1.55; color: var(--tc-on-surface-m, #5E655C); }
+.dv-price { padding-top: 16px; border-top: 1px solid var(--tc-border-light, #E0E3DF); }
+.dv-price small { display: block; font-size: 13px; color: var(--tc-on-surface-m, #5E655C); }
+.dv-price strong { font-size: 22px; color: var(--tc-primary); }
+.dv-price strong span { font-size: 14px; font-weight: 500; color: var(--tc-on-surface-m, #5E655C); }
+.dv-empty { padding: 40px 0; text-align: center; color: var(--tc-on-surface-m, #5E655C); }
+@media (max-width: 960px) { .dv-filters { grid-template-columns: 1fr 1fr; } .dv-search { grid-column: 1 / -1; } .dv-clear { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .dv-grid { grid-template-columns: 1fr; } .dv-filters { grid-template-columns: 1fr; padding: 18px; } .dv-card { padding: 22px; } }

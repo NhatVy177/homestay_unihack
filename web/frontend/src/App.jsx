@@ -5,6 +5,8 @@ import { getAuthenticatedHomePath } from './auth/auth.routes.js';
 
 import TrangChu from './pages/TrangChu.jsx';
 import KhamPhaPhongPage from './pages/khamPhaPhong/KhamPhaPhongPage.jsx';
+import DanhSachPhongPage from './pages/danhSachPhong/DanhSachPhongPage.jsx';
+import DichVuPage from './pages/dichVu/DichVuPage.jsx';
 import KhachHangPortalPage from './pages/khachHang/KhachHangPortalPage.jsx';
 import NhanVienSalePage from './pages/nhanVienSale/NhanVienSalePage.jsx';
 import NhanVienQuanLyPage from './pages/nhanVienQuanLy/NhanVienQuanLyPage.jsx';
@@ -59,6 +61,8 @@ export default function App() {
     <Routes>
       <Route path="/" element={<TrangChu />} />
       <Route path="/kham-pha-phong" element={<KhamPhaPhongPage />} />
+      <Route path="/phong" element={<DanhSachPhongPage />} />
+      <Route path="/dich-vu" element={<DichVuPage />} />
       <Route path="/ho-so-xac-nhan" element={<ProtectedRoute><Suspense fallback={<LoadingScreen />}><AvalanchePortal /></Suspense></ProtectedRoute>} />
       <Route path="/kiem-chung-avalanche" element={<Suspense fallback={<LoadingScreen />}><AvalancheVerifyPage /></Suspense>} />
       <Route path="/thanh-toan-mo-phong/:id" element={<ProtectedRoute><CustomerOnlyRoute><Suspense fallback={<LoadingScreen />}><ThanhToanMoPhongPage /></Suspense></CustomerOnlyRoute></ProtectedRoute>} />

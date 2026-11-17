@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Icon } from '../../components/common/Icon.jsx';
 import { Reveal } from './HomeExperience.jsx';
 import './servicesShowcase.css';
@@ -25,6 +26,7 @@ export default function ServicesShowcase() {
             <div><h3>{item.title}</h3><p>{item.text}</p></div>
           </Reveal>)}
         </div>
+        <Reveal delay={460}><Link to="/dich-vu" className="sv-link">Xem bảng giá dịch vụ <Icon name="arrow_forward" /></Link></Reveal>
       </div>
     </div>
   </section>;

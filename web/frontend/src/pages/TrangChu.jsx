@@ -239,6 +239,7 @@ function HeaderPublic({ onOpenAuth }) {
 
         <div id="tc-public-menu" className={`tc-nav-links ${mobileOpen ? 'tc-nav-links--open' : ''}`} onClick={() => setMobileOpen(false)}>
           <a href="#phong-noi-bat" className="tc-nav-link">Phòng</a>
+          <a href="/dich-vu" className="tc-nav-link" onClick={(event) => { event.preventDefault(); navigate('/dich-vu'); }}>Dịch vụ</a>
           <a href="#vi-tri" className="tc-nav-link">Vị trí</a>
           <a href="#gioi-thieu" className="tc-nav-link">Giới thiệu</a>
           <a href="#lien-he" className="tc-nav-link">Liên hệ</a>
@@ -539,6 +540,10 @@ export default function TrangChu() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search, isLoading, user]);
   useEffect(() => {
+    const auth = new URLSearchParams(location.search).get('auth');
+    if ((auth === 'login' || auth === 'register') && !isLoading && !user) setAuthModal(auth);
+  }, [location.search, isLoading, user]);
+  useEffect(() => {
     const next = safeNextPath(new URLSearchParams(location.search).get('next'));
     if (!next || isLoading) return;
     if (user) navigate(next, { replace: true });
@@ -596,7 +601,7 @@ export default function TrangChu() {
           <div className="tc-container">
             <div className="hx-rooms-head">
               <div><span className="hx-rooms-eyebrow">Phòng trống</span><h2>Phòng trống tiêu biểu</h2></div>
-              <button className="hx-rooms-all" type="button" onClick={() => navigate('/kham-pha-phong')}>Xem tất cả phòng <Icon name="arrow_forward" /></button>
+              <button className="hx-rooms-all" type="button" onClick={() => navigate('/phong')}>Xem tất cả phòng <Icon name="arrow_forward" /></button>
             </div>
 
             {loadingRooms ? (
