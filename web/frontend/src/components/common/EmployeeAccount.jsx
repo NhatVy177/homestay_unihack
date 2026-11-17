@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import AccountSecurity from '../components/common/AccountSecurity.jsx';
 import PortalIcon from './PortalIcon.jsx';
 import './employeeAccount.css';
 
@@ -101,7 +102,7 @@ export function EmployeeAccountView({ user, positionLabel }) {
         <article>
           <h3>Thông tin đăng nhập</h3>
           <dl>
-            <div><dt>Tên đăng nhập</dt><dd>{user?.tenDangNhap || 'Chưa cập nhật'}</dd></div>
+            <div><dt>Email đăng nhập</dt><dd>{user?.email || 'Chưa cập nhật'}</dd></div>
             <div><dt>Vai trò</dt><dd>{displayRole(user?.vaiTro)}</dd></div>
             <div><dt>Chức vụ</dt><dd>{user?.chucVu || positionLabel}</dd></div>
             <div><dt>Chi nhánh</dt><dd>{user?.maChiNhanh || 'Chưa cập nhật'}</dd></div>
@@ -117,6 +118,7 @@ export function EmployeeAccountView({ user, positionLabel }) {
           </dl>
         </article>
       </div>
+      <AccountSecurity />
     </section>
   );
 }

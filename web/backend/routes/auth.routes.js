@@ -10,6 +10,11 @@ router.get('/kiem-tra-sdt', controller.kiemTraSoDienThoai);
 router.get('/google/cau-hinh', controller.cauHinhGoogle);
 router.post('/google', controller.dangNhapGoogle);
 router.post('/google/hoan-tat', controller.hoanTatDangKyGoogle);
+router.post('/quen-mat-khau', controller.quenMatKhau);
+router.post('/dat-lai-mat-khau', controller.datLaiMatKhau);
+router.post('/doi-mat-khau', requireAuth, controller.doiMatKhau);
+router.put('/avatar', requireAuth, controller.capNhatAvatar);
+router.delete('/avatar', requireAuth, controller.xoaAvatar);
 router.get('/toi', requireAuth, controller.getToi);
 router.post('/dang-xuat', requireAuth, controller.dangXuat);
 

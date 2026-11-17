@@ -1,4 +1,5 @@
 import * as service from '../services/auth.service.js';
+import * as taiKhoan from '../services/taiKhoan.service.js';
 import { ghiNhatKy } from '../services/audit.service.js';
 
 function getToken(req) {
@@ -62,3 +63,10 @@ export async function dangNhapGoogle(req, res, next) {
 export async function hoanTatDangKyGoogle(req, res, next) {
   try { res.status(201).json(await service.hoanTatDangKyGoogle(req.body)); } catch (err) { next(err); }
 }
+
+const wrap = (fn) => async (req, res, next) => { try { res.json(await fn(req)); } catch (err) { next(err); } };
+export const quenMatKhau = wrap((req) => taiKhoan.quenMatKhau(req.body));
+export const datLaiMatKhau = wrap((req) => taiKhoan.datLaiMatKhau(req.body));
+export const doiMatKhau = wrap((req) => taiKhoan.doiMatKhau(req.user, req.body));
+export const capNhatAvatar = wrap((req) => taiKhoan.capNhatAvatar(req.user, req.body));
+export const xoaAvatar = wrap((req) => taiKhoan.xoaAvatar(req.user));

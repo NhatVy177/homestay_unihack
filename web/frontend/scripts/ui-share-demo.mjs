@@ -38,7 +38,7 @@ try {
     await page.locator('summary', { hasText: 'Tài khoản dùng thử' }).click();
     await page.getByRole('button', { name: /Kế toán: Đinh Lan Ngọc/ }).click();
     assert.equal(await page.locator('input[name="tenDangNhap"]').first().inputValue(), 'nv0012');
-    assert.equal(await page.locator('input[name="matKhau"]').first().inputValue(), '123456');
+    assert.equal(await page.locator('input[name="matKhau"]').first().inputValue(), '123');
     await page.screenshot({ path: `${folder}/demo-accounts-${width}.png` });
     assert.deepEqual(errors, []);
     await ctx.close();

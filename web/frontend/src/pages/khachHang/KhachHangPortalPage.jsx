@@ -1587,13 +1587,13 @@ export default function KhachHangPortalPage() {
         <article className="kp-info-panel">
           <div className="kh-info-list">
             <div><span>Mã khách hàng</span><strong>{user?.maNguoiDung || 'Chưa cập nhật'}</strong></div>
-            <div><span>Tên đăng nhập</span><strong>{user?.tenDangNhap || 'Chưa cập nhật'}</strong></div>
             <div><span>Họ tên</span><strong>{user?.hoTen || 'Chưa cập nhật'}</strong></div>
             <div><span>Giới tính</span><strong>{user?.gioiTinh || 'Chưa cập nhật'}</strong></div>
             <div><span>Số điện thoại</span><strong>{user?.soDienThoai || 'Chưa cập nhật'}</strong></div>
             <div><span>Email</span><strong>{user?.email || 'Chưa cập nhật'}</strong></div>
           </div>
         </article>
+        <AccountSecurity />
       </section>
     );
   }
@@ -4472,7 +4472,7 @@ export default function KhachHangPortalPage() {
     <WorkspaceShell roleLabel="Khách hàng" eyebrow="Cổng khách hàng"
       title={navItems.find(item => item.id === activeTab)?.title || extraTitles[activeTab] || 'Cổng khách hàng'}
       items={navItems.map(item => ({ id: item.id, label: item.title, icon: item.icon, locked: Boolean(locks[item.id]) }))}
-      activeTab={activeTab} onSelect={goTo} user={user} showBranch={false}
+      activeTab={activeTab} onSelect={(id) => (id === 'kham-pha' ? navigate('/#phong-noi-bat') : goTo(id))} user={user} showBranch={false}
       onAccount={() => goTo('tai-khoan')} onLogout={logout} mainClassName="kh-main"
       footer={<div className="kp-support-mini"><span>Hỗ trợ 24/7</span><strong>1900 6789</strong></div>}>
           {loading && <div className="kp-loading"><span /><p>Đang tải cổng khách hàng...</p></div>}

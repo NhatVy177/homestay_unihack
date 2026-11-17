@@ -4,7 +4,9 @@ import { useAuth } from '../auth/AuthContext.jsx';
 import AccountMenu from '../components/common/AccountMenu.jsx';
 import DemoAccounts from '../components/common/DemoAccounts.jsx';
 import GoogleAuthSection from '../components/common/GoogleAuthSection.jsx';
+import ForgotPasswordForm from '../components/common/ForgotPasswordForm.jsx';
 import TrustStrip from './homeExperience/TrustStrip.jsx';
+import ServicesShowcase from './homeExperience/ServicesShowcase.jsx';
 import { safeNextPath } from '../auth/returnPath.js';
 import { httpClient } from '../api/httpClient.js';
 import { Icon } from '../components/common/Icon.jsx';
@@ -23,6 +25,7 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
   const [regForm, setRegForm] = useState(() => ({ ...INIT_REGISTER, email: initialEmail }));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [forgot, setForgot] = useState(false);
   const overlayRef = useRef();
 
   // Close on ESC
@@ -103,7 +106,11 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
           {error && <div className="tc-modal-error">{error}</div>}
 
           {/* ── LOGIN ── */}
-          {mode === 'login' && (
+          {mode === 'login' && forgot && (
+            <ForgotPasswordForm initialEmail={loginForm.tenDangNhap.includes('@') ? loginForm.tenDangNhap : ''} onBack={() => { setError(''); setForgot(false); }}
+              onReset={(email) => { setForgot(false); setLoginForm({ tenDangNhap: email, matKhau: '' }); setError(''); }} />
+          )}
+          {mode === 'login' && !forgot && (
             <form className="tc-modal-form" onSubmit={handleLogin}>
               <div className="tc-modal-header">
                 <span className="tc-modal-emoji ui-auth-symbol"><Icon name="login" /></span>
@@ -111,11 +118,11 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
                 <p>Đăng nhập để quản lý thuê phòng của bạn.</p>
               </div>
               <label className="tc-form-field">
-                <span>Tên đăng nhập</span>
+                <span>Email đăng nhập</span>
                 <span className="ui-field-control">
-                  <Icon name="person" />
+                  <Icon name="mail" />
                   <input name="tenDangNhap" value={loginForm.tenDangNhap} onChange={updateLogin}
-                    placeholder="kh0001" required autoComplete="username" />
+                    placeholder="ban@example.com" required autoComplete="username" />
                 </span>
               </label>
               <label className="tc-form-field">
@@ -126,6 +133,7 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
                     placeholder="••••••••" required autoComplete="current-password" />
                 </span>
               </label>
+              <p className="tc-modal-switch tc-forgot-link"><button type="button" onClick={() => { setError(''); setForgot(true); }}>Quên mật khẩu?</button></p>
               <button className="tc-modal-submit" type="submit" disabled={loading}>
                 {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
               </button>
@@ -150,11 +158,6 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
                 <span>Họ và tên <span className="tc-required">*</span></span>
                 <input name="hoTen" value={regForm.hoTen} onChange={updateReg}
                   placeholder="Nguyễn Văn An" required />
-              </label>
-              <label className="tc-form-field">
-                <span>Tên đăng nhập <span className="tc-required">*</span></span>
-                <input name="tenDangNhap" value={regForm.tenDangNhap} onChange={updateReg}
-                  placeholder="nguyenvanan" required maxLength={50} autoComplete="username" />
               </label>
               <div className="tc-form-row">
                 <label className="tc-form-field">
@@ -201,7 +204,7 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
                 Đã có tài khoản?{' '}
                 <button type="button" onClick={() => { setError(''); onSwitchMode('login'); }}>Đăng nhập</button>
               </p>
-              <GoogleAuthSection onDone={onClose} label="Hoặc đăng ký bằng Google" />
+              <GoogleAuthSection onDone={onClose} label="Hoặc đăng ký với tài khoản Google" buttonText="signup_with" />
             </form>
           )}
         </div>
@@ -542,6 +545,14 @@ export default function TrangChu() {
     else setAuthModal('login');
   }, [location.search, isLoading, user, navigate]);
 
+  // Liên kết kiểu /#phong-noi-bat (vd. nút "Khám phá phòng" của khách đã đăng nhập) cuộn tới đúng mục sau khi trang dựng xong.
+  useEffect(() => {
+    const id = location.hash.slice(1);
+    if (!id || loadingRooms) return undefined;
+    const timer = setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+    return () => clearTimeout(timer);
+  }, [location.hash, loadingRooms]);
+
   const openAuth = useCallback((mode) => setAuthModal(mode), []);
   const closeAuth = useCallback(() => setAuthModal(null), []);
   const switchMode = useCallback((mode) => setAuthModal(mode), []);
@@ -583,7 +594,7 @@ export default function TrangChu() {
         {/* Phòng nổi bật */}
         <section className="hx-section tc-rooms-section" id="phong-noi-bat">
           <div className="tc-container">
-            <SectionHeading title="Phòng Nổi Bật" subtitle="Những không gian được chọn lọc cho cuộc sống mỗi ngày." />
+            <SectionHeading title="Phòng trống tiêu biểu" subtitle="Những không gian được chọn lọc cho cuộc sống mỗi ngày." />
 
             {loadingRooms ? (
               <div className="tc-rooms-loading">
@@ -606,6 +617,7 @@ export default function TrangChu() {
           </div>
         </section>
 
+        <ServicesShowcase />
         <TrustStrip />
         <AboutSection rooms={catalog} branches={branches} roomTypes={roomTypes} onViewDetail={viewRoomDetail} />
         <LocationSection rooms={catalog} branches={branches} />

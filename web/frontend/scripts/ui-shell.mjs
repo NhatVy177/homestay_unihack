@@ -46,7 +46,7 @@ try {
     // Open every unlocked tab once: catches tabs that crash on render (e.g. a missing React import).
     await page.setViewportSize({ width: 1440, height: 1000 });
     // Admin views need richer fixtures than this generic stub, so Admin is checked for frame and menu only.
-    const tabs = name === 'admin' ? [] : await page.locator('aside nav button:not(.is-locked):not(:disabled)').allInnerTexts();
+    const tabs = name === 'admin' ? [] : await page.locator('aside nav button:not(.is-locked):not(:disabled)').allInnerTexts().then(list => list.filter(text => !/Khám phá phòng/.test(text))); // "Khám phá phòng" của khách chuyển sang mục phòng ở trang chủ, không mở tab trong cổng
     const brokenTabs = [];
     for (const tab of tabs) {
       const before = errors.length;

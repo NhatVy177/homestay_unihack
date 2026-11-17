@@ -1,9 +1,9 @@
 import React from 'react';
 import './demoAccounts.css';
 
-// Tài khoản mẫu để demo và để giám khảo thử nhanh (mật khẩu chung 123456). Bấm để điền sẵn vào form đăng nhập.
+// Tài khoản mẫu để demo và để giám khảo thử nhanh (mật khẩu chung 123). Bấm để điền sẵn vào form đăng nhập.
 // Tắt bằng VITE_SHOW_DEMO_ACCOUNTS=false khi không muốn hiện (ví dụ bản chạy thật).
-const DEMO_PASSWORD = '123456';
+const DEMO_PASSWORD = '123';
 const GROUPS = [
   { title: 'Khách hàng', items: [
     { user: 'demo4', label: 'Khách demo4' },

@@ -41,3 +41,6 @@ web/backend/uploads/chung-tu-doi-soat/*
 
 # Local UI review screenshots and reports
 web/frontend/.ui-screens/
+
+web/backend/uploads/avatars/*
+!web/backend/uploads/avatars/.gitkeep

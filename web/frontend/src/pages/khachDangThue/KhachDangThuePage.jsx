@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AccountSecurity from '../../components/common/AccountSecurity.jsx';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import PortalIcon from '../../components/common/PortalIcon.jsx';
 import YeuCauTraPhong from '../traPhong/YeuCauTraPhong.jsx';
@@ -339,6 +340,7 @@ export default function KhachDangThuePage() {
                   ]} />
                 </article>
               </div>
+              <AccountSecurity />
             </section>
           )}
 
@@ -359,7 +361,6 @@ export default function KhachDangThuePage() {
                   </div>
                   <InfoList rows={[
                     ['Mã khách hàng', user?.maNguoiDung || seededRental.customerId],
-                    ['Tên đăng nhập', user?.tenDangNhap || 'kh0001'],
                     ['Vai trò', 'Khách hàng'],
                     ['Trạng thái cư trú', 'Đang thuê']
                   ]} />

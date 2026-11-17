@@ -19,7 +19,7 @@ const loadScript = () => {
   return scriptPromise;
 };
 
-export default function GoogleAuthSection({ onDone, onError, label = 'Hoặc tiếp tục bằng Google' }) {
+export default function GoogleAuthSection({ onDone, onError, label = 'Hoặc đăng nhập với tài khoản Google', buttonText = 'signin_with' }) {
   const { dangNhapGoogle, hoanTatGoogle } = useAuth();
   const [config, setConfig] = useState(null), [profile, setProfile] = useState(null), [busy, setBusy] = useState(false), [error, setError] = useState('');
   const holder = useRef(null);
@@ -45,7 +45,7 @@ export default function GoogleAuthSection({ onDone, onError, label = 'Hoặc ti�
           } finally { setBusy(false); }
         },
       });
-      window.google.accounts.id.renderButton(holder.current, { theme: 'outline', size: 'large', shape: 'pill', text: 'continue_with', locale: 'vi', width: 320 });
+      window.google.accounts.id.renderButton(holder.current, { theme: 'outline', size: 'large', shape: 'pill', text: buttonText, locale: 'vi', width: 320 });
     }).catch((e) => setError(e.message));
     return () => { alive = false; };
   }, [config]);

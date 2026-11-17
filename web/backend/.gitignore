@@ -15,3 +15,6 @@ uploads/chung-tu-doi-soat/*
 # Khóa riêng cục bộ (Privy JWT, D-011) và hộp thư dev
 secrets/
 outbox/
+
+uploads/avatars/*
+!uploads/avatars/.gitkeep

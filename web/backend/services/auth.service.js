@@ -1,6 +1,7 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { executeProcedure, executeQuery, sql } from '../database/connection.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
+import { avatarUrlOf, resolveLoginName } from './taiKhoan.service.js';
 import { googleClientId, verifyGoogleIdToken } from './googleAuth.js';
 
 function getAuthSecret() {
@@ -55,7 +56,8 @@ function toUser(record) {
     chucVu: record.chucVu || null,
     maChiNhanh: record.maChiNhanh || null,
     quocTich: record.quocTich || null,
-    cccd: record.cccd || null
+    cccd: record.cccd || null,
+    avatarUrl: avatarUrlOf(record.maNguoiDung)
   };
 
   return {
@@ -91,7 +93,8 @@ function handleDatabaseError(error) {
 }
 
 export async function dangKy(data = {}) {
-  const tenDangNhap = String(data.tenDangNhap || '').trim();
+  // Đăng ký bằng email: không còn ô tên đăng nhập, tên đăng nhập nội bộ lấy từ email (vẫn nhận tên đăng nhập nếu client gửi lên).
+  const tenDangNhap = String(data.tenDangNhap || '').trim() || taoTenDangNhapTuEmail(String(data.email || '').trim());
   const matKhau = String(data.matKhau || '');
   const xacNhanMatKhau = String(data.xacNhanMatKhau || '');
   const hoTen = String(data.hoTen || '').trim();
@@ -177,12 +180,13 @@ export async function kiemTraSoDienThoai(value) {
 }
 
 export async function dangNhap(data = {}) {
-  const tenDangNhap = String(data.tenDangNhap || '').trim();
+  const nhap = String(data.tenDangNhap || '').trim();
   const matKhau = String(data.matKhau || '');
 
-  if (!tenDangNhap || !matKhau) {
-    throw createServiceError('Vui long nhap ten dang nhap va mat khau');
+  if (!nhap || !matKhau) {
+    throw createServiceError('Vui lòng nhập email và mật khẩu');
   }
+  const tenDangNhap = await resolveLoginName(nhap);
 
   try {
     const result = await executeProcedure('dbo.SP_DangNhap', [
@@ -218,7 +222,8 @@ export async function getSessionUser(token) {
     chucVu: payload.chucVu || null,
     maChiNhanh: payload.maChiNhanh || null,
     quocTich: payload.quocTich || null,
-    cccd: payload.cccd || null
+    cccd: payload.cccd || null,
+    avatarUrl: avatarUrlOf(payload.maNguoiDung)
   };
 }
 

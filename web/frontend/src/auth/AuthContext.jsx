@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
     authApi.getToi()
       .then(({ data }) => {
         const storedUser = getStoredSession()?.user || {};
-        setUser(mergeFilled(storedUser, data));
+        setUser({ ...mergeFilled(storedUser, data), avatarUrl: data.avatarUrl || null });
       })
       .catch(() => clearSession())
       .finally(() => setIsLoading(false));
@@ -83,8 +83,9 @@ export function AuthProvider({ children }) {
     return Promise.resolve();
   }
 
+  const capNhatAvatar = (avatarUrl) => setUser((current) => (current ? { ...current, avatarUrl } : current));
   const value = useMemo(
-    () => ({ user, isLoading, dangNhap, dangKy, dangXuat, dangNhapGoogle, hoanTatGoogle }),
+    () => ({ user, isLoading, dangNhap, dangKy, dangXuat, dangNhapGoogle, hoanTatGoogle, capNhatAvatar }),
     [user, isLoading]
   );
 

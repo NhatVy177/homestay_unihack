@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import AccountSecurity from '../../components/common/AccountSecurity.jsx';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import PortalIcon from '../../components/common/PortalIcon.jsx';
 import ResultModal from '../../components/common/ResultModal.jsx';
@@ -573,7 +574,6 @@ export default function KhachMoiPage() {
                   </div>
                   <div className="km-info-list">
                     <div><span>Mã khách hàng</span><strong>{user?.maNguoiDung || 'Chưa cập nhật'}</strong></div>
-                    <div><span>Tên đăng nhập</span><strong>{user?.tenDangNhap || 'Chưa cập nhật'}</strong></div>
                     <div><span>Vai trò</span><strong>{user?.vaiTro === 'KhachHang' ? 'Khách hàng' : user?.vaiTro || 'Chưa cập nhật'}</strong></div>
                   </div>
                 </div>
@@ -590,6 +590,7 @@ export default function KhachMoiPage() {
                   </div>
                 </div>
               </div>
+              <AccountSecurity />
             </section>
           )}
 
