@@ -5,6 +5,7 @@ import { Icon, serviceIconName } from '../../components/common/Icon.jsx';
 import { getLockedRoomIds, setRoomLocked } from '../../utils/lockedRooms.js';
 import { adminApi } from './admin.api.js';
 import './admin.css';
+import './admin-nam4.css';
 
 const ROOM_STATUS_EMPTY = 'Trống';
 const ROOM_STATUS_MAINTENANCE = 'Bảo trì';
@@ -16,6 +17,9 @@ const navItems = [
   { id: 'employees', label: 'Tài khoản nhân viên', icon: 'person_add' },
   { id: 'property', label: 'Chi nhánh & phòng', icon: 'apartment' },
   { id: 'services', label: 'Dịch vụ & nội quy', icon: 'bolt' },
+  { id: 'customers', label: 'Khách hàng', icon: 'groups' },
+  { id: 'assets', label: 'Tài sản', icon: 'inventory_2' },
+  { id: 'conditions', label: 'Điều kiện lưu trú', icon: 'policy' },
   { id: 'settings', label: 'Cấu hình hệ thống', icon: 'build' },
   { id: 'backup', label: 'Sao lưu dữ liệu', icon: 'download' },
   { id: 'logs', label: 'Nhật ký hệ thống', icon: 'list' }
@@ -2980,13 +2984,16 @@ function SettingsView() {
 }
 
 const adminTabMeta = {
-  overview: { label: 'Tổng quan', eyebrow: 'Admin · Tổng quan' },
-  employees: { label: 'Tài khoản nhân viên', eyebrow: 'Admin · Tài khoản nhân viên' },
-  property: { label: 'Chi nhánh & phòng', eyebrow: 'Admin · Chi nhánh & phòng' },
-  services: { label: 'Dịch vụ & nội quy', eyebrow: 'Admin · Dịch vụ & nội quy' },
-  settings: { label: 'Cấu hình hệ thống', eyebrow: 'Admin · Cấu hình hệ thống' },
-  backup: { label: 'Sao lưu dữ liệu', eyebrow: 'Admin · Sao lưu dữ liệu' },
-  logs: { label: 'Nhật ký hệ thống', eyebrow: 'Admin · Nhật ký hệ thống' }
+  overview:   { label: 'Tổng quan',            eyebrow: 'Admin · Tổng quan' },
+  employees:  { label: 'Tài khoản nhân viên',  eyebrow: 'Admin · Tài khoản nhân viên' },
+  property:   { label: 'Chi nhánh & phòng',    eyebrow: 'Admin · Chi nhánh & phòng' },
+  services:   { label: 'Dịch vụ & nội quy',    eyebrow: 'Admin · Dịch vụ & nội quy' },
+  customers:  { label: 'Khách hàng',            eyebrow: 'Admin · Khách hàng' },
+  assets:     { label: 'Tài sản',               eyebrow: 'Admin · Tài sản' },
+  conditions: { label: 'Điều kiện lưu trú',     eyebrow: 'Admin · Điều kiện lưu trú' },
+  settings:   { label: 'Cấu hình hệ thống',    eyebrow: 'Admin · Cấu hình hệ thống' },
+  backup:     { label: 'Sao lưu dữ liệu',       eyebrow: 'Admin · Sao lưu dữ liệu' },
+  logs:       { label: 'Nhật ký hệ thống',      eyebrow: 'Admin · Nhật ký hệ thống' }
 };
 
 
@@ -3215,6 +3222,752 @@ function LogsView() {
   );
 }
 
+
+/* ================================================================
+   ĐIỀU KIỆN LƯU TRÚ VIEW (Nam4 style → green)
+   API: adminApi.getRules / createRule / updateRule
+   ================================================================ */
+
+function classifyCondition(title, desc) {
+  const text = (title + ' ' + desc).toLowerCase();
+  let category = 'Nội quy';
+  if (text.includes('tạm trú') || text.includes('pháp lý') || text.includes('giấy tờ') || text.includes('cccd')) {
+    category = 'Pháp lý';
+  } else if (text.includes('hút thuốc') || text.includes('vệ sinh') || text.includes('rác')) {
+    category = 'Vệ sinh';
+  } else if (text.includes('bảo vệ') || text.includes('an ninh') || text.includes('thẻ từ') || text.includes('cổng')) {
+    category = 'An ninh';
+  } else if (text.includes('lưu trú') || text.includes('nhận phòng') || text.includes('trả phòng') || text.includes('giới nghiêm')) {
+    category = 'Lưu trú';
+  }
+  let priority = 'medium';
+  if (text.includes('bắt buộc') || text.includes('nghiêm cấm') || text.includes('tạm trú') || text.includes('giờ giấc') || text.includes('hút thuốc')) {
+    priority = 'high';
+  } else if (text.includes('khuyến nghị') || text.includes('nên') || text.includes('nhắc nhở')) {
+    priority = 'low';
+  }
+  return { category, priority };
+}
+
+const PRIORITY_LABEL = { high: 'Bắt buộc', medium: 'Quan trọng', low: 'Khuyến nghị' };
+
+function ConditionsView() {
+  const [conditions, setConditions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [filterCat, setFilterCat] = useState('');
+  const [filterPrio, setFilterPrio] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalMode] = useState('add');
+  const [form, setForm] = useState({});
+  const [toast, setToast] = useState('');
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3500); };
+
+  const loadConditions = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await adminApi.getRules();
+      const mapped = (data || []).map(r => {
+        const { category, priority } = classifyCondition(r.tieuDe || r.tenQuyDinh || '', r.noiDung || r.moTa || '');
+        return {
+          id: r.maQuyDinh || r.id,
+          title: r.tieuDe || r.tenQuyDinh || '',
+          description: r.noiDung || r.moTa || '',
+          isActive: r.trangThai !== 'Vô hiệu' && r.trangThai !== false,
+          effectiveDate: r.thoiGianTao ? new Date(r.thoiGianTao).toLocaleDateString('vi-VN') : '',
+          category, priority
+        };
+      });
+      setConditions(mapped);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => { loadConditions(); }, []);
+
+  const categories = useMemo(() => [...new Set(conditions.map(c => c.category))], [conditions]);
+
+  const kpis = useMemo(() => [
+    { icon: 'policy',         label: 'Tổng điều kiện',    val: conditions.length },
+    { icon: 'check_circle',   label: 'Đang áp dụng',      val: conditions.filter(c => c.isActive).length,           cls: 'success' },
+    { icon: 'priority_high',  label: 'Quy định bắt buộc', val: conditions.filter(c => c.priority === 'high').length, cls: 'danger' },
+    { icon: 'category',       label: 'Danh mục',           val: categories.length }
+  ], [conditions, categories]);
+
+  const filtered = useMemo(() => conditions.filter(c => {
+    const q = search.toLowerCase();
+    return (!q || c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q))
+      && (!filterCat || c.category === filterCat)
+      && (!filterPrio || c.priority === filterPrio);
+  }), [conditions, search, filterCat, filterPrio]);
+
+  const openAdd = () => {
+    setModalMode('add');
+    setForm({ title: '', category: 'Nội quy', description: '', isActive: true, priority: 'medium' });
+    setShowModal(true);
+  };
+  const openEdit = (c) => { setModalMode('edit'); setForm({ ...c }); setShowModal(true); };
+
+  const saveForm = async () => {
+    if (!form.title?.trim() || !form.description?.trim()) { alert('Tiêu đề và nội dung không được để trống!'); return; }
+    try {
+      const payload = { tieuDe: form.title, noiDung: form.description, trangThai: form.isActive ? 'Hiệu lực' : 'Vô hiệu' };
+      if (modalMode === 'add') {
+        await adminApi.createRule(payload);
+        showToast('Đã thêm điều kiện lưu trú mới!');
+      } else {
+        await adminApi.updateRule(form.id, payload);
+        showToast('Đã cập nhật điều kiện lưu trú!');
+      }
+      setShowModal(false);
+      await loadConditions();
+    } catch (e) { alert(e.response?.data?.message || 'Lỗi khi lưu'); }
+  };
+
+  return (
+    <section className="admin-workspace admin-fade-in-up">
+      {toast && <div className="admin-toast"><span className="material-symbols-outlined" style={{fontSize:18}}>check_circle</span>{toast}</div>}
+
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: 'var(--color-primary)' }}>Quản trị điều kiện lưu trú</h2>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-muted)' }}>Quản lý các quy chế, nội quy và điều kiện lưu trú của ký túc xá/homestay.</p>
+        </div>
+        <button className="admin-btn primary" type="button" onClick={openAdd}>
+          <Icon name="add_circle" /> Thêm điều kiện
+        </button>
+      </div>
+
+      {/* KPI */}
+      <div className="admin-kpi-grid" style={{ marginBottom: 20 }}>
+        {kpis.map((k, i) => (
+          <div className="admin-kpi-card" key={i}>
+            <div className={`admin-kpi-icon ${k.cls || ''}`}>
+              <span className="material-symbols-outlined" style={{ fontSize: 22 }}>{k.icon}</span>
+            </div>
+            <div>
+              <p className="admin-kpi-label">{k.label}</p>
+              <p className="admin-kpi-value">{k.val}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filter */}
+      <div className="admin-filter-bar" style={{ marginBottom: 20 }}>
+        <div className="admin-filter-search">
+          <span className="material-symbols-outlined search-icon">search</span>
+          <input placeholder="Tìm theo tiêu đề hoặc nội dung..." value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <select className="admin-filter-select" value={filterCat} onChange={e => setFilterCat(e.target.value)}>
+          <option value="">Tất cả danh mục</option>
+          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <select className="admin-filter-select" value={filterPrio} onChange={e => setFilterPrio(e.target.value)}>
+          <option value="">Tất cả mức độ</option>
+          <option value="high">Bắt buộc</option>
+          <option value="medium">Quan trọng</option>
+          <option value="low">Khuyến nghị</option>
+        </select>
+        <button className="admin-btn secondary" type="button" onClick={() => { setSearch(''); setFilterCat(''); setFilterPrio(''); }}>
+          <Icon name="refresh" /> Làm mới
+        </button>
+      </div>
+
+      {/* List */}
+      <div className="admin-condition-list">
+        {isLoading ? (
+          [1,2,3].map(i => (
+            <div key={i} style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 12, padding: 20 }}>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <div className="admin-skeleton" style={{ height: 20, width: 70 }} />
+                <div className="admin-skeleton" style={{ height: 20, width: 90 }} />
+              </div>
+              <div className="admin-skeleton" style={{ height: 20, width: '60%', marginBottom: 8 }} />
+              <div className="admin-skeleton" style={{ height: 16, width: '90%' }} />
+            </div>
+          ))
+        ) : filtered.length === 0 ? (
+          <div className="admin-empty-nam4">
+            <span className="material-symbols-outlined icon">manage_search</span>
+            <p>Không tìm thấy điều kiện lưu trú phù hợp.</p>
+            <small>Vui lòng thay đổi từ khóa hoặc bộ lọc.</small>
+          </div>
+        ) : (
+          filtered.map(c => (
+            <div key={c.id} className={`admin-condition-card ${!c.isActive ? 'inactive' : ''}`}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+                    <span className={`admin-badge ${c.priority}`}>{PRIORITY_LABEL[c.priority]}</span>
+                    <span className="admin-badge type">{c.category}</span>
+                    {!c.isActive && <span className="admin-badge off">Đã tắt</span>}
+                  </div>
+                  <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: 'var(--color-primary)' }}>{c.title}</h3>
+                  <p style={{ margin: 0, fontSize: 13, color: 'var(--color-text-muted)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.description}</p>
+                  {c.effectiveDate && <p style={{ margin: '8px 0 0', fontSize: 11, color: 'var(--color-text-muted)' }}>Có hiệu lực từ: {c.effectiveDate}</p>}
+                </div>
+                <button className="admin-icon-btn" type="button" title="Chỉnh sửa" onClick={() => openEdit(c)}>
+                  <Icon name="edit" />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="admin-modal-backdrop" role="presentation" onMouseDown={() => setShowModal(false)}>
+          <section className="admin-modal admin-modal-wide" role="dialog" aria-modal="true" onMouseDown={e => e.stopPropagation()}>
+            <header className="admin-modal-head">
+              <div>
+                <span className="admin-eyebrow">Điều kiện lưu trú</span>
+                <h3>{modalMode === 'add' ? 'Thêm điều kiện mới' : 'Chỉnh sửa điều kiện'}</h3>
+              </div>
+              <button className="admin-icon-btn" type="button" onClick={() => setShowModal(false)} aria-label="Đóng">
+                <Icon name="close" />
+              </button>
+            </header>
+            <div className="admin-modal-form">
+              <div className="admin-form-grid">
+                <label className="admin-form-full">
+                  Tiêu đề <b className="admin-required">*</b>
+                  <input value={form.title || ''} onChange={e => setForm(p => ({...p, title: e.target.value}))} placeholder="Tiêu đề điều kiện..." />
+                </label>
+                <label className="admin-form-full">
+                  Nội dung quy định <b className="admin-required">*</b>
+                  <textarea value={form.description || ''} onChange={e => setForm(p => ({...p, description: e.target.value}))} rows={4} placeholder="Nhập nội dung quy định lưu trú chi tiết..." />
+                </label>
+                <label>
+                  Danh mục
+                  <select value={form.category || 'Nội quy'} onChange={e => setForm(p => ({...p, category: e.target.value}))}>
+                    {['Nội quy','Pháp lý','Vệ sinh','An ninh','Lưu trú'].map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </label>
+                <label>
+                  Mức độ
+                  <select value={form.priority || 'medium'} onChange={e => setForm(p => ({...p, priority: e.target.value}))}>
+                    <option value="high">Bắt buộc</option>
+                    <option value="medium">Quan trọng</option>
+                    <option value="low">Khuyến nghị</option>
+                  </select>
+                </label>
+                {modalMode === 'edit' && (
+                  <label>
+                    Trạng thái
+                    <select value={form.isActive ? 'true' : 'false'} onChange={e => setForm(p => ({...p, isActive: e.target.value === 'true'}))}>
+                      <option value="true">Đang áp dụng</option>
+                      <option value="false">Ngưng áp dụng</option>
+                    </select>
+                  </label>
+                )}
+              </div>
+            </div>
+            <footer className="admin-modal-actions">
+              <button className="admin-btn secondary" type="button" onClick={() => setShowModal(false)}>Hủy</button>
+              <button className="admin-btn primary" type="button" onClick={saveForm}>
+                <Icon name={modalMode === 'add' ? 'add_circle' : 'save'} />
+                {modalMode === 'add' ? 'Thêm điều kiện' : 'Lưu thay đổi'}
+              </button>
+            </footer>
+          </section>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ================================================================
+   TÀI SẢN PHÒNG VIEW (Nam4 AdminAssetsPage style → green)
+   API: adminApi.getRoomAssets (per room) — dùng room+branch filter
+   ================================================================ */
+
+function AssetsView() {
+  const [assets, setAssets] = useState([]);
+  const [branches, setBranches] = useState([]);
+  const [rooms, setRooms] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [filterBranch, setFilterBranch] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalMode] = useState('add');
+  const [form, setForm] = useState({});
+  const [toast, setToast] = useState('');
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3500); };
+
+  const loadBranches = async () => {
+    try { const { data } = await adminApi.getBranches(); setBranches(data || []); } catch {}
+  };
+  const loadRooms = async (branchId) => {
+    try { const { data } = await adminApi.getRooms(branchId ? { maChiNhanh: branchId } : {}); setRooms(data || []); } catch {}
+  };
+
+  const loadAssets = async () => {
+    setIsLoading(true);
+    try {
+      // Load all rooms first, then load assets for each room
+      const { data: allRooms } = await adminApi.getRooms({});
+      const targetRooms = filterBranch ? allRooms.filter(r => r.maChiNhanh === filterBranch) : allRooms;
+      const allAssets = [];
+      await Promise.allSettled(
+        targetRooms.slice(0, 20).map(async (room) => {
+          const { data: roomAssets } = await adminApi.getRoomAssets(room.maPhong);
+          (roomAssets || []).forEach(a => allAssets.push({
+            ...a,
+            tenPhong: room.tenPhong,
+            maPhong: room.maPhong,
+            maChiNhanh: room.maChiNhanh,
+            tenChiNhanh: room.tenChiNhanh
+          }));
+        })
+      );
+      setAssets(allAssets);
+    } catch (e) { console.error(e); } finally { setIsLoading(false); }
+  };
+
+  useEffect(() => { loadBranches(); }, []);
+  useEffect(() => { loadAssets(); }, [filterBranch]);
+
+  const kpis = useMemo(() => [
+    { icon: 'inventory_2', label: 'Tổng tài sản',    val: assets.length },
+    { icon: 'check_circle', label: 'Đang sử dụng',  val: assets.filter(a => (a.trangThai || a.tinhTrang) === 'Đang sử dụng').length, cls: 'success' },
+    { icon: 'build',        label: 'Bảo trì',        val: assets.filter(a => (a.trangThai || a.tinhTrang) === 'Bảo trì').length,       cls: 'warning' },
+    { icon: 'warning',      label: 'Hỏng',           val: assets.filter(a => (a.trangThai || a.tinhTrang) === 'Hỏng').length,          cls: 'danger' }
+  ], [assets]);
+
+  const filtered = useMemo(() => assets.filter(a => {
+    const q = search.toLowerCase();
+    const name = (a.tenTaiSan || a.ten || '').toLowerCase();
+    return (!q || name.includes(q) || (a.tenPhong || '').toLowerCase().includes(q))
+      && (!filterStatus || (a.trangThai || a.tinhTrang) === filterStatus);
+  }), [assets, search, filterStatus]);
+
+  const openAdd = () => {
+    setModalMode('add');
+    setForm({ tenTaiSan: '', soLuong: 1, trangThai: 'Đang sử dụng', maPhong: '', maChiNhanh: '' });
+    setShowModal(true);
+  };
+  const openEdit = (a) => {
+    setModalMode('edit');
+    setForm({ ...a, tenTaiSan: a.tenTaiSan || a.ten || '' });
+    setShowModal(true);
+    if (a.maChiNhanh) loadRooms(a.maChiNhanh);
+  };
+
+  const saveForm = async () => {
+    if (!form.tenTaiSan?.trim() || !form.maPhong) { alert('Vui lòng điền đầy đủ thông tin!'); return; }
+    try {
+      const payload = { tenTaiSan: form.tenTaiSan, soLuong: Number(form.soLuong) || 1, trangThai: form.trangThai };
+      if (modalMode === 'add') {
+        await adminApi.createRoomAsset(form.maPhong, payload);
+        showToast('Đã thêm tài sản mới!');
+      } else {
+        await adminApi.updateRoomAsset(form.maPhong, form.maTaiSan || form.id, payload);
+        showToast('Đã cập nhật tài sản!');
+      }
+      setShowModal(false);
+      await loadAssets();
+    } catch (e) { alert(e.response?.data?.message || 'Lỗi khi lưu tài sản'); }
+  };
+
+  const getStatusCls = (s) => {
+    if (!s) return '';
+    if (s === 'Bảo trì') return 'warn';
+    if (s === 'Hỏng') return 'danger';
+    return 'done';
+  };
+
+  return (
+    <section className="admin-workspace admin-fade-in-up">
+      {toast && <div className="admin-toast"><span className="material-symbols-outlined" style={{fontSize:18}}>check_circle</span>{toast}</div>}
+
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: 'var(--color-primary)' }}>Quản lý tài sản</h2>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-muted)' }}>Theo dõi và quản lý tài sản thiết bị trong các phòng.</p>
+        </div>
+        <button className="admin-btn primary" type="button" onClick={openAdd}>
+          <Icon name="add_circle" /> Thêm tài sản
+        </button>
+      </div>
+
+      {/* KPI */}
+      <div className="admin-kpi-grid" style={{ marginBottom: 20 }}>
+        {kpis.map((k, i) => (
+          <div className="admin-kpi-card" key={i}>
+            <div className={`admin-kpi-icon ${k.cls || ''}`}>
+              <span className="material-symbols-outlined" style={{ fontSize: 22 }}>{k.icon}</span>
+            </div>
+            <div>
+              <p className="admin-kpi-label">{k.label}</p>
+              <p className="admin-kpi-value">{k.val}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filter */}
+      <div className="admin-filter-bar" style={{ marginBottom: 20 }}>
+        <div className="admin-filter-search">
+          <span className="material-symbols-outlined search-icon">search</span>
+          <input placeholder="Tìm theo tên tài sản, phòng..." value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <select className="admin-filter-select" value={filterBranch} onChange={e => setFilterBranch(e.target.value)}>
+          <option value="">Tất cả chi nhánh</option>
+          {branches.map(b => <option key={b.maChiNhanh} value={b.maChiNhanh}>{b.tenChiNhanh}</option>)}
+        </select>
+        <select className="admin-filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+          <option value="">Tất cả trạng thái</option>
+          <option value="Đang sử dụng">Đang sử dụng</option>
+          <option value="Bảo trì">Bảo trì</option>
+          <option value="Hỏng">Hỏng</option>
+        </select>
+        <button className="admin-btn secondary" type="button" onClick={() => { setSearch(''); setFilterStatus(''); }}>
+          <Icon name="refresh" /> Làm mới
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="admin-panel">
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Tên tài sản</th>
+                <th>Phòng</th>
+                <th>Chi nhánh</th>
+                <th>Số lượng</th>
+                <th>Trạng thái</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr><td colSpan={6} style={{ textAlign: 'center', padding: 28, color: 'var(--color-text-muted)' }}>Đang tải tài sản...</td></tr>
+              ) : filtered.length === 0 ? (
+                <tr><td colSpan={6} style={{ textAlign: 'center', padding: 28, color: 'var(--color-text-muted)' }}>Không tìm thấy tài sản nào.</td></tr>
+              ) : filtered.map((a, i) => (
+                <tr key={a.maTaiSan || a.id || i}>
+                  <td><strong>{a.tenTaiSan || a.ten}</strong></td>
+                  <td>{a.tenPhong || a.maPhong}</td>
+                  <td>{a.tenChiNhanh || a.maChiNhanh}</td>
+                  <td>{a.soLuong ?? 1}</td>
+                  <td><StatusPill>{a.trangThai || a.tinhTrang || 'Đang sử dụng'}</StatusPill></td>
+                  <td style={{ textAlign: 'center' }}>
+                    <button className="admin-icon-btn" type="button" title="Chỉnh sửa" onClick={() => openEdit(a)}>
+                      <Icon name="edit" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="admin-modal-backdrop" role="presentation" onMouseDown={() => setShowModal(false)}>
+          <section className="admin-modal admin-modal-wide" role="dialog" aria-modal="true" onMouseDown={e => e.stopPropagation()}>
+            <header className="admin-modal-head">
+              <div>
+                <span className="admin-eyebrow">Tài sản phòng</span>
+                <h3>{modalMode === 'add' ? 'Thêm tài sản mới' : 'Chỉnh sửa tài sản'}</h3>
+              </div>
+              <button className="admin-icon-btn" type="button" onClick={() => setShowModal(false)} aria-label="Đóng">
+                <Icon name="close" />
+              </button>
+            </header>
+            <div className="admin-modal-form">
+              <div className="admin-form-grid">
+                <label className="admin-form-full">
+                  Tên tài sản <b className="admin-required">*</b>
+                  <input value={form.tenTaiSan || ''} onChange={e => setForm(p => ({...p, tenTaiSan: e.target.value}))} placeholder="Điều hòa, giường tầng..." />
+                </label>
+                <label>
+                  Chi nhánh <b className="admin-required">*</b>
+                  <select value={form.maChiNhanh || ''} onChange={e => { setForm(p => ({...p, maChiNhanh: e.target.value, maPhong: ''})); loadRooms(e.target.value); }}>
+                    <option value="">Chọn chi nhánh</option>
+                    {branches.map(b => <option key={b.maChiNhanh} value={b.maChiNhanh}>{b.tenChiNhanh}</option>)}
+                  </select>
+                </label>
+                <label>
+                  Phòng <b className="admin-required">*</b>
+                  <select value={form.maPhong || ''} onChange={e => setForm(p => ({...p, maPhong: e.target.value}))}>
+                    <option value="">Chọn phòng</option>
+                    {rooms.filter(r => !form.maChiNhanh || r.maChiNhanh === form.maChiNhanh)
+                      .map(r => <option key={r.maPhong} value={r.maPhong}>{r.tenPhong}</option>)}
+                  </select>
+                </label>
+                <label>
+                  Số lượng
+                  <input type="number" min={1} value={form.soLuong || 1} onChange={e => setForm(p => ({...p, soLuong: e.target.value}))} />
+                </label>
+                <label>
+                  Trạng thái
+                  <select value={form.trangThai || 'Đang sử dụng'} onChange={e => setForm(p => ({...p, trangThai: e.target.value}))}>
+                    <option>Đang sử dụng</option>
+                    <option>Bảo trì</option>
+                    <option>Hỏng</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <footer className="admin-modal-actions">
+              <button className="admin-btn secondary" type="button" onClick={() => setShowModal(false)}>Hủy</button>
+              <button className="admin-btn primary" type="button" onClick={saveForm}>
+                <Icon name={modalMode === 'add' ? 'add_circle' : 'save'} />
+                {modalMode === 'add' ? 'Thêm tài sản' : 'Lưu thay đổi'}
+              </button>
+            </footer>
+          </section>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ================================================================
+   KHÁCH HÀNG VIEW (Nam4 AdminUsersPage style → green)
+   API: httpClient /admin/customers (nếu có) hoặc fallback message
+   ================================================================ */
+
+function CustomersView() {
+  const [customers, setCustomers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [selected, setSelected] = useState(null);
+  const [isBusy, setIsBusy] = useState(false);
+  const [drawerTab, setDrawerTab] = useState('info');
+  const [toast, setToast] = useState('');
+
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3500); };
+
+  const loadCustomers = async () => {
+    setIsLoading(true);
+    try {
+      const { httpClient } = await import('../../api/httpClient.js');
+      const { data } = await httpClient.get('/admin/customers');
+      setCustomers(data || []);
+    } catch (e) {
+      // API chưa có → thử getLogs để lấy danh sách khách từ hệ thống
+      setCustomers([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => { loadCustomers(); }, []);
+
+  const kpis = useMemo(() => [
+    { icon: 'groups',        label: 'Tổng khách hàng',  val: customers.length },
+    { icon: 'home',          label: 'Đang thuê',         val: customers.filter(c => c.trangThaiThue === 'Đang thuê').length,    cls: 'success' },
+    { icon: 'person_off',   label: 'Chưa thuê',         val: customers.filter(c => c.trangThaiThue !== 'Đang thuê').length },
+    { icon: 'lock',          label: 'Tài khoản khóa',    val: customers.filter(c => c.trangThaiTaiKhoan === 'Vô hiệu hóa').length, cls: 'danger' }
+  ], [customers]);
+
+  const filtered = useMemo(() => customers.filter(c => {
+    const q = search.toLowerCase();
+    return (!q || (c.hoTen || '').toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q) || (c.maNguoiDung || '').toLowerCase().includes(q))
+      && (!filterStatus || c.trangThaiTaiKhoan === filterStatus);
+  }), [customers, search, filterStatus]);
+
+  const handleToggleLock = async (customer) => {
+    setIsBusy(true);
+    try {
+      const isLocked = customer.trangThaiTaiKhoan !== 'Vô hiệu hóa';
+      const { httpClient } = await import('../../api/httpClient.js');
+      await httpClient.patch(`/admin/customers/${customer.maNguoiDung}/lock`, { isLocked });
+      showToast(isLocked ? 'Đã khóa tài khoản khách hàng!' : 'Đã mở khóa tài khoản!');
+      await loadCustomers();
+      setSelected(customers.find(c => c.maNguoiDung === customer.maNguoiDung) || null);
+    } catch (e) {
+      alert(e.response?.data?.message || 'Không thể cập nhật trạng thái tài khoản.');
+    } finally { setIsBusy(false); }
+  };
+
+  const initials = (name = '') => String(name).split(/\s+/).filter(Boolean).slice(-2).map(w => w[0]).join('').toUpperCase() || 'KH';
+  const isLocked = selected?.trangThaiTaiKhoan === 'Vô hiệu hóa';
+
+  return (
+    <section className="admin-workspace admin-fade-in-up">
+      {toast && <div className="admin-toast"><span className="material-symbols-outlined" style={{fontSize:18}}>check_circle</span>{toast}</div>}
+
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: 'var(--color-primary)' }}>Quản lý khách hàng</h2>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-muted)' }}>Xem thông tin, lịch sử thuê phòng và quản lý tài khoản khách hàng.</p>
+        </div>
+        <button className="admin-btn secondary" type="button" onClick={loadCustomers}>
+          <Icon name="refresh" /> Làm mới
+        </button>
+      </div>
+
+      {/* KPI */}
+      <div className="admin-kpi-grid" style={{ marginBottom: 20 }}>
+        {kpis.map((k, i) => (
+          <div className="admin-kpi-card" key={i}>
+            <div className={`admin-kpi-icon ${k.cls || ''}`}>
+              <span className="material-symbols-outlined" style={{ fontSize: 22 }}>{k.icon}</span>
+            </div>
+            <div>
+              <p className="admin-kpi-label">{k.label}</p>
+              <p className="admin-kpi-value">{k.val}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filter */}
+      <div className="admin-filter-bar" style={{ marginBottom: 20 }}>
+        <div className="admin-filter-search">
+          <span className="material-symbols-outlined search-icon">search</span>
+          <input placeholder="Tìm theo tên, email, mã khách hàng..." value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <select className="admin-filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+          <option value="">Tất cả trạng thái</option>
+          <option value="Hoạt động">Hoạt động</option>
+          <option value="Vô hiệu hóa">Đã khóa</option>
+        </select>
+        <button className="admin-btn secondary" type="button" onClick={() => { setSearch(''); setFilterStatus(''); }}>
+          <Icon name="refresh" /> Làm mới
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="admin-panel">
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Mã KH</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Số điện thoại</th>
+                <th>Trạng thái thuê</th>
+                <th>Tài khoản</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr><td colSpan={7} style={{ textAlign: 'center', padding: 28, color: 'var(--color-text-muted)' }}>Đang tải danh sách khách hàng...</td></tr>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: 32 }}>
+                    {customers.length === 0
+                      ? <span style={{ color: 'var(--color-text-muted)', fontSize: 14 }}>API /admin/customers chưa được triển khai. Dữ liệu sẽ hiển thị sau khi backend cập nhật.</span>
+                      : <span style={{ color: 'var(--color-text-muted)' }}>Không tìm thấy khách hàng phù hợp.</span>
+                    }
+                  </td>
+                </tr>
+              ) : filtered.map(c => (
+                <tr key={c.maNguoiDung}>
+                  <td><strong>{c.maNguoiDung}</strong></td>
+                  <td>{c.hoTen}</td>
+                  <td>{c.email || '-'}</td>
+                  <td>{c.soDienThoai || '-'}</td>
+                  <td><StatusPill>{c.trangThaiThue || 'Chưa thuê'}</StatusPill></td>
+                  <td><StatusPill>{c.trangThaiTaiKhoan || 'Hoạt động'}</StatusPill></td>
+                  <td style={{ textAlign: 'center' }}>
+                    <button className="admin-icon-btn" type="button" title="Xem chi tiết" onClick={() => { setSelected(c); setDrawerTab('info'); }}>
+                      <Icon name="visibility" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Right Drawer */}
+      {selected && (
+        <>
+          <div className="admin-drawer-overlay" onClick={() => setSelected(null)} />
+          <aside className="admin-drawer">
+            <div className="admin-drawer-head">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div className="admin-drawer-avatar">{initials(selected.hoTen)}</div>
+                <div>
+                  <p className="admin-drawer-title">{selected.hoTen}</p>
+                  <p className="admin-drawer-sub">{selected.maNguoiDung} · {selected.email}</p>
+                </div>
+              </div>
+              <button className="admin-icon-btn" type="button" onClick={() => setSelected(null)} aria-label="Đóng">
+                <Icon name="close" />
+              </button>
+            </div>
+
+            {/* Drawer Tabs */}
+            <div className="admin-drawer-tabs">
+              {[['info','Thông tin'],['rent','Lịch sử thuê']].map(([t, label]) => (
+                <button key={t} className={`admin-drawer-tab ${drawerTab === t ? 'active' : ''}`} type="button" onClick={() => setDrawerTab(t)}>{label}</button>
+              ))}
+            </div>
+
+            <div className="admin-drawer-body">
+              {drawerTab === 'info' && (
+                <div className="admin-drawer-grid">
+                  {[
+                    ['Mã khách hàng', selected.maNguoiDung],
+                    ['Họ tên', selected.hoTen],
+                    ['Email', selected.email || 'Chưa có'],
+                    ['Số điện thoại', selected.soDienThoai || 'Chưa cập nhật'],
+                    ['Giới tính', selected.gioiTinh || 'Chưa cập nhật'],
+                    ['Ngày sinh', selected.ngaySinh ? new Date(selected.ngaySinh).toLocaleDateString('vi-VN') : 'Chưa cập nhật'],
+                    ['Địa chỉ', selected.diaChi || 'Chưa cập nhật'],
+                    ['Trạng thái TK', selected.trangThaiTaiKhoan || 'Hoạt động']
+                  ].map(([label, val]) => (
+                    <div className="admin-drawer-field" key={label}>
+                      <label>{label}</label>
+                      <span>{val}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {drawerTab === 'rent' && (
+                <div className="admin-empty-nam4">
+                  <span className="material-symbols-outlined icon">history</span>
+                  <p>Lịch sử thuê phòng</p>
+                  <small>Tính năng sẽ hiển thị sau khi API backend hỗ trợ.</small>
+                </div>
+              )}
+            </div>
+
+            <div className="admin-drawer-footer">
+              <button className="admin-btn secondary" type="button" onClick={() => setSelected(null)} style={{ flex: 1 }}>Đóng</button>
+              {selected.trangThaiTaiKhoan !== undefined && (
+                <button
+                  className={`admin-btn ${isLocked ? 'primary' : 'danger'}`}
+                  type="button"
+                  disabled={isBusy}
+                  onClick={() => handleToggleLock(selected)}
+                  style={{ flex: 1 }}
+                >
+                  <Icon name={isLocked ? 'lock_open' : 'lock'} />
+                  {isBusy ? 'Đang xử lý...' : isLocked ? 'Mở khóa TK' : 'Khóa tài khoản'}
+                </button>
+              )}
+            </div>
+          </aside>
+        </>
+      )}
+    </section>
+  );
+}
+
 export default function AdminPage() {
   const { user, dangXuat } = useAuth() || {};
   const [activeTab, setActiveTab] = useState('overview');
@@ -3228,6 +3981,12 @@ export default function AdminPage() {
         return <PropertyView />;
       case 'services':
         return <ServicesView />;
+      case 'customers':
+        return <CustomersView />;
+      case 'assets':
+        return <AssetsView />;
+      case 'conditions':
+        return <ConditionsView />;
       case 'settings':
         return <SettingsView />;
       case 'backup':

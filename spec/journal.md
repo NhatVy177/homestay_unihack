@@ -1737,3 +1737,20 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File quy ước/hồ sơ: `AGENTS.md` thêm ngoại lệ tạmD-061 cho commit/merge/pushmain tự chủ; `spec/decisions.md` ghi quyết định thay quy tắc cũ và điều kiện kết thúc; `spec/progress.md` cập nhật trạng thái đãgộp/cáchlàm tạm tại chỗ; `spec/journal.md` ghi quyền và kếtquả. Chỉ thay quy trình làm việc ngoài phần codeđãreview, không đổi tínhnăng/scope bổ sung.
 - Kiểm mới: kiểmdiff/sourceidentity, chạy `scripts/ui-customer-profile.mjs` trên localmain5173 vớiAPIfixture để kiểm lại profile/avatar/menu/cưtrú/Quaylại ở1440/390 trướcpush; PASS1440/390, không pageerror/trànngang, requestghi chỉ cóPUTavatarfixture của ca cũ, không ghiAPI thật. Không chạy lại backend/blockchain/SQL/SMTP/Fuji vì không đổi source tương ứng.
 - Kết thúc: commit merge bằngNhatVy177, push đúngorigin main, đối chiếuhashremote. Rootmain/Vite5173 dùngngay sourcegộp; không còn phải xem riêng5203 để thấy nút mới. Hash và kết quảpush báo phản hồi cuối; các đợt tiếp theo áp dụng ngoại lệ tạm trongAGENTS cho tới khi Vy đổi điều kiện.
+
+## 2026-11-18 00:17:17 +07:00 — J-A001 — Đồng bộ giao diện và chức năng Admin từ dự án Nam4 sang HomeStayDorm (Màu xanh thương hiệu)
+
+- Người thực hiện: Antigravity (theo yêu cầu của Vy: đồng bộ phần quản trị/admin từ dự án Nam4 sang, chuyển màu từ be/nâu sang xanh tokens.css của dự án).
+- File:
+  + `web/frontend/src/pages/admin/admin-nam4.css`: file stylesheet bổ sung các lớp giao diện chuẩn Nam4 (KPI cards, Slide-in Drawer, Filter bar, Card grid cho chi nhánh & dịch vụ, occupancy bar, animations, priority badges) sử dụng toàn bộ CSS variables xanh (`--color-primary`, `--color-surface`, `--color-border`, `--color-bg`...).
+  + `web/frontend/src/pages/admin/AdminPage.jsx`:
+    * Nhúng `admin-nam4.css`.
+    * Thêm 3 tab mới từ Nam4: Khách hàng (`customers`), Tài sản phòng (`assets`), Điều kiện lưu trú (`conditions`).
+    * Thêm các view components: `ConditionsView` (phân loại tự động, KPI cards, bộ lọc danh mục/mức độ, modal thêm/sửa, gọi `adminApi.getRules`/`createRule`/`updateRule`), `AssetsView` (danh sách tài sản phòng, KPI cards, lọc chi nhánh/trạng thái, modal thêm/sửa, gọi `adminApi.getRoomAssets`/`createRoomAsset`/`updateRoomAsset`), `CustomersView` (KPI cards, bảng khách hàng, drawer chi tiết bên phải với các tab thông tin và lịch sử, thao tác khóa/mở khóa tài khoản).
+    * Cập nhật `navItems`, `adminTabMeta`, và `renderActiveView`.
+- Kiểm tra:
+  + Frontend build: `npm run build` PASS (built in 1m 12s, không lỗi bundle).
+  + UI smoke test: `npm run test:avalanche-ui` PASS (Verify, D-017 views, D-018 gateway, D-023 FIFO, D-024 residence exception, không browser exceptions).
+  + Backend tests: `npm test` trong `web/backend` PASS (127 pass, 0 fail, 4 skip).
+  + Blockchain tests: `npm test` trong `blockchain` PASS (25 pass, 0 fail, 1 skip).
+- Việc còn lại: Vy kiểm tra trực quan giao diện admin trên cổng quản trị viên.

@@ -1,6 +1,15 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-17 22:06:29 +07:00** (J-X091/D-061, gộp nút Quay lại và tạm chủ động push main). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 00:17:17 +07:00** (J-A001: đồng bộ giao diện & tính năng Admin từ Nam4 sang theo tone xanh). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+
+## Quản trị viên (Admin) — đồng bộ Nam4 trên main (J-A001)
+
+- Đã tích hợp các màn hình và chức năng quản trị từ `D:\Nam4\Contest\Homestay-Dorm` sang `web/frontend`:
+  + Thêm 3 tab mới: **Khách hàng** (`customers`), **Tài sản** (`assets`), **Điều kiện lưu trú** (`conditions`).
+  + Tạo `admin-nam4.css` chuyển đổi toàn bộ màu nâu be của Nam4 sang màu xanh thương hiệu hệ thống (`--color-primary: #4A6549`, tokens.css).
+  + Thêm các thành phần giao diện chuẩn: KPI cards, Drawer trượt bên phải (slideInRight), bộ lọc tìm kiếm và lọc danh mục, các badge mức độ (Bắt buộc, Quan trọng, Khuyến nghị), thanh tiến độ lấp đầy, modal thêm/sửa.
+  + Kiểm thử: Frontend build PASS, `test:avalanche-ui` PASS, `web/backend` 127 PASS / 0 FAIL / 4 SKIP, `blockchain` 25 PASS / 0 FAIL / 1 SKIP.
+
 
 ## Trang chủ/nhà3D trên main
 
