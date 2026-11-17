@@ -97,7 +97,7 @@ try {
   console.log('PASS public availability rules at 1440/390px');
   {
     const { context, page, errors, writes } = await contextFor(1440, true);
-    await page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${base}/khach-hang?tab=kham-pha`, { waitUntil: 'domcontentloaded' });
     await page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết', exact: true }).click();
     await detailReady(page);
     await page.screenshot({ path: resolve(output, 'customer-shared-view.png'), fullPage: true });

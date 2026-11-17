@@ -4,30 +4,61 @@ import { Icon } from '../../components/common/Icon.jsx';
 import PublicLayout from '../../components/publicSite/PublicLayout.jsx';
 import './dichVu.css';
 
-// Trang "Dịch vụ & tiện ích": bảng giá dịch vụ công khai, có tìm kiếm và bộ lọc. Dữ liệu lấy từ bảng DichVu;
-// nhóm và mô tả là lời giải thích cho khách nên suy ra từ tên dịch vụ (dịch vụ lạ thì vào nhóm "Khác").
-const META = [
-  { match: /điện/i, group: 'Thiết yếu', icon: 'bolt', text: 'Tính theo chỉ số công tơ của phòng, thanh toán theo mức dùng thực tế.' },
-  { match: /nước/i, group: 'Thiết yếu', icon: 'water_drop', text: 'Tính theo chỉ số đồng hồ nước của phòng, thanh toán theo mức dùng thực tế.' },
-  { match: /wifi|internet|mạng/i, group: 'Kết nối', icon: 'wifi', text: 'Internet tốc độ cao phủ sóng toàn khu, dùng chung cho cả phòng.' },
-  { match: /xe/i, group: 'Xe cộ', icon: 'two_wheeler', text: 'Phí giữ xe hằng tháng tại bãi xe của tòa nhà.' },
-  { match: /vệ sinh|dọn/i, group: 'Vệ sinh', icon: 'cleaning_services', text: 'Dọn dẹp, giữ vệ sinh khu vực chung định kỳ.' },
+// Trang "Dịch vụ & tiện ích": bảng giá dịch vụ công khai, có tìm kiếm, bộ lọc và cửa sổ chi tiết. Dữ liệu lấy từ bảng DichVu.
+const ICONS = [
+  [/điện/i, 'bolt'], [/nước tinh khiết|bơi/i, 'water_drop'], [/nước/i, 'water_drop'], [/wifi|internet/i, 'wifi'], [/xe/i, 'two_wheeler'],
+  [/rác/i, 'delete'], [/giặt|vệ sinh|dọn/i, 'cleaning_services'], [/máy lạnh/i, 'build'], [/nệm/i, 'bed'], [/gym|fitness/i, 'group'], [/tủ lạnh/i, 'room_service'],
 ];
 const money = (value) => `${Number(value).toLocaleString('vi-VN')} VNĐ`;
-const enrich = (item) => {
-  const meta = META.find((entry) => entry.match.test(item.tenDichVu)) || { group: 'Khác', icon: 'room_service', text: 'Dịch vụ đi kèm khi thuê phòng.' };
-  const monthly = /tháng/i.test(item.donViTinh);
-  return { ...item, ...meta, fee: monthly ? 'Theo tháng' : 'Theo mức dùng', unitLabel: monthly ? 'Tháng' : item.donViTinh };
+const feeOf = (unit) => (/kwh|m3|m³/i.test(unit) ? 'Theo chỉ số' : /tháng/i.test(unit) ? 'Theo tháng' : 'Theo lần');
+const unitLabel = (unit) => (/tháng/i.test(unit) ? 'Tháng' : unit.replace(/^m3$/i, 'm³').replace(/^lần$/i, 'Lần').replace(/^bình$/i, 'Bình'));
+const enrich = (item) => ({
+  ...item, icon: (ICONS.find(([test]) => test.test(item.tenDichVu)) || [null, 'room_service'])[1],
+  group: item.nhom || 'Khác', text: item.moTa || 'Dịch vụ đi kèm khi thuê phòng.', fee: feeOf(item.donViTinh), unit: unitLabel(item.donViTinh),
+  active: (item.trangThai || 'Đang cung cấp') === 'Đang cung cấp', status: item.trangThai || 'Đang cung cấp',
+});
+const FEE_NOTE = {
+  'Theo tháng': 'Tính phí định kỳ hằng tháng vào hóa đơn tổng.',
+  'Theo chỉ số': 'Tính theo chỉ số ghi trên đồng hồ riêng của phòng mỗi kỳ.',
+  'Theo lần': 'Tính theo số lần sử dụng thực tế; liên hệ nhân viên để hẹn lịch.',
 };
 const PRICE_BANDS = [
   { value: '', label: 'Tất cả', test: () => true },
   { value: 'low', label: 'Dưới 100.000đ', test: (price) => price < 100000 },
-  { value: 'mid', label: '100.000đ - 200.000đ', test: (price) => price >= 100000 && price <= 200000 },
-  { value: 'high', label: 'Trên 200.000đ', test: (price) => price > 200000 },
+  { value: 'mid', label: '100.000đ - 500.000đ', test: (price) => price >= 100000 && price <= 500000 },
+  { value: 'high', label: 'Trên 500.000đ', test: (price) => price > 500000 },
 ];
 
+function DetailDialog({ item, onClose }) {
+  useEffect(() => {
+    const onKey = (event) => { if (event.key === 'Escape') onClose(); };
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => { document.body.style.overflow = previous; window.removeEventListener('keydown', onKey); };
+  }, [onClose]);
+  return <div className="dv-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <div className="dv-dialog" role="dialog" aria-modal="true" aria-labelledby="dv-dialog-title">
+      <header><span className="dv-dialog-eyebrow">Chi tiết dịch vụ</span>
+        <button type="button" className="dv-close" aria-label="Đóng" onClick={onClose}><Icon name="close" /></button></header>
+      <div className="dv-dialog-body">
+        <div className="dv-dialog-title"><span className="dv-icon"><Icon name={item.icon} /></span>
+          <div><h2 id="dv-dialog-title">{item.tenDichVu}</h2><span className="dv-group-badge">{item.group}</span>{!item.active && <span className="dv-status-badge">{item.status}</span>}</div></div>
+        <section><h3>Mô tả dịch vụ</h3><p>{item.text}</p></section>
+        <section className="dv-dialog-price"><h3>Đơn giá áp dụng</h3><strong>{money(item.donGia)} <span>/{item.unit}</span></strong><small>* {FEE_NOTE[item.fee]}</small></section>
+        <section className="dv-policy"><h3>Chính sách sử dụng</h3><ul>
+          <li>Dịch vụ tính theo tháng và theo chỉ số được cộng vào hóa đơn kỳ hằng tháng của hợp đồng.</li>
+          <li>Dịch vụ được chọn cùng nhân viên khi lập hợp đồng thuê; thay đổi dịch vụ giữa kỳ vui lòng liên hệ nhân viên.</li>
+          <li>Dịch vụ theo lần (vệ sinh, giặt sấy, giao nước…): vui lòng hẹn trước nhân viên ít nhất 24 giờ.</li>
+          {!item.active && <li>Dịch vụ này hiện {item.status.toLowerCase()}, chưa nhận đăng ký.</li>}
+        </ul></section>
+      </div>
+    </div>
+  </div>;
+}
+
 export default function DichVuPage() {
-  const [items, setItems] = useState(null), [error, setError] = useState(false);
+  const [items, setItems] = useState(null), [error, setError] = useState(false), [detail, setDetail] = useState(null);
   const [query, setQuery] = useState(''), [group, setGroup] = useState(''), [band, setBand] = useState(''), [fee, setFee] = useState('');
   useEffect(() => {
     let alive = true;
@@ -40,8 +71,7 @@ export default function DichVuPage() {
     const test = PRICE_BANDS.find((entry) => entry.value === band).test, needle = query.trim().toLowerCase();
     return (items || []).filter((item) => (!needle || item.tenDichVu.toLowerCase().includes(needle)) && (!group || item.group === group) && (!fee || item.fee === fee) && test(item.donGia));
   }, [items, query, group, band, fee]);
-  const monthly = (items || []).filter((item) => item.fee === 'Theo tháng');
-  const cheapest = monthly.length ? Math.min(...monthly.map((item) => item.donGia)) : null;
+  const popular = useMemo(() => (items || []).filter((item) => item.active && item.soHopDong > 0).sort((a, b) => b.soHopDong - a.soHopDong).slice(0, 2).map((item) => item.tenDichVu), [items]);
   const clear = () => { setQuery(''); setGroup(''); setBand(''); setFee(''); };
   const filtered = Boolean(query || group || band || fee);
 
@@ -54,7 +84,7 @@ export default function DichVuPage() {
         </div>
         {items?.length > 0 && <div className="dv-stats">
           <div><span className="dv-stat-icon"><Icon name="apartment" /></span><div><small>Hiện có</small><strong>{items.length} dịch vụ</strong></div></div>
-          {cheapest !== null && <div><span className="dv-stat-icon"><Icon name="payments" /></span><div><small>Phí tháng từ</small><strong>{money(cheapest)}</strong></div></div>}
+          {popular.length > 0 && <div><span className="dv-stat-icon dv-stat-icon--warm"><Icon name="wifi" /></span><div><small>Phổ biến nhất</small><strong>{popular.join(' / ')}</strong></div></div>}
         </div>}
       </div>
 
@@ -75,14 +105,15 @@ export default function DichVuPage() {
       {!error && items === null && <p className="dv-empty">Đang tải dịch vụ...</p>}
       {items && !visible.length && <p className="dv-empty">Không có dịch vụ nào phù hợp với bộ lọc.</p>}
       <div className="dv-grid">
-        {visible.map((item) => <article className="dv-card" key={item.maDichVu}>
-          <div className="dv-card-top"><span className="dv-icon"><Icon name={item.icon} /></span><span className="dv-tag">{item.fee}</span></div>
+        {visible.map((item) => <button type="button" className={`dv-card${item.active ? '' : ' is-inactive'}`} key={item.maDichVu} onClick={() => setDetail(item)} aria-label={`Xem chi tiết ${item.tenDichVu}`}>
+          <span className="dv-card-top"><span className="dv-icon"><Icon name={item.icon} /></span><span className="dv-tag">{item.active ? item.fee : item.status}</span></span>
           <small className="dv-group">{item.group}</small>
           <h2>{item.tenDichVu}</h2>
           <p>{item.text}</p>
-          <div className="dv-price"><small>Đơn giá</small><strong>{money(item.donGia)} <span>/{item.unitLabel}</span></strong></div>
-        </article>)}
+          <span className="dv-price"><span><small>Đơn giá</small><strong>{money(item.donGia)} <span>/{item.unit}</span></strong></span><Icon name="arrow_forward" /></span>
+        </button>)}
       </div>
     </div>
+    {detail && <DetailDialog item={detail} onClose={() => setDetail(null)} />}
   </PublicLayout>;
 }

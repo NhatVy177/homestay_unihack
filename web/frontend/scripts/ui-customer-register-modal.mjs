@@ -26,7 +26,7 @@ try {
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
-    await page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${base}/khach-hang?tab=kham-pha`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: /Đăng ký nhu cầu thuê|Tạo nhu cầu thuê/ }).first().click();
     const modal = page.locator('.kh-register-modal').first();
     await modal.waitFor({ timeout: 8000 });

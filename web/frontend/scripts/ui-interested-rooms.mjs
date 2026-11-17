@@ -47,7 +47,7 @@ try {
   for (const width of [1440, 390]) {
     // --- cổng khách
     const { context, page, errors, writes, bodies } = await newPage(width, customer);
-    await page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${base}/khach-hang?tab=kham-pha`, { waitUntil: 'domcontentloaded' });
     await page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
 
     const chips = await page.locator('.kh-room-card .kh-room-status').allInnerTexts();
@@ -73,7 +73,7 @@ try {
     assert.match(await page.locator('.kh-detail-room-status').innerText(), /Đang chờ cọc/);
 
     // Phòng còn trống: hiện số giường trống và nút "Tôi quan tâm phòng này"
-    await page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${base}/khach-hang?tab=kham-pha`, { waitUntil: 'domcontentloaded' });
     await page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
     await page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết' }).click();
     const open = page.getByRole('button', { name: 'Đăng ký thuê ngay' });
@@ -161,7 +161,7 @@ try {
 
     // --- Phiếu đầy đủ: thời gian xem, tiện ích, ghi chú được gộp vào ghi chú hồ sơ gửi lên
     const fill = await newPage(width, customer);
-    await fill.page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await fill.page.goto(`${base}/khach-hang?tab=kham-pha`, { waitUntil: 'domcontentloaded' });
     await fill.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
     await fill.page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết' }).click();
     await fill.page.getByRole('button', { name: 'Đăng ký thuê ngay' }).click();
@@ -207,7 +207,7 @@ try {
     // --- D-043: khách đã có hồ sơ mở thì thêm phòng bằng một lần bấm, không mở form
     const withProfile = { trangThai: { coQuyTrinhThueDangHoatDong: true }, hoSo: [{ maDangKy: 'DK0001', trangThai: 'Chờ tiếp nhận', loaiPhongYeuCau: 'Phòng 4 người', danhSachPhongQuanTam: [{ maPhong: 'P901', tenPhong: 'Phòng P901', maChiNhanh: 'CN0001', chiNhanh: 'Chi nhánh giao diện' }] }], lichXem: [], phongGoiY: [] };
     const second = await newPage(width, customer, withProfile);
-    await second.page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await second.page.goto(`${base}/khach-hang?tab=kham-pha`, { waitUntil: 'domcontentloaded' });
     await second.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
     assert.match(await second.page.locator('.kh-profile-banner').innerText(), /DK0001/);
     assert.match(await second.page.locator('.kh-profile-banner .kh-profile-room').first().innerText(), /Phòng P901/);
@@ -225,14 +225,14 @@ try {
 
     // Hồ sơ loại khác: trái tim bị khóa, không thêm được phòng khác loại
     const otherType = await newPage(width, customer, { ...withProfile, hoSo: [{ ...withProfile.hoSo[0], loaiPhongYeuCau: 'Phòng 6 người', danhSachPhongQuanTam: [] }] });
-    await otherType.page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await otherType.page.goto(`${base}/khach-hang?tab=kham-pha`, { waitUntil: 'domcontentloaded' });
     await otherType.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
     assert.equal(await otherType.page.locator('.kh-room-card').nth(0).locator('.kh-heart').isDisabled(), true, 'khác loại phòng thì không thêm được');
     await otherType.context.close();
 
     // J-C105: hồ sơ nữ thì phòng đã khóa Nam bị khóa trái tim kèm lý do; phòng không phân biệt vẫn thêm được
     const gender = await newPage(width, customer, { ...withProfile, hoSo: [{ ...withProfile.hoSo[0], soNam: 0, soNu: 1, danhSachPhongQuanTam: [] }] }, rooms.map((room, index) => ({ ...room, gioiTinhChoPhep: index === 0 ? 'Nam' : 'Không phân biệt' })));
-    await gender.page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await gender.page.goto(`${base}/khach-hang?tab=kham-pha`, { waitUntil: 'domcontentloaded' });
     await gender.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
     const lockedHeart = gender.page.locator('.kh-room-card').nth(0).locator('.kh-heart');
     assert.equal(await lockedHeart.isDisabled(), true, 'phòng khóa Nam thì hồ sơ nữ không thêm được');
@@ -243,7 +243,7 @@ try {
     // --- Hồ sơ đã có lịch xem: báo rõ, không cho thêm phòng
     const scheduled = { trangThai: { coQuyTrinhThueDangHoatDong: true }, hoSo: [{ maDangKy: 'DK0002', trangThai: 'Đã tiếp nhận', sttLich: 1, trangThaiLich: 'Chờ xem', thoiGianHen: '2026-11-20T09:00:00' }], lichXem: [], phongGoiY: [] };
     const third = await newPage(width, customer, scheduled);
-    await third.page.goto(`${base}/khach-hang`, { waitUntil: 'domcontentloaded' });
+    await third.page.goto(`${base}/khach-hang?tab=kham-pha`, { waitUntil: 'domcontentloaded' });
     await third.page.locator('.kh-room-card').first().waitFor({ timeout: 10000 });
     assert.match(await third.page.locator('.kh-profile-banner--scheduled').innerText(), /Xem xong rồi mới thêm phòng khác/);
     assert.equal(await third.page.getByRole('button', { name: /Thêm vào hồ sơ/ }).count(), 0);

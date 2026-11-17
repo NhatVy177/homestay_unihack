@@ -392,6 +392,7 @@ BEGIN
             ELSE CAST(0 AS BIT)
         END AS BatBuoc
     FROM dbo.DichVu
+    WHERE TrangThai = N'Đang cung cấp' -- cột thêm bởi services-catalog:db:migrate
     ORDER BY
         CASE
             WHEN TenDichVu LIKE N'%Điện%' OR TenDichVu LIKE N'%Nước%' THEN 0

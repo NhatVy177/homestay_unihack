@@ -27,9 +27,9 @@ router.get('/minh-bach', async (req, res) => {
 // Bảng giá dịch vụ công khai (chỉ tên, đơn vị, đơn giá) cho trang Dịch vụ.
 router.get('/dich-vu', async (req, res, next) => {
   try {
-    const { recordset } = await executeQuery('SELECT MaDichVu AS maDichVu, TenDichVu AS tenDichVu, DonViTinh AS donViTinh, DonGia AS donGia FROM dbo.DichVu ORDER BY MaDichVu');
+    const { recordset } = await executeQuery(`SELECT dv.MaDichVu AS maDichVu, dv.TenDichVu AS tenDichVu, dv.DonViTinh AS donViTinh, dv.DonGia AS donGia, dv.Nhom AS nhom, dv.MoTa AS moTa, dv.TrangThai AS trangThai, COUNT(dvhd.MaChiTietDVHD) AS soHopDong FROM dbo.DichVu dv LEFT JOIN dbo.DichVuHopDong dvhd ON dvhd.MaDichVu = dv.MaDichVu GROUP BY dv.MaDichVu, dv.TenDichVu, dv.DonViTinh, dv.DonGia, dv.Nhom, dv.MoTa, dv.TrangThai ORDER BY dv.MaDichVu`);
     res.set('Cache-Control', 'public, max-age=60');
-    res.json({ data: recordset.map((row) => ({ ...row, donGia: Number(row.donGia) })) });
+    res.json({ data: recordset.map((row) => ({ ...row, donGia: Number(row.donGia), soHopDong: Number(row.soHopDong) })) });
   } catch (error) { next(error); }
 });
 router.get('/loai-phong', getLoaiPhong);

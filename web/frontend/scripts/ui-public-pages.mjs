@@ -46,10 +46,10 @@ try {
     await page.getByLabel('Tìm kiếm dịch vụ').fill('wifi');
     assert.equal(await page.locator('.dv-card').count(), 1);
     await page.getByRole('button', { name: 'Xoá bộ lọc' }).click();
-    await page.getByLabel('Khoảng giá').selectOption('high');
-    assert.deepEqual(await page.locator('.dv-card h2').allInnerTexts(), ['Vệ sinh']);
+    await page.getByLabel('Khoảng giá').selectOption('low');
+    assert.deepEqual(await page.locator('.dv-card h2').allInnerTexts(), ['Điện']);
     await page.getByRole('button', { name: 'Xoá bộ lọc' }).click();
-    await page.getByLabel('Hình thức phí').selectOption('Theo mức dùng');
+    await page.getByLabel('Hình thức phí').selectOption('Theo chỉ số');
     assert.deepEqual(await page.locator('.dv-card h2').allInnerTexts(), ['Điện']);
     await page.getByRole('button', { name: 'Xoá bộ lọc' }).click();
     assert.equal(await page.locator('.dv-card').count(), 4);

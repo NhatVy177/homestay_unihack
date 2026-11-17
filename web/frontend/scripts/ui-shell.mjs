@@ -34,7 +34,7 @@ try {
     await toggle.click();
     const opened = await page.locator('aside nav').isVisible();
     await page.screenshot({ path: `.ui-screens/shell-after/${name}-390-menu.png` });
-    const target = page.locator('aside nav button:not(.is-locked)').nth(name === 'admin' ? 0 : 1);
+    const target = page.locator('aside nav button:not(.is-locked)', { hasNotText: /Khám phá phòng/ }).nth(name === 'admin' ? 0 : 1);
     const label = (await target.innerText()).trim();
     await target.click();
     const title = await page.locator('h1').first().innerText({ timeout: 5000 }).then(s => s.trim()).catch(() => `(không thấy tiêu đề; url ${page.url()}; lỗi: ${errors.join(' | ') || 'không'})`);

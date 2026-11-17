@@ -72,7 +72,7 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(base, { waitUntil: 'domcontentloaded' });
     await page.locator('.tc-room-card').first().waitFor();
-    assert.equal(await page.locator('.tc-room-card').count(), 6);
+    assert.equal(await page.locator('.tc-room-card').count(), 4);
     assert.equal(await page.locator('#gioi-thieu').count(), 1);
     const metrics = await capture(page, `verified-${width}`);
 

@@ -1,4 +1,5 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import AccountSecurity from '../../components/common/AccountSecurity.jsx';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { khachMoiApi } from '../khachMoi/khachMoi.api.js';
@@ -24,7 +25,7 @@ import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Cl
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
 const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
-const PORTAL_TABS = ['kham-pha', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'cu-tru', 'hop-dong', 'tra-phong'];
+const PORTAL_TABS = ['tai-khoan', 'kham-pha', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'cu-tru', 'hop-dong', 'tra-phong'];
 
 // Gốc backend để mở lại file chứng từ đã upload (DB lưu đường dẫn /uploads/chung-tu/..).
 const FILE_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
@@ -684,7 +685,7 @@ export default function KhachHangPortalPage() {
   // Link trong email (/khach-hang?tab=hop-dong) và cổng thanh toán mô phỏng mở đúng tab.
   const [activeTab, setActiveTab] = useState(() => {
     const tab = new URLSearchParams(window.location.search).get('tab');
-    return PORTAL_TABS.includes(tab) ? tab : 'kham-pha';
+    return PORTAL_TABS.includes(tab) ? tab : 'tai-khoan';
   });
   const [detailPhong, setDetailPhong] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -804,16 +805,17 @@ export default function KhachHangPortalPage() {
 
   // Icon names follow the shared Icon set used by WorkspaceShell.
   const navItems = [
+    { id: 'tai-khoan', icon: 'person', title: 'Thông tin cá nhân' },
+    { id: 'cu-tru', icon: 'group', title: 'Thông tin cư trú' },
     { id: 'kham-pha', icon: 'search', title: 'Khám phá phòng' },
     { id: 'ho-so', icon: 'description', title: 'Hồ sơ đăng ký' },
     { id: 'lich-xem', icon: 'event_note', title: 'Lịch xem phòng' },
     { id: 'dat-coc', icon: 'payments', title: 'Hóa đơn & thanh toán' },
     { id: 'lich-su-coc', icon: 'receipt_long', title: 'Lịch sử đặt cọc' },
-    { id: 'cu-tru', icon: 'group', title: 'Thông tin cư trú' },
     { id: 'hop-dong', icon: 'article', title: 'Hợp đồng' },
     { id: 'tra-phong', icon: 'logout', title: 'Trả phòng' }
   ];
-  const extraTitles = { 'tai-khoan': 'Thông tin tài khoản' };
+  const extraTitles = {};
 
   async function loadPortal(nextFilters = filters) {
     setLoading(true);
@@ -4472,7 +4474,7 @@ export default function KhachHangPortalPage() {
     <WorkspaceShell roleLabel="Khách hàng" eyebrow="Cổng khách hàng"
       title={navItems.find(item => item.id === activeTab)?.title || extraTitles[activeTab] || 'Cổng khách hàng'}
       items={navItems.map(item => ({ id: item.id, label: item.title, icon: item.icon, locked: Boolean(locks[item.id]) }))}
-      activeTab={activeTab} onSelect={(id) => (id === 'kham-pha' ? navigate('/#phong-noi-bat') : goTo(id))} user={user} showBranch={false}
+      activeTab={activeTab} onSelect={(id) => (id === 'kham-pha' ? navigate('/phong') : goTo(id))} user={user} showBranch={false}
       onAccount={() => goTo('tai-khoan')} onLogout={logout} mainClassName="kh-main"
       footer={<div className="kp-support-mini"><span>Hỗ trợ 24/7</span><strong>1900 6789</strong></div>}>
           {loading && <div className="kp-loading"><span /><p>Đang tải cổng khách hàng...</p></div>}
