@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { getAuthenticatedHomePath } from '../../auth/auth.routes.js';
+import { resolveAvatarUrl } from './avatarUrl.js';
 import './accountMenu.css';
 
 const initialsOf = (name = '') => String(name).trim().split(/\s+/).slice(-2).map((part) => part[0]).join('').toUpperCase() || 'U';
@@ -24,7 +25,7 @@ export default function AccountMenu() {
   if (!user) return null;
   return <div className="acm" ref={ref}>
     <button type="button" className="acm-trigger" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
-      <span className="acm-avatar" aria-hidden="true">{initialsOf(user.hoTen)}</span>
+      <span className="acm-avatar" aria-hidden="true">{user.avatarUrl ? <img src={resolveAvatarUrl(user.avatarUrl)} alt="" /> : initialsOf(user.hoTen)}</span>
       <span className="acm-name">{user.hoTen || user.tenDangNhap}</span>
       <svg className={`acm-chevron${open ? ' is-open' : ''}`} viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
     </button>

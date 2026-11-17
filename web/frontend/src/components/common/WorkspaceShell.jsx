@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import NavigationToggle from './NavigationToggle.jsx';
 import BranchChip from './BranchChip.jsx';
+import ShellAccountMenu from './ShellAccountMenu.jsx';
 import { Icon } from './Icon.jsx';
 import '../../pages/khamPhaPhong/khamPhaPhong.css';
 import '../../pages/nhanVienKeToan/nhanVienKeToanPortal.css';
@@ -21,10 +22,6 @@ export default function WorkspaceShell({
   isItemDisabled = () => false, user, showBranch = true, onAccount, onLogout,
   footer, mainClassName = '', children,
 }) {
-  const accountContent = <>
-    <span className="kp-avatar">{initial(user?.hoTen || roleLabel)}</span>
-    <span><strong>{user?.hoTen || roleLabel}</strong><small>{roleLabel}</small></span>
-  </>;
   return (
     <div className={`kp-page kh-page ui-employee-shell ui-workspace ${className}`}>
       <aside className="kp-sidebar">
@@ -61,10 +58,7 @@ export default function WorkspaceShell({
           </div>
           <div className="kp-top-actions">
             {showBranch && <BranchChip user={user} />}
-            {onAccount
-              ? <button className="ui-workspace-account" type="button" onClick={onAccount}>{accountContent}</button>
-              : <div className="ui-workspace-account">{accountContent}</div>}
-            <button className="ui-btn ui-btn--ghost" type="button" onClick={onLogout} aria-label="Đăng xuất" title="Đăng xuất"><Icon name="logout" /></button>
+            <ShellAccountMenu user={user} roleLabel={roleLabel} onAccount={onAccount} onLogout={onLogout} />
           </div>
         </header>
         <main className={`kp-main ${mainClassName}`}>{children}</main>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
-import EmptyState from '../../components/common/EmptyState.jsx';
 import { checkResidentsGender } from '../../utils/genderRules.js';
 import './customerResidence.css';
 
@@ -94,14 +93,20 @@ function WithdrawButton({ item, onWithdraw }) {
   </div>;
 }
 
-export default function CustomerResidenceTab({ data, loading, error, onSubmit, onWithdraw }) {
+export default function CustomerResidenceTab({ data, loading, error, onSubmit, onWithdraw, representative }) {
   const phieu = data?.phieu || [];
   return <section className="cres-page" aria-label="Thông tin cư trú">
     <header className="ui-card cres-head"><h2>Thông tin cư trú</h2>
       <p>Khai thông tin những người sẽ ở cho từng phiếu cọc đã thanh toán. Hệ thống kiểm tra ngay; hồ sơ cần xem thêm sẽ chuyển quản lý chi nhánh duyệt.</p></header>
     {error && <p className="customer-viewing-error" role="alert">{error}</p>}
     {loading && <p role="status">Đang tải thông tin cư trú...</p>}
-    {!loading && !phieu.length && <div className="ui-card"><EmptyState message="Chưa có phiếu cọc đã thanh toán. Khai người ở sau khi kế toán xác nhận tiền cọc." /></div>}
+    {!loading && !phieu.length && <article className="ui-card cres-card" aria-label="Người đại diện">
+      <div className="cres-card-top"><div><small>NGƯỜI ĐẠI DIỆN</small><h3>{representative?.hoTen || 'Chưa cập nhật'}</h3>
+        <p>Thông tin bạn đã nhập khi đăng ký tài khoản.</p></div></div>
+      <ul className="cres-list"><li><strong>{representative?.hoTen || '—'}</strong>
+        <span>{[representative?.gioiTinh, representative?.ngaySinh ? dateLabel(representative.ngaySinh) : null, representative?.soDienThoai, representative?.email].filter(Boolean).join(' · ') || '—'}</span></li></ul>
+      <p className="cres-reason">Chưa có phiếu cọc đã thanh toán. Sau khi kế toán xác nhận tiền cọc, bạn khai thêm những người cùng ở tại đây.</p>
+    </article>}
     {phieu.map((item) => {
       const [label, tone] = STATUS[item.trangThaiHoSo] || [item.trangThaiHoSo, 'todo'];
       return <article key={item.maPhieuDatCoc} className="ui-card cres-card" aria-label={`Cư trú ${item.maPhieuDatCoc}`}>

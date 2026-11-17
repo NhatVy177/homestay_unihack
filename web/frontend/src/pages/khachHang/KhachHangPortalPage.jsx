@@ -607,7 +607,7 @@ function getNavLocks(state = {}) {
     'lich-xem': false,
     'dat-coc': false, // Hóa đơn & thanh toán luôn mở (trống thì báo chưa có hóa đơn), như Lịch sử đặt cọc
     'lich-su-coc': false,
-    'cu-tru': !hasDeposit,
+    'cu-tru': false, // luôn mở: chưa có phiếu cọc thì hiện thông tin người đại diện đã đăng ký
     'hop-dong': !hasContract,
     'tra-phong': !(hasDeposit || hasContract),
     'tai-khoan': false,
@@ -1586,16 +1586,9 @@ export default function KhachHangPortalPage() {
   function renderAccount() {
     return (
       <section>
-        <article className="kp-info-panel">
-          <div className="kh-info-list">
-            <div><span>Mã khách hàng</span><strong>{user?.maNguoiDung || 'Chưa cập nhật'}</strong></div>
-            <div><span>Họ tên</span><strong>{user?.hoTen || 'Chưa cập nhật'}</strong></div>
-            <div><span>Giới tính</span><strong>{user?.gioiTinh || 'Chưa cập nhật'}</strong></div>
-            <div><span>Số điện thoại</span><strong>{user?.soDienThoai || 'Chưa cập nhật'}</strong></div>
-            <div><span>Email</span><strong>{user?.email || 'Chưa cập nhật'}</strong></div>
-          </div>
-        </article>
-        <AccountSecurity />
+        <AccountSecurity details={[
+          ['Mã khách hàng', user?.maNguoiDung], ['Giới tính', user?.gioiTinh], ['Số điện thoại', user?.soDienThoai], ['Email', user?.email],
+        ]} />
       </section>
     );
   }
@@ -3954,7 +3947,7 @@ export default function KhachHangPortalPage() {
   }
 
   function renderResidence() {
-    return <CustomerResidenceTab data={residence} loading={residence === null} error={residenceError} onSubmit={submitResidence} onWithdraw={withdrawResidence} />;
+    return <CustomerResidenceTab data={residence} loading={residence === null} error={residenceError} representative={user} onSubmit={submitResidence} onWithdraw={withdrawResidence} />;
   }
 
   function renderDepositHistory() {
@@ -4462,7 +4455,7 @@ export default function KhachHangPortalPage() {
     if (activeTab === 'lich-xem') return renderSchedules();
     if (activeTab === 'dat-coc') return renderDatCoc();
     if (activeTab === 'lich-su-coc') return renderDepositHistory();
-    if (activeTab === 'cu-tru') return locks['cu-tru'] ? renderLocked('cu-tru') : renderResidence();
+    if (activeTab === 'cu-tru') return renderResidence();
     if (activeTab === 'hop-dong') return renderHopDongTab();
     if (activeTab === 'tra-phong') return renderHopDong();
     if (activeTab === 'tai-khoan') return renderAccount();

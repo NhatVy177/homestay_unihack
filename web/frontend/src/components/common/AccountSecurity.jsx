@@ -13,7 +13,7 @@ const readFile = (file) => new Promise((resolve, reject) => {
 });
 
 // Ảnh đại diện và đổi mật khẩu, dùng chung cho trang hồ sơ của khách và nhân viên.
-export default function AccountSecurity() {
+export default function AccountSecurity({ details }) {
   const { user, capNhatAvatar } = useAuth();
   const fileRef = useRef(null);
   const [avatarMsg, setAvatarMsg] = useState(null), [busy, setBusy] = useState(false);
@@ -53,8 +53,9 @@ export default function AccountSecurity() {
     <section className="acs-card" aria-label="Ảnh đại diện">
       <div className="acs-avatar">{src ? <img src={src} alt="Ảnh đại diện" /> : <span aria-hidden="true">{initialOf(user)}</span>}</div>
       <div className="acs-body">
-        <h3>Ảnh đại diện</h3>
-        <p>PNG, JPG hoặc WebP, tối đa 2MB.</p>
+        <h3>{details ? (user?.hoTen || 'Thông tin cá nhân') : 'Ảnh đại diện'}</h3>
+        {details && <dl className="acs-details">{details.filter(([, value]) => value).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>}
+        <p>Ảnh đại diện: PNG, JPG hoặc WebP, tối đa 2MB.</p>
         <div className="acs-actions">
           <button type="button" className="acs-btn" disabled={busy} onClick={() => fileRef.current?.click()}>{busy ? 'Đang tải...' : 'Đổi ảnh'}</button>
           {src && <button type="button" className="acs-btn acs-btn--ghost" disabled={busy} onClick={remove}>Xóa ảnh</button>}
