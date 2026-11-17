@@ -9,13 +9,18 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 const user = { maNguoiDung: 'KH9319', hoTen: 'Nguyễn Văn A', tenDangNhap: 'a@example.com', email: 'a@example.com', soDienThoai: '0188939399', gioiTinh: 'Nữ', ngaySinh: '2000-01-02', vaiTro: 'KhachHang', trangThai: 'Hoạt động' };
 try {
   for (const width of [1440, 390]) {
-    const errors = [];
+    const errors = [], avatarWrites = [];
+    const fixtureUser = { ...user, avatarUrl: width === 390 ? `${base}/images/home/room.jpg` : null };
     const ctx = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' });
-    await ctx.addInitScript((value) => localStorage.setItem('happyroom_session', JSON.stringify({ _v: 2, token: 'ui-fixture-only', user: value })), user);
+    await ctx.addInitScript((value) => localStorage.setItem('happyroom_session', JSON.stringify({ _v: 2, token: 'ui-fixture-only', user: value })), fixtureUser);
     await ctx.route('**/api/**', (route) => {
       const path = new URL(route.request().url()).pathname;
       if (!path.startsWith('/api/')) return route.fallback();
-      if (path.endsWith('/auth/toi')) return route.fulfill({ json: user });
+      if (path.endsWith('/auth/toi')) return route.fulfill({ json: fixtureUser });
+      if (path.endsWith('/auth/avatar')) {
+        avatarWrites.push({ method: route.request().method(), body: route.request().postDataJSON() });
+        return route.fulfill({ json: { avatarUrl: `${base}/images/home/hero.jpg` } });
+      }
       if (path.includes('tong-quan')) return route.fulfill({ json: {} });
       if (path.endsWith('/cu-tru')) return route.fulfill({ json: { phieu: [] } });
       return route.fulfill({ json: [] });
@@ -32,7 +37,29 @@ try {
     assert.equal(await page.locator('.kp-info-panel').count(), 0, 'không còn khối hàng thông tin riêng');
     const card = page.locator('.acs-card').first();
     const text = await card.innerText();
-    for (const part of ['Nguyễn Văn A', 'KH9319', '0188939399', 'a@example.com', 'Đổi ảnh']) assert.ok(text.includes(part), `thẻ ảnh đại diện có ${part}`);
+    for (const part of ['Nguyễn Văn A', 'KH9319', '0188939399', 'a@example.com']) assert.ok(text.includes(part), `thẻ ảnh đại diện có ${part}`);
+    assert.doesNotMatch(text, /Đổi ảnh|Xóa ảnh|Ảnh đại diện: PNG/);
+    const pencil = card.getByRole('button', { name: 'Chỉnh ảnh đại diện', exact: true });
+    const avatarBounds = await card.locator('.acs-avatar').boundingBox(), pencilBounds = await pencil.boundingBox();
+    assert.ok(pencilBounds.x > avatarBounds.x && pencilBounds.y > avatarBounds.y);
+    assert.ok(pencilBounds.x < avatarBounds.x + avatarBounds.width && pencilBounds.y < avatarBounds.y + avatarBounds.height, 'bút nằm chồng lên góc ảnh');
+    await pencil.focus();
+    const chooserPromise = page.waitForEvent('filechooser');
+    await page.keyboard.press('Enter');
+    const chooser = await chooserPromise;
+    await chooser.setFiles({ name: 'not-an-image.txt', mimeType: 'text/plain', buffer: Buffer.from('invalid') });
+    await card.getByRole('alert').filter({ hasText: 'Ảnh phải là PNG, JPG hoặc WebP.' }).waitFor();
+    assert.equal(avatarWrites.length, 0);
+    await card.locator('input[type=file]').setInputFiles({ name: 'too-large.png', mimeType: 'image/png', buffer: Buffer.alloc(2 * 1024 * 1024 + 1) });
+    await card.getByRole('alert').filter({ hasText: 'Ảnh tối đa 2MB.' }).waitFor();
+    assert.equal(avatarWrites.length, 0);
+    const nextChooser = page.waitForEvent('filechooser'); await pencil.click();
+    await (await nextChooser).setFiles({ name: 'avatar.png', mimeType: 'image/png', buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jN1sAAAAASUVORK5CYII=', 'base64') });
+    await card.getByRole('status').filter({ hasText: 'Đã cập nhật ảnh đại diện.' }).waitFor();
+    assert.equal(avatarWrites.length, 1); assert.equal(avatarWrites[0].method, 'PUT'); assert.match(avatarWrites[0].body.anh, /^data:image\/png;base64,/);
+    assert.equal(await card.locator('.acs-avatar img').getAttribute('src'), `${base}/images/home/hero.jpg`);
+    await card.locator('.acs-avatar img').evaluate(image => image.decode());
+    await card.screenshot({ path: `${folder}/avatar-pencil-${width}.png` });
     assert.equal(await page.getByRole('button', { name: 'Đăng xuất' }).count(), 0, 'không để nút đăng xuất lộ sẵn');
     const trigger = page.locator('.acm--shell .acm-trigger');
     await trigger.click();

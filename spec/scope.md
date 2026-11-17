@@ -160,3 +160,5 @@ Hóa đơn định kỳ (J-C145, 2026-11-16): kế toán có tab "Hóa đơn đ�
 **Tích hợp J-X083 (17/11):** chi tiết phòng dùng chung và public giữ quy tắc D-042: khóa nút Hết chỗ, cho quan tâm phòng Đang chờ cọc kèm ghi chú. DTO public chỉ thêm nhãn khả dụng, không trả dữ liệu khách/giá vốn. Gộp theo yêu cầu mới của Vy, không đổi nghiệp vụ hoặc chạy migration SQL.
 
 **Tinh chỉnh J-X086:** nhà3D không vẽ nhãn “Tầng …” trên hình nhà; giữ tên phòng khi mở và bộ chọn tầng/số phòng bên dưới. Chỉ đổi trình bày, giữ dữ liệu/số tầng/phòng của D-055.
+
+**Ảnh đại diện J-X088 (bổ sung trình bày D-054):** hồ sơ dùng chung hiển thị nút cây bút ngay góc ảnh để chọn/cập nhật ảnh. Bỏ hai nút chữ Đổi ảnh/Xóa ảnh và dòng hướng dẫn định dạng/dung lượng; giữ giới hạn PNG/JPG/WebP2MB và báo lỗi khi file không hợp lệ, trạng thái đang tải/kết quả. Backend/API/quyền và form đổi mật khẩu không đổi.

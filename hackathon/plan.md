@@ -328,3 +328,5 @@ Các phụ thuộc còn lại: chốt nghiệp vụ cọc với Vy; quyền truy
 **Tích hợp J-X083 (17/11):** chi tiết phòng dùng chung và public giữ quy tắc D-042: khóa nút Hết chỗ, cho quan tâm phòng Đang chờ cọc kèm ghi chú. DTO public chỉ thêm nhãn khả dụng, không trả dữ liệu khách/giá vốn. Gộp theo yêu cầu mới của Vy, không đổi nghiệp vụ hoặc chạy migration SQL.
 
 **J-X086 (17/11):** theo yêu cầu Vy, bỏ nhãn tầng trên mô hình nhà3D; bộ chọn tầng bên dưới và nhãn tên phòng khi mở giữ nguyên. Không đổi hình học/dữ liệu tầng/phòng hoặc nghiệp vụ.
+
+**J-X088 (17/11):** theo yêu cầu Vy, hồ sơ khách/nhân viên dùng cây bút chồng góc ảnh để chỉnh ảnh; bỏ nút chữ Đổi ảnh/Xóa ảnh và dòng hướng dẫn PNG/JPG/WebP2MB. Giữ kiểm tra file, báo lỗi/kết quả, API cập nhật và đổi mật khẩu; không sửa backend/DB. Kiểm keyboard/filechooser/upload fixture và1440/390px, build/smoke.
