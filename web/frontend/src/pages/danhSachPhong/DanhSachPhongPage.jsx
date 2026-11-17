@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { httpClient } from '../../api/httpClient.js';
 import { Icon } from '../../components/common/Icon.jsx';
 import PublicLayout from '../../components/publicSite/PublicLayout.jsx';
@@ -10,6 +10,8 @@ import './danhSachPhong.css';
 // Trang "Danh sách phòng": toàn bộ phòng, lọc nhanh theo chi nhánh. Bấm một phòng để xem chi tiết (trang khám phá phòng).
 export default function DanhSachPhongPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const customerPortalTab = location.state?.customerPortalTab;
   const [searchParams] = useSearchParams();
   // Bộ lọc từ ô tìm phòng ở trang chủ (khu vực, loại phòng, mức giá) đi qua địa chỉ; máy chủ lọc.
   const filters = ['khuVuc', 'loaiPhong', 'mucGiaToiDa', 'tuKhoa'].filter((name) => searchParams.get(name)).map((name) => [name, searchParams.get(name)]);
@@ -26,13 +28,14 @@ export default function DanhSachPhongPage() {
   }, [filterKey]);
   const branches = useMemo(() => [...new Set((rooms || []).map((room) => room.TenChiNhanh).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'vi')), [rooms]);
   const visible = useMemo(() => (rooms || []).filter((room) => !branch || room.TenChiNhanh === branch), [rooms, branch]);
-  const view = (room) => navigate(`/phong/${encodeURIComponent(room.MaPhong)}`);
+  const view = (room) => navigate(`/phong/${encodeURIComponent(room.MaPhong)}`, { state: location.state });
 
   return <PublicLayout>
     <div className="pl-wrap dsp">
       <div className="dsp-head">
+        {typeof customerPortalTab === 'string' && <button type="button" className="ui-btn ui-btn--ghost dsp-back" onClick={() => navigate(`/khach-hang?tab=${encodeURIComponent(customerPortalTab)}`)}><Icon name="arrow_back" />Quay lại</button>}
         <h1><Icon name="bed" />Danh sách phòng</h1>
-        {rooms && <p>{visible.length} phòng{filters.length > 0 && <> · đang lọc theo tìm kiếm của bạn. <button type="button" className="dsp-clear" onClick={() => navigate('/phong')}>Xem tất cả phòng</button></>}</p>}
+        {rooms && <p>{visible.length} phòng{filters.length > 0 && <> · đang lọc theo tìm kiếm của bạn. <button type="button" className="dsp-clear" onClick={() => navigate('/phong', { state: location.state })}>Xem tất cả phòng</button></>}</p>}
       </div>
       {branches.length > 1 && <div className="dsp-chips" role="group" aria-label="Lọc theo chi nhánh">
         {['', ...branches].map((name) => <button key={name || 'all'} type="button" className={`dsp-chip${branch === name ? ' is-active' : ''}`} aria-pressed={branch === name} onClick={() => setBranch(name)}>{name || 'Tất cả chi nhánh'}</button>)}

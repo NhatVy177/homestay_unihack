@@ -75,6 +75,9 @@ Trạng thái hồ sơ (`PhieuDangKy`): Chờ tiếp nhận → **Đã tiếp nh
 
 ### 3.1 Giai đoạn 1: Đăng ký và xem phòng (D-026, D-042)
 
+J-X090: tab Khám phá phòng của khách mở danh sách public kèm dấu nguồn/tab khách đang xem; danh sách có nút Quay lại về đúng tab đó. Nguồn được giữ qua reload/xóa tìm kiếm và xem chi tiết rồi trở lại danh sách; mở trực tiếp/trang chủ thì không hiện nút trở về cổng.
+
+
 D-055: nhà 3D ở giới thiệu trang chủ dùng số tầng/phòng của từng chi nhánh từ danh sách public; số phòng hiển thị P4xx là tầng4, không dùng mã nội bộ khác tên để đoán sai tầng. Các phòng chưa rõ tầng được liệt kê riêng; bố trí/nội thất vẫn minh họa. Bộ chọn tầng mở đầy đủ phòng, click tiếp tục dùng GET/route chi tiết và quy tắc D-042/D-052 hiện có.
 
 

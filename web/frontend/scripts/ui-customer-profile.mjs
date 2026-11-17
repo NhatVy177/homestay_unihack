@@ -7,6 +7,8 @@ const base = process.env.UI_BASE_URL || 'http://localhost:5199', folder = '.ui-s
 await mkdir(folder, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
 const user = { maNguoiDung: 'KH9319', hoTen: 'Nguyễn Văn A', tenDangNhap: 'a@example.com', email: 'a@example.com', soDienThoai: '0188939399', gioiTinh: 'Nữ', ngaySinh: '2000-01-02', vaiTro: 'KhachHang', trangThai: 'Hoạt động' };
+const room = { maPhong: 'P101', tenPhong: 'Phòng giao diện 101', loaiPhong: 'Phòng 2 người', chiNhanh: 'Chi nhánh giao diện', giaThue: 2200000,
+  hinhAnh: [{ stt: 1, urlAnh: `${base}/images/home/hero.jpg` }] };
 try {
   for (const width of [1440, 390]) {
     const errors = [], avatarWrites = [];
@@ -23,6 +25,8 @@ try {
       }
       if (path.includes('tong-quan')) return route.fulfill({ json: {} });
       if (path.endsWith('/cu-tru')) return route.fulfill({ json: { phieu: [] } });
+      if (path === '/api/trang-chu/kham-pha-phong') return route.fulfill({ json: { data: [room] } });
+      if (path === '/api/trang-chu/phong/P101') return route.fulfill({ json: { data: room } });
       return route.fulfill({ json: [] });
     });
     const page = await ctx.newPage();
@@ -75,6 +79,29 @@ try {
     await page.getByText('NGƯỜI ĐẠI DIỆN').waitFor();
     assert.match(await page.locator('.cres-page').innerText(), /NGƯỜI ĐẠI DIỆN[\s\S]*Nguyễn Văn A/);
     await page.screenshot({ path: `${folder}/residence-${width}.png` });
+    if (width === 390) await page.locator('.ui-navigation-toggle').click();
+    await page.locator('aside nav button', { hasText: 'Khám phá phòng' }).click();
+    await page.getByRole('heading', { name: 'Danh sách phòng', exact: true }).waitFor();
+    const returnToPortal = page.getByRole('button', { name: 'Quay lại', exact: true });
+    assert.equal(await returnToPortal.isVisible(), true);
+    await page.screenshot({ path: `${folder}/rooms-return-${width}.png` });
+    // Reload and clearing a search must retain the original portal tab.
+    await page.evaluate(() => history.replaceState(history.state, '', '/phong?khuVuc=fixture'));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.locator('.dsp-clear').click();
+    await page.waitForURL('**/phong');
+    assert.equal(await returnToPortal.isVisible(), true);
+    await page.locator('.hx-room-card .hx-room-view').first().click();
+    await page.waitForURL('**/phong/P101');
+    await page.locator('.kh-detail-back').click();
+    await page.waitForURL('**/phong');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await returnToPortal.click();
+    await page.waitForURL('**/khach-hang?tab=cu-tru');
+    await page.getByRole('heading', { name: 'Thông tin cư trú', level: 2 }).waitFor();
+    await page.goto(`${base}/phong`, { waitUntil: 'domcontentloaded' });
+    await page.getByRole('heading', { name: 'Danh sách phòng', exact: true }).waitFor();
+    assert.equal(await returnToPortal.count(), 0, 'không hiện nút trở về cổng khi mở danh sách trực tiếp');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width);
     assert.deepEqual(errors, []);
     await ctx.close();

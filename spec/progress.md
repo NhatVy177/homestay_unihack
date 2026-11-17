@@ -1,6 +1,6 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-17 20:53:09 +07:00** (J-X089, gộp chỉnh avatar bằng bút vào main theo yêu cầu Vy). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-17 22:06:29 +07:00** (J-X091/D-061, gộp nút Quay lại và tạm chủ động push main). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Trang chủ/nhà3D trên main
 
@@ -14,6 +14,10 @@ Cập nhật: **2026-11-17 20:53:09 +07:00** (J-X089, gộp chỉnh avatar bằn
 Cập nhật: **2026-11-15 01:10:30 +07:00** (J-C105: chặn lệch giới tính sớm, D-047; J-C103: tab khách "Thông tin cư trú", chờ migration; J-C099: tab "Hóa đơn của tôi" khớp mẫu nhóm; J-C093: tab khách "Hóa đơn & thanh toán" nhiều kỳ; J-C092: D-046 thư mời thành viên cư trú; trước đó J-C090: khách tự gửi giữ chỗ "Tôi muốn đặt cọc", Sale "Lập lịch xem phòng mới"; D-045 đã migrate và gộp ở `integration/d043-d045`). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Tóm tắt
+
+**Cách làm tạm thời D-061:** Vy xác nhận hiện chỉ Codex sửa code; hoàn tất/kiểm tra rồi chủ động commit/gộp/push main, không chờ lệnh merge mỗi đợt. AGENTS đã cập nhật ngoại lệ; có người/AI khác cùng sửa hoặc Vy yêu cầu review/chưa push thì quay về quy trình nhánh riêng. Không tự gộp các nhánh cũ ngoài phạm vi.
+
+**Quay lại cổng khách từ danh sách phòng (J-X090/J-X091, gộp main):** gộp `fix/rooms-portal-back`/`9a54038` vào main `82200b3` theo yêu cầu Vy, không xung đột. Có Quay lại khi vào danh sách bằng tab Khám phá phòng, về đúng activeTab, giữ dấu nguồn qua reload/xóa tìm kiếm/vòng chi tiết→list; nguồn trực tiếp/trang chủ không có nút. Sourcefrontend/backend/blockchain bản gộp đối chiếu giống code9a54038 đã kiểm build/smoke/customer/public-pages1440/390 ởJ-X090; không chạy lại toàn bộ bộ kiểm khi không đổi source. Kiểm thêm flowprofile/return trên local5173 PASS1440/390 trước push bằngAPIfixture; không ghiDB. Previewnhánh5203 vẫn có; code đã gộp nằm ở rootmain dùng5173.
 
 **Hồ sơ/ảnh đại diện (J-X088/J-X089, gộp vào main):** theo yêu cầu “merge lun” của Vy, gộp `fix/avatar-pencil`/`95178e7` từ main `ba4831a` trong worktree riêng `D:\HomeStayDorm-avatar-main`/`integration/avatar-main`, không xung đột. `AccountSecurity.jsx`/`accountSecurity.css` dùng cây bút ở góc ảnh, bỏ hai nút chữ/dòng hướng dẫn, giữ upload/validation/mật khẩu; testprofile cập nhật tương ứng. Đã đối chiếu toàn bộ sourcefrontend/backend/blockchain bản gộp giống nhánh95178e7 vừa kiểm ở J-X088 (build+smoke pass, customer1440/390 vàSale mobile pass); không chạy lại bộ kiểm không có thay đổi code. Các sửa dở TrustStrip/xác nhận tại root không đưa vào commit. Push main/xác nhận hash rồi fast-forward root khi không trùng file đang sửa; backend/DB không đổi.
 

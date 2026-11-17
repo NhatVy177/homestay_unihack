@@ -898,6 +898,10 @@ export default function KhachHangPortalPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
+  function openPublicRooms() {
+    navigate('/phong', { state: { customerPortalTab: activeTab } });
+  }
+
   function goTo(tab) {
     if (locks[tab]) {
       setToast(getLockedMessage(tab));
@@ -1313,7 +1317,7 @@ export default function KhachHangPortalPage() {
 
   function renderLocked(tab) {
     return (
-      <Empty title="Chức năng đang khóa" action={<button className="kp-btn kp-btn-primary" type="button" onClick={() => navigate('/phong')}>Khám phá phòng</button>}>
+      <Empty title="Chức năng đang khóa" action={<button className="kp-btn kp-btn-primary" type="button" onClick={openPublicRooms}>Khám phá phòng</button>}>
         {getLockedMessage(tab)}
       </Empty>
     );
@@ -4467,7 +4471,7 @@ export default function KhachHangPortalPage() {
     <WorkspaceShell roleLabel="Khách hàng" eyebrow="Cổng khách hàng"
       title={navItems.find(item => item.id === activeTab)?.title || extraTitles[activeTab] || 'Cổng khách hàng'}
       items={navItems.map(item => ({ id: item.id, label: item.title, icon: item.icon, locked: Boolean(locks[item.id]) }))}
-      activeTab={activeTab} onSelect={(id) => (id === 'kham-pha' ? navigate('/phong') : goTo(id))} user={user} showBranch={false}
+      activeTab={activeTab} onSelect={(id) => (id === 'kham-pha' ? openPublicRooms() : goTo(id))} user={user} showBranch={false}
       onAccount={() => goTo('tai-khoan')} onLogout={logout} mainClassName="kh-main"
       footer={<div className="kp-support-mini"><span>Hỗ trợ 24/7</span><strong>1900 6789</strong></div>}>
           {loading && <div className="kp-loading"><span /><p>Đang tải cổng khách hàng...</p></div>}

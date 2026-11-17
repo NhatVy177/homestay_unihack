@@ -14,7 +14,7 @@ Nếu `luong-tong-hop.md` khác `decisions.md` thì `decisions.md` đúng; sửa
 
 ## Nhánh, commit, push
 
-- Mọi thay đổi (code lẫn tài liệu) làm trên **nhánh riêng** tạo từ `origin/main` mới nhất. **Không push `main`, không tự merge.** Vy xem rồi tự merge. Tôn trọng yêu cầu mới nếu Vy bảo chưa commit/push.
+- **Ngoại lệ tạm thời D-061 / J-X091 (Vy chốt 17/11/2026):** hiện chỉ Codex sửa code, nên sau mỗi đợt hoàn tất và kiểm tra phù hợp, chủ động commit/gộp và push lên `main`, không chờ Vy yêu cầu merge riêng. Có thể dùng nhánh/worktree để chuẩn bị và kiểm tra trước khi gộp. Khi Vy thông báo có người/AI khác cùng sửa, hoặc yêu cầu review nhánh/chưa commit/push, quay lại quy trình nhánh riêng từ `origin/main` mới nhất và để Vy duyệt merge. Không tự gom các nhánh hoặc thay đổi cũ ngoài phạm vi đợt đang làm.
 - Commit bằng danh tính Git `NhatVy177`. **Không thêm dòng `Co-Authored-By` hay chú thích do AI tạo** vào commit và mô tả PR.
 - Push xong báo: tên nhánh, mã commit, danh sách file đã sửa, kết quả kiểm tra.
 - Không gom thay đổi không liên quan của người khác. Không commit `.env`, `web/backend/secrets/`, khóa bí mật.
