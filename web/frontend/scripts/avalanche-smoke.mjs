@@ -145,18 +145,34 @@ try {
   await page.route('**/api/diem-thuong', route => route.fulfill({ json: {
     enabled: true, linked: true, balance: 100, awardPoints: 100, voucherPoints: 100, voucherVnd: 20000,
     contracts: [{ id: 'HDTEST' }],
-    history: [{ id: 'award', type: 'Award', invoiceId: 'HO0001', status: 'Confirmed' }],
+    history: [
+      { id: 'award', type: 'Award', invoiceId: 'HO0001', status: 'Confirmed', createdAt: at },
+      { id: 'redeem', type: 'Redeem', contractId: 'HDTEST', discountVnd: 20000, appliedInvoiceId: 'HO0002', status: 'Confirmed' },
+    ],
   } }));
-  await page.goto(base + '/khach-hang?tab=diem-thuong', { waitUntil: 'domcontentloaded' });
-  await page.getByRole('heading', { name: 'Điểm thưởng' }).waitFor();
-  await page.getByText('100 điểm', { exact: true }).waitFor();
-  await page.getByText('Đã cộng điểm').waitFor();
-  assert.equal(await page.getByRole('button', { name: 'Đổi ưu đãi' }).isDisabled(), true);
+  await page.goto(base + '/khach-hang?tab=tai-khoan', { waitUntil: 'domcontentloaded' });
+  const rewardToggle = page.getByRole('button', { name: 'Điểm thưởng 100 điểm' });
+  const rewardHistory = page.getByRole('heading', { name: 'Lịch sử điểm thưởng' });
+  await rewardToggle.waitFor();
+  assert.equal(await page.getByRole('navigation').getByText('Điểm thưởng', { exact: true }).count(), 0);
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 900 });
-    assert.ok(await page.locator('.reward-page').evaluate(el => el.scrollWidth <= el.clientWidth + 1));
+    assert.equal(await rewardToggle.getAttribute('aria-expanded'), 'false');
+    assert.equal(await rewardHistory.isVisible(), false);
+    await rewardToggle.press('Enter');
+    await rewardHistory.waitFor();
+    await page.getByText('Đã cộng điểm').waitFor();
+    await page.getByText('+100 điểm', { exact: true }).waitFor();
+    await page.getByText('−100 điểm', { exact: true }).waitFor();
+    await page.getByText('Đã áp dụng · HO0002', { exact: true }).waitFor();
+    assert.equal(await page.getByRole('button', { name: 'Đổi ưu đãi' }).isDisabled(), true);
+    assert.ok(await page.locator('.reward-profile').evaluate(el => el.scrollWidth <= el.clientWidth + 1));
+    await capture(`diem-thuong-ho-so-${width}.png`);
+    await rewardToggle.click();
   }
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(base + '/khach-hang?tab=diem-thuong', { waitUntil: 'domcontentloaded' });
+  await rewardHistory.waitFor();
   await page.goto(base + '/khach-hang?tab=hop-dong', { waitUntil: 'domcontentloaded' });
   await page.getByRole('heading', { name: 'Thanh toán khi nhận phòng' }).waitFor();
   await capture('06-hop-dong-khoan-thu-ky-dau.png');

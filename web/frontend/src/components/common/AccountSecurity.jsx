@@ -14,7 +14,7 @@ const readFile = (file) => new Promise((resolve, reject) => {
 });
 
 // Ảnh đại diện và đổi mật khẩu, dùng chung cho trang hồ sơ của khách và nhân viên.
-export default function AccountSecurity({ details }) {
+export default function AccountSecurity({ details, profileExtra }) {
   const { user, capNhatAvatar } = useAuth();
   const fileRef = useRef(null);
   const [avatarMsg, setAvatarMsg] = useState(null), [busy, setBusy] = useState(false);
@@ -45,7 +45,7 @@ export default function AccountSecurity({ details }) {
   const set = (name) => (e) => setForm((f) => ({ ...f, [name]: e.target.value }));
 
   return <div className="acs">
-    <section className="acs-card" aria-label="Ảnh đại diện">
+    <section className={profileExtra ? 'acs-card acs-card--extended' : 'acs-card'} aria-label="Ảnh đại diện">
       <div className="acs-avatar-wrap">
         <div className="acs-avatar">{src ? <img src={src} alt="Ảnh đại diện" /> : <span aria-hidden="true">{initialOf(user)}</span>}</div>
         <button type="button" className="acs-avatar-edit" aria-label="Chỉnh ảnh đại diện" aria-busy={busy}
@@ -59,6 +59,7 @@ export default function AccountSecurity({ details }) {
         {details && <dl className="acs-details">{details.filter(([, value]) => value).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>}
         {avatarMsg && <p className={avatarMsg.error ? 'acs-msg acs-msg--error' : 'acs-msg'} role={avatarMsg.error ? 'alert' : 'status'}>{avatarMsg.text}</p>}
       </div>
+      {profileExtra && <div className="acs-profile-extra">{profileExtra}</div>}
     </section>
     <form className="acs-card acs-card--form" onSubmit={changePassword}>
       <h3>Đổi mật khẩu</h3>

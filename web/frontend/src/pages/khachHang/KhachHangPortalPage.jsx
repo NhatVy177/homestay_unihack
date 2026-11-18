@@ -26,10 +26,9 @@ import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Cl
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
 const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
-const CustomerRewardsTab = lazy(() => import('./CustomerRewardsTab.jsx'));
+const CustomerProfileRewards = lazy(() => import('./CustomerProfileRewards.jsx'));
 const showRewards = import.meta.env.VITE_LOYALTY_ENABLED === 'true';
-const PORTAL_TABS = ['tai-khoan', 'cu-tru', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'hop-dong', 'bao-hong', 'tra-phong',
-  ...(showRewards ? ['diem-thuong'] : [])];
+const PORTAL_TABS = ['tai-khoan', 'cu-tru', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'hop-dong', 'bao-hong', 'tra-phong'];
 
 // Gốc backend để mở lại file chứng từ đã upload (DB lưu đường dẫn /uploads/chung-tu/..).
 const FILE_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
@@ -776,7 +775,6 @@ export default function KhachHangPortalPage() {
     { id: 'ho-so', icon: 'description', title: 'Hồ sơ đăng ký' },
     { id: 'lich-xem', icon: 'event_note', title: 'Lịch xem phòng' },
     { id: 'dat-coc', icon: 'payments', title: 'Hóa đơn & thanh toán' },
-    ...(showRewards ? [{ id: 'diem-thuong', icon: 'sparkle', title: 'Điểm thưởng' }] : []),
     { id: 'lich-su-coc', icon: 'receipt_long', title: 'Lịch sử đặt cọc' },
     { id: 'hop-dong', icon: 'article', title: 'Hợp đồng' },
     { id: 'bao-hong', icon: 'build', title: 'Báo hỏng' },
@@ -1457,11 +1455,14 @@ export default function KhachHangPortalPage() {
   }
 
   function renderAccount() {
+    const openRewardHistory = new URLSearchParams(location.search).get('tab') === 'diem-thuong';
     return (
       <section>
         <AccountSecurity details={[
           ['Mã khách hàng', user?.maNguoiDung], ['Giới tính', user?.gioiTinh], ['Số điện thoại', user?.soDienThoai], ['Email', user?.email],
-        ]} />
+        ]} profileExtra={showRewards && <Suspense fallback={<p role="status">Đang tải điểm thưởng…</p>}>
+          <CustomerProfileRewards defaultOpen={openRewardHistory} />
+        </Suspense>} />
       </section>
     );
   }
@@ -4321,7 +4322,6 @@ export default function KhachHangPortalPage() {
     if (activeTab === 'ho-so') return renderProfiles();
     if (activeTab === 'lich-xem') return renderSchedules();
     if (activeTab === 'dat-coc') return renderDatCoc();
-    if (activeTab === 'diem-thuong') return <Suspense fallback={<p role="status">Đang tải điểm thưởng…</p>}><CustomerRewardsTab /></Suspense>;
     if (activeTab === 'lich-su-coc') return renderDepositHistory();
     if (activeTab === 'cu-tru') return renderResidence();
     if (activeTab === 'hop-dong') return renderHopDongTab();
