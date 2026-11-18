@@ -85,6 +85,7 @@
 
 /* Logo */
 .tc-logo {
+  --brand-logo-size: 38px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -96,7 +97,6 @@
   letter-spacing: -0.02em;
 }
 .tc-logo strong { color: var(--tc-accent); }
-.tc-logo-icon { width: 24px; height: 24px; flex-shrink: 0; color: var(--tc-primary); }
 .tc-logo--light { color: var(--color-surface); }
 .tc-logo--light strong { color: var(--tc-accent-light); }
 

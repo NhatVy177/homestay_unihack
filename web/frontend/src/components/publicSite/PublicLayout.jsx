@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import AccountMenu from '../common/AccountMenu.jsx';
+import BrandLogo from '../common/BrandLogo.jsx';
 import '../../styles/TrangChu.css';
 import '../../pages/homeExperience/experience.css';
 import './publicLayout.css';
@@ -16,10 +17,7 @@ export default function PublicLayout({ children }) {
     <header className="tc-header">
       <nav className="tc-nav-inner">
         <Link to="/" className="tc-logo">
-          <svg className="tc-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 9.5L12 3l9 6.5V21H3V9.5z" /><path d="M9 21V12h6v9" />
-          </svg>
-          Homestay<strong>Dorm</strong>
+          <BrandLogo />
         </Link>
         <div id="tc-public-menu" className={`tc-nav-links ${open ? 'tc-nav-links--open' : ''}`} onClick={() => setOpen(false)}>
           <NavLink to="/phong" className={link}>Phòng</NavLink>

@@ -4,6 +4,7 @@ import NavigationToggle from './NavigationToggle.jsx';
 import BranchChip from './BranchChip.jsx';
 import ShellAccountMenu from './ShellAccountMenu.jsx';
 import { Icon } from './Icon.jsx';
+import BrandLogo from './BrandLogo.jsx';
 import '../../pages/khamPhaPhong/khamPhaPhong.css';
 import '../../pages/nhanVienKeToan/nhanVienKeToanPortal.css';
 
@@ -26,7 +27,7 @@ export default function WorkspaceShell({
     <div className={`kp-page kh-page ui-employee-shell ui-workspace ${className}`}>
       <aside className="kp-sidebar">
         <div className="kp-sidebar-brand">
-          <Link className="ui-workspace-brand" to="/"><Icon name="home" /><span>Homestay<span>Dorm</span></span></Link>
+          <Link className="ui-workspace-brand" to="/"><BrandLogo /></Link>
           <span className="ui-role-label">{roleLabel}</span>
         </div>
         <nav className="ktp-sidebar-nav" aria-label={`Menu ${roleLabel}`}>
