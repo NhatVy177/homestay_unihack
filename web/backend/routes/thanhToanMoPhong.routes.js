@@ -3,10 +3,11 @@ import { getCheckoutClosure, reconcileCheckoutBySettlement } from '../integratio
 import { randomBytes } from 'node:crypto';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import { PaymentSimulator } from '../integrations/payment-sim/service.js';
+import { checkMomoPayment, createMomoQr, handleMomoNotification } from '../integrations/payment-sim/momoSandbox.js';
 import { sqlDeposits, sqlFirstCharges, sqlInvoices, sqlPaymentStore, sqlTopUps } from '../integrations/payment-sim/sql.js';
 import { notifyDeposit } from '../integrations/mail/datCocNotifications.js';
 import { notifyNhanPhong } from '../integrations/mail/nhanPhongNotifications.js';
-// D-013: cổng thanh toán ví điện tử MÔ PHỎNG cho tiền cọc. Không gọi nhà cung cấp thật, không nhận tiền thật.
+// Cổng thanh toán thử nghiệm. MoMo chỉ chạy trên Sandbox.
 const router = Router();
 let simulator;
 const getSimulator = () => {
@@ -23,6 +24,12 @@ router.use((req, res, next) => enabled() ? next() : res.status(503).json({ messa
 const route = fn => async (req, res, next) => { try { res.json(await fn(getSimulator(), req)); } catch (error) { next(error); } };
 // Server-to-server notification, authenticated by its HMAC signature (no user session).
 router.post('/ipn', route((s, r) => s.handleIpn(r.body || {})));
+router.post('/momo/ipn', async (req, res, next) => {
+  try {
+    await handleMomoNotification(getSimulator(), req.body || {});
+    res.sendStatus(204);
+  } catch (error) { next(error); }
+});
 router.use(requireAuth);
 router.post('/dat-coc/:maPhieuCoc', route((s, r) => s.createDepositOrder(r.user, r.params.maPhieuCoc)));
 router.get('/thu-nhan-phong', route((s, r) => s.firstChargeQuotes(r.user)));
@@ -32,6 +39,8 @@ router.get('/thu-them/:maHopDong', route((s, r) => s.topUpQuote(r.user, r.params
 router.post('/hoa-don/:maHoaDon', route((s, r) => s.createInvoiceOrder(r.user, r.params.maHoaDon)));
 router.post('/thu-them/:maHopDong', route((s, r) => s.createTopUpOrder(r.user, r.params.maHopDong)));
 router.get('/:id', route((s, r) => s.getOrder(r.user, r.params.id)));
+router.post('/:id/momo/qr', route((s, r) => createMomoQr(s, r.user, r.params.id)));
+router.post('/:id/momo/trang-thai', route((s, r) => checkMomoPayment(s, r.user, r.params.id)));
 router.post('/:id/thanh-toan', route((s, r) => s.pay(r.user, r.params.id)));
 router.post('/:id/huy', route((s, r) => s.cancel(r.user, r.params.id)));
 export default router;
