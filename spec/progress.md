@@ -33,6 +33,8 @@ Cập nhật: **2026-11-15 01:10:30 +07:00** (J-C105: chặn lệch giới tính
 
 ## Tóm tắt
 
+**7 việc trước khi nộp (J-C180, D-063, nhánh `feat/pre-submit`, worktree `D:\HomeStayDorm-features`):** báo hỏng, link Facebook, link chốt phòng của Sale, nguồn khách (đã migrate HOMEDORM4), nhắc hóa đơn, khôi phục từ chuỗi, tài liệu minh bạch. Có code, test tự động qua, đã chạy thật với HOMEDORM4 qua backend phụ 5012. **Chưa gộp main**: chờ Vy test xong luồng trên 5173 rồi gộp.
+
 **Cách làm tạm thời D-061:** Vy xác nhận hiện chỉ Codex sửa code; hoàn tất/kiểm tra rồi chủ động commit/gộp/push main, không chờ lệnh merge mỗi đợt. AGENTS đã cập nhật ngoại lệ; có người/AI khác cùng sửa hoặc Vy yêu cầu review/chưa push thì quay về quy trình nhánh riêng. Không tự gộp các nhánh cũ ngoài phạm vi.
 
 **Quay lại cổng khách từ danh sách phòng (J-X090/J-X091, gộp main):** gộp `fix/rooms-portal-back`/`9a54038` vào main `82200b3` theo yêu cầu Vy, không xung đột. Có Quay lại khi vào danh sách bằng tab Khám phá phòng, về đúng activeTab, giữ dấu nguồn qua reload/xóa tìm kiếm/vòng chi tiết→list; nguồn trực tiếp/trang chủ không có nút. Sourcefrontend/backend/blockchain bản gộp đối chiếu giống code9a54038 đã kiểm build/smoke/customer/public-pages1440/390 ởJ-X090; không chạy lại toàn bộ bộ kiểm khi không đổi source. Kiểm thêm flowprofile/return trên local5173 PASS1440/390 trước push bằngAPIfixture; không ghiDB. Previewnhánh5203 vẫn có; code đã gộp nằm ở rootmain dùng5173.

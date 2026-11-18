@@ -88,6 +88,15 @@ Tình huống demo: nệm đã rách lúc nhận phòng, nhưng khi trả phòng
 | 5. Lưu và kiểm chứng | Khách có file bằng chứng, nút “Kiểm tra hồ sơ” và “Xem giao dịch trên Avalanche” | Verify dùng file khách giữ và RPC để đối chiếu; không cần lấy lại bản gốc từ server quản lý. |
 
 
+### Bổ sung trước khi nộp — D-063 (18/11/2026)
+
+Bảy việc Vy duyệt (chi tiết ở `spec/scope.md` F-17–F-20, nhật ký J-C180):
+- Báo hỏng kèm ảnh trong thời gian thuê; ảnh và ngày báo được dùng lúc kiểm tra trả phòng, nên hư hỏng "không do khách" không bị tính vào đối soát cọc. Nối thẳng vào câu chuyện bằng chứng của phần Avalanche.
+- Link phòng hiện ảnh/giá/địa chỉ khi dán Facebook; Sale gửi "link chốt phòng" qua Messenger, khách đăng ký với thông tin điền sẵn. Câu pitch: chốt trên Messenger như cũ, giấy tờ và tiền cọc thì có bằng chứng.
+- Nguồn khách và tỷ lệ chốt theo nguồn; email nhắc hóa đơn trước hạn.
+- `npm run avalanche:recover` dựng lại hồ sơ chỉ từ chuỗi; `docs/minh-bach-ky-thuat.md` nêu dữ liệu lên chuỗi, gas đo thật (≈430.000 gas một hợp đồng, relayer trả), giới hạn.
+- Không làm: chatbot Messenger thật (phải chờ Meta duyệt), ghép bạn cùng phòng.
+
 ### Luồng nhận phòng và ký điện tử đã chốt — D-009 (05/11/2026)
 
 HomeStayDorm hướng tới **sinh viên có smartphone**. Giữ nhân viên dẫn khách đến xem phòng và kiểm tra thiết bị/tài sản trực tiếp; **không chuyển sang mô hình tự check-in**.

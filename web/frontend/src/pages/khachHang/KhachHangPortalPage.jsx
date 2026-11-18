@@ -76,7 +76,7 @@ const rentInitial = {
   nguonKhach: ''
 };
 
-// Nguồn khách (D-062): giá trị khớp danh sách ở backend services/nguonKhach.service.js.
+// Nguồn khách (D-063): giá trị khớp danh sách ở backend services/nguonKhach.service.js.
 const CUSTOMER_SOURCES = ['Facebook', 'Zalo', 'Người quen giới thiệu', 'Tìm trên web', 'Sale gửi link', 'Khác'];
 const VIEWING_SLOTS = ['Linh hoạt theo Sale', 'Buổi sáng (7:00–11:30)', 'Buổi chiều (13:00–17:00)'];
 const AMENITY_OPTIONS = ['Máy lạnh', 'Wifi mạnh', 'WC riêng', 'Bếp chung', 'Máy giặt'];
