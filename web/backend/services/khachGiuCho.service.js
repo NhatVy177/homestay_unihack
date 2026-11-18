@@ -1,7 +1,8 @@
 import { executeProcedure, executeQuery, sql } from '../database/connection.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import { notifyDeposit } from '../integrations/mail/datCocNotifications.js';
-import { checkRoomGender, loaiGioiTinhHoSo } from './genderRules.js';
+import { checkRoomForRentGroup, loaiGioiTinhHoSo } from './genderRules.js';
+import { ganTrangThaiQuanTam } from './phongKhamPha.service.js';
 
 // D-026: khách tự gửi yêu cầu giữ chỗ sau buổi "Đã xem". Dùng lại đúng hai thủ tục của Sale,
 // với Sale phụ trách của phiếu làm người đại diện; quản lý vẫn là người duyệt (không tự giữ chỗ).
@@ -49,10 +50,19 @@ export async function khachGuiYeuCauGiuCho(user, data = {}, { query = executeQue
   const profile = await ownProfile(user, maDangKy, query);
   if (profile.trangThai !== 'Đã tiếp nhận') throw createServiceError('Phiếu của bạn đã gửi yêu cầu giữ chỗ hoặc chưa ở bước này.', 409);
   if (!profile.maNhanVienSale) throw createServiceError('Phiếu chưa có nhân viên Sale phụ trách. Vui lòng liên hệ nhân viên.', 409);
+  const gender = loaiGioiTinhHoSo(profile);
+  if (gender === 'Hỗn hợp' && hinhThucThue !== 'Nguyên phòng') {
+    throw createServiceError('Nhóm có cả nam và nữ cần thuê nguyên phòng.', 409);
+  }
   const room = (await query('SELECT TenPhong AS tenPhong, GioiTinhChoPhep AS gioiTinhChoPhep FROM dbo.Phong WHERE MaPhong = @MaPhong',
     [{ name: 'MaPhong', type: sql.VarChar(4), value: maPhong }])).recordset?.[0];
-  const genderIssue = room && checkRoomGender(loaiGioiTinhHoSo({ soNam: profile.soNam, soNu: profile.soNu }), room.gioiTinhChoPhep, room.tenPhong);
+  if (!room) throw createServiceError('Không tìm thấy phòng.', 404);
+  const [availableRoom] = await ganTrangThaiQuanTam([{ ...room, maPhong }], query);
+  const genderIssue = checkRoomForRentGroup(gender, availableRoom, profile.soNguoiDuKienO);
   if (genderIssue) throw createServiceError(genderIssue, 409);
+  if (hinhThucThue === 'Nguyên phòng' && availableRoom.coTheThueNguyenPhong === false) {
+    throw createServiceError('Phòng chưa trống toàn bộ giường để thuê nguyên phòng.', 409);
+  }
   try {
     await run('dbo.SP_ChonPhongKhachChot', [
       { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },

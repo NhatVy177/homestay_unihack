@@ -5,7 +5,7 @@ export async function layHoSoCuaKhach(maDangKy, khachHangId) {
   const result = await executeQuery(`
     SELECT
       pdk.MaDangKy AS maDangKy,
-      pdk.TrangThai AS trangThai, pdk.SoNam AS soNam, pdk.SoNu AS soNu,
+      pdk.TrangThai AS trangThai, pdk.SoNam AS soNam, pdk.SoNu AS soNu, pdk.SoNguoiDuKienO AS soNguoiDuKienO,
       CASE WHEN EXISTS (
         SELECT 1 FROM dbo.LichXemPhong lxp
         WHERE lxp.MaDangKy = pdk.MaDangKy AND lxp.TrangThai <> N'Đã hủy'
@@ -53,7 +53,8 @@ export async function layThongTinPhong(maPhongs = []) {
   for (const maPhong of ids) {
     const result = await executeQuery(
       `SELECT p.MaPhong AS maPhong, p.TenPhong AS tenPhong, p.MaChiNhanh AS maChiNhanh,
-              p.MaLoaiPhong AS maLoaiPhong, lp.TenLoaiPhong AS tenLoaiPhong, p.GioiTinhChoPhep AS gioiTinhChoPhep
+              p.MaLoaiPhong AS maLoaiPhong, lp.TenLoaiPhong AS tenLoaiPhong, lp.SucChuaToiDa AS sucChua,
+              p.GioiTinhChoPhep AS gioiTinhChoPhep
        FROM dbo.Phong p JOIN dbo.LoaiPhong lp ON lp.MaLoaiPhong = p.MaLoaiPhong
        WHERE p.MaPhong = @MaPhong;`,
       [{ name: 'MaPhong', type: sql.VarChar(4), value: maPhong }]

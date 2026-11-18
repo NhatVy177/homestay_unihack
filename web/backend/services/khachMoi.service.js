@@ -9,7 +9,7 @@ import * as phieuTraPhongRepository from '../repositories/phieuTraPhong.reposito
 import { getPaymentAccount } from '../config/payment.js';
 import { attachViewingConfirmations } from './viewingConfirmation.service.js';
 import { cachTinhCoc } from './tienCoc.js';
-import { checkRoomGender, loaiGioiTinhHoSo } from './genderRules.js';
+import { checkRoomForRentGroup, loaiGioiTinhHoSo } from './genderRules.js';
 
 function requireCustomer(user) {
   if (!user || user.vaiTro !== 'KhachHang') {
@@ -172,26 +172,26 @@ async function assertRoomsCanBeInterested(roomIds) {
     .filter(Boolean))];
   if (!ids.length) return [];
 
-  const rooms = await ganTrangThaiQuanTam(ids.map((maPhong) => ({ maPhong })));
+  const info = await phongQuanTamRepository.layThongTinPhong(ids);
+  if (info.length !== ids.length) throw createServiceError('Có phòng không tồn tại, vui lòng chọn lại.');
+  const rooms = await ganTrangThaiQuanTam(info);
   const full = rooms.filter((room) => !coTheQuanTam(room.trangThaiQuanTam));
   if (full.length) {
     throw createServiceError(`Phòng ${full.map((room) => room.maPhong).join(', ')} đã hết chỗ, vui lòng chọn phòng khác.`);
   }
 
-  const info = await phongQuanTamRepository.layThongTinPhong(ids);
-  if (info.length !== ids.length) throw createServiceError('Có phòng không tồn tại, vui lòng chọn lại.');
   const accepted = [];
-  for (const room of info) {
+  for (const room of rooms) {
     const reason = checkRoomCanJoin(accepted, room);
     if (reason) throw createServiceError(reason);
     accepted.push(room);
   }
-  return info.map((room) => room.maPhong);
+  return rooms;
 }
 
 // J-C105: phòng đã khóa giới tính khác thì không cho đăng ký/quan tâm ngay từ đầu.
-function assertRoomsMatchGender(profileGender, rooms) {
-  const issue = rooms.map((room) => checkRoomGender(profileGender, room.gioiTinhChoPhep, room.tenPhong)).find(Boolean);
+function assertRoomsMatchGender(profileGender, rooms, people) {
+  const issue = rooms.map((room) => checkRoomForRentGroup(profileGender, room, people)).find(Boolean);
   if (issue) throw createServiceError(issue, 409);
 }
 
@@ -353,11 +353,10 @@ export async function createHoSo(user, data = {}) {
 
   await assertCanCreateRentRegistration(khachHangId);
   await assertUniqueCustomerContact(data, khachHangId);
-  const interestedRoomIds = await assertRoomsCanBeInterested(data.phongQuanTamIds);
-  if (interestedRoomIds.length) {
-    assertRoomsMatchGender(loaiGioiTinhHoSo({ gioiTinh: data.gioiTinhThue, soNam: data.soNam, soNu: data.soNu }),
-      await phongQuanTamRepository.layThongTinPhong(interestedRoomIds));
-  }
+  const interestedRooms = await assertRoomsCanBeInterested(data.phongQuanTamIds);
+  const gender = data.gioiTinhThue;
+  const composition = gender === 'Nam' || gender === 'Nữ' ? { gioiTinh: gender } : data;
+  assertRoomsMatchGender(loaiGioiTinhHoSo(composition), interestedRooms, soNguoiO);
 
   try {
     let finalGhiChu = data.ghiChu || '';
@@ -388,7 +387,7 @@ export async function createHoSo(user, data = {}) {
     const maDangKy = created?.maDangKy || created?.MaDangKy;
     try { await ghiNguon(maDangKy, data.nguonKhach); }
     catch (sourceError) { console.error('Không ghi được nguồn khách', maDangKy, sourceError.message); }
-    for (const maPhong of interestedRoomIds) {
+    for (const { maPhong } of interestedRooms) {
       try {
         await phongQuanTamRepository.themPhongQuanTam(maDangKy, maPhong);
       } catch (roomError) {
@@ -433,7 +432,7 @@ export async function themPhongQuanTam(user, maDangKy, maPhong) {
   const profileRoomTypes = await phongQuanTamRepository.layLoaiPhongHoSo(profile.maDangKy);
   const reason = checkRoomCanJoin(current, room, profileRoomTypes);
   if (reason) throw createServiceError(reason, 409);
-  assertRoomsMatchGender(loaiGioiTinhHoSo(profile), [room]);
+  assertRoomsMatchGender(loaiGioiTinhHoSo(profile), [withStatus], profile.soNguoiDuKienO);
   await phongQuanTamRepository.themPhongQuanTam(profile.maDangKy, room.maPhong);
   return phongQuanTamRepository.layPhongQuanTam(profile.maDangKy);
 }
@@ -534,10 +533,11 @@ export async function updateHoSo(user, maDangKy, data = {}) {
   const checkResult = await pool.request()
     .input('MaDangKy', sql.VarChar(6), maDangKy)
     .input('KhachHangId', sql.VarChar(6), khachHangId)
-    .query(`SELECT TrangThai FROM dbo.PhieuDangKy WHERE MaDangKy = @MaDangKy AND MaKhachHang = @KhachHangId;`);
+    .query(`SELECT TrangThai, SoNam, SoNu, SoNguoiDuKienO FROM dbo.PhieuDangKy WHERE MaDangKy = @MaDangKy AND MaKhachHang = @KhachHangId;`);
 
   if (!checkResult.recordset[0]) throw createServiceError('Không tìm thấy hồ sơ', 404);
-  const { TrangThai } = checkResult.recordset[0];
+  const original = checkResult.recordset[0];
+  const { TrangThai } = original;
   if (TrangThai !== 'Chờ tiếp nhận') {
     throw createServiceError(`Không thể cập nhật hồ sơ đang ở trạng thái "${TrangThai}"`, 400);
   }
@@ -565,6 +565,12 @@ export async function updateHoSo(user, maDangKy, data = {}) {
     } else {
       soNam = soNguoiO || 0;
       soNu = 0;
+    }
+
+    if (soNam !== Number(original.SoNam) || soNu !== Number(original.SoNu) || soNguoiO !== Number(original.SoNguoiDuKienO)) {
+      const interested = await phongQuanTamRepository.layPhongQuanTam(maDangKy);
+      const rooms = await phongQuanTamRepository.layThongTinPhong(interested.map(room => room.maPhong));
+      assertRoomsMatchGender(loaiGioiTinhHoSo({ soNam, soNu }), await ganTrangThaiQuanTam(rooms), soNguoiO);
     }
 
     await transaction.request()

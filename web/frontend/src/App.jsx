@@ -40,6 +40,17 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+function CustomerPortalEntry() {
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  if (params.get('tab') === 'kham-pha') {
+    if (!params.get('phong')) return <Navigate to="/phong" replace />;
+    params.delete('tab');
+    return <Navigate to={`/khach-hang?${params.toString()}`} replace />;
+  }
+  return <ProtectedRoute><CustomerOnlyRoute><KhachHangPortalPage /></CustomerOnlyRoute></ProtectedRoute>;
+}
+
 function PublicOnlyRoute({ children }) {
   const { user, isLoading } = useAuth();
 
@@ -80,16 +91,7 @@ export default function App() {
       <Route path="/kiem-chung-avalanche" element={<Suspense fallback={<LoadingScreen />}><AvalancheVerifyPage /></Suspense>} />
       <Route path="/thanh-toan-mo-phong/:id" element={<ProtectedRoute><CustomerOnlyRoute><Suspense fallback={<LoadingScreen />}><ThanhToanMoPhongPage /></Suspense></CustomerOnlyRoute></ProtectedRoute>} />
 
-      <Route
-        path="/khach-hang"
-        element={(
-          <ProtectedRoute>
-            <CustomerOnlyRoute>
-              <KhachHangPortalPage />
-            </CustomerOnlyRoute>
-          </ProtectedRoute>
-        )}
-      />
+      <Route path="/khach-hang" element={<CustomerPortalEntry />} />
       <Route path="/khach-moi" element={<Navigate to="/khach-hang" replace />} />
       <Route
         path="/nhan-vien-sale"

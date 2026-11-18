@@ -1,3 +1,4 @@
+import { ganTrangThaiQuanTam } from './phongKhamPha.service.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as lichXemPhongRepository from '../repositories/lichXemPhong.repository.js';
 import * as phongQuanTamRepository from '../repositories/phongQuanTam.repository.js';
@@ -114,7 +115,7 @@ function isRoomSuitableForProfile(row = {}, profile = {}) {
   if (male > 0 && female > 0) {
     return roomAllowsMixedGender(row)
       && capacity >= total
-      && availableSlots >= capacity;
+      && (row.coTheThueNguyenPhong ?? availableSlots >= capacity);
   }
 
   if (male > 0) {
@@ -348,7 +349,7 @@ export async function getPhongPhuHop(maDangKy, user = null) {
       mucGiaToiDa
     });
 
-    const rows = filterRoomsByProfileCapacity(roomRows, profileRecord)
+    const rows = filterRoomsByProfileCapacity(await ganTrangThaiQuanTam(roomRows), profileRecord)
       .filter((row) => !user?.maChiNhanh || row.maChiNhanh === user.maChiNhanh || row.MaChiNhanh === user.maChiNhanh);
     const khongCoChiNhanhPhuHop = rows.some((row) => Boolean(row.khongCoChiNhanhPhuHop));
     const daXem = new Set(await lichXemPhongRepository.layPhongDaCoLichXem(hoSoId));
