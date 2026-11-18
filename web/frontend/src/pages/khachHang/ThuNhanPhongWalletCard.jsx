@@ -35,7 +35,7 @@ export default function ThuNhanPhongWalletCard({ contractId }) {
       {quote?.status === 'Pending' && <>
         <div className="hd-summary-row"><span>Khoản thu kỳ đầu</span><strong>{money(quote.amountVnd)}</strong></div>
         <button type="button" className="kp-btn kp-btn-primary" disabled={busy} onClick={openPayment}>
-          {busy ? 'Đang mở cổng…' : 'Ví điện tử (mô phỏng)'}
+          {busy ? 'Đang mở cổng…' : 'MoMo (mô phỏng)'}
         </button>
       </>}
       {error && <p role="alert">{error}</p>}

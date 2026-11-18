@@ -28,6 +28,22 @@ export function checkRoomGender(profileGender, roomGender, roomName = 'Phòng n�
   return '';
 }
 
+export function checkRoomForRentGroup(profileGender, room, people) {
+  const name = room.tenPhong || room.maPhong || 'Phòng này';
+  const issue = checkRoomGender(profileGender, room.gioiTinhChoPhep, name);
+  if (issue) return issue;
+  if (profileGender === 'Hỗn hợp' && room.coTheThueNguyenPhong === false) {
+    return `Nhóm có cả nam và nữ cần thuê nguyên phòng. ${name} chưa trống toàn bộ giường.`;
+  }
+  if (people > 1 && Number(room.sucChua) > 0 && people > Number(room.sucChua)) {
+    return `${name} chỉ có sức chứa tối đa ${room.sucChua} người.`;
+  }
+  if (people > 1 && room.soGiuongTrong != null && Number(room.soGiuongTrong) < people) {
+    return `${name} chưa có đủ giường trống cho ${people} người.`;
+  }
+  return '';
+}
+
 // Người ở khai ở bước cư trú không được nhiều hơn số nam/số nữ đã đăng ký.
 export function checkResidentsGender(members = [], { soNam, soNu } = {}) {
   const nam = Number(soNam) || 0;

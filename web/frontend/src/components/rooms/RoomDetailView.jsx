@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { formatMoney, formatServiceMoney, getDemoRoomImage } from './roomDetail.js';
 import ShareRoomButton from '../common/ShareRoomButton.jsx';
+import { gioiTinhIcon, nhanGioiTinhPhong } from '../../utils/genderRules.js';
 import './roomDetail.css';
 
 const ROOM_FULL_LABEL = 'Hết chỗ';
@@ -77,14 +78,6 @@ function GalleryPhoto({ urlAnh, fallbackUrl, moTa, index }) {
 
 // Các prop sau chỉ dùng ở trang khách đã đăng nhập (D-042/D-043): lịch xem đang có, hồ sơ đang mở để thêm phòng quan tâm,
 // đăng ký theo nhóm. Trang công khai không truyền thì giữ nguyên nút "Đăng ký thuê ngay".
-// Phòng không khóa giới (hoặc chưa có dữ liệu) hiển thị là Unisex.
-export function gioiTinhIcon(value) {
-  return value === 'Nam' ? 'man' : value === 'Nữ' ? 'woman' : 'wc';
-}
-export function gioiTinhHienThi(value) {
-  return value === 'Nam' || value === 'Nữ' ? value : 'Unisex';
-}
-
 export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, heartState = null, scheduledMessage = '', profile = null, isInProfile = false, profileBusy = false, onAddToProfile, onRemoveFromProfile }) {
   const [lightbox, setLightbox] = useState(null);
   const lightboxRef = useRef(null);
@@ -162,7 +155,7 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
               <div>
                 <Icon name={gioiTinhIcon(phong.gioiTinhChoPhep)} />
                 <span>Giới tính phù hợp</span>
-                <strong>{gioiTinhHienThi(phong.gioiTinhChoPhep)}</strong>
+                <strong>{nhanGioiTinhPhong(phong.gioiTinhChoPhep) || 'Chưa cập nhật'}</strong>
               </div>
               {phong.tang != null && (
                 <div>

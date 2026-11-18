@@ -36,7 +36,7 @@ export default function ThuThemDoiSoatWalletCard({ contractId }) {
       {quote?.status === 'Pending' && <>
         <div className="hd-summary-row"><span>Khoản phải trả thêm theo đối soát bạn đã đồng ý</span><strong>{money(quote.amountVnd)}</strong></div>
         <button type="button" className="kp-btn kp-btn-primary" disabled={busy} onClick={openPayment}>
-          {busy ? 'Đang mở cổng…' : 'Ví điện tử (mô phỏng)'}
+          {busy ? 'Đang mở cổng…' : 'MoMo (mô phỏng)'}
         </button>
         <p>Bạn cũng có thể trả tiền mặt hoặc chuyển khoản cho kế toán.</p>
       </>}

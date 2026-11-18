@@ -15,14 +15,13 @@ import '../khamPhaPhong/khamPhaPhong.css';
 import './khachHangPortal.css';
 import LichXemPhongPage from '../lichXemPhong/LichXemPhongPage.jsx';
 import { httpClient } from '../../api/httpClient.js';
-import MomoSimPanel from './MomoSimPanel.jsx';
 import ThuNhanPhongWalletCard from './ThuNhanPhongWalletCard.jsx';
 import CustomerInvoicesList from './CustomerInvoicesList.jsx';
 import CustomerDepositHistory from './CustomerDepositHistory.jsx';
 import CustomerResidenceTab from './CustomerResidenceTab.jsx';
 import VietQrCode from '../../components/common/VietQrCode.jsx';
 import { moTaCachTinhCoc } from '../../utils/tienCoc.js';
-import { loaiGioiTinhHoSo, lyDoPhongKhongHopGioiTinh } from '../../utils/genderRules.js';
+import { loaiGioiTinhHoSo, lyDoPhongKhongHopNhom, nhanGioiTinhPhong } from '../../utils/genderRules.js';
 import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Claude), one line agreed with Vy
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
@@ -51,7 +50,6 @@ function getPaymentAccount(source = {}) {
   };
 }
 
-const filtersInitial = { tuKhoa: '', khuVuc: '', hinhThucThue: '', loaiPhong: '', mucGiaToiDa: '' };
 const rentInitial = {
   hoTen: '',
   ngaySinh: '',
@@ -231,21 +229,6 @@ function getBirthDateError(value) {
 
 // D-042: phòng hết hẳn không cho quan tâm; còn trống và đang chờ cọc thì cho.
 const ROOM_FULL_LABEL = 'Hết chỗ';
-
-function getRoomStatusTone(status = '') {
-  if (status === 'Còn trống') return 'is-open';
-  if (status === 'Đang chờ cọc') return 'is-waiting';
-  if (status === ROOM_FULL_LABEL) return 'is-full';
-  return '';
-}
-
-function getRoomAvailabilityText(room = {}) {
-  const free = Number(room.soGiuongTrong ?? room.soChoTrong ?? 0);
-  const waiting = Number(room.soGiuongChoCoc ?? 0);
-  if (room.trangThaiQuanTam === ROOM_FULL_LABEL) return 'Đã hết chỗ';
-  if (room.trangThaiQuanTam === 'Đang chờ cọc') return waiting > 0 ? `Có ${waiting} giường đang chờ cọc` : 'Đang có người giữ chỗ';
-  return free > 0 ? `Còn ${free} giường trống` : 'Còn chỗ trống';
-}
 
 function isForeignNationality(value = '') {
   const normalized = String(value).toLocaleLowerCase('vi-VN').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/\s+/g, ' ').trim();
@@ -657,32 +640,6 @@ function Empty({ title, children, action }) {
   );
 }
 
-function SelectField({ label, value, options, onChange }) {
-  return (
-    <label className="kh-select-field">
-      <span>{label}</span>
-      <select value={value} onChange={(event) => onChange(event.target.value)}>
-        {options.map((option) => {
-          const normalized = typeof option === 'string' ? { value: option, label: option || 'Tất cả' } : option;
-          return <option key={normalized.value || normalized.label} value={normalized.value}>{normalized.label}</option>;
-        })}
-      </select>
-    </label>
-  );
-}
-
-function RoomPhoto({ room }) {
-  const [failed, setFailed] = useState(false);
-  const src = room.anhDai || room.urlImg || room.urlAnh || room.hinhAnh?.[0]?.urlAnh;
-  const fallbackSrc = getDemoRoomImage(room.maPhong || room.id, 0);
-
-  if (!src && !fallbackSrc) {
-    return <div className="kh-room-placeholder"><Icon name="room" /><span>{room.tenPhong || room.maPhong}</span></div>;
-  }
-
-  return <img src={failed ? fallbackSrc : (src || fallbackSrc)} alt={room.tenPhong} onError={() => setFailed(true)} />;
-}
-
 export default function KhachHangPortalPage() {
   const { user, dangXuat } = useAuth();
   const navigate = useNavigate();
@@ -699,8 +656,6 @@ export default function KhachHangPortalPage() {
   const detailRequest = useRef(0);
 
   const [overview, setOverview] = useState(null);
-  const [rooms, setRooms] = useState([]);
-  const [filters, setFilters] = useState(filtersInitial);
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [rentModal, setRentModal] = useState(false);
   const [profileBusy, setProfileBusy] = useState(false);
@@ -798,7 +753,7 @@ export default function KhachHangPortalPage() {
     if (profileBranch && room.chiNhanh && room.chiNhanh !== profileBranch) {
       return { disabled: true, title: `Hồ sơ ${openProfile.maDangKy} đang ở ${profileBranch}` };
     }
-    const genderIssue = lyDoPhongKhongHopGioiTinh(loaiGioiTinhHoSo(openProfile), room.gioiTinhChoPhep, room.tenPhong || 'Phòng này');
+    const genderIssue = lyDoPhongKhongHopNhom(loaiGioiTinhHoSo(openProfile), room);
     if (genderIssue) return { disabled: true, title: genderIssue };
     return { title: `Quan tâm (thêm vào hồ sơ ${openProfile.maDangKy})` };
   }
@@ -823,18 +778,13 @@ export default function KhachHangPortalPage() {
     { id: 'bao-hong', icon: 'build', title: 'Báo hỏng' },
     { id: 'tra-phong', icon: 'logout', title: 'Trả phòng' }
   ];
-  const extraTitles = {};
 
-  async function loadPortal(nextFilters = filters) {
+  async function loadPortal() {
     setLoading(true);
     setError('');
     try {
-      const [{ data: summary }, { data: availableRooms }] = await Promise.all([
-        khachMoiApi.getTongQuan(),
-        khachMoiApi.getPhongKhaDung(nextFilters)
-      ]);
+      const { data: summary } = await khachMoiApi.getTongQuan();
       setOverview(summary);
-      setRooms(availableRooms || []);
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Không thể tải cổng khách hàng.');
     } finally {
@@ -843,7 +793,7 @@ export default function KhachHangPortalPage() {
   }
 
   useEffect(() => {
-    loadPortal(filtersInitial);
+    loadPortal();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -882,25 +832,12 @@ export default function KhachHangPortalPage() {
     const roomId = params.get('phong');
     if (loading || !overview || params.get('dangKy') || !roomId || incomingRoomHandled.current === `xem:${roomId}`) return;
     incomingRoomHandled.current = `xem:${roomId}`;
-    setActiveTab('kham-pha');
+    setActiveTab('chi-tiet-phong');
     openRoomDetail({ maPhong: roomId });
     params.delete('phong');
     navigate({ pathname: location.pathname, search: `?${params.toString()}` }, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, overview, location.search]);
-
-  useEffect(() => {
-    const hasIncomingRoom = new URLSearchParams(location.search).get('phong');
-    if (loading || activeTab !== 'kham-pha' || detailPhong || detailLoading || detailError || rentModal || registrationNoticeOpen || hasIncomingRoom) return;
-    navigate('/phong', { replace: true, state: { customerPortalTab: 'tai-khoan' } });
-  }, [loading, activeTab, detailPhong, detailLoading, detailError, rentModal, registrationNoticeOpen, location.search, navigate]);
-
-  useEffect(() => {
-    const tab = new URLSearchParams(location.search).get('tab');
-    if (tab === 'kham-pha' && !new URLSearchParams(location.search).get('phong') && !incomingRoomHandled.current) {
-      navigate('/phong', { replace: true });
-    }
-  }, [location.search, navigate]);
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -945,7 +882,7 @@ export default function KhachHangPortalPage() {
 
   function openPublicRooms() {
     detailRequest.current += 1;
-    navigate('/phong', { state: { customerPortalTab: activeTab === 'kham-pha' ? 'tai-khoan' : activeTab } });
+    navigate('/phong');
   }
 
   function goTo(tab) {
@@ -953,6 +890,9 @@ export default function KhachHangPortalPage() {
       setToast(getLockedMessage(tab));
       return;
     }
+    detailRequest.current += 1;
+    setDetailLoading(false);
+    setDetailError(null);
     setDetailPhong(null);
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -988,23 +928,9 @@ export default function KhachHangPortalPage() {
     await dangXuat();
   }
 
-  async function applyFilters(event) {
-    event.preventDefault();
-    setSelectedRooms([]);
-    await loadPortal(filters);
-  }
-
-  function toggleRoom(room) {
-    setSelectedRooms((current) => (
-      current.some((item) => item.id === room.id)
-        ? current.filter((item) => item.id !== room.id)
-        : [...current, room]
-    ));
-  }
-
   // Phòng đã chọn không hợp giới tính đang khai trong phiếu (J-C105).
   const rentGenderIssues = rentModal ? selectedRooms
-    .map((room) => lyDoPhongKhongHopGioiTinh(loaiGioiTinhHoSo(rentForm), room.gioiTinhChoPhep, room.tenPhong || 'Phòng này'))
+    .map((room) => lyDoPhongKhongHopNhom(loaiGioiTinhHoSo(rentForm), room))
     .filter(Boolean) : [];
 
   function getRentDefaultsFromUser() {
@@ -1086,7 +1012,7 @@ export default function KhachHangPortalPage() {
     try {
       await khachMoiApi.themPhongQuanTam(openProfile.maDangKy, room.maPhong || room.id);
       setToast(`Đã thêm ${room.tenPhong} vào hồ sơ ${openProfile.maDangKy}.`);
-      await loadPortal(filters);
+      await loadPortal();
     } catch (requestError) {
       setToast(requestError.response?.data?.message || 'Không thể thêm phòng vào hồ sơ lúc này.');
     } finally {
@@ -1100,7 +1026,7 @@ export default function KhachHangPortalPage() {
     try {
       await khachMoiApi.goPhongQuanTam(openProfile.maDangKy, room.maPhong || room.id);
       setToast(`Đã gỡ ${room.tenPhong || room.maPhong} khỏi hồ sơ ${openProfile.maDangKy}.`);
-      await loadPortal(filters);
+      await loadPortal();
     } catch (requestError) {
       setToast(requestError.response?.data?.message || 'Không thể gỡ phòng khỏi hồ sơ lúc này.');
     } finally {
@@ -1234,8 +1160,8 @@ export default function KhachHangPortalPage() {
       const maDangKy = data?.maDangKy || data?.MaDangKy;
       setRentModal(false);
       setSelectedRooms([]);
-      await loadPortal(filters);
       setActiveTab('ho-so');
+      await loadPortal();
       setResultModal({
         type: 'success',
         title: 'Gửi thông tin đăng ký thuê thành công',
@@ -1355,7 +1281,7 @@ export default function KhachHangPortalPage() {
 
       await khachMoiApi.updateHoSo(editModal.maDangKy, finalForm);
       setEditModal(null);
-      await loadPortal(filters);
+      await loadPortal();
       setToast('Đã cập nhật hồ sơ thành công.');
     } catch (requestError) {
       setToast(requestError.response?.data?.message || 'Không thể cập nhật hồ sơ lúc này.');
@@ -1369,114 +1295,6 @@ export default function KhachHangPortalPage() {
       <Empty title="Chức năng đang khóa" action={<button className="kp-btn kp-btn-primary" type="button" onClick={openPublicRooms}>Khám phá phòng</button>}>
         {getLockedMessage(tab)}
       </Empty>
-    );
-  }
-
-  function renderExplore() {
-    return (
-      <section className="kh-explore-view">
-        <div className={`kh-shell-grid${openProfile || scheduledProfile ? ' kh-shell-grid--single' : ''}`}>
-          <div className="kh-left-content">
-            {scheduledProfile && (
-              <div className="kh-profile-banner kh-profile-banner--scheduled" role="status">
-                <div>
-                  <strong>Đang có lịch xem phòng</strong>
-                  <p>{scheduledMessage}</p>
-                </div>
-              </div>
-            )}
-            {openProfile && (
-              <div className="kh-profile-banner" role="status">
-                <div>
-                  <strong>Hồ sơ {openProfile.maDangKy} · {openProfile.trangThai}</strong>
-                  <p>Bấm biểu tượng trái tim ở phòng bạn quan tâm (cùng loại {profileRoomType || 'phòng'}{profileBranch ? `, ${profileBranch}` : ''}), không cần điền lại thông tin. Sale sẽ xếp lịch xem các phòng này cùng lúc.</p>
-                </div>
-                <div className="kh-profile-banner-rooms">
-                  {interestedRooms.length === 0 && <span className="kh-profile-banner-empty">Chưa có phòng quan tâm nào.</span>}
-                  {interestedRooms.map((room) => (
-                    <span className="kh-profile-room" key={room.maPhong}>
-                      {room.tenPhong}
-                      <button type="button" aria-label={`Gỡ ${room.tenPhong} khỏi hồ sơ`} disabled={profileBusy} onClick={() => removeRoomFromProfile(room)}>×</button>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            <form className="kh-filter-panel" onSubmit={applyFilters}>
-              <div className="kh-filter-controls">
-                <SelectField label="Khu vực" value={filters.khuVuc} options={filterOptions.khuVuc} onChange={(value) => setFilters({ ...filters, khuVuc: value })} />
-                <SelectField label="Loại phòng" value={filters.loaiPhong} options={filterOptions.loaiPhong} onChange={(value) => setFilters({ ...filters, loaiPhong: value })} />
-                <SelectField label="Mức giá" value={filters.mucGiaToiDa} options={filterOptions.mucGiaToiDa} onChange={(value) => setFilters({ ...filters, mucGiaToiDa: value })} />
-                <button className="kp-btn kp-btn-primary kh-filter-submit" type="submit"><Icon name="search" />Tìm</button>
-              </div>
-            </form>
-
-            <div className="kh-room-count">{rooms.length} phòng</div>
-            <div className="kh-room-grid">
-              {rooms.map((room) => {
-                const checked = selectedRooms.some((item) => item.id === room.id);
-                return (
-                  <article className={`kh-room-card ${checked ? 'selected' : ''}`} key={room.id}>
-                    <div className="kh-room-media">
-                      <RoomPhoto room={room} />
-                      {getHeartState(room) && (
-                        <button
-                          type="button"
-                          className={`kh-heart ${getHeartState(room).active ? 'is-active' : ''}`}
-                          aria-pressed={Boolean(getHeartState(room).active)}
-                          aria-label={getHeartState(room).title}
-                          title={getHeartState(room).title}
-                          disabled={profileBusy || getHeartState(room).disabled}
-                          onClick={() => toggleHeart(room)}
-                        >
-                          <Icon name="heart" />
-                        </button>
-                      )}
-                    </div>
-                    <div className="kh-room-body">
-                      <div><h3>{room.tenPhong}</h3><strong>{formatMoney(room.giaThue)}</strong></div>
-                      <p className="kh-room-location"><Icon name="explore" />{getArea(room)}</p>
-                      <p>{room.moTa || 'Chưa có mô tả chi tiết.'}</p>
-                      <div className="kh-pills">
-                        {room.trangThaiQuanTam && <span className={`kh-room-status ${getRoomStatusTone(room.trangThaiQuanTam)}`}>{room.trangThaiQuanTam}</span>}
-                        {room.loaiPhong && <span>{room.loaiPhong}</span>}
-                        {room.hinhThucThue && <span>{room.hinhThucThue}</span>}
-                      </div>
-                      <div className="kh-room-actions">
-                        <button className="kp-btn kp-btn-soft kp-full" type="button" onClick={() => openRoomDetail(room)}>Xem chi tiết</button>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-            {!rooms.length && <Empty title="Không có phòng phù hợp">Thử đổi khu vực, hình thức thuê hoặc mức giá.</Empty>}
-            {!!selectedRooms.length && (
-              <div className="kh-sticky-action">
-                <span>Đã chọn {selectedRooms.length} phòng</span>
-                <button className="kp-btn kp-btn-primary" type="button" onClick={() => openRentForm()}>Gửi nhu cầu thuê</button>
-              </div>
-            )}
-          </div>
-
-          {/* Có hồ sơ đang mở hoặc đã có lịch xem thì cột phải trống: không dựng cột (tránh khoảng trắng lớn bên phải). */}
-          {!openProfile && !scheduledProfile && <aside className="kh-rightbar">
-            <article className="kh-rent-help">
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', marginBottom: '16px' }}>
-                <Icon name="support" />Bạn muốn thuê phòng?
-              </h3>
-              <div style={{ backgroundColor: 'var(--kp-accent-soft)', padding: '16px', borderRadius: '12px' }}>
-                <p style={{ color: 'var(--kp-accent-dark)', fontSize: '12px', marginBottom: '16px', lineHeight: '1.5' }}>
-                  Gửi nhu cầu thuê, nhân viên sale sẽ tư vấn phòng phù hợp nhất cho bạn.
-                </p>
-                <button className="kp-btn kp-btn-primary kp-full" type="button" onClick={openGeneralRentForm} style={{ backgroundColor: 'var(--kp-accent)' }}>
-                  <Icon name="profile" />Đăng ký nhu cầu thuê
-                </button>
-              </div>
-            </article>
-          </aside>}
-        </div>
-      </section>
     );
   }
 
@@ -3485,30 +3303,17 @@ export default function KhachHangPortalPage() {
     }
   }
 
-  // D-013: thanh toán cọc qua cổng ví điện tử MÔ PHỎNG (không nhận tiền thật).
-  async function thanhToanViMoPhong() {
-    if (!datCocSelected) return;
-    try {
-      const { data } = await httpClient.post(`/thanh-toan-mo-phong/dat-coc/${datCocSelected.maPhieuCoc}`);
-      navigate(`/thanh-toan-mo-phong/${data.id}`);
-    } catch (error) {
-      setToast(error?.response?.data?.message || 'Không mở được cổng thanh toán mô phỏng.');
-    }
-  }
-
-  // Ví mô phỏng thanh toán ngay trong trang (không chuyển trang): tạo đơn rồi xác nhận, sau đó tải lại phiếu.
-  async function thanhToanViTaiCho() {
-    if (!datCocSelected || walletBusy) return;
+  async function thanhToanViMoPhong(phieu) {
+    if (!phieu?.maPhieuCoc || walletBusy) return;
     setWalletBusy(true);
     try {
-      const { data: order } = await httpClient.post(`/thanh-toan-mo-phong/dat-coc/${datCocSelected.maPhieuCoc}`);
-      await httpClient.post(`/thanh-toan-mo-phong/${order.id}/thanh-toan`);
-      setWalletTab(false);
-      setToast('Thanh toán bằng ví thành công (mô phỏng).');
-      await loadDatCoc();
+      const { data } = await httpClient.post(`/thanh-toan-mo-phong/dat-coc/${encodeURIComponent(phieu.maPhieuCoc)}`);
+      navigate(`/thanh-toan-mo-phong/${encodeURIComponent(data.id)}`);
     } catch (error) {
-      setToast(error?.response?.data?.message || 'Thanh toán bằng ví mô phỏng không thành công.');
-    } finally { setWalletBusy(false); }
+      setToast(error?.response?.data?.message || 'Không mở được cổng thanh toán mô phỏng.');
+    } finally {
+      setWalletBusy(false);
+    }
   }
 
   function renderDatCocList() {
@@ -3554,9 +3359,16 @@ export default function KhachHangPortalPage() {
               <h3 className="dc-section-title">Phương thức thanh toán</h3>
               <div className="dpay-tabs" role="group" aria-label="Chọn phương thức thanh toán">
                 <button type="button" aria-pressed={isTransfer && !walletTab} className={`dpay-tab${isTransfer && !walletTab ? ' is-active' : ''}`} onClick={() => { setWalletTab(false); if (!isTransfer) chonPhuongThucCoc('Chuyển khoản'); }}><Icon name="invoice" /> QR chuyển khoản</button>
-                <button type="button" aria-pressed={walletTab} className={`dpay-tab${walletTab ? ' is-active' : ''}`} onClick={() => setWalletTab(true)}><Icon name="payment" /> Ví điện tử (mô phỏng)</button>
+                <button type="button" aria-pressed={walletTab} className={`dpay-tab${walletTab ? ' is-active' : ''}`} onClick={() => setWalletTab(true)}><Icon name="payment" /> MoMo (mô phỏng)</button>
               </div>
-              {walletTab && <MomoSimPanel content={`Tiền cọc – phiếu ${phieu.maPhieuCoc}`} amount={amount} busy={walletBusy} onConfirm={thanhToanViTaiCho} />}
+              {walletTab && <div className="dpay-wallet-panel">
+                <div className="dc-bank-info dpay-bank">
+                  <div><span>Nội dung</span><strong>Tiền cọc – phiếu {phieu.maPhieuCoc}</strong></div>
+                  <div><span>Số tiền</span><strong>{amount.toLocaleString('vi-VN')} VNĐ</strong></div>
+                </div>
+                <p className="dc-bank-note">Xem lại số tiền và xác nhận ở cổng mô phỏng. Giao dịch thử không trừ tiền thật.</p>
+                <button type="button" className="kp-btn kp-btn-primary kp-full" disabled={walletBusy} onClick={() => thanhToanViMoPhong(phieu)}>{walletBusy ? 'Đang mở cổng…' : 'Tiếp tục với MoMo mô phỏng'}</button>
+              </div>}
               {!walletTab && isTransfer && <div className="dpay-transfer">
                 <VietQrCode account={account} amount={amount} content={transferContent} />
                 <div className="dc-bank-info dpay-bank">
@@ -3607,20 +3419,18 @@ export default function KhachHangPortalPage() {
   }
 
   // Thanh toán khoản thu kỳ đầu khi nhận phòng: cùng bố cục trang thanh toán đặt cọc (QR chuyển khoản, tiền mặt, ví mô phỏng).
-  async function thanhToanKyDauViTaiCho(quote) {
+  async function moCongViKyDau(quote) {
     if (fcBusy) return;
     setFcBusy(true);
     try {
-      const isInvoice = quote.kind === 'hoaDon';
-      const { data: order } = await httpClient.post(`/thanh-toan-mo-phong/${isInvoice ? 'hoa-don' : 'thu-nhan-phong'}/${quote.refId}`);
-      await httpClient.post(`/thanh-toan-mo-phong/${order.id}/thanh-toan`);
-      setToast(isInvoice ? `Thanh toán hóa đơn ${quote.refId} bằng ví thành công (mô phỏng).` : 'Thanh toán khoản thu kỳ đầu bằng ví thành công (mô phỏng).');
-      setFirstChargePay(null); setInvoices(null);
-      httpClient.get('/thanh-toan-mo-phong/thu-nhan-phong').then(({ data }) => setFirstCharges(Array.isArray(data) ? data : [])).catch(() => {});
-      khachMoiApi.getHoaDon().then(({ data }) => setInvoices(Array.isArray(data) ? data : [])).catch(() => setInvoices([]));
+      const purpose = quote.kind === 'hoaDon' ? 'hoa-don' : 'thu-nhan-phong';
+      const { data } = await httpClient.post(`/thanh-toan-mo-phong/${purpose}/${encodeURIComponent(quote.refId)}`);
+      navigate(`/thanh-toan-mo-phong/${encodeURIComponent(data.id)}`);
     } catch (error) {
-      setToast(error?.response?.data?.message || 'Thanh toán bằng ví mô phỏng không thành công.');
-    } finally { setFcBusy(false); }
+      setToast(error?.response?.data?.message || 'Không mở được cổng thanh toán mô phỏng.');
+    } finally {
+      setFcBusy(false);
+    }
   }
 
   async function guiChungTuKyDau(event, quote) {
@@ -3671,7 +3481,7 @@ export default function KhachHangPortalPage() {
                 <h3 className="dc-section-title">Phương thức thanh toán</h3>
                 <div className="dpay-tabs" role="group" aria-label="Chọn phương thức thanh toán">
                   <button type="button" aria-pressed={fcMethod === 'transfer'} className={`dpay-tab${fcMethod === 'transfer' ? ' is-active' : ''}`} onClick={() => setFcMethod('transfer')}><Icon name="invoice" /> QR chuyển khoản</button>
-                  <button type="button" aria-pressed={fcMethod === 'wallet'} className={`dpay-tab${fcMethod === 'wallet' ? ' is-active' : ''}`} onClick={() => setFcMethod('wallet')}><Icon name="payment" /> Ví điện tử (mô phỏng)</button>
+                  <button type="button" aria-pressed={fcMethod === 'wallet'} className={`dpay-tab${fcMethod === 'wallet' ? ' is-active' : ''}`} onClick={() => setFcMethod('wallet')}><Icon name="payment" /> MoMo (mô phỏng)</button>
                 </div>
                 {fcMethod === 'transfer' && <div className="dpay-transfer">
                   <VietQrCode account={account} amount={amount} content={transferContent} />
@@ -3682,7 +3492,14 @@ export default function KhachHangPortalPage() {
                     <div><span>Nội dung chuyển khoản</span><strong>{transferContent}</strong><button type="button" onClick={() => navigator.clipboard.writeText(transferContent)}>Sao chép</button></div>
                   </div>
                 </div>}
-                {fcMethod === 'wallet' && <MomoSimPanel content={quote.kind === 'hoaDon' ? `Hóa đơn ${quote.refId}` : `Khoản thu kỳ đầu – hợp đồng ${quote.refId}`} amount={amount} busy={fcBusy} onConfirm={() => thanhToanKyDauViTaiCho(quote)} />}
+                {fcMethod === 'wallet' && <div className="dpay-wallet-panel">
+                  <div className="dc-bank-info dpay-bank">
+                    <div><span>Nội dung</span><strong>{quote.kind === 'hoaDon' ? `Hóa đơn ${quote.refId}` : `Khoản thu kỳ đầu – hợp đồng ${quote.refId}`}</strong></div>
+                    <div><span>Số tiền</span><strong>{amount.toLocaleString('vi-VN')} VNĐ</strong></div>
+                  </div>
+                  <p className="dc-bank-note">Quét bằng ứng dụng MoMo Test. Đơn thử không trừ tiền thật.</p>
+                  <button type="button" className="kp-btn kp-btn-primary kp-full" disabled={fcBusy} onClick={() => moCongViKyDau(quote)}>{fcBusy ? 'Đang mở cổng…' : 'Tiếp tục với MoMo mô phỏng'}</button>
+                </div>}
                 {fcMethod !== 'wallet' && <p className="dc-bank-note">Sau khi chuyển khoản hoặc nộp tiền, kế toán sẽ xác nhận. Khoản này sẽ chuyển sang "Đã thanh toán" khi được ghi nhận.</p>}
               </section>
               {fcMethod === 'transfer' && <section className="dc-section-card dpay-card">
@@ -3834,8 +3651,8 @@ export default function KhachHangPortalPage() {
                   <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={() => chonPhuongThucCoc('Chuyển khoản')} style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-primary)', color: 'var(--color-surface)' }}>
                     <Icon name="invoice" /> Chuyển khoản
                   </button>
-                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={thanhToanViMoPhong} style={{ backgroundColor: 'var(--color-accent)', borderColor: 'var(--color-accent)', color: 'var(--color-surface)' }}>
-                    <Icon name="payment" /> Ví điện tử (mô phỏng)
+                  <button type="button" className="kp-btn kp-btn-primary kp-full" disabled={walletBusy} onClick={() => thanhToanViMoPhong(phieu)} style={{ backgroundColor: 'var(--color-accent)', borderColor: 'var(--color-accent)', color: 'var(--color-surface)' }}>
+                    <Icon name="payment" /> MoMo (mô phỏng)
                   </button>
                 </div>
               </div>
@@ -3861,8 +3678,8 @@ export default function KhachHangPortalPage() {
 
                 <div className="dc-section-card">
                   <p className="dc-bank-note">Không muốn tải chứng từ? Bạn có thể thanh toán nhanh qua ví điện tử (môi trường mô phỏng, không trừ tiền thật).</p>
-                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={thanhToanViMoPhong} style={{ backgroundColor: 'var(--color-accent)', borderColor: 'var(--color-accent)', color: 'var(--color-surface)', marginTop: 8 }}>
-                    <Icon name="payment" /> Thanh toán bằng ví điện tử (mô phỏng)
+                  <button type="button" className="kp-btn kp-btn-primary kp-full" disabled={walletBusy} onClick={() => thanhToanViMoPhong(phieu)} style={{ backgroundColor: 'var(--color-accent)', borderColor: 'var(--color-accent)', color: 'var(--color-surface)', marginTop: 8 }}>
+                    <Icon name="payment" /> Thanh toán bằng MoMo (mô phỏng)
                   </button>
                 </div>
 
@@ -4194,7 +4011,7 @@ export default function KhachHangPortalPage() {
 
   // Số chỗ tối đa của nhóm: ít nhất trong các phòng đã chọn, theo giường còn trống.
   function groupCapacity() {
-    const caps = selectedRooms.map((room) => Number(room.soGiuongTrong) || Number(room.sucChua) || 0).filter(Boolean);
+    const caps = selectedRooms.map((room) => Number(room.soGiuongTrong ?? room.soChoTrong ?? room.sucChua ?? 0));
     return caps.length ? Math.min(...caps) : 6;
   }
 
@@ -4222,7 +4039,7 @@ export default function KhachHangPortalPage() {
     if (new Set(people.map((p) => p.cccd)).size !== people.length) return 'Có CCCD trùng nhau giữa các thành viên. Vui lòng kiểm tra lại.';
     if (new Set(people.map((p) => p.soDienThoai)).size !== people.length) return 'Có số điện thoại trùng nhau giữa các thành viên. Vui lòng kiểm tra lại.';
     const profileGender = loaiGioiTinhHoSo({ soNam, soNu });
-    const roomIssue = selectedRooms.map((room) => lyDoPhongKhongHopGioiTinh(profileGender, room.gioiTinhChoPhep, room.tenPhong || 'Phòng này')).find(Boolean);
+    const roomIssue = selectedRooms.map((room) => lyDoPhongKhongHopNhom(profileGender, room)).find(Boolean);
     return roomIssue || '';
   }
 
@@ -4230,7 +4047,9 @@ export default function KhachHangPortalPage() {
     const error = validateGroupMembers();
     if (error) { setToast(error); return; }
     const { people, soNam, soNu, gioiTinhThue } = groupSummary();
-    setRentForm({ ...rentForm, soNguoiO: String(people.length), soNam: String(soNam), soNu: String(soNu), gioiTinhThue, thanhVienNhom: groupMembers });
+    const wholeRoomPrice = normalizeMoneyVnd(selectedRooms[0]?.giaNguyenPhong ?? selectedRooms[0]?.giaThueNguyenPhong);
+    setRentForm({ ...rentForm, soNguoiO: String(people.length), soNam: String(soNam), soNu: String(soNu), gioiTinhThue, thanhVienNhom: groupMembers,
+      ...(soNam && soNu && wholeRoomPrice ? { mucGiaToiDa: String(wholeRoomPrice) } : {}) });
     setGroupStep(2);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -4269,6 +4088,7 @@ export default function KhachHangPortalPage() {
           <div className="kh-grp-card-head"><h2>Thông tin các thành viên</h2><span className="kh-grp-count">Số lượng: <b>{total}</b> / {max}</span></div>
           <div className="kh-grp-info">
             <p>Thành viên đầu tiên là <strong>người đại diện nhóm</strong> (tài khoản đang đăng nhập) để ký hợp đồng, thanh toán và nhận hóa đơn.</p>
+            <p>Giới tính của phòng <strong>{nhanGioiTinhPhong(first.gioiTinhChoPhep) || 'Chưa cập nhật'}</strong>. Nhóm có cả nam và nữ cần thuê nguyên phòng trống.</p>
             <p>Các thành viên khác <strong>không cần có tài khoản</strong>. Nếu nhập email, hệ thống sẽ mời tạo tài khoản (không bắt buộc) sau khi hồ sơ cư trú được duyệt.</p>
           </div>
           <article className="kh-grp-member is-rep">
@@ -4469,13 +4289,13 @@ export default function KhachHangPortalPage() {
 
   function renderCurrentTab() {
     if (rentModal) return renderRentRequestPage();
-    if (activeTab === 'kham-pha' && detailLoading) return <div className="kp-loading" role="status"><span /><p>Đang tải chi tiết phòng...</p></div>;
-    if (activeTab === 'kham-pha' && detailError) return <div className="kp-detail-error" role="alert">
+    if (activeTab === 'chi-tiet-phong' && detailLoading) return <div className="kp-loading" role="status"><span /><p>Đang tải chi tiết phòng...</p></div>;
+    if (activeTab === 'chi-tiet-phong' && detailError) return <div className="kp-detail-error" role="alert">
       <h2>Chưa thể mở phòng</h2><p>{detailError.message}</p>
       <button className="kp-btn kp-btn-soft" type="button" onClick={openPublicRooms}>Quay lại danh sách phòng</button>
       <button className="kp-btn kp-btn-primary" type="button" onClick={() => openRoomDetail(detailError.room)}>Thử lại</button>
     </div>;
-    if (detailPhong && activeTab === 'kham-pha') {
+    if (detailPhong && activeTab === 'chi-tiet-phong') {
       return (
         <ChiTietPhongView
           phong={detailPhong}
@@ -4492,7 +4312,6 @@ export default function KhachHangPortalPage() {
         />
       );
     }
-    if (activeTab === 'kham-pha') return <div className="kp-loading" role="status"><span /><p>Đang mở danh sách phòng...</p></div>;
     if (activeTab === 'ho-so') return renderProfiles();
     if (activeTab === 'lich-xem') return renderSchedules();
     if (activeTab === 'dat-coc') return renderDatCoc();
@@ -4508,7 +4327,7 @@ export default function KhachHangPortalPage() {
   return (
     <>
     <WorkspaceShell roleLabel="Khách hàng" eyebrow="Cổng khách hàng"
-      title={navItems.find(item => item.id === activeTab)?.title || extraTitles[activeTab] || 'Cổng khách hàng'}
+      title={navItems.find(item => item.id === activeTab)?.title || (activeTab === 'chi-tiet-phong' ? 'Chi tiết phòng' : 'Cổng khách hàng')}
       items={navItems.map(item => ({ id: item.id, label: item.title, icon: item.icon, locked: Boolean(locks[item.id]) }))}
       activeTab={activeTab} onSelect={(id) => goTo(id)} user={user} showBranch={false}
       onAccount={() => goTo('tai-khoan')} onLogout={logout} mainClassName="kh-main"

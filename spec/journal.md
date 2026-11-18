@@ -1902,6 +1902,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: SaleBookingView.jsx, LichXemPhongTab.jsx, saleWorkspace.css, ui-sale-workspace/ui-viewing-outcomes/ui-customer-profile (cập nhật giả định cũ).
 - Kiểm tra: build PASS; ui-viewing-outcomes, ui-shell, ui-interested-rooms PASS. ui-sale-workspace và ui-customer-profile còn FAIL do giả định cũ của test (menu Khám phá phòng đã bỏ, import react từ dev server).
 
+## 2026-11-18 15:11:10 +07:00 — J-X099 — Hoàn tất ghi chú 11–13 và QR MoMo Sandbox
+
+- Người thực hiện: Codex. Kiểm tra bản Antigravity và cập nhật Claude trên main. Note 11 đã có liên kết vị trí dùng chung. Note 12 bỏ danh sách trùng trong cổng khách. Note 13 làm rõ giới tính thực tế và điều kiện nhóm hỗn hợp thuê nguyên phòng trống, nhóm cùng giới chọn phòng phù hợp còn đủ chỗ.
+- File phòng: App.jsx, KhachHangPortalPage.jsx, RoomDetailView.jsx, HomeExperience và DTO/controller/service/repository liên quan đến quan tâm, hồ sơ, lịch xem và giữ chỗ.
+- Note 26: thay màn nhập số điện thoại/mã xác nhận mô phỏng bằng QR thật của môi trường thử MoMo. File: momoSandbox.js, thanhToanMoPhong.routes.js, .env.example, ThanhToanMoPhongPage.jsx, thanhToanMoPhong.css, các thẻ thanh toán trong cổng khách và khai báo qrcode. Tiếp tục dùng PaymentSimOrder và xác nhận nghiệp vụ sẵn có.
+- Kiểm tra: rà diff và luồng từ mã nguồn. Vy yêu cầu tự thử qua giao diện nên bỏ test tự động. Máy chưa có khóa Sandbox, chưa tạo giao dịch hoặc quét thử. Không chạy migration, sửa dữ liệu DB hoặc kiểm Fuji. Nhánh riêng do Claude và Antigravity đang cùng sửa dự án.
+
 ## 2026-11-18 16:00:00 +07:00 — J-C184 — Lỗi note 18–28
 
 - Người thực hiện: Claude (Vy cho gộp thẳng). 18 StatusBadge cho trạng thái hồ sơ khách; 19 khung tóm tắt ở hộp thoại Ghi nhận Đã xem; 20 nút "Tôi muốn xem phòng khác"; 21 bỏ tab Sale "Gửi phòng cho khách"; 22 hai thẻ lọc hợp đồng luôn hiện; 23 biểu tượng giới tính theo Nam/Nữ/Unisex; 24 gallery cao theo khung; 25 nút quay lại dạng viên thuốc; 26 ví mô phỏng kiểu MoMo (số điện thoại, mã 6 số); 27 bộ lọc hóa đơn một hàng; 28 bấm Chia sẻ tự sao chép link và báo.

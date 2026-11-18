@@ -17,21 +17,25 @@ export function coTheQuanTam(trangThaiQuanTam) {
   return trangThaiQuanTam !== TRANG_THAI_QUAN_TAM.HET_CHO;
 }
 
-export async function ganTrangThaiQuanTam(rooms = []) {
+export async function ganTrangThaiQuanTam(rooms = [], query) {
   if (!Array.isArray(rooms) || rooms.length === 0) return rooms;
 
-  const rows = await phongKhamPhaRepository.layDemGiuongTheoPhong();
+  const rows = await phongKhamPhaRepository.layDemGiuongTheoPhong(query);
   const byRoom = new Map(rows.map((row) => [String(row.maPhong || '').trim(), row]));
 
   return rooms.map((room) => {
     const row = byRoom.get(String(room.maPhong ?? room.MaPhong ?? room.id ?? '').trim());
+    if (!row) return room;
     const soGiuongTrong = Number(row?.soGiuongTrong || 0);
     const soGiuongChoCoc = Number(row?.soGiuongChoCoc || 0);
+    const tongGiuong = Number(row.tongGiuong || 0);
     return {
       ...room,
       soGiuongTrong,
       soGiuongChoCoc,
-      gioiTinhChoPhep: room.gioiTinhChoPhep ?? room.GioiTinhChoPhep ?? row?.gioiTinhChoPhep ?? null,
+      tongGiuong,
+      gioiTinhChoPhep: row.gioiTinhChoPhep,
+      coTheThueNguyenPhong: tongGiuong > 0 && soGiuongTrong === tongGiuong,
       trangThaiQuanTam: tinhTrangThaiQuanTam(soGiuongTrong, soGiuongChoCoc)
     };
   });

@@ -14,6 +14,7 @@ export function normalizeRoom(room) {
   return {
     ...room, MaPhong: room.MaPhong || room.maPhong || room.id,
     TenPhong: room.TenPhong || room.tenPhong, TenLoaiPhong: room.TenLoaiPhong || room.loaiPhong,
+    GioiTinhChoPhep: room.gioiTinhChoPhep ?? room.GioiTinhChoPhep,
     GiaThueTheoGiuong: room.GiaThueTheoGiuong ?? room.giaTheoGiuong,
     GiaThueNguyenPhong: room.GiaThueNguyenPhong ?? room.giaNguyenPhong,
     TenChiNhanh: room.TenChiNhanh || room.chiNhanh, DiaChi: room.DiaChi || room.diaChi,

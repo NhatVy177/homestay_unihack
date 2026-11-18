@@ -1,51 +1,124 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
+import QRCode from 'qrcode';
 import { httpClient } from '../../api/httpClient.js';
+import { Icon } from '../../components/common/Icon.jsx';
 import './thanhToanMoPhong.css';
-// D-013: cổng ví điện tử MÔ PHỎNG cho demo. Không phải ứng dụng/API của nhà cung cấp thật; không trừ tiền thật.
+// Checkout thử nghiệm. Dữ liệu QR được cấp bởi MoMo Sandbox cho đúng đơn.
 const money = v => Number(v || 0).toLocaleString('vi-VN') + ' đ';
 const message = (e, f) => e?.response?.data?.message || f;
+const purposes = {
+  'dat-coc': { label: 'Tiền cọc', reference: 'Phiếu đặt cọc', tab: 'dat-coc' },
+  'hoa-don': { label: 'Hóa đơn tháng', reference: 'Hóa đơn', tab: 'dat-coc' },
+  'thu-nhan-phong': { label: 'Khoản thu kỳ đầu', reference: 'Hợp đồng', tab: 'hop-dong' },
+  'thu-them-doi-soat': { label: 'Khoản thu thêm khi trả phòng', reference: 'Phiếu đối soát', tab: 'hop-dong' },
+};
 export default function ThanhToanMoPhongPage() {
   const { id } = useParams();
+  const [search] = useSearchParams();
+  const returnedFromMomo = search.get('orderId') === `HSD-${id}` && search.has('resultCode');
   const [order, setOrder] = useState(null), [error, setError] = useState(''), [busy, setBusy] = useState(false);
-  useEffect(() => { httpClient.get(`/thanh-toan-mo-phong/${id}`).then(r => setOrder(r.data)).catch(e => setError(message(e, 'Không tìm thấy đơn thanh toán.'))); }, [id]);
-  const act = async path => {
+  const [momo, setMomo] = useState(null), [pendingMessage, setPendingMessage] = useState('');
+  const [attempt, setAttempt] = useState(0);
+  const endpoint = `/thanh-toan-mo-phong/${encodeURIComponent(id)}`;
+  const qrCacheKey = `momo-test:${id}`;
+  useEffect(() => {
+    const controller = new AbortController();
+    setOrder(null);
+    setMomo(null);
+    setPendingMessage('');
+    setError('');
+    const load = returnedFromMomo
+      ? httpClient.post(`${endpoint}/momo/trang-thai`, undefined, { signal: controller.signal })
+        .catch(() => httpClient.get(endpoint, { signal: controller.signal }))
+      : httpClient.get(endpoint, { signal: controller.signal });
+    load.then(({ data }) => {
+      if (controller.signal.aborted) return;
+      setOrder(data);
+      if (data.status === 'Pending') {
+        try { setMomo(JSON.parse(sessionStorage.getItem(qrCacheKey))); }
+        catch { /* QR generation remains available when browser storage is disabled. */ }
+      }
+    }).catch(e => {
+      if (!controller.signal.aborted) setError(message(e, 'Chưa tải được đơn thanh toán.'));
+    });
+    return () => controller.abort();
+  }, [endpoint, attempt, qrCacheKey, returnedFromMomo]);
+  async function createQr() {
+    if (busy || order?.status !== 'Pending') return;
+    setBusy(true);
+    setError('');
+    setPendingMessage('');
+    try {
+      const { data } = await httpClient.post(`${endpoint}/momo/qr`);
+      const image = data.qrCode ? await QRCode.toDataURL(data.qrCode, { width: 320, margin: 4, errorCorrectionLevel: 'M' }) : null;
+      const checkout = { image, payUrl: data.payUrl, existing: data.existing };
+      setMomo(checkout);
+      if (image || data.payUrl) {
+        try { sessionStorage.setItem(qrCacheKey, JSON.stringify(checkout)); }
+        catch { /* Keep the checkout visible even if storage is unavailable. */ }
+      }
+    } catch (e) {
+      setError(message(e, 'Chưa tạo được mã QR MoMo thử nghiệm.'));
+    } finally { setBusy(false); }
+  }
+
+  async function act(path) {
+    if (busy || order?.status !== 'Pending') return;
     setBusy(true); setError('');
-    try { setOrder((await httpClient.post(`/thanh-toan-mo-phong/${id}/${path}`)).data); }
+    setPendingMessage('');
+    try {
+      const { data } = await httpClient.post(`${endpoint}/${path}`);
+      setOrder(data);
+      if (path === 'momo/trang-thai' && data.status === 'Pending') {
+        setPendingMessage('MoMo Test chưa xác nhận thanh toán. Vui lòng thử kiểm tra lại sau khi thanh toán trên app.');
+      }
+    }
     catch (e) {
       setError(message(e, 'Thanh toán không thành công.'));
-      try { setOrder((await httpClient.get(`/thanh-toan-mo-phong/${id}`)).data); } catch { /* Keep the original error visible. */ }
+      try {
+        const { data } = await httpClient.get(endpoint);
+        setOrder(data);
+        if (data.status === 'Paid' || data.status === 'Cancelled') setError('');
+      } catch { /* Keep the original error visible. */ }
     }
     finally { setBusy(false); }
-  };
-  const topUp = order?.purpose === 'thu-them-doi-soat';
-  const firstCharge = order?.purpose === 'thu-nhan-phong' || topUp; // both return to the contract tab
-  const description = topUp ? `Khoản thu thêm khi trả phòng – đối soát ${order.refId}`
-    : firstCharge ? `Khoản thu kỳ đầu – hợp đồng ${order.refId}` : `Tiền cọc – phiếu ${order?.refId || ''}`;
+  }
+  const purpose = purposes[order?.purpose || 'dat-coc'] || { label: 'Thanh toán', reference: 'Mã tham chiếu', tab: 'dat-coc' };
   return <main className="tm-page">
-    <div className="tm-sim-banner">MÔI TRƯỜNG MÔ PHỎNG — dùng để demo, không có tiền thật được chuyển.</div>
+    <p className="tm-sim-banner">Giao dịch mô phỏng không trừ tiền thật.</p>
     <section className="tm-card">
-      <header><span className="tm-logo">VĐT</span><div><strong>Cổng ví điện tử (mô phỏng)</strong><small>Thanh toán cho HomeStayDorm</small></div></header>
+      <header><span className="tm-wallet-icon"><Icon name="payments" /></span><div><h1>MoMo mô phỏng</h1><p>Thanh toán cho HomeStayDorm</p></div></header>
       {error && <p className="tm-error" role="alert">{error}</p>}
-      {!order && !error && <p>Đang tải đơn thanh toán…</p>}
+      {!order && !error && <p role="status">Đang tải đơn thanh toán…</p>}
+      {!order && error && <button type="button" className="ui-btn ui-btn--secondary" onClick={() => setAttempt(value => value + 1)}>Thử lại</button>}
       {order && <>
         <dl>
-          <div><dt>Nội dung</dt><dd>{description}</dd></div>
+          <div><dt>Nội dung</dt><dd>{purpose.label}</dd></div>
+          <div><dt>{purpose.reference}</dt><dd>{order.refId}</dd></div>
           <div className="tm-amount"><dt>Số tiền</dt><dd>{money(order.amountVnd)}</dd></div>
         </dl>
         {order.status === 'Pending' && <>
-          <div className="tm-qr" aria-hidden="true">{Array.from({ length: 49 }, (_, i) => <i key={i} className={(i * 7 + order.id.charCodeAt(i % order.id.length)) % 3 ? 'on' : ''} />)}</div>
-          <p className="tm-hint">Trong môi trường thật, bạn quét mã bằng ứng dụng ví. Ở bản mô phỏng, bấm nút bên dưới để giả lập ví xác nhận thanh toán.</p>
+          {momo?.image && <figure className="tm-qr-panel">
+            <img src={momo.image} alt="Mã QR MoMo Sandbox của đơn thanh toán" width="320" height="320" />
+            <figcaption>Mở MoMo Test, chọn Quét QR và xác nhận khoản thanh toán thử.</figcaption>
+          </figure>}
+          {momo?.payUrl && <a className="tm-back" href={momo.payUrl} target="_blank" rel="noreferrer">{momo.image ? 'Mở trang thanh toán MoMo Sandbox' : 'Mở MoMo Sandbox để lấy mã QR'}</a>}
+          {momo?.existing && <p className="tm-result" role="status">Đơn thử đã được tạo. Bạn có thể kiểm tra kết quả hoặc hủy để tạo đơn mới.</p>}
+          {pendingMessage && <p className="tm-result" role="status">{pendingMessage}</p>}
           <div className="tm-actions">
-            <button type="button" className="tm-btn" disabled={busy} onClick={() => act('thanh-toan')}>{busy ? 'Đang xử lý…' : 'Xác nhận thanh toán'}</button>
-            <button type="button" className="tm-btn secondary" disabled={busy} onClick={() => act('huy')}>Hủy</button>
+            <button type="button" className="ui-btn ui-btn--secondary" disabled={busy} onClick={() => act('huy')}>Hủy</button>
+            {momo
+              ? <button type="button" className="ui-btn ui-btn--primary" disabled={busy} onClick={() => act('momo/trang-thai')}>{busy ? 'Đang đối chiếu…' : 'Kiểm tra thanh toán'}</button>
+              : <button type="button" className="ui-btn ui-btn--primary" disabled={busy} onClick={createQr}>{busy ? 'Đang tạo mã…' : 'Tạo mã QR MoMo'}</button>}
           </div>
+          {!momo && <button type="button" className="ui-btn ui-btn--ghost" disabled={busy} onClick={() => act('momo/trang-thai')}>Kiểm tra giao dịch đã quét</button>}
         </>}
-        {order.status === 'Paid' && <div className="tm-result ok"><strong>Thanh toán thành công (mô phỏng)</strong><p>{topUp ? `Khoản thu thêm của đối soát ${order.refId}` : firstCharge ? `Khoản thu kỳ đầu của hợp đồng ${order.refId}` : `Phiếu cọc ${order.refId}`} đã được ghi nhận thanh toán. Mã giao dịch mô phỏng: {order.transId}</p></div>}
+        {order.status === 'Paid' && <div className="tm-result ok" role="status"><strong>Thanh toán thành công (mô phỏng)</strong><p>Hệ thống đã ghi nhận thanh toán cho {order.refId}.{order.transId && ` Mã giao dịch mô phỏng: ${order.transId}`}</p></div>}
         {order.status === 'Cancelled' && <div className="tm-result"><strong>Đã hủy thanh toán</strong><p>Bạn có thể mở lại khoản thanh toán trong tài khoản.</p></div>}
-        {['Failed', 'Processing'].includes(order.status) && <div className="tm-result"><strong>{order.status === 'Failed' ? 'Thanh toán không thành công' : 'Đang xử lý'}</strong><p>{order.lastError || 'Vui lòng kiểm tra lại khoản thanh toán.'}</p></div>}
+        {['Failed', 'Processing'].includes(order.status) && <div className="tm-result" role="status"><strong>{order.status === 'Failed' ? 'Thanh toán không thành công' : 'Đang xử lý'}</strong><p>{order.lastError || 'Vui lòng kiểm tra lại khoản thanh toán.'}</p>{order.status === 'Processing' && <button type="button" className="ui-btn ui-btn--secondary" onClick={() => setAttempt(value => value + 1)}>Kiểm tra trạng thái</button>}</div>}
       </>}
-      <Link className="tm-back" to={firstCharge ? '/khach-hang?tab=hop-dong' : '/khach-hang?tab=dat-coc'}>← {firstCharge ? 'Quay lại hợp đồng' : 'Quay lại phiếu đặt cọc'}</Link>
+      <Link className="tm-back" to={`/khach-hang?tab=${purpose.tab}`}>{purpose.tab === 'hop-dong' ? 'Quay lại hợp đồng' : 'Quay lại thanh toán'}</Link>
     </section>
   </main>;
 }

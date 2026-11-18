@@ -1,5 +1,5 @@
 import { getPool } from '../database/connection.js';
-import { getBoLocPhongKhamPha, getDanhSachPhongKhamPha, getChiTietPhong } from '../services/phongKhamPha.service.js';
+import { ganTrangThaiQuanTam, getBoLocPhongKhamPha, getDanhSachPhongKhamPha, getChiTietPhong } from '../services/phongKhamPha.service.js';
 import { toPublicRoomDetail } from '../models/publicRoom.dto.js';
 
 export async function getChiTietPhongCongKhai(req, res, next) {
@@ -41,7 +41,11 @@ export async function getPhongNoiBat(req, res, next) {
       ORDER BY p.MaPhong
     `);
 
-    res.json({ data: result.recordset });
+    const rooms = await ganTrangThaiQuanTam(result.recordset);
+    res.json({ data: result.recordset.map((room, index) => ({
+      ...room,
+      GioiTinhChoPhep: rooms[index].gioiTinhChoPhep ?? room.GioiTinhChoPhep
+    })) });
   } catch (err) {
     next(err);
   }

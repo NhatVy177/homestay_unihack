@@ -3,6 +3,8 @@ import { cachTinhCocDuKien } from './tienCoc.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import { attachPaymentAccount } from '../config/payment.js';
 import { notifyDeposit } from '../integrations/mail/datCocNotifications.js';
+import { checkRoomForRentGroup, loaiGioiTinhHoSo } from './genderRules.js';
+import { ganTrangThaiQuanTam } from './phongKhamPha.service.js';
 
 function handleDatabaseError(error) {
   mapDatabaseError(error, {
@@ -105,6 +107,28 @@ export async function guiYeuCauDatCoc(user, data = {}) {
     throw createServiceError('Chọn giường cho khách');
 
   try {
+    const { recordset } = await executeQuery(`
+      SELECT d.SoNam AS soNam, d.SoNu AS soNu, d.SoNguoiDuKienO AS soNguoiDuKienO,
+        p.MaPhong AS maPhong, p.TenPhong AS tenPhong
+      FROM dbo.PhieuDangKy d
+      JOIN dbo.ChiTietXemPhong x ON x.MaDangKy = d.MaDangKy AND x.KhachChon = 1
+      JOIN dbo.Phong p ON p.MaPhong = x.MaPhong
+      WHERE d.MaDangKy = @MaDangKy AND p.MaChiNhanh = @MaChiNhanh`, [
+      { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
+      { name: 'MaChiNhanh', type: sql.VarChar(6), value: user.maChiNhanh || null }
+    ]);
+    if (recordset[0]) {
+      const [room] = await ganTrangThaiQuanTam(recordset.slice(0, 1));
+      const gender = loaiGioiTinhHoSo(room);
+      if (gender === 'Hỗn hợp' && hinhThucThue !== 'Nguyên phòng') {
+        throw createServiceError('Nhóm có cả nam và nữ cần thuê nguyên phòng.', 409);
+      }
+      const issue = checkRoomForRentGroup(gender, room, room.soNguoiDuKienO);
+      if (issue) throw createServiceError(issue, 409);
+      if (hinhThucThue === 'Nguyên phòng' && room.coTheThueNguyenPhong === false) {
+        throw createServiceError('Phòng chưa trống toàn bộ giường để thuê nguyên phòng.', 409);
+      }
+    }
     const result = await executeProcedure('dbo.SP_GuiYeuCauCocKemLuaChon', [
       { name: 'MaDangKy', type: sql.VarChar(6), value: maDangKy },
       { name: 'MaNhanVienSale', type: sql.VarChar(6), value: maNhanVienSale },

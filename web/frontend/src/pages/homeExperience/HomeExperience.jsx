@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { getAuthenticatedHomePath } from '../../auth/auth.routes.js';
 import { Icon } from '../../components/common/Icon.jsx';
+import { gioiTinhIcon, nhanGioiTinhPhong } from '../../utils/genderRules.js';
 import { CONTACT_PHONE, groupBranches, imageFallback, imageFor, money, priceFor, unitFor } from './homeData.js';
 import { buildBranchLayout } from './houseLayout.js';
-import { gioiTinhHienThi, gioiTinhIcon } from '../../components/rooms/RoomDetailView.jsx';
 import './experience.css';
 
 const CurvedGallery = lazy(() => import('./HomeScenes.jsx').then(module => ({ default: module.CurvedGallery })));
@@ -91,6 +91,7 @@ export function GallerySection({ rooms }) {
 }
 
 export function RoomCard({ room, onViewDetail, index = 0 }) {
+  const genderLabel = nhanGioiTinhPhong(room.GioiTinhChoPhep);
   const card = useRef(null);
   const reduced = useReducedMotion();
   const { user } = useAuth();
@@ -115,7 +116,7 @@ export function RoomCard({ room, onViewDetail, index = 0 }) {
       <button className="hx-room-heart" type="button" aria-label={`Quan tâm ${room.TenPhong}`} title="Quan tâm phòng này" onClick={interest}><Icon name="favorite" /></button>
       <button className="hx-room-image" type="button" onClick={() => onViewDetail(room)} aria-label={`Xem ${room.TenPhong}`}><img src={imageFor(room)} alt={room.TenPhong} loading="lazy" onError={imageFallback} /></button>
       <div className="hx-room-body"><h3>{room.TenPhong}</h3><p className="hx-room-area"><Icon name="home" />{room.TenChiNhanh}</p>
-        <div className="hx-room-tags"><span><Icon name="wifi" />Wifi miễn phí</span>{room.SucChuaToiDa && <span><Icon name="group" />{room.SucChuaToiDa} người</span>}<span><Icon name={gioiTinhIcon(room.GioiTinhChoPhep ?? room.gioiTinhChoPhep)} />{gioiTinhHienThi(room.GioiTinhChoPhep ?? room.gioiTinhChoPhep)}</span></div>
+        <div className="hx-room-tags"><span><Icon name="wifi" />Wifi miễn phí</span>{room.SucChuaToiDa && <span><Icon name="group" />{room.SucChuaToiDa} người</span>}{genderLabel && <span><Icon name={gioiTinhIcon(genderLabel)} />{genderLabel}</span>}</div>
         <div className="hx-room-bottom"><div><strong>{priceFor(room) ? money(priceFor(room)) : 'Liên hệ'}</strong><span> / {unitFor(room)}</span></div><button className="tc-room-cta hx-room-view" type="button" onClick={() => onViewDetail(room)}>Xem ngay</button></div>
       </div>
     </article>

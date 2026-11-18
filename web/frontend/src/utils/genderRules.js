@@ -22,6 +22,29 @@ export function lyDoPhongKhongHopGioiTinh(profileGender, roomGender, roomName = 
   return '';
 }
 
+export function nhanGioiTinhPhong(value) {
+  const gender = norm(value);
+  if (gender === 'nam') return 'Nam';
+  if (gender === 'nữ') return 'Nữ';
+  if (gender && UNRESTRICTED.includes(gender)) return 'Không phân biệt';
+  return '';
+}
+
+export function gioiTinhIcon(value) {
+  const gender = nhanGioiTinhPhong(value);
+  return gender === 'Nam' ? 'man' : gender === 'Nữ' ? 'woman' : 'wc';
+}
+
+export function lyDoPhongKhongHopNhom(profileGender, room) {
+  const name = room.tenPhong || 'Phòng này';
+  const issue = lyDoPhongKhongHopGioiTinh(profileGender, room.gioiTinhChoPhep, name);
+  if (issue) return issue;
+  if (profileGender === 'Hỗn hợp' && room.coTheThueNguyenPhong === false) {
+    return `Nhóm có cả nam và nữ cần thuê nguyên phòng. ${name} chưa trống toàn bộ giường.`;
+  }
+  return '';
+}
+
 // Người ở khai ở bước cư trú không được nhiều hơn số nam/số nữ đã đăng ký.
 export function checkResidentsGender(members = [], { soNam, soNu } = {}) {
   const nam = Number(soNam) || 0;

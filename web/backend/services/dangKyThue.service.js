@@ -1,3 +1,4 @@
+import { ganTrangThaiQuanTam } from './phongKhamPha.service.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import { assertSingleRoomTypeCapacity } from './rentRegistrationRules.js';
 import * as dangKyThueRepository from '../repositories/dangKyThue.repository.js';
@@ -85,7 +86,7 @@ function isRoomSuitableForProfile(row = {}, profile = {}) {
   if (male > 0 && female > 0) {
     return roomAllowsMixedGender(row)
       && capacity >= total
-      && availableSlots >= capacity;
+      && (row.coTheThueNguyenPhong ?? availableSlots >= capacity);
   }
 
   if (male > 0) {
@@ -255,7 +256,7 @@ export async function getPhongGiuongKhaDung(filter = {}) {
   }
 
   return {
-    rooms: rooms.filter((row) => row.maPhong && isRoomSuitableForProfile(row, profileCriteria)),
+    rooms: (await ganTrangThaiQuanTam(rooms)).filter((row) => row.maPhong && isRoomSuitableForProfile(row, profileCriteria)),
     isRegionValid
   };
 }

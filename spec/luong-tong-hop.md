@@ -43,6 +43,8 @@ Trình bày trang chủ/phòng công khai (D-062/J-X092): dùng cùng họ chữ
 
 Bộ chọn ngày giờ/dropdown toàn frontend (D-064/J-X093): popup tiếng Việt, màu sage, giữ control/giá trị/giới hạn/handler. Đăng xuất (D-066/J-X094): hộp dùng chung icon/nội dung căn giữa, nút X và Hủy/Đăng xuất; chỉ xác nhận mới thoát. Thêm ảnh Báo hỏng dùng ô viền nét đứt/icon rõ, giữ tối đa3 ảnh và xử lý hiện có.
 
+D-068/J-X099: danh sách phòng chung ở /phong. Link có mã phòng vẫn vào chi tiết/form khi cần. Giới tính phòng tính theo giường trống và người đang ở, hiện trên thẻ và chi tiết. Nhóm hỗn hợp chỉ chọn phòng Không phân biệt trống toàn bộ để thuê nguyên phòng. Nhóm cùng giới chọn phòng phù hợp hoặc Không phân biệt khi đủ chỗ.
+
 D-067/J-X096: khách chỉ sửa/xóa báo hỏng của chính mình ở trạng thái Chờ tiếp nhận; sau tiếp nhận/hoàn tất/từ chối là chỉ xem. Sửa giữ giới hạn3 ảnh; xóa cần xác nhận, tranh chấp cập nhật không xóa ảnh đang dùng. Danh sách phòng chỉ ở `/phong`; cổng khách giữ chi tiết để thêm quan tâm hoặc đăng ký, phải tải đủ dữ liệu và giữ thông báo khóa. Chia sẻ/CTA/nút nhóm đồng bộ, giữ quy tắc thuê và D-065.
 
 ## 1. Vai trò và hệ thống
@@ -115,7 +117,7 @@ Trang chủ công khai theo D-049 → D-051 (bố cục/hiệu ứng, gallery ph
 
 | Cách trả | Quy trình |
 |---|---|
-| **Ví mô phỏng** (khách tự trả) | Khách bấm "Thanh toán ngay" (link trong email, qua đăng nhập, vào thẳng phiếu) → trang cổng ghi rõ "mô phỏng" → IPN ký HMAC → kiểm tra chữ ký, số tiền, chống ghi hai lần → phiếu tự "Đã thanh toán" |
+| **Ví mô phỏng** (khách tự trả) | Khách bấm "Thanh toán ngay" (link trong email, qua đăng nhập, vào thẳng phiếu) → trang cổng tạo QR MoMo Sandbox → khách quét bằng MoMo Test → máy chủ kiểm tra IPN hoặc truy vấn Sandbox, đối chiếu mã đơn và số tiền, chống ghi hai lần → phiếu tự "Đã thanh toán" |
 | **Tiền mặt** | Sale in "Giấy biên nhận đặt cọc", hai bên ký, mỗi bên giữ 1 bản, Sale chụp bản công ty giữ rồi tải lên, bấm "Xác nhận đã thu tiền mặt" → "Đã thanh toán" ngay + email. **Kế toán đối soát và bấm "Đã nộp quỹ"** |
 | **Chuyển khoản tay** | Khách chuyển khoản theo nội dung chuẩn `DCxxxx SĐT` (có nút sao chép), tải minh chứng → **kế toán xác nhận** (tab "Duyệt thanh toán") |
 
@@ -233,7 +235,7 @@ Contract `DormSettlement.sol` (EIP-712). Trạng thái: None → HandoverPropose
 | Thu thêm khi trả phòng | Có (D-030) | Có | Có | Ví: tự. Còn lại: kế toán |
 | Hoàn cọc | Không | — | Kế toán chi, **kèm chứng từ** | Kế toán |
 
-**Cổng ví mô phỏng:** ghi rõ "mô phỏng", **không** dùng thương hiệu/logo/API MoMo thật, không nhận tiền thật. Người thu = trống, phương thức "Ví điện tử", màn kế toán hiện "Tự động (cổng thanh toán mô phỏng)".
+**Cổng MoMo mô phỏng (D-069):** tạo đơn MoMo Sandbox, hiển thị mã QR trả về để khách quét bằng MoMo Test. Máy chủ nhận IPN ký HMAC hoặc truy vấn MoMo Sandbox để xác thực trạng thái, mã đơn và số tiền. Localhost dùng nút Kiểm tra thanh toán khi IPN chưa truy cập được. Môi trường thử không nhận tiền thật. Người thu = trống, phương thức "Ví điện tử", màn kế toán hiện "Tự động (cổng thanh toán mô phỏng)".
 
 ---
 

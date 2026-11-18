@@ -1,6 +1,12 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 13:21:19 +07:00** (J-X097: tiếp nối Claude đã trên main, xác nhận tích hợp local5173 và giữ sửa dở điều hướng). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 15:11:10 +07:00** (J-X099: hoàn tất code ghi chú 11–13 và QR MoMo Sandbox). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+
+## Ghi chú 11–13 và QR MoMo Sandbox — D-068 / D-069 / J-X099
+
+- Nhánh fix/notes-11-13. Đã rà phần Antigravity và Claude trong main. Điều hướng vị trí từ Dịch vụ đã có. Hoàn tất bỏ danh sách phòng riêng, hiển thị giới tính thực tế và áp dụng điều kiện nhóm khi chọn phòng.
+- Cổng khách mở thanh toán Sandbox cho cọc, khoản thu kỳ đầu, hóa đơn tháng và khoản thu thêm. Backend đối chiếu giao dịch trước khi ghi nhận. Localhost kiểm tra kết quả qua nút trên trang. Máy hiện tại chưa cấu hình khóa thử MoMo.
+- Mức bằng chứng: đã có code. Vy tự kiểm tra trên giao diện. Đợt này không chạy test tự động, thao tác SQL Server hoặc Fuji.
 
 ## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4, khắc phục giao diện & tối ưu trải nghiệm (J-A002 / J-A003 / J-A004)
 
