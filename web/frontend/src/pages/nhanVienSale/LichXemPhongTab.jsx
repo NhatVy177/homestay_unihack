@@ -18,7 +18,9 @@ function toTimeInput(value) {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
-const STATUS_TABS = ['Chờ xem', 'Yêu cầu đổi lịch', 'Yêu cầu hủy', 'Đã xem', 'Khách không đến', 'Đã hủy'];
+const MAIN_TABS = ['Chờ xem', 'Đã xem'];
+// "Khác" gom các trạng thái ít gặp: yêu cầu đổi lịch, yêu cầu hủy, khách không đến, đã hủy.
+const isOther = (status) => !MAIN_TABS.includes(status);
 // Lịch đang chờ xử lý (Chờ xem, yêu cầu đổi/hủy) lên đầu, gần giờ hẹn nhất trước; lịch đã xong xuống dưới, mới nhất trước.
 const OPEN_STATUS = ['Chờ xem', 'Yêu cầu đổi lịch', 'Yêu cầu hủy'];
 function byPriority(a, b) {
@@ -48,7 +50,7 @@ export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
       const searchableText = [schedule.id, schedule.maDangKy, schedule.hoTenKhach, schedule.sdtKhach, schedule.danhSachPhong, schedule.maPhong].filter(Boolean).join(' ').toLocaleLowerCase('vi-VN');
       const scheduleDate = toDateInput(schedule.thoiGianHen);
       if (keyword && !searchableText.includes(keyword)) return false;
-      if (filters.status && schedule.trangThai !== filters.status) return false;
+      if (filters.status === 'khac' ? !isOther(schedule.trangThai) : filters.status && schedule.trangThai !== filters.status) return false;
       if (filters.fromDate && (!scheduleDate || scheduleDate < filters.fromDate)) return false;
       if (filters.toDate && (!scheduleDate || scheduleDate > filters.toDate)) return false;
       return true;
@@ -120,7 +122,7 @@ export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
       <SaleCalendar month={month} onMonth={setMonth} schedules={filteredSchedules} selectedDay={selectedDay} onDay={setSelectedDay} />
       <section className="ui-card sale-panel sale-appointments-list" aria-label="Danh sách và chi tiết lịch hẹn"><div className="sale-section-heading"><div><h2>Danh sách lịch hẹn</h2>{selectedDay && <p className="ui-cell-sub">{dateLabel(selectedDay)}</p>}</div><span className="ui-badge ui-badge--neutral">{visible.length} lịch</span></div>
         <StatusFilterTabs ariaLabel="Lọc lịch hẹn theo trạng thái" activeKey={filters.status} onChange={status => setFilters(current => ({ ...current, status }))}
-          items={[{ key: '', label: 'Tất cả', count: baseFiltered.length }, ...STATUS_TABS.map(key => ({ key, label: key, count: baseFiltered.filter(s => s.trangThai === key).length }))]} />
+          items={[{ key: '', label: 'Tất cả', count: baseFiltered.length }, ...MAIN_TABS.map(key => ({ key, label: key, count: baseFiltered.filter(s => s.trangThai === key).length })), { key: 'khac', label: 'Khác', count: baseFiltered.filter(s => isOther(s.trangThai)).length }]} />
         {selectedDay && <button className="ui-btn ui-btn--ghost ui-btn--sm" onClick={() => setSelectedDay('')}>Tất cả ngày</button>}
         {!loading && !visible.length && <><EmptyState message="Không có lịch hẹn phù hợp. Chọn ngày khác hoặc xóa bộ lọc." /></>}
         {visible.length > 0 && <div className="sale-schedule-list"><table className="sale-appointments-table"><thead><tr><th>Mã lịch</th><th>Khách hàng</th><th>Phòng / Chi nhánh</th><th>Thời gian</th><th>Trạng thái</th></tr></thead><tbody>{visible.map(s => <tr key={s.id} className={detail?.id === s.id ? 'is-selected' : ''} onClick={() => setDetailId(s.id)}><td><button type="button" className={`sale-schedule-item ${detail?.id === s.id ? 'is-selected' : ''}`} aria-label={`${s.id} · ${s.hoTenKhach}`} onClick={() => setDetailId(s.id)}>{s.id}</button></td><td><strong>{s.hoTenKhach}</strong>{s.sdtKhach && <small>{s.sdtKhach}</small>}</td><td><strong>{s.danhSachPhong || s.maPhong || 'Chưa có phòng'}</strong>{(s.tenChiNhanh || s.maChiNhanh) && <small>{s.tenChiNhanh || s.maChiNhanh}</small>}</td><td>{dateLabel(s.thoiGianHen)}<small>{timeLabel(s.thoiGianHen)}</small></td><td><StatusBadge status={s.trangThai} /></td></tr>)}</tbody></table></div>}

@@ -4569,3 +4569,5 @@
 .kh-grp-actions .kh-grp-back { border: 1px solid var(--color-border); background: var(--color-surface); }
 .dpay-countdown { font-variant-numeric: tabular-nums; letter-spacing: .04em; font-size: 16px; }
 .dpay-wallet-panel { display: grid; gap: 12px; margin-top: 16px; }
+
+.dc-edit-icon { display: inline-flex; vertical-align: middle; color: var(--color-primary, #4A6549); }

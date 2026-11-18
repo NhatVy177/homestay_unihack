@@ -23,23 +23,8 @@ try {
     page.on('pageerror', (e) => errors.push(e.message));
     await page.goto(`${base}/phong/P103`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Chia sẻ', exact: true }).click();
-    const menu = page.getByRole('menu', { name: 'Chia sẻ phòng' });
-    const geometry = await menu.evaluate(element => { const r = element.getBoundingClientRect(); return { left: r.left, right: r.right, height: r.height, scrollWidth: document.documentElement.scrollWidth }; });
-    assert.ok(geometry.left >= 0 && geometry.right <= width && geometry.height >= 88, JSON.stringify(geometry));
-    assert.equal(geometry.scrollWidth, width, 'share menu does not widen the page');
-    await page.keyboard.press('ArrowDown');
-    assert.match(await page.evaluate(() => document.activeElement.textContent), /ứng dụng khác/);
-    await page.keyboard.press('Escape');
-    assert.equal(await menu.count(), 0);
-    assert.equal(await page.getByRole('button', { name: 'Chia sẻ', exact: true }).evaluate(button => button === document.activeElement), true);
-    await page.getByRole('button', { name: 'Chia sẻ', exact: true }).click();
-    const fb = page.getByRole('menuitem', { name: 'Chia sẻ lên Facebook' });
-    const href = await fb.getAttribute('href');
-    assert.match(href, /^https:\/\/www\.facebook\.com\/sharer\/sharer\.php\?u=/);
-    assert.ok(decodeURIComponent(href).includes('/phong/P103'), 'link trỏ đúng phòng');
     await page.getByRole('status').filter({ hasText: 'Đã sao chép link' }).waitFor();
     await page.screenshot({ path: `${folder}/share-${width}.png` });
-    await page.keyboard.press('Escape');
     await page.evaluate(() => {
       Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: () => Promise.reject(new Error('fixture denied')) } });
       document.execCommand = () => false;

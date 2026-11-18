@@ -683,3 +683,8 @@ button.kh-gallery-main, button.kh-gallery-thumb, button.kh-all-photo-item {
 /* Nút quay lại vừa phải, dạng viên thuốc như bên cổng khách. */
 .kh-detail-back, .cinv-back { align-items: center; background: var(--color-surface-alt, #F1F4F0); border: 1px solid var(--color-border, #E0E3DF); border-radius: 999px; color: var(--color-primary, #4A6549); cursor: pointer; display: inline-flex; font-size: 14px; font-weight: 500; gap: 8px; min-height: 38px; padding: 0 16px; width: fit-content; }
 .kh-detail-back:hover, .cinv-back:hover { text-decoration: none; border-color: var(--color-primary, #4A6549); }
+
+.kh-detail-stats--more { margin-top: 10px; }
+.kh-extra-services { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.kh-extra-services > div { display: flex; justify-content: space-between; gap: 12px; padding: 14px 16px; border: 1px solid var(--color-border, #E0E3DF); border-radius: var(--radius-md, 12px); background: var(--color-surface, #fff); font-size: 14px; }
+.kh-extra-services strong { font-weight: 600; white-space: nowrap; }

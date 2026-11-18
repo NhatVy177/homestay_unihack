@@ -49,6 +49,7 @@ function Icon({ name, className = '' }) {
         <circle cx="12" cy="10" r="2.2" />
       </>
     ),
+    bed: <><path d="M3 18v-7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7" /><path d="M3 15h18M7 9V7h4v2" /></>,
     bell: <><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" /><path d="M10 20a2 2 0 0 0 4 0" /></>
   };
 
@@ -171,7 +172,13 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
                 </div>
               )}
             </div>
-            {phong.moTa && <p className="kh-detail-mota">{phong.moTa}</p>}
+            <div className="kh-detail-stats kh-detail-stats--more">
+              {phong.loaiPhong && <div><Icon name="room" /><span>Loại phòng</span><strong>{phong.loaiPhong}</strong></div>}
+              {phong.chiNhanh && <div><Icon name="map" /><span>Chi nhánh</span><strong>{phong.chiNhanh}</strong></div>}
+              {phong.giaThueTheoGiuong ? <div><Icon name="payment" /><span>Giá mỗi giường</span><strong>{Number(phong.giaThueTheoGiuong).toLocaleString('vi-VN')}đ/tháng</strong></div> : null}
+              {Number(phong.soGiuongTrong) > 0 && <div><Icon name="bed" /><span>Giường còn trống</span><strong>{phong.soGiuongTrong} giường</strong></div>}
+            </div>
+            <p className="kh-detail-mota">{phong.moTa || `${phong.tenPhong || 'Phòng'} thuộc ${phong.chiNhanh || 'HomeStayDorm'}${phong.loaiPhong ? `, loại ${phong.loaiPhong.toLowerCase()}` : ''}${phong.sucChua ? `, sức chứa tối đa ${phong.sucChua} người` : ''}. Phòng được dọn dẹp định kỳ, có an ninh và hỗ trợ từ nhân viên quản lý trong suốt thời gian thuê.`}</p>
           </div>
 
           {tienNghi.length > 0 && (
@@ -198,6 +205,16 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
                   <button key={img.stt} type="button" aria-label={`Phóng to ảnh ${idx + 1}`} className="kh-all-photo-item" onClick={() => setLightbox(idx)}>
                     <GalleryPhoto urlAnh={img.urlAnh} fallbackUrl={img.fallbackUrl} moTa={img.moTa} index={idx} />
                   </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {dichVuUocTinh.length > 0 && (
+            <div className="kh-detail-section">
+              <h2>Dịch vụ đi kèm</h2>
+              <div className="kh-extra-services">
+                {dichVuUocTinh.map((item) => (
+                  <div key={item.maDichVu || item.tenDichVu}><span>{item.tenDichVu}</span><strong>{formatServiceMoney(item.donGia, item.donViTinh)}</strong></div>
                 ))}
               </div>
             </div>
@@ -282,14 +299,6 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
             )}
           </div>
 
-          <div className="kh-detail-info-card">
-            <div><span>Chi nhánh</span><strong>{phong.chiNhanh || 'Chưa cập nhật'}</strong></div>
-            {/* Khách biết TÊN phòng, không biết mã. Mã chỉ dùng để xử lý dữ liệu bên trong. */}
-            <div><span>Phòng</span><strong>{phong.tenPhong || phong.maPhong}</strong></div>
-            {phong.giaThueTheoGiuong && (
-              <div><span>Giá/giường</span><strong>{Number(phong.giaThueTheoGiuong).toLocaleString('vi-VN')}đ</strong></div>
-            )}
-          </div>
         </aside>
       </div>
 

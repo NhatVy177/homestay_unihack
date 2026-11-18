@@ -94,7 +94,7 @@ try {
       await page.getByRole('button', { name: 'Tháng sau', exact: true }).click();
       assert.notEqual(await page.locator('.sale-calendar-heading h2').textContent(), title);
       await page.getByRole('button', { name: 'Tháng trước', exact: true }).click();
-      await page.getByRole('group', { name: 'Lọc lịch hẹn theo trạng thái' }).getByRole('button', { name: /^Đã hủy/ }).click();
+      await page.getByRole('group', { name: 'Lọc lịch hẹn theo trạng thái' }).getByRole('button', { name: /^Khác/ }).click();
       assert.equal(await page.locator('.sale-schedule-item').count(), 1);
       await page.locator('#schedule-search').fill('không có khách này');
       await page.getByText('Không có lịch hẹn phù hợp.', { exact: false }).waitFor();

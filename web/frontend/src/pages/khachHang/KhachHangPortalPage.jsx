@@ -7,7 +7,6 @@ import { khachMoiApi } from '../khachMoi/khachMoi.api.js';
 import { datCocApi } from '../datCoc/datCoc.api.js';
 import ChiTietPhongView from '../../components/rooms/RoomDetailView.jsx';
 import { normalizeRoomDetail, getDemoRoomImage, getRoomFloor } from '../../components/rooms/roomDetail.js';
-import DepositPolicyPanel from '../../components/common/DepositPolicyPanel.jsx';
 import ResultModal from '../../components/common/ResultModal.jsx';
 import WorkspaceShell from '../../components/common/WorkspaceShell.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
@@ -3581,7 +3580,6 @@ export default function KhachHangPortalPage() {
                 <button className="kp-btn kp-btn-primary kp-full" type="submit" disabled={uploading}>{uploading ? 'Đang gửi...' : 'Gửi chứng từ thanh toán'}</button>
               </form>
             </section>}
-            <DepositPolicyPanel key={phieu.maPhieuCoc} depositId={phieu.maPhieuCoc} />
           </div>
           <aside className="dpay-side">
             <section className="dpay-amount">
@@ -3763,7 +3761,6 @@ export default function KhachHangPortalPage() {
     if (isWaiting) return renderDepositPaymentLayout(phieu);
     return (
       <section className="dc-detail">
-        <DepositPolicyPanel key={phieu.maPhieuCoc} depositId={phieu.maPhieuCoc} />
         {(isWaiting || isRejected) && !!deadlineMs && <div className="dc-banner dc-banner-info">
           <Icon name="schedule" /> <strong>Còn {Math.floor(remainingMinutes / 60)} giờ {remainingMinutes % 60} phút để thanh toán</strong>
         </div>}
@@ -3927,7 +3924,6 @@ export default function KhachHangPortalPage() {
               <div className="dc-section-card">
                 <h3 className="dc-section-title"><Icon name="check" />Chứng từ đã gửi</h3>
                 <div className="dc-receipt-box">
-                  <span className="dc-chip dc-chip-info" style={{ fontSize: 11 }}>⏳ Chờ kiểm tra chứng từ</span>
                   {minhChung.fileName && (
                     minhChung.fileUrl
                       ? <a className="dc-receipt-file" href={minhChung.fileUrl} target="_blank" rel="noreferrer"><Icon name="profile" /><span>{minhChung.fileName}</span></a>
@@ -3939,7 +3935,7 @@ export default function KhachHangPortalPage() {
                 <button className="kp-btn kp-btn-soft kp-full" type="button" style={{ marginTop: 12, fontSize: 13 }}
                   onClick={() => { setUploadForm({ maGiaoDich: '', ngayGiaoDich: '', nganHang: taiKhoanThanhToan.nganHang, ghiChu: '', fileBase64: '', fileName: '' }); setDatCocSelected({ ...phieu, trangThai: 'Chờ thanh toán' }); }}
                 >
-                  ✏️ Thay đổi chứng từ
+                  <span className="dc-edit-icon"><Icon name="edit" /></span> Thay đổi chứng từ
                 </button>
                 <p style={{ fontSize: 12, color: 'var(--kp-soft-text)', marginTop: 8 }}>Nếu có sai sót trong thông tin đã gửi, vui lòng liên hệ bộ phận Hỗ trợ ngay.</p>
               </div>
