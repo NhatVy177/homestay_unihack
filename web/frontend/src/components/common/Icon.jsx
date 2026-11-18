@@ -103,6 +103,11 @@ export function Icon({ name, className = '', style = {} }) {
     cleaning_services: <><path d="M16 3v7" /><path d="M13 10h6l1 4H12l1-4Z" /><path d="M12 14l-1 7h10l-1-7" /><path d="M5 12 3 21h5l1.5-6" /></>,
     room_service: <><path d="M3 18h18" /><path d="M4.5 18a7.5 7.5 0 0 1 15 0" /><path d="M12 7V4.5M10 4.5h4" /></>,
     lock: <><rect x="5" y="10" width="14" height="11" rx="3" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" /></>,
+    inventory_2: <><path d="M3 3h18v4H3z" /><path d="M4 7v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7" /><line x1="10" y1="12" x2="14" y2="12" /></>,
+    inventory: <><path d="M3 3h18v4H3z" /><path d="M4 7v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7" /><line x1="10" y1="12" x2="14" y2="12" /></>,
+    policy: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></>,
+    favorite: <><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8Z" /></>,
+    gavel:<><path d="m14 13-7.5 7.5a2.12 2.12 0 0 1-3-3L11 10" /><path d="m16 16 6-6" /><path d="m8 8 6-6" /><path d="m9 7 8 8" /><path d="m21 11-8-8" /></>,
   };
 
   return (
@@ -111,3 +116,6 @@ export function Icon({ name, className = '', style = {} }) {
     </svg>
   );
 }
+
+export default Icon;
+

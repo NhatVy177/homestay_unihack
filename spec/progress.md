@@ -1,14 +1,23 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 00:17:17 +07:00** (J-A001: đồng bộ giao diện & tính năng Admin từ Nam4 sang theo tone xanh). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 10:05:10 +07:00** (J-A002: Tách mới toàn bộ hệ thống Admin theo chuẩn Nam4 - Theme Xanh tokens.css, loại bỏ hoàn toàn code Admin cũ hơn 4000 dòng). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
-## Quản trị viên (Admin) — đồng bộ Nam4 trên main (J-A001)
+## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4 (J-A002)
 
-- Đã tích hợp các màn hình và chức năng quản trị từ `D:\Nam4\Contest\Homestay-Dorm` sang `web/frontend`:
-  + Thêm 3 tab mới: **Khách hàng** (`customers`), **Tài sản** (`assets`), **Điều kiện lưu trú** (`conditions`).
-  + Tạo `admin-nam4.css` chuyển đổi toàn bộ màu nâu be của Nam4 sang màu xanh thương hiệu hệ thống (`--color-primary: #4A6549`, tokens.css).
-  + Thêm các thành phần giao diện chuẩn: KPI cards, Drawer trượt bên phải (slideInRight), bộ lọc tìm kiếm và lọc danh mục, các badge mức độ (Bắt buộc, Quan trọng, Khuyến nghị), thanh tiến độ lấp đầy, modal thêm/sửa.
-  + Kiểm thử: Frontend build PASS, `test:avalanche-ui` PASS, `web/backend` 127 PASS / 0 FAIL / 4 SKIP, `blockchain` 25 PASS / 0 FAIL / 1 SKIP.
+- Loại bỏ hoàn toàn mã nguồn đơn khối cũ hơn 4000 dòng trong `AdminPage.jsx`.
+- Tách thành cấu trúc modular 8 tab sạch sẽ tương ứng 8 trang của Nam4:
+  1. `AdminDashboardTab.jsx`: Tổng quan hệ thống (4 KPI cards, SVG donut chart tỷ lệ phòng, chỉ số công suất vận hành, cảnh báo bảo trì, greeting header, nút refresh).
+  2. `AdminUsersTab.jsx`: Quản trị Khách hàng (4 KPI cards, thanh tìm kiếm & lọc trạng thái, bảng khách hàng, Right Drawer 3 tab: Thông tin cá nhân, Lịch sử hợp đồng, Hóa đơn & thanh toán, modal khóa/mở khóa tài khoản, modal thêm khách hàng).
+  3. `AdminEmployeesTab.jsx`: Quản trị Nhân viên (4 KPI cards phân theo vai trò Sale/Quản lý/Kế toán, bảng nhân viên phân trang, Right Drawer đổi vai trò & chi nhánh phụ trách, modal thêm nhân viên có xem mật khẩu, modal xác nhận khóa tài khoản).
+  4. `AdminBranchesTab.jsx`: Quản trị Chi nhánh (4 KPI cards, bảng lưới card chi nhánh 3 cột, thanh tiến độ tỷ lệ lấp đầy %, modal thêm/sửa chi nhánh, modal xác nhận ngưng/kích hoạt hoạt động).
+  5. `AdminRoomsTab.jsx`: Phòng & Giường (4 KPI cards, bảng danh mục phòng phân trang, Right Drawer quản lý chi tiết phòng và danh sách giường riêng, thêm/sửa giường trực tiếp, modal thêm phòng mới).
+  6. `AdminServicesTab.jsx`: Danh mục Dịch vụ (4 KPI cards, lưới card dịch vụ 2 cột, icon động theo dịch vụ điện/nước/wifi/giặt/xe, switch bật/tắt trực tiếp, modal thêm/sửa dịch vụ).
+  7. `AdminConditionsTab.jsx`: Điều kiện lưu trú (4 KPI cards, phân loại tự động Pháp lý/Vệ sinh/An ninh/Lưu trú/Nội quy, badge mức độ Bắt buộc/Quan trọng/Khuyến nghị, toggle trạng thái áp dụng, modal thêm/sửa quy định).
+  8. `AdminAssetsTab.jsx`: Tài sản dùng chung (4 KPI cards, bảng tài sản phân trang, lọc theo chi nhánh/phòng/loại tài sản/tình trạng, modal thêm/sửa tài sản liên kết chi nhánh và phòng).
+- Menu sidebar rút gọn chuẩn đúng 8 mục của Nam4 (`dashboard`, `users`, `employees`, `branches`, `rooms`, `services`, `conditions`, `assets`).
+- Toàn bộ màu be/nâu từ Nam4 được chuyển thành màu xanh thương hiệu hệ thống (`--color-primary: #4A6549`, tokens.css).
+- Bổ sung các biểu tượng SVG cần thiết (`inventory_2`, `inventory`, `policy`, `gavel`) trong `Icon.jsx`.
+- Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 127 PASS / 0 FAIL / 4 SKIP, `blockchain` 25 PASS / 0 FAIL / 1 SKIP.
 
 
 ## Trang chủ/nhà3D trên main

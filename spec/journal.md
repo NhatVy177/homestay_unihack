@@ -1754,3 +1754,27 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
   + Backend tests: `npm test` trong `web/backend` PASS (127 pass, 0 fail, 4 skip).
   + Blockchain tests: `npm test` trong `blockchain` PASS (25 pass, 0 fail, 1 skip).
 - Việc còn lại: Vy kiểm tra trực quan giao diện admin trên cổng quản trị viên.
+
+
+## 2026-11-18 10:05:10 +07:00 — J-A002 — Tách mới toàn bộ hệ thống Admin theo chuẩn Nam4 (Theme Xanh), loại bỏ hoàn toàn code Admin cũ
+
+- Người thực hiện: Antigravity theo yêu cầu Vy: sao chép toàn bộ chức năng và giao diện quản trị Admin từ dự án Nam4 (`D:\Nam4\Contest\Homestay-Dorm`), thay thế toàn bộ mã Admin cũ, chuyển màu chủ đạo từ be/nâu sang xanh tokens.css (`#4A6549`).
+- File:
+  + `web/frontend/src/components/common/Icon.jsx`: bổ sung các shape SVG (`inventory_2`, `inventory`, `policy`, `gavel`) và thêm `export default Icon`.
+  + `web/frontend/src/pages/admin/admin-nam4.css`: hoàn thiện toàn bộ hệ thống style cho 8 tab (KPI cards, Drawer trượt phải, Filter bar, Grid card chi nhánh, thanh tiến độ công suất occupancy, Grid dịch vụ 2 cột, danh sách điều kiện & priority badge, modal backdrop, skeleton, toast).
+  + Tạo mới 8 component tab chuyên biệt trong `web/frontend/src/pages/admin/tabs/`:
+    1. `AdminDashboardTab.jsx`: Tổng quan hệ thống (4 KPI cards, SVG donut chart tỷ lệ phòng, chỉ số công suất vận hành, cảnh báo bảo trì, greeting header, nút refresh).
+    2. `AdminUsersTab.jsx`: Quản trị Khách hàng (4 KPI cards, thanh tìm kiếm & lọc trạng thái, bảng khách hàng, Right Drawer 3 tab: Thông tin cá nhân, Lịch sử hợp đồng, Hóa đơn & thanh toán, modal khóa/mở khóa tài khoản, modal thêm khách hàng).
+    3. `AdminEmployeesTab.jsx`: Quản trị Nhân viên (4 KPI cards phân theo vai trò Sale/Quản lý/Kế toán, bảng nhân viên phân trang, Right Drawer đổi vai trò & chi nhánh phụ trách, modal thêm nhân viên có xem mật khẩu, modal xác nhận khóa tài khoản).
+    4. `AdminBranchesTab.jsx`: Quản trị Chi nhánh (4 KPI cards, bảng lưới card chi nhánh 3 cột, thanh tiến độ tỷ lệ lấp đầy %, modal thêm/sửa chi nhánh, modal xác nhận ngưng/kích hoạt hoạt động).
+    5. `AdminRoomsTab.jsx`: Phòng & Giường (4 KPI cards, bảng danh mục phòng phân trang, Right Drawer quản lý chi tiết phòng và danh sách giường riêng, thêm/sửa giường trực tiếp, modal thêm phòng mới).
+    6. `AdminServicesTab.jsx`: Danh mục Dịch vụ (4 KPI cards, lưới card dịch vụ 2 cột, icon động theo dịch vụ điện/nước/wifi/giặt/xe, switch bật/tắt trực tiếp, modal thêm/sửa dịch vụ).
+    7. `AdminConditionsTab.jsx`: Điều kiện lưu trú (4 KPI cards, phân loại tự động Pháp lý/Vệ sinh/An ninh/Lưu trú/Nội quy, badge mức độ Bắt buộc/Quan trọng/Khuyến nghị, toggle trạng thái áp dụng, modal thêm/sửa quy định).
+    8. `AdminAssetsTab.jsx`: Tài sản dùng chung (4 KPI cards, bảng tài sản phân trang, lọc theo chi nhánh/phòng/loại tài sản/tình trạng, modal thêm/sửa tài sản liên kết chi nhánh và phòng).
+  + `web/frontend/src/pages/admin/AdminPage.jsx`: Viết lại hoàn toàn, loại bỏ code nguyên khối cũ hơn 4000 dòng. Menu sidebar chuẩn hóa đúng 8 mục của Nam4 (`dashboard`, `users`, `employees`, `branches`, `rooms`, `services`, `conditions`, `assets`), tích hợp cùng `WorkspaceShell`.
+- Kiểm tra:
+  + Frontend build: `npm run build` PASS (Vite v6.4.2 built in 1m 32s, bundle hoàn chỉnh không lỗi).
+  + UI smoke test: `npm run test:avalanche-ui` PASS (Verify, D-017 views, D-018 gateway, D-023 FIFO, D-024 residence exception, không browser exceptions).
+  + Backend unit tests: `npm test` trong `web/backend` PASS (127 pass, 0 fail, 4 skip).
+  + Blockchain tests: `npm test` trong `blockchain` PASS (25 pass, 0 fail, 1 skip).
+- Việc còn lại: Vy đăng nhập vào tài khoản Admin (`nv0013` / mật khẩu `123`) và trải nghiệm toàn bộ 8 màn hình Admin mới.
