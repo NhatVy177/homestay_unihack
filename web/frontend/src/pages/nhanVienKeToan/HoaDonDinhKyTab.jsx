@@ -40,7 +40,8 @@ function printInvoice(inv) {
     .total{font-size:18px;font-weight:700;color:#4A6549;text-align:right;margin-top:12px}</style></head><body>
     <h1>Hóa đơn ${inv.maHoaDon}</h1><p>Kỳ ${showPeriod(inv.kyThanhToan)} · ${inv.hoTen} · ${inv.tenPhong} · Hạn thanh toán ${day(inv.ngayHanTT)}</p>
     <table><thead><tr><th>Khoản</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead><tbody>
-    <tr><td>Tiền phòng</td><td>1 tháng</td><td>${plain(inv.tienPhong)}</td><td>${plain(inv.tienPhong)}</td></tr>${rows}${fees}</tbody></table>
+    <tr><td>Tiền phòng</td><td>1 tháng</td><td>${plain(inv.tienPhong)}</td><td>${plain(inv.tienPhong)}</td></tr>${rows}${fees}
+    ${inv.giamDiemThuong > 0 ? `<tr><td>Ưu đãi điểm thưởng</td><td></td><td></td><td>−${plain(inv.giamDiemThuong)}</td></tr>` : ''}</tbody></table>
     <p class="total">Tổng cộng: ${plain(inv.tongTien)} VNĐ</p></body></html>`);
   win.document.close(); win.focus(); setTimeout(() => win.print(), 300);
 }
@@ -112,7 +113,9 @@ export default function HoaDonDinhKyTab() {
   const fees = detail?.phiPhatSinh || [];
   const feesCost = fees.filter((f) => f.trangThai === 'Đã xác nhận').reduce((s, f) => s + f.soTien, 0);
   const rent = detail?.hopDong.giaThue || 0;
-  const total = rent + elecCost + waterCost + servicesCost + feesCost;
+  const subtotal = rent + elecCost + waterCost + servicesCost + feesCost;
+  const discount = subtotal > detail?.giamDiemThuong ? detail.giamDiemThuong : 0;
+  const total = subtotal - discount;
   const hasUnconfirmed = fees.some((f) => f.trangThai === 'Chưa xác nhận');
   const lockedReading = Boolean(detail?.chiSo.current);
   const firstReading = !detail?.chiSo.previous && !lockedReading;
@@ -269,6 +272,7 @@ export default function HoaDonDinhKyTab() {
                 <div><span>Tiền điện nước:</span><b>{money(elecCost + waterCost)}</b></div>
                 <div><span>Tiền dịch vụ đã đăng ký:</span><b>{money(servicesCost)}</b></div>
                 {feesCost > 0 && <div><span>Phí phát sinh trong kỳ:</span><b className="is-danger">+{money(feesCost)}</b></div>}
+                {discount > 0 && <div><span>Ưu đãi điểm thưởng:</span><b>−{money(discount)}</b></div>}
                 <div className="is-grand"><span>Tổng tiền cần thanh toán:</span><b>{money(total)}</b></div>
               </div>
               <div className="hdk-actions">
@@ -321,7 +325,14 @@ export default function HoaDonDinhKyTab() {
                 {drawer.phiPhatSinh.map((f) => <div key={f.maPhi}><span>• {f.tenPhi}:</span><span>+{money(f.soTien)}</span></div>)}</div>}
             </div>
           </div>
+          {drawer.giamDiemThuong > 0 && <div className="hdk-drawer-row"><span>Ưu đãi điểm thưởng</span><b>−{money(drawer.giamDiemThuong)}</b></div>}
           <div className="hdk-drawer-total"><span>Tổng cộng:</span><b>{plain(drawer.tongTien)} VND</b></div>
+          {drawer.minhChungDiemThuong?.length > 0 && <div className="hdk-proof">
+            <span className="hdk-label">Minh chứng điểm thưởng trên Fuji</span>
+            {drawer.minhChungDiemThuong.map(item => <a key={item.url} href={item.url} target="_blank" rel="noreferrer">
+              {item.kind === 'Award' ? 'Giao dịch cộng điểm' : 'Giao dịch đổi ưu đãi'}
+            </a>)}
+          </div>}
           {drawer.chungTu && <div className="hdk-proof"><span className="hdk-label">Minh chứng khách gửi</span>
             <a href={`${FILE_BASE}${drawer.chungTu.duongDan}`} target="_blank" rel="noreferrer">{drawer.chungTu.tenTep}</a>
             <small>Đối chiếu sao kê ngân hàng trước khi xác nhận đã nhận tiền.</small></div>}

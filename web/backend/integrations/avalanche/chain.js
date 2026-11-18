@@ -1,6 +1,6 @@
 import { createPublicClient, createWalletClient, defineChain, http, keccak256, decodeEventLog, encodeFunctionData } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { abi } from '@homestaydorm/settlement/abi';
+import { abi as settlementAbi } from '@homestaydorm/settlement/abi';
 const json = value => JSON.parse(JSON.stringify(value, (_, v) => typeof v === 'bigint' ? v.toString() : v));
 export function chainConfig() {
   const chainId = Number(process.env.AVALANCHE_CHAIN_ID || 43113);
@@ -10,7 +10,7 @@ export function chainConfig() {
     rpcUrl: process.env.AVALANCHE_RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
   };
 }
-export function makeChain(deployment, publicClient, wallets) {
+export function makeChain(deployment, publicClient, wallets, abi = settlementAbi) {
   const read = (functionName, args) => publicClient.readContract({ address: deployment.address, abi, functionName, args });
   return {
     deployment, read, publicClient,

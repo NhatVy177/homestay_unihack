@@ -221,7 +221,7 @@ Contract `DormSettlement.sol` (EIP-712). Trạng thái: None → HandoverPropose
 - **Khóa vận hành:** khóa của "quản lý", "kế toán" và relayer nằm trên máy chủ, đại diện cho bên cho thuê; không phải ví riêng của từng nhân viên. Contract chỉ nhận một địa chỉ quản lý và một địa chỉ kế toán cho toàn hệ thống.
 - **Cách gọi:** dùng "xác nhận điện tử", không gọi là "chữ ký số". Đây là bằng chứng bổ sung theo thỏa thuận hai bên, không thay hợp đồng thuê (vẫn ký giấy).
 - **Trạng thái thật (11/11):** mới chạy trên chain local; chưa deploy Fuji.
-- **Token point** (D-014): chỉ dự phòng, không làm trước khi luồng chính đạt nghiệm thu.
+- **Điểm thưởng (D-070):** backend ghi 100 điểm khi thấy hóa đơn tháng đã trả đúng hạn kể từ ngày mở chương trình. Khách đổi 100 điểm lấy voucher giảm 20.000đ bằng ví nhúng. Chỉ khi sự kiện trừ điểm được xác nhận thì ưu đãi mới sẵn sàng để trừ trên hóa đơn kỳ sau đủ điều kiện. Bảng SQL giữ tham chiếu hóa đơn và trạng thái áp dụng một lần. Cọc hoàn theo luồng tiền Web2.
 
 ---
 
@@ -291,7 +291,7 @@ Email có chống trùng theo từng lần gửi; lỗi gửi không làm hỏng
 | 7 Đang ở | **D-029** |
 | 8 Trả phòng | **D-030**, D-004 (không khai báo thanh toán on-chain) |
 | 9 Đóng hồ sơ | **D-030** (5), **D-031** (1) |
-| Web3 chung | D-002 (ví + gas), D-003, D-012, D-014 (token dự phòng) |
+| Web3 chung | D-002 (ví + gas), D-003, D-012, D-070 (điểm thưởng) |
 | Giao diện, lịch | **D-037 (Fuji trước, T-22 theo mức ưu tiên; thay lịch D-025)**, D-025 (ràng buộc thiết kế), D-032 (icon/form), D-033 (danh sách), D-035, D-036 (không gian Sale) |
 | Bổ sung thực tế | **D-038** (đường thoát khi khách im lặng, điều khoản xác nhận điện tử, ô đồng ý dữ liệu cá nhân), D-034 (nguồn tiền cọc và điều kiện phát hành bàn giao) |
 

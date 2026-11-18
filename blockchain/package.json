@@ -8,7 +8,8 @@
     "./evidence": "./src/evidence.js",
     "./closure": "./src/closure.js",
     "./confirmation": "./src/confirmation.js",
-    "./abi": "./src/abi.js"
+    "./abi": "./src/abi.js",
+    "./loyalty": "./src/loyalty.js"
   },
   "engines": {
     "node": ">=24 <25"
@@ -20,6 +21,7 @@
     "chain": "hardhat node --network local --hostname 127.0.0.1",
     "deploy:local": "npm run compile && node scripts/deploy.mjs local",
     "deploy:fuji": "npm run compile && node --env-file=.env scripts/deploy.mjs fuji",
+    "deploy:loyalty": "npm run compile && node scripts/deploy-loyalty.mjs",
     "verify:fuji": "node scripts/verify-fuji.mjs",
     "fuji:keygen": "node scripts/fuji-keygen.mjs",
     "fuji:fund": "node scripts/fuji-fund.mjs",

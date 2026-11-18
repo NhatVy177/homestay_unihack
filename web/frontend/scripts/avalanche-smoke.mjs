@@ -16,7 +16,7 @@ assert.equal(emailNotice({ notifications: [{ kind: 'handover-confirmed', status:
 assert.equal(emailNotice({ notifications: [{ kind: 'settlement-disputed', status: 'sent' }] }, 'settlement-confirmed', 'sent', 'fallback'), 'fallback');
 const port = 5189, base = 'http://127.0.0.1:' + port;
 // Build an unconfigured copy (process env overrides .env in Vite) so the test never depends on local .env.
-const unconfigured = { ...process.env, VITE_PRIVY_APP_ID: '', VITE_AVALANCHE_CONTRACT_ADDRESS: '', VITE_AVALANCHE_CHAIN_ID: '31337' };
+const unconfigured = { ...process.env, VITE_PRIVY_APP_ID: '', VITE_AVALANCHE_CONTRACT_ADDRESS: '', VITE_AVALANCHE_CHAIN_ID: '31337', VITE_LOYALTY_ENABLED: 'true' };
 const outDir = await mkdtemp(join(tmpdir(), 'homedorm-smoke-dist-'));
 execFileSync(process.execPath, ['node_modules/vite/bin/vite.js', 'build', '--outDir', outDir, '--emptyOutDir', '--logLevel', 'error'], { stdio: 'inherit', env: unconfigured });
 const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', 'preview', '--outDir', outDir, '--host', '127.0.0.1', '--port', String(port), '--strictPort'],
@@ -62,15 +62,15 @@ try {
   // D-013: simulated e-wallet page is clearly labelled and drives the order API only.
   await page.route('**/api/thanh-toan-mo-phong/SIMTEST', route => route.fulfill({ json: { id: 'SIMTEST', refId: 'PC0001', amountVnd: 3000000, status: 'Pending' } }));
   await page.goto(base + '/thanh-toan-mo-phong/SIMTEST', { waitUntil: 'domcontentloaded' });
-  await page.getByText('MÔI TRƯỜNG MÔ PHỎNG', { exact: false }).waitFor();
-  await page.getByRole('button', { name: 'Xác nhận thanh toán' }).waitFor();
+  await page.getByText('Giao dịch mô phỏng không trừ tiền thật.').waitFor();
+  await page.getByRole('button', { name: 'Tạo mã QR MoMo' }).waitFor();
   assert.ok((await page.textContent('body')).includes('3.000.000'));
   await capture('01-cong-tien-coc.png');
   await page.route('**/api/thanh-toan-mo-phong/SIMFIRST', route => route.fulfill({ json: {
     id: 'SIMFIRST', purpose: 'thu-nhan-phong', refId: 'HDTEST', amountVnd: 2500000, status: 'Pending',
   } }));
   await page.goto(base + '/thanh-toan-mo-phong/SIMFIRST', { waitUntil: 'domcontentloaded' });
-  await page.getByText('Khoản thu kỳ đầu – hợp đồng HDTEST').waitFor();
+  await page.getByText('Khoản thu kỳ đầu', { exact: true }).waitFor();
   await page.getByRole('link', { name: 'Quay lại hợp đồng' }).waitFor();
   await capture('02-cong-khoan-thu-ky-dau.png');
   // D-017: one mocked case checks the rendered customer and both staff views without SQL or secrets.
@@ -142,12 +142,27 @@ try {
     ? { id: 'SIMFIRST', purpose: 'thu-nhan-phong', refId: 'HDTEST', amountVnd: 2500000, status: 'Pending' }
     : { purpose: 'thu-nhan-phong', refId: 'HDTEST', amountVnd: 2500000, status: 'Pending' } }));
   await openAs({ maNguoiDung: 'KHDEMO', vaiTro: 'KhachHang' });
+  await page.route('**/api/diem-thuong', route => route.fulfill({ json: {
+    enabled: true, linked: true, balance: 100, awardPoints: 100, voucherPoints: 100, voucherVnd: 20000,
+    contracts: [{ id: 'HDTEST' }],
+    history: [{ id: 'award', type: 'Award', invoiceId: 'HO0001', status: 'Confirmed' }],
+  } }));
+  await page.goto(base + '/khach-hang?tab=diem-thuong', { waitUntil: 'domcontentloaded' });
+  await page.getByRole('heading', { name: 'Điểm thưởng' }).waitFor();
+  await page.getByText('100 điểm', { exact: true }).waitFor();
+  await page.getByText('Đã cộng điểm').waitFor();
+  assert.equal(await page.getByRole('button', { name: 'Đổi ưu đãi' }).isDisabled(), true);
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    assert.ok(await page.locator('.reward-page').evaluate(el => el.scrollWidth <= el.clientWidth + 1));
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(base + '/khach-hang?tab=hop-dong', { waitUntil: 'domcontentloaded' });
   await page.getByRole('heading', { name: 'Thanh toán khi nhận phòng' }).waitFor();
   await capture('06-hop-dong-khoan-thu-ky-dau.png');
-  await page.getByRole('button', { name: 'Ví điện tử (mô phỏng)' }).click();
+  await page.getByRole('button', { name: 'MoMo (mô phỏng)' }).click();
   await page.waitForURL(base + '/thanh-toan-mo-phong/SIMFIRST');
-  await page.getByText('Khoản thu kỳ đầu – hợp đồng HDTEST').waitFor();
+  await page.getByText('Khoản thu kỳ đầu', { exact: true }).waitFor();
   // D-023: manager queue marks FIFO and requires an explanation for later requests.
   await page.route('**/api/dat-coc/cho-xac-nhan', route => route.fulfill({ json: [
     { maDangKy: 'DKD001', hoTen: 'Khách mẫu 1', maPhong: 'P102', tenPhong: 'Phòng P102',
