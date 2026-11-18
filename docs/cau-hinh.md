@@ -33,6 +33,16 @@ npm run dev
 - Frontend: `http://localhost:5173`
 - Backend: `http://localhost:5000`
 
+## Điểm thưởng hóa đơn tháng — D-070
+
+1. Chuẩn bị ví vận hành riêng có AVAX thử. Đặt khóa ví này trong `LOYALTY_OPERATOR_PRIVATE_KEY`. Trong `blockchain/`, chạy `npm run deploy:loyalty` để deploy lên Fuji, hoặc `npm run deploy:loyalty -- --local` khi RPC local đang chạy. Lệnh đọc `.env` của blockchain nếu có, hoặc nhận đường dẫn cấu hình qua `LOYALTY_DEPLOY_ENV`. Ghi lại địa chỉ contract được in ra.
+2. Trên cơ sở dữ liệu thử đã có luồng hóa đơn và ví nhúng, chạy `npm run loyalty:db:migrate` trong `web/backend/`. Migration tạo bảng điểm và các thủ tục áp voucher. Nếu dùng HOMEDORM4, cần Vy đồng ý trước khi chạy.
+3. Giữ cấu hình xác nhận điện tử và Privy đang hoạt động. Backend đặt `LOYALTY_ENABLED=true`, `LOYALTY_CONTRACT_ADDRESS` trỏ contract mới, `LOYALTY_OPERATOR_PRIVATE_KEY` của ví riêng, `LOYALTY_START_DATE` theo định dạng YYYY-MM-DD và bật scheduler. Ngày bắt đầu được so với ngày đã ghi nhận thanh toán của hóa đơn tháng.
+4. Frontend đặt `VITE_LOYALTY_ENABLED=true` rồi chạy lại hoặc build lại. Khách mở **Điểm thưởng** trong cổng khách.
+5. Dùng hóa đơn tháng của hợp đồng thử còn kỳ sau. Kế toán ghi nhận trả đúng hạn. Khách xác thực email để kết nối tài khoản nếu cần, nhận 100 điểm rồi chọn đổi voucher. Kế toán lập hóa đơn kế tiếp và mở chi tiết để kiểm tra dòng giảm và liên kết giao dịch. Nếu backend gián đoạn sau khi gửi giao dịch, worker đọc lại cùng giao dịch khi khởi động lại.
+
+Bài kiểm tra thật trên SQL local dùng `LOYALTY_SQL_TEST=true` và `node --test test/loyalty-sql.test.mjs` từ backend. Ca chạy riêng tạo cơ sở dữ liệu dùng một lần.
+
 ## Lịch xem phòng — C5-a / D-026
 
 Trong `web/backend`, `npm run viewing-status:db:check` chỉ đọc định nghĩa 8 SP và liệt kê khối tự chuyển Đã xem còn tồn tại. Sau khi Vy cho phép chạy lên HOMEDORM4, `npm run viewing-status:db:migrate` gỡ đúng các khối cũ, giữ phần SP còn lại (kể cả thay đổi của migration mới hơn), mở rộng trạng thái Khách không đến và thêm `SP_GhiNhanKetQuaBuoiXem` trong cùng transaction. Định nghĩa không đúng mẫu sẽ báo lỗi để xem lại; không tự thay cả SP bằng bản nguồn cũ. Migration không ghi trạng thái lịch/phiếu cũ và chạy lại được.

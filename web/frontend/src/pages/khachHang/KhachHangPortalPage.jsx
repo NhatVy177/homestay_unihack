@@ -26,7 +26,10 @@ import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Cl
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
 const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
-const PORTAL_TABS = ['tai-khoan', 'cu-tru', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'hop-dong', 'bao-hong', 'tra-phong'];
+const CustomerRewardsTab = lazy(() => import('./CustomerRewardsTab.jsx'));
+const showRewards = import.meta.env.VITE_LOYALTY_ENABLED === 'true';
+const PORTAL_TABS = ['tai-khoan', 'cu-tru', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'hop-dong', 'bao-hong', 'tra-phong',
+  ...(showRewards ? ['diem-thuong'] : [])];
 
 // Gốc backend để mở lại file chứng từ đã upload (DB lưu đường dẫn /uploads/chung-tu/..).
 const FILE_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
@@ -773,6 +776,7 @@ export default function KhachHangPortalPage() {
     { id: 'ho-so', icon: 'description', title: 'Hồ sơ đăng ký' },
     { id: 'lich-xem', icon: 'event_note', title: 'Lịch xem phòng' },
     { id: 'dat-coc', icon: 'payments', title: 'Hóa đơn & thanh toán' },
+    ...(showRewards ? [{ id: 'diem-thuong', icon: 'sparkle', title: 'Điểm thưởng' }] : []),
     { id: 'lich-su-coc', icon: 'receipt_long', title: 'Lịch sử đặt cọc' },
     { id: 'hop-dong', icon: 'article', title: 'Hợp đồng' },
     { id: 'bao-hong', icon: 'build', title: 'Báo hỏng' },
@@ -3476,6 +3480,7 @@ export default function KhachHangPortalPage() {
                 <span>Số tiền cần thanh toán</span>
                 <strong>{amount.toLocaleString('vi-VN')} VNĐ</strong>
                 <p className="dpay-formula">{quote.kind === 'hoaDon' ? `Hóa đơn ${quote.refId} · hợp đồng ${quote.maHopDong}` : `Hợp đồng ${quote.refId}`}</p>
+                {quote.giamDiemThuong > 0 && <p className="dpay-formula">Ưu đãi điểm thưởng −{quote.giamDiemThuong.toLocaleString('vi-VN')}đ đã được áp dụng</p>}
               </section>
               <section className="dc-section-card dpay-card">
                 <h3 className="dc-section-title">Phương thức thanh toán</h3>
@@ -3812,7 +3817,8 @@ export default function KhachHangPortalPage() {
     if (firstChargePay) return renderFirstChargePayment(firstChargePay);
     return <CustomerInvoicesList deposits={datCocList || []} invoices={invoices || []} firstCharges={firstCharges}
       onPayInvoice={(inv) => {
-        const quote = { kind: 'hoaDon', refId: inv.maHoaDon, amountVnd: Number(inv.tongTien) || 0, maHopDong: inv.maHopDong, kyThanhToan: inv.kyThanhToan, ngayHanTT: inv.ngayHanTT };
+        const quote = { kind: 'hoaDon', refId: inv.maHoaDon, amountVnd: Number(inv.tongTien) || 0, maHopDong: inv.maHopDong,
+          kyThanhToan: inv.kyThanhToan, ngayHanTT: inv.ngayHanTT, giamDiemThuong: inv.giamDiemThuong };
         setFcMethod('transfer'); setFcProof(null); setFcFile(null); setFirstChargePay(quote);
         khachMoiApi.getChungTuHoaDon(inv.maHoaDon).then(({ data }) => setFcProof(data || null)).catch(() => setFcProof(null));
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -4315,6 +4321,7 @@ export default function KhachHangPortalPage() {
     if (activeTab === 'ho-so') return renderProfiles();
     if (activeTab === 'lich-xem') return renderSchedules();
     if (activeTab === 'dat-coc') return renderDatCoc();
+    if (activeTab === 'diem-thuong') return <Suspense fallback={<p role="status">Đang tải điểm thưởng…</p>}><CustomerRewardsTab /></Suspense>;
     if (activeTab === 'lich-su-coc') return renderDepositHistory();
     if (activeTab === 'cu-tru') return renderResidence();
     if (activeTab === 'hop-dong') return renderHopDongTab();

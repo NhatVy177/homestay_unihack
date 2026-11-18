@@ -1,10 +1,15 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 15:11:10 +07:00** (J-X099: hoàn tất code ghi chú 11–13 và QR MoMo Sandbox). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 16:27:35 +07:00** (J-X100: hoàn tất code điểm thưởng và kiểm trên chain cùng SQL local). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+
+## Điểm thưởng hóa đơn tháng — D-070 / J-X100
+
+- Nhánh feat/loyalty-points. Đã có token DormPoints, ví nhúng ký đổi điểm, hàng chờ dùng lại giao dịch đã ký, voucher SQL và giao diện Điểm thưởng. Kế toán xem khoản giảm khi lập hóa đơn và minh chứng trong chi tiết.
+- Mức bằng chứng: code, kiểm tự động trên Hardhat local, SQL Server riêng và giao diện fixture đã qua. Chưa triển khai DormPoints lên Fuji hoặc cài migration trên HOMEDORM4. Chuẩn bị ví vận hành riêng và triển khai theo [cấu hình](../docs/cau-hinh.md#điểm-thưởng-hóa-đơn-tháng--d-070).
 
 ## Ghi chú 11–13 và QR MoMo Sandbox — D-068 / D-069 / J-X099
 
-- Nhánh fix/notes-11-13. Đã rà phần Antigravity và Claude trong main. Điều hướng vị trí từ Dịch vụ đã có. Hoàn tất bỏ danh sách phòng riêng, hiển thị giới tính thực tế và áp dụng điều kiện nhóm khi chọn phòng.
+- Đã gộp fix/notes-11-13 ở PR #17. Đã rà phần Antigravity và Claude trong main. Điều hướng vị trí từ Dịch vụ đã có. Hoàn tất bỏ danh sách phòng riêng, hiển thị giới tính thực tế và áp dụng điều kiện nhóm khi chọn phòng.
 - Cổng khách mở thanh toán Sandbox cho cọc, khoản thu kỳ đầu, hóa đơn tháng và khoản thu thêm. Backend đối chiếu giao dịch trước khi ghi nhận. Localhost kiểm tra kết quả qua nút trên trang. Máy hiện tại chưa cấu hình khóa thử MoMo.
 - Mức bằng chứng: đã có code. Vy tự kiểm tra trên giao diện. Đợt này không chạy test tự động, thao tác SQL Server hoặc Fuji.
 

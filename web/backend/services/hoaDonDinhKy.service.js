@@ -1,5 +1,6 @@
 import { executeQuery, sql } from '../database/connection.js';
 import { createServiceError } from './serviceErrors.js';
+import { invoiceDiscounts, invoiceRewardEvidence } from '../integrations/loyalty/invoices.js';
 
 // Hóa đơn định kỳ cho kế toán (theo màn "Hóa đơn Định kỳ" của nhóm Hằng): chốt chỉ số điện nước theo phòng,
 // cộng tiền phòng + dịch vụ đã đăng ký + phí phát sinh đã xác nhận thành hóa đơn tháng; danh sách hóa đơn và thu tiền.
@@ -130,13 +131,13 @@ async function readingsFor(contract, period, query) {
   return { current: num(current.recordset?.[0]) || null, previous: num(previous.recordset?.[0]) || null };
 }
 
-export async function chiTietLapHoaDon(user, maHopDong, { query = executeQuery } = {}) {
+export async function chiTietLapHoaDon(user, maHopDong, { query = executeQuery, includeDiscount = true } = {}) {
   assertAccountant(user);
   const contract = await loadContract(user, maHopDong, query);
   if (contract.hetHan) throw createServiceError('Hợp đồng đã lập hóa đơn tới hết thời hạn.', 409);
   const period = contract.kyCanLap;
   const idParam = [{ name: 'MaHopDong', type: sql.VarChar(6), value: contract.maHopDong }];
-  const [services, fees, readings, tyLe] = await Promise.all([
+  const [services, fees, readings, tyLe, discounts] = await Promise.all([
     query(`SELECT d.MaChiTietDVHD AS maChiTietDVHD, v.TenDichVu AS tenDichVu, v.DonViTinh AS donViTinh, v.DonGia AS donGia,
         CASE WHEN TRY_CAST(d.GhiChu AS DECIMAL(10,2)) > 0 THEN TRY_CAST(d.GhiChu AS DECIMAL(10,2)) ELSE 1 END AS soLuong
       FROM dbo.DichVuHopDong d JOIN dbo.DichVu v ON v.MaDichVu = d.MaDichVu WHERE d.MaHopDong = @MaHopDong ORDER BY d.MaChiTietDVHD`, idParam),
@@ -144,10 +145,13 @@ export async function chiTietLapHoaDon(user, maHopDong, { query = executeQuery }
       FROM dbo.PhiPhatSinh WHERE MaHopDong = @MaHopDong AND TrangThai <> N'Đã tính' ORDER BY NgayTao`, idParam),
     readingsFor(contract, period, query),
     shareOf(contract, query),
+    includeDiscount && period > periodOf(contract.ngayBatDau)
+      ? invoiceDiscounts({ contractId: contract.maHopDong, pending: true }, query)
+      : new Map(),
   ]);
   return {
     hopDong: contract, kyThanhToan: period, tyLeChia: tyLe, hanThanhToan: dueDateFor(period),
-    chiSo: readings,
+    chiSo: readings, giamDiemThuong: discounts.get(null) || 0,
     dichVu: (services.recordset || []).map((s) => ({ ...s, donGia: Number(s.donGia) || 0, soLuong: Number(s.soLuong) || 1 })),
     phiPhatSinh: (fees.recordset || []).map((f) => ({ ...f, soTien: Number(f.soTien) || 0 })),
   };
@@ -161,7 +165,7 @@ const reading = (value, label) => {
 
 export async function lapHoaDon(user, data = {}, { query = executeQuery, today = new Date() } = {}) {
   assertAccountant(user);
-  const detail = await chiTietLapHoaDon(user, data.maHopDong, { query });
+  const detail = await chiTietLapHoaDon(user, data.maHopDong, { query, includeDiscount: false });
   const { hopDong: contract, kyThanhToan: period } = detail;
   if (data.kyThanhToan && data.kyThanhToan !== period) throw createServiceError(`Kỳ cần lập của hợp đồng là ${period}.`, 409);
   if (detail.phiPhatSinh.some((f) => f.trangThai === 'Chưa xác nhận')) {
@@ -230,8 +234,12 @@ UPDATE dbo.HoaDon SET TongTien = @GiaThue
   + ISNULL((SELECT SUM(ThanhTien) FROM dbo.ChiTietHoaDon WHERE MaHoaDon = @MaHoaDon), 0)
   + ISNULL((SELECT SUM(SoTien) FROM dbo.PhiPhatSinh WHERE MaHoaDon = @MaHoaDon), 0)
 WHERE MaHoaDon = @MaHoaDon;
+DECLARE @GiamDiemThuong INT = 0;
+IF OBJECT_ID('dbo.SP_Loyalty_ApplyVoucher', 'P') IS NOT NULL
+  EXEC dbo.SP_Loyalty_ApplyVoucher @MaHoaDon, @MaHopDong, @GiamDiemThuong OUTPUT;
 COMMIT;
-SELECT @MaHoaDon AS maHoaDon, (SELECT TongTien FROM dbo.HoaDon WHERE MaHoaDon = @MaHoaDon) AS tongTien;`, params);
+SELECT @MaHoaDon AS maHoaDon, @GiamDiemThuong AS giamDiemThuong,
+  (SELECT TongTien FROM dbo.HoaDon WHERE MaHoaDon = @MaHoaDon) AS tongTien;`, params);
   } catch (error) {
     const number = error.number ?? error.originalError?.info?.number;
     if (number === 51001) throw createServiceError('Hợp đồng đã có hóa đơn cho kỳ này.', 409);
@@ -239,7 +247,8 @@ SELECT @MaHoaDon AS maHoaDon, (SELECT TongTien FROM dbo.HoaDon WHERE MaHoaDon = 
     throw error;
   }
   const row = (result.recordsets?.at(-1) || result.recordset || [])[0];
-  return { maHoaDon: row?.maHoaDon, tongTien: Number(row?.tongTien) || 0, kyThanhToan: period };
+  return { maHoaDon: row?.maHoaDon, tongTien: Number(row?.tongTien) || 0, kyThanhToan: period,
+    ...(Number(row?.giamDiemThuong) > 0 ? { giamDiemThuong: Number(row.giamDiemThuong) } : {}) };
 }
 
 export async function danhSachHoaDon(user, { query = executeQuery } = {}) {
@@ -282,7 +291,7 @@ export async function chiTietHoaDon(user, maHoaDon, { query = executeQuery } = {
   const invoice = (await danhSachHoaDon(user, { query })).find((row) => row.maHoaDon === id);
   if (!invoice) throw createServiceError('Không tìm thấy hóa đơn trong chi nhánh.', 404);
   const p = [{ name: 'MaHoaDon', type: sql.VarChar(6), value: id }];
-  const [lines, fees] = await Promise.all([
+  const [lines, fees, discounts, rewardEvidence] = await Promise.all([
     query(`SELECT ct.MaChiTietHD AS maChiTietHD, v.TenDichVu AS tenDichVu, ct.DonViTinh AS donViTinh, ct.SoLuong AS soLuong,
         ct.DonGia AS donGia, ct.ThanhTien AS thanhTien, g.ChiSoDienDau AS dienDau, g.ChiSoDienCuoi AS dienCuoi,
         g.ChiSoNuocDau AS nuocDau, g.ChiSoNuocCuoi AS nuocCuoi
@@ -290,10 +299,14 @@ export async function chiTietHoaDon(user, maHoaDon, { query = executeQuery } = {
       JOIN dbo.DichVu v ON v.MaDichVu = d.MaDichVu LEFT JOIN dbo.PhieuGhiChiSo g ON g.MaPhieuGhi = ct.MaPhieuGhi
       WHERE ct.MaHoaDon = @MaHoaDon ORDER BY ct.MaChiTietHD`, p),
     query(`SELECT MaPhi AS maPhi, TenPhi AS tenPhi, SoTien AS soTien FROM dbo.PhiPhatSinh WHERE MaHoaDon = @MaHoaDon ORDER BY NgayTao`, p),
+    invoiceDiscounts({ invoiceId: id }, query),
+    invoiceRewardEvidence(id, query),
   ]);
   const n = (v) => (v === null || v === undefined ? null : Number(v));
   return {
     ...invoice,
+    giamDiemThuong: discounts.get(id) || 0,
+    minhChungDiemThuong: rewardEvidence,
     chiTiet: (lines.recordset || []).map((l) => ({ ...l, soLuong: n(l.soLuong), donGia: n(l.donGia), thanhTien: n(l.thanhTien),
       dienDau: n(l.dienDau), dienCuoi: n(l.dienCuoi), nuocDau: n(l.nuocDau), nuocCuoi: n(l.nuocCuoi) })),
     phiPhatSinh: (fees.recordset || []).map((f) => ({ ...f, soTien: Number(f.soTien) || 0 })),

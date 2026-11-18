@@ -99,7 +99,9 @@ export default function CustomerInvoicesList({ deposits, invoices, firstCharges 
         <td data-label="Mã hóa đơn"><strong>{row.id}</strong></td>
         <td data-label="Kỳ thanh toán">{periodLabel(row.period)}</td>
         <td data-label="Loại"><span className={`cinv-type cinv-type--${row.kind === 'deposit' ? 'deposit' : 'period'}`}>{row.loai}</span></td>
-        <td data-label="Số tiền"><strong>{money(row.amount)}</strong></td>
+        <td data-label="Số tiền"><strong>{money(row.amount)}</strong>
+          {row.source.giamDiemThuong > 0 && <small className="ui-cell-sub">Ưu đãi đã áp dụng −{money(row.source.giamDiemThuong)}</small>}
+        </td>
         <td data-label="Hạn thanh toán">{dateLabel(row.due)}</td>
         <td data-label="Trạng thái"><StatusPill group={row.group} status={row.kind} /></td>
         <td data-label="Hành động"><div className="cinv-actions">

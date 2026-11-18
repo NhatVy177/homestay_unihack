@@ -16,6 +16,13 @@ export async function getHoaDonCuaKhach(user, query = executeQuery) {
       CAST(CASE WHEN EXISTS (SELECT 1 FROM dbo.ChungTuHoaDon c WHERE c.MaHoaDon = hd.MaHoaDon) THEN 1 ELSE 0 END AS BIT) AS daGuiMinhChung
     FROM dbo.HoaDon hd JOIN dbo.HopDongThue h ON h.MaHopDong = hd.MaHopDong
     WHERE h.MaKhachHang = @MaKhachHang AND hd.TrangThai <> N'Tạm tính'
-    ORDER BY hd.KyThanhToan DESC, hd.MaHoaDon DESC`, [{ name: 'MaKhachHang', type: sql.VarChar(6), value: user.maNguoiDung }]);
-  return result.recordset.map((row) => ({ ...row, loai: classifyInvoice(row) }));
+    ORDER BY hd.KyThanhToan DESC, hd.MaHoaDon DESC;
+    IF OBJECT_ID('dbo.SP_Loyalty_InvoiceDiscounts', 'P') IS NOT NULL
+      EXEC dbo.SP_Loyalty_InvoiceDiscounts @MaKhachHang = @MaKhachHang;
+    `, [{ name: 'MaKhachHang', type: sql.VarChar(6), value: user.maNguoiDung }]);
+  const discounts = new Map((result.recordsets?.[1] || []).map(row => [row.maHoaDon, Number(row.giamDiemThuong)]));
+  return result.recordset.map((row) => {
+    const discount = discounts.get(row.maHoaDon);
+    return { ...row, loai: classifyInvoice(row), ...(discount > 0 ? { giamDiemThuong: discount } : {}) };
+  });
 }

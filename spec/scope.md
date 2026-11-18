@@ -33,6 +33,7 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 | F-18 | Link phòng chia sẻ và link chốt phòng (D-063) | `/chia-se/phong/<mã>` trả thẻ Open Graph (ảnh, giá, địa chỉ) rồi chuyển sang trang phòng; Sale tạo `/chot/<mã>` có giờ hẹn, hết hạn 7 ngày, khách đăng ký với thông tin điền sẵn và nguồn "Sale gửi link". |
 | F-19 | Nguồn khách và nhắc hóa đơn (D-063) | Phiếu đăng ký ghi nguồn (Facebook/Zalo/người quen/web/Sale gửi link/khác); Sale xem hồ sơ, đã cọc, đã ký và tỷ lệ chốt theo nguồn. Hóa đơn định kỳ chưa trả được nhắc qua email 3 ngày trước hạn, mỗi hóa đơn một lần. |
 | F-20 | Khôi phục từ chuỗi và tài liệu minh bạch (D-063) | `npm run avalanche:recover` dựng lại trạng thái bàn giao/đối soát chỉ từ sự kiện contract và so với DB; `docs/minh-bach-ky-thuat.md` nêu dữ liệu lên chuỗi, gas đo thật, giới hạn. |
+| F-21 | Điểm thưởng hóa đơn tháng (D-070) | Hóa đơn tháng trả đúng hạn kể từ ngày mở chương trình được 100 điểm, mỗi hóa đơn một lần. Ví Privy ký đổi 100 điểm lấy voucher 20.000đ của hợp đồng khách chọn. Giao dịch Fuji được gửi hộ và đối chiếu sự kiện trước khi ghi nhận. Voucher được dùng một lần trong giao dịch lập hóa đơn tiếp theo, kế toán xem dòng ưu đãi và minh chứng, khách xem lịch sử điểm thưởng. |
 | F-09 | Triển khai và demo Fuji | Contract deploy và verify source; ABI/address/UI thống nhất; chạy luồng đầy đủ ba vai trò, có tx thật, test phù hợp, README setup và bằng chứng demo. Local pass không thay thế nghiệm thu này. |
 
 
@@ -87,7 +88,7 @@ Theo yêu cầu Vy ngày 11/11: tạo ba ví mới (deployer kiêm manager, acco
 
 - Ngoài MVP: escrow/giữ hoặc chuyển tiền, NFT, token point, L1 riêng, AI phân xử; giao dịch riêng cho báo trả/thời gian báo trước; khai báo đã trả/đã nhận tiền on-chain.
 - ~~Tùy chọn sau khi luồng chính đạt nghiệm thu: simulator thanh toán hoặc MoMo sandbox.~~ **D-013 / D-069:** cổng thanh toán mô phỏng và QR của MoMo Sandbox thuộc F-11. Thanh toán MoMo production ngoài phạm vi.
-- Token point (D-014): dự phòng, chỉ cân nhắc sau khi luồng chính đạt nghiệm thu trên Fuji.
+- Token điểm của D-014 đã vào bản demo theo F-21 / D-070. Ưu đãi theo hóa đơn tháng.
 - Không chuyển nền SQL Server sang Supabase trong đợt chuẩn bị này.
 
 ## Điều kiện xuyên suốt
