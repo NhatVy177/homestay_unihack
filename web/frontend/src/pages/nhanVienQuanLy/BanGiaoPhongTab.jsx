@@ -376,8 +376,11 @@ export default function BanGiaoPhongTab() {
             boxShadow: '0 18px 48px rgba(0, 0, 0, 0.22)',
             overflow: 'hidden'
           }}>
-            <div style={{ padding: '22px 24px', backgroundColor: '#4A6549', color: '#ffffff' }}>
-              <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 700 }}>{successDialog.title}</h3>
+            <div style={{ padding: '20px 24px', backgroundColor: '#ffffff', color: '#191c1d', borderBottom: '1px solid #e1e3e4', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F1F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4A6549' }}>
+                <Icon name="check_circle" />
+              </div>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#191c1d' }}>{successDialog.title}</h3>
             </div>
             <div style={{ padding: '24px' }}>
               <p style={{ margin: 0, color: '#191c1d', fontSize: '15px', lineHeight: 1.6 }}>{successDialog.message}</p>

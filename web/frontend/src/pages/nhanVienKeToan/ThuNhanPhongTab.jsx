@@ -237,19 +237,24 @@ export default function ThuNhanPhongTab() {
             onClick={(event) => event.stopPropagation()}
             style={{ maxWidth: '520px', overflow: 'hidden' }}
           >
-            <div className="ktp-modal-header-primary">
-              <div>
-                <h3 style={{ fontSize: '20px', margin: 0, color: '#ffffff' }}>
-                  {paymentSuccessDialog.title}
-                </h3>
-                <p style={{ fontSize: '14px', margin: '4px 0 0 0', opacity: 0.9 }}>
-                  Hoàn tất ghi nhận khoản thu nhận phòng
-                </p>
+            <div className="ktp-modal-header" style={{ padding: '20px 24px', backgroundColor: '#ffffff', borderBottom: '1px solid #e1e3e4', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F1F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4A6549' }}>
+                  <Icon name="check_circle" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '18px', margin: 0, color: '#191c1d', fontWeight: '700' }}>
+                    {paymentSuccessDialog.title}
+                  </h3>
+                  <p style={{ fontSize: '13px', margin: '2px 0 0 0', color: '#6f797a' }}>
+                    Hoàn tất ghi nhận khoản thu nhận phòng
+                  </p>
+                </div>
               </div>
               <button
                 className="ktp-modal-close"
                 onClick={() => setPaymentSuccessDialog(null)}
-                style={{ color: '#ffffff' }}
+                style={{ color: '#6f797a', background: 'transparent', border: 'none', cursor: 'pointer' }}
                 aria-label="Đóng thông báo"
               >
                 <Icon name="close" />

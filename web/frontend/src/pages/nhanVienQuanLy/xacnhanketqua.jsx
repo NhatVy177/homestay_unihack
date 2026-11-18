@@ -187,11 +187,16 @@ export default function XacNhanKetQua() {
       {modalOpen && (
         <div className="ktp-modal-overlay" onClick={() => setModalOpen(false)}>
           <div className="ktp-modal" style={{ maxWidth: '700px', width: '90%', padding: '0', backgroundColor: '#ffffff', borderRadius: '12px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="ktp-modal-header" style={{ padding: '16px 24px', backgroundColor: '#4A6549', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '12px 12px 0 0' }}>
+            <div className="ktp-modal-header" style={{ padding: '20px 24px', backgroundColor: '#ffffff', borderBottom: '1px solid #e1e3e4', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '12px 12px 0 0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h3 style={{ fontSize: '20px', margin: 0, color: '#ffffff', fontWeight: '700' }}>Xác nhận kết quả đối soát</h3>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F1F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4A6549' }}>
+                  <Icon name="fact_check" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '18px', margin: 0, color: '#191c1d', fontWeight: '700' }}>Xác nhận kết quả đối soát</h3>
+                </div>
               </div>
-              <button className="ktp-modal-close" onClick={() => setModalOpen(false)} style={{ color: '#ffffff', background: 'transparent', border: 'none', cursor: 'pointer' }}><Icon name="close" /></button>
+              <button className="ktp-modal-close" onClick={() => setModalOpen(false)} style={{ color: '#6f797a', background: 'transparent', border: 'none', cursor: 'pointer' }}><Icon name="close" /></button>
             </div>
             
             <div className="ktp-modal-body" style={{ padding: '16px 24px', maxHeight: '70vh', overflowY: 'auto', backgroundColor: '#f8f9fa' }}>
