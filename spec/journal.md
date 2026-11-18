@@ -1779,6 +1779,30 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
   + Blockchain tests: `npm test` trong `blockchain` PASS (25 pass, 0 fail, 1 skip).
 - Việc còn lại: Vy đăng nhập vào tài khoản Admin (`nv0013` / mật khẩu `123`) và trải nghiệm toàn bộ 8 màn hình Admin mới.
 
+## 2026-11-18 10:33:30 +07:00 — J-X092 — Bỏ nhãn loại phòng trên ảnh và đồng bộ font trang chủ
+
+- Người thực hiện: Codex, theo yêu cầu Vy giữ trái tim trên ảnh và đồng bộ kiểu chữ. D-062 thay ngoại lệ Playfair của D-050; dùng Inter hiện có, không thêm font/thư viện.
+- Source: `web/frontend/src/pages/homeExperience/HomeExperience.jsx` bỏ nhãn loại phòng chồng ảnh, giữ phần nút trái tim đang có ở local; `experience.css` bỏ font-face HomeDisplay và CSS badge, đặt token heading/display bằng body trong `.tc-page`, đồng bộ font map, giữ style trái tim. Component chung cũng áp dụng cho danh sách phòng công khai; không đổi sức chứa hiển thị dưới ảnh. Phần tim có sẵn ở local được giữ trong snapshot cùng phạm vi yêu cầu, không gom các sửa dở khác.
+- Test: mở rộng `web/frontend/scripts/ui-home.mjs` kiểm computed font Inter, không badge, mỗi card có tim và bấm tim khi chưa đăng nhập giữ đúng next. Snapshot 3 file trong worktree `D:\HomeStayDorm-home-typeface`/`fix/home-typeface` từ origin/main `de36e64`, không chứa các sửa dở khác của root. Frontend Vite build PASS (cảnh báo dependency/chunk còn), homepage fixture PASS1440/1024/768/390/320 + empty/error, không API ghi; avalanche UI smoke PASS Verify/D-017/D-018/D-023/D-024, không browser exception. Chạy script Node trực tiếp với GOMAXPROCS=2 như môi trường đã dùng; tương đương các script build/test:avalanche-ui.
+- Đọc API thật qua backend5000: homepage và danh sách `/phong` PASS1440/390, không badge/tràn ngang, số tim bằng số card. Đã xem ảnh mobile `.ui-screens/home-effects/layout/live-typeface-390.png` (ignored). Đây là kiểm trình bày với GET thật; không đăng nhập, không gửi API ghi hoặc thay dữ liệu SQL, không nghiệm thu nghiệp vụ SQL/Fuji. Không chạy lại backend/blockchain do source tương ứng không đổi.
+- Hồ sơ: `spec/decisions.md`, `spec/scope.md`, `hackathon/plan.md`, `spec/luong-tong-hop.md`, `spec/progress.md`, `spec/journal.md` đồng bộ yêu cầu và bằng chứng. Theo D-061 commit/push main bằng NhatVy177; chỉ stage 3 file source/test trên và hồ sơ, giữ riêng các sửa dở TrangChu/RoomDetail/ChiTietPhong/AvalancheVerify/servicesShowcase/trustStrip/roomDetailLayout và file chưa theo dõi. Đối chiếu snapshot đã kiểm trước commit, hash remote sau push. Không có bước tính năng còn dở trong phạm vi này.
+
+
+## 2026-11-18 10:41:22 +07:00 — J-A003 — Khắc phục lỗi "Lỗi khi tải số liệu tổng quan" và đồng bộ bóc tách dữ liệu mảng an toàn
+
+- Người thực hiện: Antigravity theo thông báo lỗi của Vy từ ảnh chụp màn hình Admin ("Lỗi khi tải số liệu tổng quan").
+- Nguyên nhân: Cấu trúc phản hồi từ backend không đồng nhất giữa các endpoint quản trị: `branches`, `rooms`, `employees` trả về mảng trực tiếp `[...]`, trong khi `services`, `rules`, `beds`, `assets` bọc trong object `{ data: [...] }`. Khi frontend truy xuất `res.data` rồi gọi hàm mảng (`.filter`, `.map`, `.reduce`), các endpoint bọc object gây ra `TypeError` dẫn đến khối catch kích hoạt thông báo lỗi đỏ.
+- Khắc phục:
+  + `web/frontend/src/pages/admin/admin.utils.js`: tạo tiện ích dùng chung `extractArray(res)` và `formatVND(num)` hỗ trợ an toàn mọi dạng response (`res`, `res.data`, `res.data.data`).
+  + `web/frontend/src/pages/admin/tabs/AdminDashboardTab.jsx`: áp dụng `extractArray`, tính toán chỉ số công suất phòng, giường trống và khách đang ở chính xác theo trường `soGiuong`/`soGiuongTrong` của SQL Server.
+  + Cập nhật đồng bộ `extractArray` trên toàn bộ các tab còn lại: `AdminServicesTab.jsx`, `AdminConditionsTab.jsx`, `AdminRoomsTab.jsx`, `AdminBranchesTab.jsx`, `AdminEmployeesTab.jsx`, `AdminAssetsTab.jsx`, `AdminUsersTab.jsx`.
+  + `AdminUsersTab.jsx`: bổ sung cơ chế liên kết dữ liệu khách thuê thực tế từ đơn đăng ký thuê để hiển thị danh sách khách hàng sống động.
+- Kiểm tra:
+  + Chạy script kiểm thử trình duyệt thực tế Playwright trên `http://localhost:5173/admin`: Banner lỗi đỏ hoàn toàn biến mất (`Has error: false`), 4 thẻ KPI tải đầy đủ: 3 Chi nhánh, 43 Phòng / 158 Giường, 14 Tài khoản, 15 Dịch vụ. Biểu đồ donut và thống kê vận hành hiển thị chính xác. Ảnh chụp màn hình đã được lưu đối chứng.
+  + Frontend Vite build: `npm run build` PASS (`built in 1m 28s`).
+  + UI smoke test: `npm run test:avalanche-ui` PASS.
+  + Backend unit tests: `npm test` trong `web/backend` PASS (127 pass, 0 fail, 4 skip).
+
 ## 2026-11-18 10:42:12 +07:00 — J-C180 — 7 việc trước khi nộp trên nhánh `feat/pre-submit`
 - Người thực hiện: Claude, theo yêu cầu của Vy (duyệt cả 7 đề xuất; Claude làm cả giao diện phần mới; làm nhánh riêng để không đụng localhost:5173; hạn sửa code dời tới 21:00 18/11). Quyết định: D-063. Worktree `D:\HomeStayDorm-features` từ `origin/main` `de36e64`; `node_modules` là liên kết sang thư mục chính; backend phụ cổng 5012 (`SCHEDULERS_ENABLED=false`) và bản xem thử 5198 chỉ để kiểm tra.
 - (1) Báo hỏng: `web/backend/services/suaChuaBaoTri.service.js` (viết lại bằng truy vấn trực tiếp; các thủ tục `SP_*YeuCauSuaChua` mà bản cũ gọi không có trong DB), controller, routes, `middleware/audit.middleware.js` (ẩn mảng ảnh khỏi nhật ký), `uploads/sua-chua/`; frontend `components/suaChua/*` (tab khách, tab quản lý, khung lịch sử theo hợp đồng), gắn vào cổng khách (tab "Báo hỏng", mở khi có hợp đồng), trang quản lý (tab "Báo hỏng & sửa chữa") và hộp kiểm tra trả phòng (`XuLyTraPhongTab.jsx`).

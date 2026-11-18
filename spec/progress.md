@@ -1,8 +1,8 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 10:05:10 +07:00** (J-A002: Tách mới toàn bộ hệ thống Admin theo chuẩn Nam4 - Theme Xanh tokens.css, loại bỏ hoàn toàn code Admin cũ hơn 4000 dòng). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 10:41:22 +07:00** (J-A003: Khắc phục lỗi tải số liệu tổng quan Admin, đồng bộ tiện ích extractArray cho toàn bộ 8 tab). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
-## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4 (J-A002)
+## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4 & sửa lỗi số liệu (J-A002 / J-A003)
 
 - Loại bỏ hoàn toàn mã nguồn đơn khối cũ hơn 4000 dòng trong `AdminPage.jsx`.
 - Tách thành cấu trúc modular 8 tab sạch sẽ tương ứng 8 trang của Nam4:
@@ -17,10 +17,14 @@ Cập nhật: **2026-11-18 10:05:10 +07:00** (J-A002: Tách mới toàn bộ h�
 - Menu sidebar rút gọn chuẩn đúng 8 mục của Nam4 (`dashboard`, `users`, `employees`, `branches`, `rooms`, `services`, `conditions`, `assets`).
 - Toàn bộ màu be/nâu từ Nam4 được chuyển thành màu xanh thương hiệu hệ thống (`--color-primary: #4A6549`, tokens.css).
 - Bổ sung các biểu tượng SVG cần thiết (`inventory_2`, `inventory`, `policy`, `gavel`) trong `Icon.jsx`.
-- Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 127 PASS / 0 FAIL / 4 SKIP, `blockchain` 25 PASS / 0 FAIL / 1 SKIP.
+- Khắc phục lỗi bóc tách response (mảng vs object bọc `{ data }`) bằng `extractArray` trong `admin.utils.js`.
+- Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 127 PASS / 0 FAIL / 4 SKIP, trình duyệt Playwright đọc thực tế trên local5173 xác nhận sạch banner đỏ, 4 thẻ KPI và donut chart tải đầy đủ số liệu thật.
 
 
 ## Trang chủ/nhà3D trên main
+
+- **D-062/J-X092:** trang chủ dùng Inter thống nhất qua token `.tc-page`, gồm tiêu đề/nút/dịch vụ/minh bạch/footer và map. Thẻ phòng công khai dùng chung bỏ nhãn loại phòng xanh trên ảnh, giữ trái tim; danh sách phòng kế thừa, thông tin sức chứa bên dưới ảnh giữ nguyên.
+- **Kiểm mới J-X092:** snapshot riêng từ origin/main `de36e64` chỉ gồm 3 file source/test của đợt này: frontend build PASS; `ui-home.mjs` PASS1440/1024/768/390/320 + empty/error (computed font Inter, không badge, đủ tim, tim mở đăng nhập với next đúng); avalanche UI smoke PASS, không browser exception. Trình duyệt đọc API thật backend5000: trang chủ và `/phong` PASS1440/390, không tràn ngang. Không đăng nhập/ghi DB/Fuji. Chỉ đưa các file liên quan và hồ sơ lên main theo D-061, giữ riêng thay đổi dở khác tại root.
 
 - **J-X087:** Vy hỏi “sửa đâu, push main chưa”; cho phép gộp nhánh `fix/home-3d-branch-layout` (`f6f8dc5`, gồm D-055/J-X084 và bỏ nhãn tầng J-X086) vào main mới nhất `f9954b6`. Làm trong nhánh/worktree riêng `integration/house-main`/`D:\HomeStayDorm-house-main`, giữ thay đổi main J-C173/J-C174/J-C175. `main` dùng nhà dựng theo tầng/phòng từng chi nhánh, không vẽ nhãnTầng trên mặt nhà, giữ bộ chọn tầng/số đếm và tên phòng khi mở.
 - Mọi nút phòng mở route hiện hành **`/phong/<mã phòng>`**; nút bản đồ mở **`/phong?khuVuc=...`**. Test ui-house-layout đã đổi kỳ vọng điều hướng theo J-C174; không khôi phục liên kết khám phá cũ. Journal hợp nhất giữ cả lịch sử main và UI, sắp theo thời gian; không đổi quy tắc thuê.
