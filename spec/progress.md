@@ -1,6 +1,6 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 10:05:10 +07:00** (J-A002: Tách mới toàn bộ hệ thống Admin theo chuẩn Nam4 - Theme Xanh tokens.css, loại bỏ hoàn toàn code Admin cũ hơn 4000 dòng). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 10:33:30 +07:00** (J-X092: bỏ nhãn trên ảnh phòng, giữ trái tim và thống nhất font Inter trang chủ). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4 (J-A002)
 
@@ -21,6 +21,9 @@ Cập nhật: **2026-11-18 10:05:10 +07:00** (J-A002: Tách mới toàn bộ h�
 
 
 ## Trang chủ/nhà3D trên main
+
+- **D-062/J-X092:** trang chủ dùng Inter thống nhất qua token `.tc-page`, gồm tiêu đề/nút/dịch vụ/minh bạch/footer và map. Thẻ phòng công khai dùng chung bỏ nhãn loại phòng xanh trên ảnh, giữ trái tim; danh sách phòng kế thừa, thông tin sức chứa bên dưới ảnh giữ nguyên.
+- **Kiểm mới J-X092:** snapshot riêng từ origin/main `de36e64` chỉ gồm 3 file source/test của đợt này: frontend build PASS; `ui-home.mjs` PASS1440/1024/768/390/320 + empty/error (computed font Inter, không badge, đủ tim, tim mở đăng nhập với next đúng); avalanche UI smoke PASS, không browser exception. Trình duyệt đọc API thật backend5000: trang chủ và `/phong` PASS1440/390, không tràn ngang. Không đăng nhập/ghi DB/Fuji. Chỉ đưa các file liên quan và hồ sơ lên main theo D-061, giữ riêng thay đổi dở khác tại root.
 
 - **J-X087:** Vy hỏi “sửa đâu, push main chưa”; cho phép gộp nhánh `fix/home-3d-branch-layout` (`f6f8dc5`, gồm D-055/J-X084 và bỏ nhãn tầng J-X086) vào main mới nhất `f9954b6`. Làm trong nhánh/worktree riêng `integration/house-main`/`D:\HomeStayDorm-house-main`, giữ thay đổi main J-C173/J-C174/J-C175. `main` dùng nhà dựng theo tầng/phòng từng chi nhánh, không vẽ nhãnTầng trên mặt nhà, giữ bộ chọn tầng/số đếm và tên phòng khi mở.
 - Mọi nút phòng mở route hiện hành **`/phong/<mã phòng>`**; nút bản đồ mở **`/phong?khuVuc=...`**. Test ui-house-layout đã đổi kỳ vọng điều hướng theo J-C174; không khôi phục liên kết khám phá cũ. Journal hợp nhất giữ cả lịch sử main và UI, sắp theo thời gian; không đổi quy tắc thuê.
