@@ -1,6 +1,6 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 10:41:22 +07:00** (J-A003: Khắc phục lỗi tải số liệu tổng quan Admin, đồng bộ tiện ích extractArray cho toàn bộ 8 tab). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 11:08:25 +07:00** (J-X093: bộ chọn ngày giờ/dropdown chung; nhánh riêng chờ duyệt do có AI sửa song song). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4 & sửa lỗi số liệu (J-A002 / J-A003)
 
@@ -20,6 +20,12 @@ Cập nhật: **2026-11-18 10:41:22 +07:00** (J-A003: Khắc phục lỗi tải 
 - Khắc phục lỗi bóc tách response (mảng vs object bọc `{ data }`) bằng `extractArray` trong `admin.utils.js`.
 - Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 127 PASS / 0 FAIL / 4 SKIP, trình duyệt Playwright đọc thực tế trên local5173 xác nhận sạch banner đỏ, 4 thẻ KPI và donut chart tải đầy đủ số liệu thật.
 
+
+## Bộ chọn ngày giờ và dropdown — D-064 / J-X093
+
+- Có code và kiểm mới trên `fix/shared-date-controls` / `D:\HomeStayDorm-date-controls`, từ origin/main `24988a6`. Lớp chung ở root frontend thay popup date/time/datetime-local và select một giá trị, tự áp dụng form động; giữ input/select, giá trị, validation và handler. Rà static có34 ô date, 3 ô time và1 datetime-local trong18 file JSX, kể cả GoogleAuthSection; không phải bằng chứng đã mở từng màn nghiệp vụ thật.
+- Helper4/4 PASS; frontend build PASS (cảnh báo dependency/chunk còn); avalanche UI smoke PASS. UI riêng PASS1440/390: React đăng ký giữ giá trị, chọn năm/ngày nhuận, min/max/step, giờ/datetime, xóa/required, readOnly, bàn phím, popup trong viewport. Hồi quy homepage1440/1024/768/390/320 + empty/error, lịch Sale1440/1024/390 và modal đăng ký khách1440/390 PASS; API fixture, không ghi DB thật. Đã xem ảnh lịch desktop/mobile; ảnh/report `.ui-screens/form-controls/` ignored. Source/test/package8 file đối chiếu snapshot trước commit.
+- Preview bản build **http://127.0.0.1:5206/**. Chưa gộp main: fetch thấy D-063 trên origin/feat/pre-submit ghi Vy đã giao Claude sửa song song; áp dụng lại quy tắc nhánh/worktree riêng và chờ Vy duyệt theo AGENTS. Giữ riêng các thay đổi dở tại checkout gốc; chỉ gộp đợt này sau duyệt. Không chạy backend/blockchain test do source tương ứng không đổi, không coi kiểm fixture là nghiệm thu SQL/Fuji.
 
 ## Trang chủ/nhà3D trên main
 
