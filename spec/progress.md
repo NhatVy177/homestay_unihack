@@ -1,10 +1,10 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 23:24:09 +07:00** (J-X104: thay logo và ba ảnh slideshow trang chủ). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 23:53:47 +07:00** (J-X105: thay logo mái nhà/nhánh lá màu xanh sage). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
-## Nhận diện và slideshow trang chủ — D-073
+## Nhận diện và slideshow trang chủ — D-073 / D-074
 
-- Nhánh `feat/demo-data-avalanche-ui` dùng logo nhà có giường tầng cho nhận diện chung và ba ảnh phòng Vy gửi theo đúng thứ tự cho slideshow trang chủ. Giữ chữ HomeStayDorm cạnh biểu tượng và giữ nguyên bố cục, hiệu ứng, nghiệp vụ hiện có.
+- `main` dùng logo mái nhà kết hợp nhánh lá màu xanh sage cho nhận diện chung và ba ảnh phòng Vy gửi theo đúng thứ tự cho slideshow trang chủ. Giữ chữ HomeStayDorm cạnh biểu tượng và giữ nguyên bố cục, hiệu ứng, nghiệp vụ hiện có.
 - Không chạy server, build hoặc test tự động trong đợt J-X104 theo yêu cầu của Vy để không tốn thêm bộ nhớ máy.
 
 ## Demo thuê phòng và trạng thái xác nhận — D-072

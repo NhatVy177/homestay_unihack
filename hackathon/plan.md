@@ -325,6 +325,8 @@ Kết quả T-21 và danh sách đợt 2 nằm ở `spec/progress.md` / J-045: �
 
 **Bổ sung D-073 / J-X104 (18/11):** thay slideshow trang chủ bằng ba ảnh phòng Vy gửi theo đúng thứ tự. Dùng logo nhà có giường tầng làm nhận diện chung ở đầu trang công khai, chân trang, thanh bên khu làm việc và favicon; giữ chữ HomeStayDorm cạnh biểu tượng. Không đổi bố cục, hiệu ứng hoặc nghiệp vụ. Theo yêu cầu của Vy, đợt này không tự chạy server, build hay test tự động.
 
+**Bổ sung D-074 / J-X105 (18/11):** thay riêng logo nhà có giường tầng của D-073 bằng biểu tượng mái nhà kết hợp nhánh lá do Vy gửi, tô xanh sage chính `#4A6549` để rõ trên nền trắng. Giữ nguyên vị trí, kích thước, chữ HomeStayDorm và ba ảnh slideshow.
+
 **Nhà 3D D-055 / J-X084 (17/11):** thay nhà cố định 2 tầng/2 phòng mỗi tầng bằng mô hình theo toàn bộ danh sách phòng public của từng chi nhánh. Ưu tiên tầng rõ ràng/tên phòng Pxxx (P4xx là tầng4; mã nội bộ có thể khác tên), dựng đủ tầng trung gian, chia đúng số ô phòng; giữ mở/gộp, xoay, camera tự căn cho desktop/mobile và giảm chuyển động. Bộ chọn tầng có số phòng và danh sách đầy đủ, nhóm chưa rõ tầng riêng; không tự suy tầng9 cho phòng thử nghiệm chưa đánh số, không sửa DB. Vẫn là T-21, bổ sung D-050; hình dáng/nội thất minh họa. Kiểm fixture biến thiên số tầng/phòng và đối chiếu GET/SELECT thật với cả3 chi nhánh, không ghi dữ liệu.
 
 **Tinh chỉnh D-051 / J-060 (17/11):** theo ảnh mới của Vy, gallery chạy phải → trái, dùng phối cảnh để ảnh ngoài rìa lớn hơn/xéo/đổ xuống, tăng chiều cao theo màn lớn; giữ thao tác và chế độ giảm chuyển động. Số liên hệ công khai trang chủ đổi thành 0795749721 ở cả chữ và link gọi; số chi nhánh/nhân viên trong nghiệp vụ giữ nguyên. Vẫn thuộc T-21, kiểm ảnh 1920/1440/390px và các ca layout/motion hiện có.

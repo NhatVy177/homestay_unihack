@@ -1948,3 +1948,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: thêm `components/common/BrandLogo.jsx` và CSS dùng chung; cập nhật nhận diện tại `TrangChu.jsx`, `PublicLayout.jsx`, `HomeExperience.jsx`, `WorkspaceShell.jsx`, `index.html` và CSS liên quan. Thêm logo/favicon trong `public/images/brand/` và ba ảnh `public/images/home/slideshow-1.jpg` đến `slideshow-3.jpg`; slideshow dùng đúng thứ tự 1–2–3.
 - Kiểm tra: chỉ đối chiếu đường dẫn tài sản, thứ tự khai báo và thay đổi Git. Không chạy server, build, test tự động hoặc trình duyệt theo yêu cầu của Vy. Các tiến trình xem trước 5187/5017 do Codex mở trong đợt này đã dừng.
 - Còn lại: không.
+
+## 2026-11-18 23:53:47 +07:00 — J-X105 — Thay logo mái nhà và nhánh lá màu xanh sage
+
+- Người thực hiện: Codex. Vy gửi biểu tượng mái nhà kết hợp nhánh lá để thay logo vừa gộp, sau đó yêu cầu tô xanh vì màu gốc hơi trắng.
+- File: thay trực tiếp `web/frontend/public/images/brand/homestaydorm-logo.png` và `homestaydorm-favicon.png` bằng bản nền trong suốt màu xanh sage chính `#4A6549`. Các component, kích thước hiển thị, chữ HomeStayDorm và ba ảnh slideshow giữ nguyên.
+- Kiểm tra: đối chiếu trực tiếp tài sản PNG sau khi xuất. Không chạy server, build, test tự động hoặc trình duyệt theo yêu cầu của Vy.
+- Còn lại: không.
