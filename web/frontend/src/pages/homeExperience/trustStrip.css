@@ -1,10 +1,10 @@
 .ts { padding: 56px 0; background: var(--color-primary-soft, #E8EDE7); }
 .ts-inner { width: min(1120px, calc(100% - 32px)); margin: 0 auto; display: grid; gap: 24px; justify-items: center; text-align: center; }
-.ts-head h2 { margin: 0 0 8px; font-family: var(--font-heading, inherit); font-size: clamp(24px, 3.2vw, 34px); color: var(--color-text, #191C1A); }
+.ts-head h2 { margin: 0 0 8px; font-family: var(--hx-display, var(--font-heading, inherit)); font-size: clamp(24px, 3.2vw, 34px); color: var(--color-text, #191C1A); }
 .ts-head p { margin: 0 auto; max-width: 640px; font-size: 16px; line-height: 1.6; color: var(--color-text-muted, #5E655C); }
 .ts-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; width: 100%; margin: 0; }
 .ts-stats > div { display: grid; gap: 6px; padding: 20px 16px; border-radius: var(--radius-lg, 20px); background: var(--color-surface, #fff); box-shadow: var(--shadow-sm, 0 1px 2px rgba(25, 28, 26, .06)); }
-.ts-stats dd { margin: 0; order: -1; font-family: var(--font-heading, inherit); font-size: 36px; font-weight: 700; color: var(--color-primary, #4A6549); font-variant-numeric: tabular-nums; }
+.ts-stats dd { margin: 0; order: -1; font-family: var(--hx-display, var(--font-heading, inherit)); font-size: 36px; font-weight: 700; color: var(--color-primary, #4A6549); font-variant-numeric: tabular-nums; }
 .ts-stats dt { font-size: 14px; color: var(--color-text-muted, #5E655C); }
 .ts-toggle { min-height: 44px; padding: 0 22px; border: 1px solid var(--color-primary, #4A6549); border-radius: 999px; background: transparent; font: inherit; font-weight: 600; color: var(--color-primary, #4A6549); cursor: pointer; }
 .ts-toggle:hover { background: var(--color-surface, #fff); }

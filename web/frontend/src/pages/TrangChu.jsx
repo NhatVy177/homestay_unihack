@@ -8,6 +8,7 @@ import ForgotPasswordForm from '../components/common/ForgotPasswordForm.jsx';
 import TrustStrip from './homeExperience/TrustStrip.jsx';
 import ServicesShowcase from './homeExperience/ServicesShowcase.jsx';
 import { safeNextPath } from '../auth/returnPath.js';
+import { getAuthenticatedHomePath } from '../auth/auth.routes.js';
 import { httpClient } from '../api/httpClient.js';
 import { Icon } from '../components/common/Icon.jsx';
 import '../styles/TrangChu.css';
@@ -56,7 +57,9 @@ function AuthModal({ mode, onClose, onSwitchMode, initialEmail = '' }) {
       const statePath = from ? `${from.pathname || ''}${from.search || ''}${from.hash || ''}` : '';
       // Không có trang cần quay lại thì ở lại trang chủ; vào khu làm việc bằng menu "Tài khoản của tôi".
       const back = safeNextPath(requested) || safeNextPath(statePath);
-      if (back) navigate(back, { replace: true });
+      // Nhân viên không dùng trang chủ: vào thẳng trang làm việc của chức vụ.
+      if (user?.vaiTro === 'NhanVien') navigate(getAuthenticatedHomePath(user), { replace: true });
+      else if (back) navigate(back, { replace: true });
       else if (user && location.pathname !== '/') navigate('/', { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Không thể đăng nhập lúc này.');
@@ -543,6 +546,9 @@ export default function TrangChu() {
     const auth = new URLSearchParams(location.search).get('auth');
     if ((auth === 'login' || auth === 'register') && !isLoading && !user) setAuthModal(auth);
   }, [location.search, isLoading, user]);
+  useEffect(() => {
+    if (!isLoading && user?.vaiTro === 'NhanVien') navigate(getAuthenticatedHomePath(user), { replace: true });
+  }, [isLoading, user, navigate]);
   useEffect(() => {
     const next = safeNextPath(new URLSearchParams(location.search).get('next'));
     if (!next || isLoading) return;

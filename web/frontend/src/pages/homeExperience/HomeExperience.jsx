@@ -106,7 +106,7 @@ export function RoomCard({ room, onViewDetail, index = 0 }) {
   function reset() { card.current.style.setProperty('--rx', '0deg'); card.current.style.setProperty('--ry', '0deg'); }
   // Dấu tim: chưa đăng nhập thì yêu cầu đăng nhập, rồi vào đúng phòng trong cổng khách để thêm vào hồ sơ quan tâm.
   function interest() {
-    const target = `/khach-hang?tab=kham-pha&phong=${encodeURIComponent(room.MaPhong)}`;
+    const target = `/khach-hang?phong=${encodeURIComponent(room.MaPhong)}`;
     window.location.assign(user ? (user.vaiTro === 'KhachHang' ? target : getAuthenticatedHomePath(user)) : `/?next=${encodeURIComponent(target)}`);
   }
   return <Reveal delay={(index % 3) * 100} kind="spring">

@@ -33,7 +33,7 @@ export default function DanhSachPhongPage() {
   return <PublicLayout>
     <div className="pl-wrap dsp">
       <div className="dsp-head">
-        {typeof customerPortalTab === 'string' && <button type="button" className="ui-btn ui-btn--ghost dsp-back" onClick={() => navigate(`/khach-hang?tab=${encodeURIComponent(customerPortalTab)}`)}><Icon name="arrow_back" />Quay lại</button>}
+        {typeof customerPortalTab === 'string' && customerPortalTab !== 'kham-pha' && <button type="button" className="ui-btn ui-btn--ghost dsp-back" onClick={() => navigate(`/khach-hang?tab=${encodeURIComponent(customerPortalTab)}`)}><Icon name="arrow_back" />Quay lại</button>}
         <h1><Icon name="bed" />Danh sách phòng</h1>
         {rooms && <p>{visible.length} phòng{filters.length > 0 && <> · đang lọc theo tìm kiếm của bạn. <button type="button" className="dsp-clear" onClick={() => navigate('/phong', { state: location.state })}>Xem tất cả phòng</button></>}</p>}
       </div>

@@ -47,9 +47,9 @@ export default function AvalancheVerifyPage() {
     <main className="avalanche-verify">
       <a href="/">← HomeStayDorm</a>
       <h1>Kiểm chứng hồ sơ trên Avalanche</h1>
-      <p>Chọn tệp bằng chứng do hai bên lưu giữ. Trình duyệt đối chiếu nội dung với contract đã cấu hình; tệp không được tải lên máy chủ HomeStayDorm.</p>
+      <p>Chọn tệp hồ sơ xác nhận mà bạn đã tải về hoặc được gửi. Trình duyệt tự đối chiếu với blockchain; tệp không được tải lên máy chủ HomeStayDorm.</p>
       {chainId === 43113 && isAddress(address) && <p>Mạng thử Avalanche Fuji · <a href={`https://testnet.snowtrace.io/address/${address}`} target="_blank" rel="noreferrer">Xem contract trên Snowtrace ↗</a></p>}
-      <label htmlFor="evidence-file">Tệp bằng chứng JSON</label>
+      <label htmlFor="evidence-file">Tệp hồ sơ xác nhận</label>
       <input id="evidence-file" type="file" accept=".json,application/json" onChange={onFile} disabled={busy} />
       {busy && <p role="status">Đang đọc trạng thái trên chain...</p>}
       {result && (

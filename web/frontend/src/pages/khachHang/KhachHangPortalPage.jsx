@@ -26,7 +26,7 @@ import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Cl
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
 const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
-const PORTAL_TABS = ['tai-khoan', 'kham-pha', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'cu-tru', 'hop-dong', 'bao-hong', 'tra-phong'];
+const PORTAL_TABS = ['tai-khoan', 'cu-tru', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'hop-dong', 'bao-hong', 'tra-phong'];
 
 // Gốc backend để mở lại file chứng từ đã upload (DB lưu đường dẫn /uploads/chung-tu/..).
 const FILE_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
@@ -606,7 +606,6 @@ function getNavLocks(state = {}) {
   const hasContract = Number(state.soHopDong || 0) > 0;
 
   return {
-    'kham-pha': false,
     'ho-so': false,
     'lich-xem': false,
     'dat-coc': false, // Hóa đơn & thanh toán luôn mở (trống thì báo chưa có hóa đơn), như Lịch sử đặt cọc
@@ -815,7 +814,6 @@ export default function KhachHangPortalPage() {
   const navItems = [
     { id: 'tai-khoan', icon: 'person', title: 'Thông tin cá nhân' },
     { id: 'cu-tru', icon: 'group', title: 'Thông tin cư trú' },
-    { id: 'kham-pha', icon: 'search', title: 'Khám phá phòng' },
     { id: 'ho-so', icon: 'description', title: 'Hồ sơ đăng ký' },
     { id: 'lich-xem', icon: 'event_note', title: 'Lịch xem phòng' },
     { id: 'dat-coc', icon: 'payments', title: 'Hóa đơn & thanh toán' },
@@ -856,7 +854,7 @@ export default function KhachHangPortalPage() {
     khachMoiApi.getChiTietPhong(roomId).then(({ data }) => {
       if (!active) return;
       incomingRoomHandled.current = roomId;
-      setActiveTab('kham-pha');
+      setActiveTab('ho-so');
       openRentForm(normalizeRoomDetail(data), params.get('dangKy') === 'nhom' ? { group: true } : {});
       // Link chốt phòng của Sale (/chot/<mã>) mang theo ngày giờ hẹn xem và nguồn khách: điền sẵn vào form.
       const ngayXem = params.get('ngayXem'), gioXem = params.get('gioXem'), nguon = params.get('nguon'), tuSale = params.get('tuSale');
@@ -895,6 +893,13 @@ export default function KhachHangPortalPage() {
     if (loading || activeTab !== 'kham-pha' || detailPhong || detailLoading || detailError || rentModal || registrationNoticeOpen || hasIncomingRoom) return;
     navigate('/phong', { replace: true, state: { customerPortalTab: 'tai-khoan' } });
   }, [loading, activeTab, detailPhong, detailLoading, detailError, rentModal, registrationNoticeOpen, location.search, navigate]);
+
+  useEffect(() => {
+    const tab = new URLSearchParams(location.search).get('tab');
+    if (tab === 'kham-pha' && !new URLSearchParams(location.search).get('phong') && !incomingRoomHandled.current) {
+      navigate('/phong', { replace: true });
+    }
+  }, [location.search, navigate]);
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -1309,7 +1314,7 @@ export default function KhachHangPortalPage() {
     }
   }
 
-  async function openScheduledRoomDetail(room) {
+  function openScheduledRoomDetail(room) {
     const maPhong = room?.maPhong || room?.MaPhong;
     if (!maPhong) {
       setToast('Không tìm thấy mã phòng để xem chi tiết.');
@@ -1317,8 +1322,7 @@ export default function KhachHangPortalPage() {
     }
 
     setScheduleDetailModal(null);
-    setActiveTab('kham-pha');
-    await openRoomDetail({ ...room, maPhong });
+    navigate(`/phong/${encodeURIComponent(maPhong)}`);
   }
 
   async function submitEditModal(event) {
@@ -4269,7 +4273,7 @@ export default function KhachHangPortalPage() {
     const total = 1 + groupMembers.length;
     const first = selectedRooms[0] || {};
     const steps = ['Thành viên nhóm', 'Thuê phòng', 'Xác nhận'];
-    const goBack = () => { if (groupStep === 1) { setRentModal(false); window.scrollTo({ top: 0, behavior: 'smooth' }); } else setGroupStep(groupStep - 1); };
+    const goBack = () => { if (groupStep === 1) { setRentModal(false); navigate('/phong'); } else setGroupStep(groupStep - 1); };
     const summary = groupSummary();
     return (
       <section className="kh-grp-page">
@@ -4368,7 +4372,7 @@ export default function KhachHangPortalPage() {
     const interested = selectedRooms[0];
     return (
       <section className="kh-rent-page">
-        <button type="button" className="ui-btn ui-btn--secondary kh-rent-back" onClick={() => { setRentModal(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+        <button type="button" className="ui-btn ui-btn--secondary kh-rent-back" onClick={() => { setRentModal(false); navigate('/phong'); }}>
           <Icon name="arrow_back" /> Quay lại
         </button>
         <form className="kh-rent-card kh-register-modal kh-register-page" onSubmit={submitRent}>
@@ -4463,7 +4467,7 @@ export default function KhachHangPortalPage() {
           <div className="kh-rent-footer">
             <p>Phiếu này sẽ được gửi đến nhân viên Sale để kiểm tra phòng/giường phù hợp trước khi lập lịch xem phòng.</p>
             <div className="kh-rent-footer-actions">
-              <button className="kp-btn kp-btn-soft" type="button" onClick={() => setRentModal(false)}>Hủy</button>
+              <button className="kp-btn kp-btn-soft" type="button" onClick={() => { setRentModal(false); navigate('/phong'); }}>Hủy</button>
               <button className="kp-btn kp-btn-primary kh-rent-submit" type="submit" disabled={submitting}>
                 {submitting ? 'Đang gửi...' : <>Gửi phiếu đăng ký<Icon name="send" /></>}
               </button>
@@ -4521,7 +4525,7 @@ export default function KhachHangPortalPage() {
     if (activeTab === 'bao-hong') return locks['bao-hong'] ? renderLocked('bao-hong') : <CustomerRepairTab />;
     if (activeTab === 'tra-phong') return renderHopDong();
     if (activeTab === 'tai-khoan') return renderAccount();
-    return renderAccount();
+    return renderProfiles();
   }
 
   return (
@@ -4529,7 +4533,7 @@ export default function KhachHangPortalPage() {
     <WorkspaceShell roleLabel="Khách hàng" eyebrow="Cổng khách hàng"
       title={navItems.find(item => item.id === activeTab)?.title || extraTitles[activeTab] || 'Cổng khách hàng'}
       items={navItems.map(item => ({ id: item.id, label: item.title, icon: item.icon, locked: Boolean(locks[item.id]) }))}
-      activeTab={activeTab} onSelect={(id) => (id === 'kham-pha' ? openPublicRooms() : goTo(id))} user={user} showBranch={false}
+      activeTab={activeTab} onSelect={(id) => goTo(id)} user={user} showBranch={false}
       onAccount={() => goTo('tai-khoan')} onLogout={logout} mainClassName="kh-main"
       footer={<div className="kp-support-mini"><span>Hỗ trợ 24/7</span><strong>1900 6789</strong></div>}>
           {loading && <div className="kp-loading"><span /><p>Đang tải cổng khách hàng...</p></div>}

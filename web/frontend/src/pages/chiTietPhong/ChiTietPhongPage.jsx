@@ -34,7 +34,7 @@ export default function ChiTietPhongPage({ roomCode, banner = null, registerQuer
   }, [maPhong, attempt]);
 
   function goRegister(mode = '1') {
-    const target = room?.maPhong ? `/khach-hang?tab=kham-pha&phong=${encodeURIComponent(room.maPhong)}&dangKy=${mode === 'nhom' ? 'nhom' : '1'}${registerQuery ? `&${registerQuery}` : ''}` : '/khach-hang';
+    const target = room?.maPhong ? `/khach-hang?phong=${encodeURIComponent(room.maPhong)}&dangKy=${mode === 'nhom' ? 'nhom' : '1'}${registerQuery ? `&${registerQuery}` : ''}` : '/khach-hang';
     if (user) navigate(user.vaiTro === 'KhachHang' ? target : getAuthenticatedHomePath(user));
     else navigate(`/?next=${encodeURIComponent(target)}`);
   }
