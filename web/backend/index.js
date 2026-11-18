@@ -32,6 +32,7 @@ import { startHoaDonQuaHanScheduler } from './services/hoaDonQuaHan.service.js';
 import { startDatCocHetHanScheduler } from './services/datCocHetHan.service.js';
 import { startYeuCauCocQuaHanScheduler } from './services/yeuCauCocQuaHan.service.js';
 import { startNhacThuDauKyScheduler } from './services/nhacThuDauKy.service.js';
+import { startNhacHoaDonScheduler } from './services/nhacHoaDon.service.js';
 import hoaDonDinhKyRoutes from './routes/hoaDonDinhKy.routes.js';
 import hopDongRoutes from './routes/hopDong.routes.js';
 import avalancheRoutes from './routes/avalanche.routes.js';
@@ -111,6 +112,7 @@ async function start() {
       startDatCocHetHanScheduler();
       startYeuCauCocQuaHanScheduler();
       startNhacThuDauKyScheduler();
+      startNhacHoaDonScheduler();
       startCheckoutLifecycleScheduler();
     }
   });
