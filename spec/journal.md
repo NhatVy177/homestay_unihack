@@ -1920,3 +1920,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: DormPoints.sol, công cụ deploy, ABI và bộ ký loyalty trong blockchain; migration 20261118_loyalty_points.sql, tích hợp loyalty, route, scheduler và nghiệp vụ hóa đơn; mục Điểm thưởng và chi tiết hóa đơn của khách/kế toán.
 - Kiểm tra: blockchain 26 pass, 1 skip và deploy local qua script thành công. Backend 156 pass, 5 skip. Ca SQL chạy riêng PASS cho migration chạy lại, hóa đơn đúng hạn, báo giá khi gọi đồng thời và áp voucher đúng một lần. Build và avalanche UI smoke PASS, phần Điểm thưởng kiểm ở 1440/390 bằng fixture. Code giao diện không thêm style inline.
 - Còn lại: ví vận hành thử riêng, deploy Fuji và cấu hình demo. Chưa chạy migration trên HOMEDORM4 hoặc xác nhận lần đầu qua Privy trong bản chạy hoàn chỉnh. Gửi nhánh riêng để giữ công việc triển khai khác trên main.
+
+## 2026-11-18 16:53:49 +07:00 — J-X102 — Đưa số dư và lịch sử điểm thưởng vào hồ sơ cá nhân
+
+- Người thực hiện: Codex. Vy muốn hiện Điểm thưởng trên Thông tin cá nhân và bấm vào xem chi tiết. Hồ sơ có số dư, mở/thu lịch sử, ngày giao dịch, số điểm tăng/giảm và trạng thái voucher. Thao tác đổi điểm nằm trong phần mở rộng.
+- File: AccountSecurity.jsx, accountSecurity.css, KhachHangPortalPage.jsx, CustomerProfileRewards.jsx, customerRewards.css và avalanche-smoke.mjs. Giữ đường dẫn cũ vào hồ sơ mở sẵn lịch sử. Không đổi API, SQL hoặc luồng ký.
+- Kiểm tra: build PASS, avalanche UI smoke PASS. Kiểm riêng tại localhost:5186 với dữ liệu giả ở 1440px và 390px, thao tác chuột và bàn phím, số dư sau cập nhật, lịch sử rỗng, đường dẫn cũ, không tràn ngang hoặc lỗi JavaScript. Không chạy giao dịch tích/đổi thật trong lượt kiểm.
+- Nhánh fix/loyalty-profile từ origin/main. Đã đưa phần UI vào worktree đang phục vụ 5186 ở commit 2d9f731 để Vy xem.

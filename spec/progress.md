@@ -1,11 +1,11 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 16:27:35 +07:00** (J-X100: hoàn tất code điểm thưởng và kiểm trên chain cùng SQL local). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 16:53:49 +07:00** (J-X102: chuyển điểm thưởng vào hồ sơ cá nhân và cập nhật bản xem trước). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
-## Điểm thưởng hóa đơn tháng — D-070 / J-X100
+## Điểm thưởng hóa đơn tháng — D-070 / D-071
 
-- Nhánh feat/loyalty-points. Đã có token DormPoints, ví nhúng ký đổi điểm, hàng chờ dùng lại giao dịch đã ký, voucher SQL và giao diện Điểm thưởng. Kế toán xem khoản giảm khi lập hóa đơn và minh chứng trong chi tiết.
-- Mức bằng chứng: code, kiểm tự động trên Hardhat local, SQL Server riêng và giao diện fixture đã qua. Chưa triển khai DormPoints lên Fuji hoặc cài migration trên HOMEDORM4. Chuẩn bị ví vận hành riêng và triển khai theo [cấu hình](../docs/cau-hinh.md#điểm-thưởng-hóa-đơn-tháng--d-070).
+- Code tích và đổi điểm của D-070 ở main. Nhánh fix/loyalty-profile đặt số dư trong Thông tin cá nhân, mở lịch sử và đổi ưu đãi ngay tại hồ sơ. Đã kiểm build và UI fixture 1440/390 trên bản xem trước.
+- Bản xem trước localhost:5186 đã có giao diện này. Giữ backend 5016, Hardhat 8559 và phạm vi thử HD0001 theo J-X101 (d084fcd). HOMEDORM4 đã có schema Vy duyệt, tính năng DormPoints chưa triển khai trên Fuji.
 
 ## Ghi chú 11–13 và QR MoMo Sandbox — D-068 / D-069 / J-X099
 

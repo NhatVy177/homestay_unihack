@@ -221,7 +221,7 @@ Contract `DormSettlement.sol` (EIP-712). Trạng thái: None → HandoverPropose
 - **Khóa vận hành:** khóa của "quản lý", "kế toán" và relayer nằm trên máy chủ, đại diện cho bên cho thuê; không phải ví riêng của từng nhân viên. Contract chỉ nhận một địa chỉ quản lý và một địa chỉ kế toán cho toàn hệ thống.
 - **Cách gọi:** dùng "xác nhận điện tử", không gọi là "chữ ký số". Đây là bằng chứng bổ sung theo thỏa thuận hai bên, không thay hợp đồng thuê (vẫn ký giấy).
 - **Trạng thái thật (11/11):** mới chạy trên chain local; chưa deploy Fuji.
-- **Điểm thưởng (D-070):** backend ghi 100 điểm khi thấy hóa đơn tháng đã trả đúng hạn kể từ ngày mở chương trình. Khách đổi 100 điểm lấy voucher giảm 20.000đ bằng ví nhúng. Chỉ khi sự kiện trừ điểm được xác nhận thì ưu đãi mới sẵn sàng để trừ trên hóa đơn kỳ sau đủ điều kiện. Bảng SQL giữ tham chiếu hóa đơn và trạng thái áp dụng một lần. Cọc hoàn theo luồng tiền Web2.
+- **Điểm thưởng (D-070):** backend ghi 100 điểm khi thấy hóa đơn tháng đã trả đúng hạn kể từ ngày mở chương trình. Khách đổi 100 điểm lấy voucher giảm 20.000đ bằng ví nhúng. Chỉ khi sự kiện trừ điểm được xác nhận thì ưu đãi mới sẵn sàng để trừ trên hóa đơn kỳ sau đủ điều kiện. Bảng SQL giữ tham chiếu hóa đơn và trạng thái áp dụng một lần. Khách bấm số điểm trên Thông tin cá nhân để xem lịch sử và đổi ưu đãi (D-071). Cọc hoàn theo luồng tiền Web2.
 
 ---
 
