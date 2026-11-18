@@ -19,7 +19,7 @@ export class LoyaltyService {
     const [wallet, history, contracts] = await Promise.all([
       this.store.getWallet(customerId),
       this.store.history(customerId, this.deployment),
-      this.store.contracts(customerId),
+      this.store.contracts(customerId, this.deployment),
     ]);
     return {
       enabled: true,

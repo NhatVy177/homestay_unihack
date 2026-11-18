@@ -7,8 +7,8 @@ const opColumns = `op.Id AS id, op.Kind AS kind, op.CustomerId AS customerId, op
     op.EarnedInvoiceId AS invoiceId, op.AppliedInvoiceId AS appliedInvoiceId, op.Status AS status,
     op.Wallet AS wallet, op.Deadline AS deadline, op.Signature AS signature, op.PendingTx AS pending,
     op.DiscountVnd AS discountVnd, op.TxHash AS txHash, op.CreatedAt AS createdAt`;
-const deploymentFilter = 'op.ChainId=@chainId AND op.TokenAddress=@tokenAddress';
-const config = ({ chainId, address }) => ({ chainId, tokenAddress: address.toLowerCase() });
+const deploymentFilter = 'op.ChainId=@chainId AND op.TokenAddress=@tokenAddress AND (@demoContract IS NULL OR op.ContractId=@demoContract)';
+const config = ({ chainId, address, demoContract = null }) => ({ chainId, tokenAddress: address.toLowerCase(), demoContract });
 const eligibleContract = `
     h.TrangThai=N'Hiệu lực'
     AND h.NgayKetThuc >= CONVERT(date, GETDATE())
@@ -46,6 +46,7 @@ export class LoyaltyStore extends SqlStore {
       FROM dbo.HoaDon hd
       JOIN dbo.HopDongThue h ON h.MaHopDong=hd.MaHopDong
       WHERE hd.TrangThai=N'Đã TT'
+        AND (@demoContract IS NULL OR h.MaHopDong=@demoContract)
         AND hd.NgayThanhToan >= @startDate AND hd.NgayThanhToan <= hd.NgayHanTT
         AND TRY_CONVERT(date, hd.KyThanhToan + '-01', 23) IS NOT NULL
         AND hd.KyThanhToan > CONVERT(char(7), h.NgayBatDau, 126)
@@ -54,11 +55,12 @@ export class LoyaltyStore extends SqlStore {
       ORDER BY hd.NgayThanhToan, hd.MaHoaDon;`, { ...config(deployment), startDate: deployment.startDate }, tx);
   }
 
-  async contracts(customerId, tx) {
+  async contracts(customerId, deployment, tx) {
     return (await this.query(`
       SELECT h.MaHopDong AS id
-      FROM dbo.HopDongThue h WHERE h.MaKhachHang=@customerId AND ${eligibleContract}
-      ORDER BY h.MaHopDong;`, { customerId }, tx)).recordset;
+      FROM dbo.HopDongThue h WHERE h.MaKhachHang=@customerId
+        AND (@demoContract IS NULL OR h.MaHopDong=@demoContract) AND ${eligibleContract}
+      ORDER BY h.MaHopDong;`, { customerId, ...config(deployment) }, tx)).recordset;
   }
 
   async history(customerId, deployment) {
@@ -76,7 +78,7 @@ export class LoyaltyStore extends SqlStore {
 
   async quote(row, deployment) {
     return this.locked(`loyalty-customer:${row.customerId}`, async tx => {
-      const contracts = await this.contracts(row.customerId, tx);
+      const contracts = await this.contracts(row.customerId, deployment, tx);
       if (!contracts.some(contract => contract.id === row.contractId)) {
         throw createServiceError('Hợp đồng chưa có kỳ hóa đơn tiếp theo đủ điều kiện hoặc đang có voucher.', 409);
       }

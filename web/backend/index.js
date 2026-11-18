@@ -119,15 +119,17 @@ async function start() {
   const server = app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
     console.log(`Connected to SQL Server database: ${process.env.DB_NAME || 'not configured'}`);
-    if (process.env.SCHEDULERS_ENABLED !== 'false') {
+    const runSchedulers = process.env.SCHEDULERS_ENABLED !== 'false';
+    if (runSchedulers) {
       startHoaDonQuaHanScheduler();
       startDatCocHetHanScheduler();
       startYeuCauCocQuaHanScheduler();
       startNhacThuDauKyScheduler();
       startNhacHoaDonScheduler();
       startCheckoutLifecycleScheduler();
-      startLoyaltyScheduler();
     }
+    const loyaltyScheduler = process.env.LOYALTY_SCHEDULER_ENABLED;
+    if (loyaltyScheduler === 'true' || (runSchedulers && loyaltyScheduler !== 'false')) startLoyaltyScheduler();
   });
 
   server.on('error', (error) => {
