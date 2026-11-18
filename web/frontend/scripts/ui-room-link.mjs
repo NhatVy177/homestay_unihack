@@ -18,6 +18,7 @@ function routes(ctx, user, posts) {
     if (p.endsWith('/link-chot') && req.method() === 'POST') { posts.push(req.postDataJSON()); return route.fulfill({ status: 201, json: { token: 'TOKEN123.sig', maPhong: 'P101', tenPhong: 'Phòng P101', hetHan: '2026-11-25T00:00:00Z' } }); }
     if (p.endsWith('/link-chot/TOKEN123.sig')) return route.fulfill({ json: { maPhong: 'P101', ngayXem: '2026-11-20', gioXem: '15:00', ghiChu: 'Nhớ mang CCCD', maSale: 'NV0005', tenSale: 'Sale Thử', sdtSale: '0901000000' } });
     if (p.endsWith('/link-chot/hong')) return route.fulfill({ status: 404, json: { message: 'Link đã hết hạn hoặc không đúng.' } });
+    if (p.endsWith('/bao-cao/nguon-khach')) return route.fulfill({ json: { ready: true, rows: [{ nguon: 'Sale gửi link', soHoSo: 4, soDatCoc: 3, soHopDong: 2, tyLeChot: 50 }, { nguon: 'Chưa ghi nguồn', soHoSo: 8, soDatCoc: 4, soHopDong: 2, tyLeChot: 25 }] } });
     if (p.endsWith('/trang-chu/kham-pha-phong')) return route.fulfill({ json: { data: [room] } });
     if (p.endsWith('/trang-chu/phong/P101') || p.endsWith('/khach-moi/phong/P101')) return route.fulfill({ json: { data: room } });
     if (p.includes('tong-quan')) return route.fulfill({ json: {} });
@@ -32,6 +33,9 @@ try {
     await routes(ctx, sale, posts);
     let page = await ctx.newPage(); page.on('pageerror', (e) => errors.push(e.message));
     await page.goto(`${base}/nhan-vien-sale`, { waitUntil: 'domcontentloaded' });
+    const report = page.locator('.src-report');
+    await report.locator('table').waitFor();
+    assert.match(await report.innerText(), /Sale gửi link\s*4\s*3\s*2\s*50%/);
     if (width === 390) await page.locator('.ui-navigation-toggle').click();
     await page.locator('aside nav button', { hasText: 'Gửi phòng cho khách' }).click();
     await page.getByLabel(/^Phòng/).selectOption('P101');
@@ -70,6 +74,7 @@ try {
     await modal.waitFor();
     assert.equal(await modal.locator('input[type=date]').evaluateAll((els) => els.map((el) => el.value).includes('2026-11-20')), true, 'ngày xem điền sẵn');
     assert.ok(await modal.locator('input').evaluateAll((els) => els.some((el) => /lúc 15:00, đã hẹn với Sale NV0005/.test(el.value))), 'giờ hẹn điền sẵn');
+    assert.ok(await modal.locator('select').evaluateAll((els) => els.some((el) => el.value === 'Sale gửi link')), 'nguồn khách chọn sẵn');
     assert.deepEqual(errors, []);
     await ctx.close();
   }

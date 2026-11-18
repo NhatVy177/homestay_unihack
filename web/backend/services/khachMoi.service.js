@@ -1,4 +1,5 @@
 import { executeProcedure, executeQuery, getPool, sql } from '../database/connection.js';
+import { ghiNguon } from './nguonKhach.service.js';
 import { coTheQuanTam, ganTrangThaiQuanTam, getDanhSachPhongKhamPha } from './phongKhamPha.service.js';
 import { isUnderAdultAge } from './customerAgeRules.js';
 import { checkProfileEditable, checkRoomCanJoin } from './interestedRoomsRules.js';
@@ -385,6 +386,8 @@ export async function createHoSo(user, data = {}) {
 
     const created = result.recordset[0] || null;
     const maDangKy = created?.maDangKy || created?.MaDangKy;
+    try { await ghiNguon(maDangKy, data.nguonKhach); }
+    catch (sourceError) { console.error('Không ghi được nguồn khách', maDangKy, sourceError.message); }
     for (const maPhong of interestedRoomIds) {
       try {
         await phongQuanTamRepository.themPhongQuanTam(maDangKy, maPhong);

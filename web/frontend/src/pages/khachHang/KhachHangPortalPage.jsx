@@ -72,9 +72,12 @@ const rentInitial = {
   ngayXemMongMuon: '',
   khungGioRanh: 'Linh hoạt theo Sale',
   ghiChuThoiGian: '',
-  tienIchMongMuon: []
+  tienIchMongMuon: [],
+  nguonKhach: ''
 };
 
+// Nguồn khách (D-062): giá trị khớp danh sách ở backend services/nguonKhach.service.js.
+const CUSTOMER_SOURCES = ['Facebook', 'Zalo', 'Người quen giới thiệu', 'Tìm trên web', 'Sale gửi link', 'Khác'];
 const VIEWING_SLOTS = ['Linh hoạt theo Sale', 'Buổi sáng (7:00–11:30)', 'Buổi chiều (13:00–17:00)'];
 const AMENITY_OPTIONS = ['Máy lạnh', 'Wifi mạnh', 'WC riêng', 'Bếp chung', 'Máy giặt'];
 
@@ -4156,6 +4159,13 @@ export default function KhachHangPortalPage() {
                       })}
                     </div>
                   </div>
+                  <label className="is-half">
+                    <span>Bạn biết HomestayDorm qua đâu?</span>
+                    <select value={rentForm.nguonKhach || ''} onChange={(event) => setRentForm({ ...rentForm, nguonKhach: event.target.value })}>
+                      <option value="">Chọn (không bắt buộc)</option>
+                      {CUSTOMER_SOURCES.map((item) => <option key={item} value={item}>{item}</option>)}
+                    </select>
+                  </label>
                   <div className="is-wide kh-register-stack">
                     <span className="kh-register-field-title">Ghi chú thêm</span>
                     <label>

@@ -23,6 +23,7 @@ import { startCheckoutLifecycleScheduler } from './services/checkoutLifecycleSch
 import suaChuaBaoTriRoutes from './routes/suaChuaBaoTri.routes.js';
 import chiaSeRoutes from './routes/chiaSe.routes.js';
 import linkChotRoutes from './routes/linkChot.routes.js';
+import baoCaoRoutes from './routes/baoCao.routes.js';
 import khachMoiRoutes from './routes/khachMoi.routes.js';
 import trangChuRoutes from './routes/trangChu.routes.js';
 import adminRoutes from './routes/admin.routes.js';
@@ -75,6 +76,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/avalanche', avalancheRoutes);
 app.use('/api/thanh-toan-mo-phong', thanhToanMoPhongRoutes); // D-013: cổng ví điện tử mô phỏng (IPN công khai, còn lại cần đăng nhập)
 app.use('/chia-se', chiaSeRoutes); // Link phòng có thẻ Open Graph cho Facebook/Messenger (công khai)
+app.use('/api/bao-cao', requireAuth, baoCaoRoutes); // Báo cáo nguồn khách cho Sale/quản lý
 app.use('/api/link-chot', linkChotRoutes); // Sale tạo link gửi phòng cho khách; mở link thì công khai
 app.use('/api/trang-chu', trangChuRoutes); // Public — no auth
 

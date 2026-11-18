@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import StatusBadge from '../../components/common/StatusBadge.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import SourceReport from '../../components/nguonKhach/SourceReport.jsx';
 import { dangKyThueApi } from '../dangKyThue/dangKyThue.api.js';
 import { lichXemPhongApi } from '../lichXemPhong/lichXemPhong.api.js';
 import { customersFromRegistrations, dateKey, dateLabel, timeLabel } from './salePresentation.js';
@@ -50,5 +51,6 @@ export default function SaleOverview({ user, onNavigate }) {
         {loading ? <p role="status">Đang tải hồ sơ...</p> : pending.length ? <div className="sale-registration-list">{pending.slice(0, 5).map(r => <button key={r.maDangKy} onClick={() => onNavigate('lich-xem')}><span className="sale-person-icon"><Icon name="person" /></span><span><strong>{r.hoTenKhach}</strong><small>{r.maDangKy} · {dateLabel(r.ngayDangKy)}</small></span><Icon name="chevron_right" /></button>)}</div> : <EmptyState message="Không có hồ sơ chờ tiếp nhận." />}
       </section>
     </div>
+    <SourceReport />
   </div>;
 }
