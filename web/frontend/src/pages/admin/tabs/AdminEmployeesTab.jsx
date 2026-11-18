@@ -293,14 +293,6 @@ export default function AdminEmployeesTab() {
             </option>
           ))}
         </select>
-        <button
-          onClick={() => { setSearch(''); setFilterRole(''); setFilterBranch(''); }}
-          className="admin-btn-refresh"
-          title="Làm mới bộ lọc"
-        >
-          <Icon name="refresh" size={18} />
-          <span>Làm mới</span>
-        </button>
       </div>
 
       {/* Table */}
@@ -409,9 +401,9 @@ export default function AdminEmployeesTab() {
                         <button
                           className="admin-btn-icon danger"
                           onClick={(e) => { e.stopPropagation(); setConfirmLockEmployee(emp); }}
-                          title={emp.status === 'active' ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}
+                          title={emp.status === 'active' ? 'Khóa / Xóa tài khoản' : 'Mở khóa tài khoản'}
                         >
-                          <Icon name={emp.status === 'active' ? 'block' : 'lock_open'} size={16} />
+                          <Icon name={emp.status === 'active' ? 'delete' : 'lock_open'} size={16} />
                         </button>
                       </div>
                     </td>

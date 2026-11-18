@@ -1,14 +1,14 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 11:26:29 +07:00** (J-X094: đăng xuất, thêm ảnh Báo hỏng và bộ chọn ngày giờ; nhánh riêng chờ duyệt). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 11:35:26 +07:00** (J-X095: Vy duyệt gộp lịch/ngày giờ, đăng xuất và thêm ảnh vào main; giữ cập nhật Admin/Báo hỏng hiện hành). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
-## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4 & sửa lỗi số liệu (J-A002 / J-A003)
+## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4, khắc phục giao diện & tối ưu trải nghiệm (J-A002 / J-A003 / J-A004)
 
 - Loại bỏ hoàn toàn mã nguồn đơn khối cũ hơn 4000 dòng trong `AdminPage.jsx`.
 - Tách thành cấu trúc modular 8 tab sạch sẽ tương ứng 8 trang của Nam4:
-  1. `AdminDashboardTab.jsx`: Tổng quan hệ thống (4 KPI cards, SVG donut chart tỷ lệ phòng, chỉ số công suất vận hành, cảnh báo bảo trì, greeting header, nút refresh).
-  2. `AdminUsersTab.jsx`: Quản trị Khách hàng (4 KPI cards, thanh tìm kiếm & lọc trạng thái, bảng khách hàng, Right Drawer 3 tab: Thông tin cá nhân, Lịch sử hợp đồng, Hóa đơn & thanh toán, modal khóa/mở khóa tài khoản, modal thêm khách hàng).
-  3. `AdminEmployeesTab.jsx`: Quản trị Nhân viên (4 KPI cards phân theo vai trò Sale/Quản lý/Kế toán, bảng nhân viên phân trang, Right Drawer đổi vai trò & chi nhánh phụ trách, modal thêm nhân viên có xem mật khẩu, modal xác nhận khóa tài khoản).
+  1. `AdminDashboardTab.jsx`: Tổng quan hệ thống (4 KPI cards, SVG donut chart tỷ lệ phòng, chỉ số công suất vận hành, cảnh báo bảo trì, greeting header).
+  2. `AdminUsersTab.jsx`: Quản trị Khách hàng (4 KPI cards SVG chuẩn hóa, thanh tìm kiếm & lọc trạng thái không đè icon, bảng khách hàng, cột Thao tác nút Xem/Sửa và Khóa/Xóa màu đỏ, Right Drawer 3 tab: Thông tin cá nhân, Lịch sử hợp đồng, Hóa đơn & thanh toán, modal khóa/mở khóa tài khoản, modal thêm khách hàng).
+  3. `AdminEmployeesTab.jsx`: Quản trị Nhân viên (4 KPI cards phân theo vai trò Sale/Quản lý/Kế toán, bảng nhân viên phân trang, cột Thao tác icon Sửa và icon Thùng rác xóa màu đỏ, Right Drawer đổi vai trò & chi nhánh phụ trách, modal thêm nhân viên có xem mật khẩu, modal xác nhận khóa tài khoản).
   4. `AdminBranchesTab.jsx`: Quản trị Chi nhánh (4 KPI cards, bảng lưới card chi nhánh 3 cột, thanh tiến độ tỷ lệ lấp đầy %, modal thêm/sửa chi nhánh, modal xác nhận ngưng/kích hoạt hoạt động).
   5. `AdminRoomsTab.jsx`: Phòng & Giường (4 KPI cards, bảng danh mục phòng phân trang, Right Drawer quản lý chi tiết phòng và danh sách giường riêng, thêm/sửa giường trực tiếp, modal thêm phòng mới).
   6. `AdminServicesTab.jsx`: Danh mục Dịch vụ (4 KPI cards, lưới card dịch vụ 2 cột, icon động theo dịch vụ điện/nước/wifi/giặt/xe, switch bật/tắt trực tiếp, modal thêm/sửa dịch vụ).
@@ -16,17 +16,18 @@ Cập nhật: **2026-11-18 11:26:29 +07:00** (J-X094: đăng xuất, thêm ảnh
   8. `AdminAssetsTab.jsx`: Tài sản dùng chung (4 KPI cards, bảng tài sản phân trang, lọc theo chi nhánh/phòng/loại tài sản/tình trạng, modal thêm/sửa tài sản liên kết chi nhánh và phòng).
 - Menu sidebar rút gọn chuẩn đúng 8 mục của Nam4 (`dashboard`, `users`, `employees`, `branches`, `rooms`, `services`, `conditions`, `assets`).
 - Toàn bộ màu be/nâu từ Nam4 được chuyển thành màu xanh thương hiệu hệ thống (`--color-primary: #4A6549`, tokens.css).
-- Bổ sung các biểu tượng SVG cần thiết (`inventory_2`, `inventory`, `policy`, `gavel`) trong `Icon.jsx`.
+- Bổ sung toàn bộ biểu tượng SVG và aliases trong `Icon.jsx`, triệt để loại bỏ tình trạng fallback về icon ngôi nhà.
+- Gỡ bỏ toàn bộ nút "Làm mới" trên tất cả các tab theo thói quen F5 của người dùng.
 - Khắc phục lỗi bóc tách response (mảng vs object bọc `{ data }`) bằng `extractArray` trong `admin.utils.js`.
-- Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 127 PASS / 0 FAIL / 4 SKIP, trình duyệt Playwright đọc thực tế trên local5173 xác nhận sạch banner đỏ, 4 thẻ KPI và donut chart tải đầy đủ số liệu thật.
+- Bằng chứng & Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 131 PASS (127 pass, 4 skip, 0 fail), `blockchain` 26 PASS (25 pass, 1 skip, 0 fail), trình duyệt Playwright đọc thực tế trên local5173 tài khoản `nv0013` xác nhận giao diện chuẩn đẹp, sạch lỗi.
 
 
-## Giao diện dùng chung/Báo hỏng — D-064 / D-066 / J-X094
+## Giao diện dùng chung/Báo hỏng trên main — D-064 / D-066 / J-X095
 
-- `fix/logout-upload-ui`, worktree `D:\HomeStayDorm-logout-upload`, base feat/pre-submit346be1f vì Báo hỏng chưa ở main; cập nhật main24988a6 bằng merge1c011b3, giữ Inter/room card/Admin. Mang8 file frontend của chính Codex từ8aab35b (D-064) vào cùng bản xem, không sửa checkout Claude/root5173. Không tự gom các commit mới ngoài base này.
-- Hộp đăng xuất theo hình2: icon32px, căn giữa, nút X và Hủy/Đăng xuất cùng hàng/rộng bằng nhau; giữ confirm/cancel/busy. Thêm ảnh hư hỏng: nút viền nét đứt, icon24px, chữ chính/phụ rõ và hover/focus; giữ mở/hủy file chooser, đủ3 ảnh/ẩn nút, bỏ ảnh/hiện lại và JPEG gửi đi.
-- Kiểm mới sau cập nhật main: build PASS59.79s và avalanche UI smoke PASS (cảnh báo dependency/chunk cũ); account-menu/repair/form-controls PASS1440/390 trên build5208; customer-profile PASS1440/390 trên dev5207; helper4/4 PASS. Hủy/X/Escape/bấm ngoài giữ phiên, xác nhận mới gọi logout; gửi báo hỏng và quản lý tiếp nhận/hoàn tất vẫn đúng bằng API fixture. Browser exception0/không tràn ngang. Đã xem ảnh logout desktop/mobile và upload mobile. Không ghi backend/SQL thật hoặc nghiệm thu Fuji.
-- Preview **http://127.0.0.1:5208/**: bản build dành cho review trỏ backend5012 của D-063 để có form Báo hỏng (biến VITE_API_URL khi build, không tạo/commit env). Build cấu hình review đã PASS; không đổi source. Nhánh độc lập ngày giờ vẫn ở `fix/shared-date-controls`/8aab35b. Commit UI970fb83, hồ sơ J-X094 đi kèm; push nhánh riêng/chưa gộp main, chờ Vy duyệt do Claude làm song song theo AGENTS/D-063. Không chạy backend/blockchain test vì đợt UI không đổi source đó.
+- Vy đã duyệt “gộp lun”: gộp `fix/logout-upload-ui`/c9da788 (gồm ngày giờ/dropdown, logout và Thêm ảnh) với main mới nhấtf919f88 trong worktree riêng `D:\HomeStayDorm-logout-main`/`integration/logout-upload-main`. Giữ nghiệp vụ Báo hỏng D-065 và toàn bộ cập nhật Admin J-A004; chỉ có conflict hồ sơ, giữ đầy đủ lịch sử theo giờ. Backend/blockchain/database không khác origin/main.
+- Bộ chọn ngày/giờ/dropdown dùng chung, logout căn giữa/icon32px/Hủy-Đăng xuất cân đối, Thêm ảnh viền nét đứt/icon24px cùng tối đa3 ảnh/preview/bỏ ảnh. Giá trị, validation, handler và nghiệp vụ giữ nguyên; form Báo hỏng vẫn có loại hư hỏng và kết quả sửa chữa mới trên main.
+- **Kiểm mới bản gộp cuối:** frontend build PASS51.06s (cảnh báo dependency/chunk cũ), avalanche UI smoke PASS Verify/D-017/D-018/D-023/D-024; helper4/4 PASS. Form-controls/account-menu/repair/customer-profile PASS1440/390 trên build5209, không browser exception/tràn ngang; auth/upload/repair chỉ ghi API fixture. Không chạy SQL/migration/SMTP/Fuji hoặc backend/blockchain test do source tương ứng không đổi.
+- Xuất bản commit merge NhatVy177 lên main; fast-forward checkout gốc để cổng5173 dùng source mới, giữ nguyên byte/hash11 file sửa dở/chưa theo dõi. Không đưa các sửa dở đó vào commit. Preview bản gộp5209 dùng backend5012; preview cũ5208 và nhánh độc lập ngày giờ8aab35b vẫn có. Không còn bước duyệt gộp cho phạm vi UI này; quyền gộp lần này theo yêu cầu trực tiếp của Vy, không đổi quy trình nhánh khi có AI song song.
 
 ## Trang chủ/nhà3D trên main
 
@@ -44,7 +45,7 @@ Cập nhật: **2026-11-15 01:10:30 +07:00** (J-C105: chặn lệch giới tính
 
 ## Tóm tắt
 
-**7 việc trước khi nộp (J-C180, D-063, nhánh `feat/pre-submit`, worktree `D:\HomeStayDorm-features`):** báo hỏng, link Facebook, link chốt phòng của Sale, nguồn khách (đã migrate HOMEDORM4), nhắc hóa đơn, khôi phục từ chuỗi, tài liệu minh bạch. Có code, test tự động qua, đã chạy thật với HOMEDORM4 qua backend phụ 5012. **Chưa gộp main**: chờ Vy test xong luồng trên 5173 rồi gộp.
+**7 việc trước khi nộp (J-C180, D-063, nhánh `feat/pre-submit`, worktree `D:\HomeStayDorm-features`):** báo hỏng, link Facebook, link chốt phòng của Sale, nguồn khách (đã migrate HOMEDORM4), nhắc hóa đơn, khôi phục từ chuỗi, tài liệu minh bạch. Có code, test tự động qua, đã chạy thật với HOMEDORM4 qua backend phụ 5012. **Đã có trên main trước J-X095** (b53cad5); các kiểm SQL của J-C180 là bằng chứng đợt đó, không phải chạy lại trong đợt UI.
 
 **Cách làm tạm thời D-061:** Vy xác nhận hiện chỉ Codex sửa code; hoàn tất/kiểm tra rồi chủ động commit/gộp/push main, không chờ lệnh merge mỗi đợt. AGENTS đã cập nhật ngoại lệ; có người/AI khác cùng sửa hoặc Vy yêu cầu review/chưa push thì quay về quy trình nhánh riêng. Không tự gộp các nhánh cũ ngoài phạm vi.
 

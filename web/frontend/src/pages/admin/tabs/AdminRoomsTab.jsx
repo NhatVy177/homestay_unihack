@@ -374,14 +374,6 @@ export default function AdminRoomsTab() {
             </option>
           ))}
         </select>
-        <button
-          onClick={() => { setSearch(''); setFilterStatus(''); setFilterBranch(''); }}
-          className="admin-btn-refresh"
-          title="Làm mới bộ lọc"
-        >
-          <Icon name="refresh" size={18} />
-          <span>Làm mới</span>
-        </button>
       </div>
 
       {/* Table */}
