@@ -42,6 +42,9 @@ async function capture(page, name) {
     width: innerWidth,
     scrollWidth: document.documentElement.scrollWidth,
     brokenImages: [...document.images].filter(img => !img.naturalWidth).map(img => img.getAttribute('src')),
+    fontFamilies: [...new Set([...document.querySelectorAll('.tc-page h1, .tc-page h2, .tc-page h3, .tc-page p, .tc-page button, .tc-page input, .tc-page label, .tc-page strong, .tc-page dt, .tc-page dd, .tc-page a')]
+      .filter(element => element.getClientRects().length)
+      .map(element => getComputedStyle(element).fontFamily.split(',')[0].replace(/["']/g, '').trim()))].sort(),
     overflowing: [...document.querySelectorAll('header *, main *, footer *')].filter(element => {
       // The mobile branch list intentionally scrolls horizontally inside its own panel.
       if (element.closest('.hx-map-list, .maplibregl-control-container, .maplibregl-marker')) return false;
@@ -51,6 +54,7 @@ async function capture(page, name) {
   }));
   assert.equal(metrics.scrollWidth, metrics.width, `${name}: document overflow`);
   assert.deepEqual(metrics.brokenImages, [], `${name}: broken image`);
+  assert.deepEqual(metrics.fontFamilies, ['Inter'], `${name}: one typeface across headings, body and controls`);
   assert.deepEqual(metrics.overflowing, [], `${name}: clipped content`);
   await page.screenshot({ path: resolve(output, `${name}.png`), fullPage: true });
   return metrics;
@@ -77,6 +81,8 @@ try {
     assert.equal(await page.locator('.tc-room-card').count(), 4);
     assert.equal(await page.locator('#gioi-thieu').count(), 1);
     const metrics = await capture(page, `verified-${width}`);
+    assert.equal(await page.locator('.hx-room-badge').count(), 0, 'no room-type badge over the photo');
+    assert.equal(await page.locator('.hx-room-heart').count(), await page.locator('.hx-room-card').count(), 'each room retains its heart control');
 
     await page.getByRole('button', { name: 'Ảnh tiếp theo', exact: true }).click();
     assert.equal(await page.locator('.hx-hero-slide.is-active .tc-hero-photo').getAttribute('src'), '/images/home/living.jpg');
@@ -125,6 +131,11 @@ try {
     await page.locator('.hx-map-detail').getByRole('button', { name: 'Xem các phòng', exact: true }).click();
     assert.equal(new URL(page.url()).pathname, '/phong', 'nút Xem các phòng trên bản đồ đi trang phòng');
     assert.equal(new URL(page.url()).searchParams.get('khuVuc'), 'Bình Thạnh');
+    await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.locator('.hx-room-heart').first().click();
+    await page.waitForURL(url => url.searchParams.has('next'));
+    assert.equal(new URL(page.url()).searchParams.get('next'), '/khach-hang?tab=kham-pha&phong=UI-1');
+    await page.getByRole('dialog').waitFor();
     assert.deepEqual(errors, []);
     assert.deepEqual(writes, []);
     report.push({ width, ...metrics, errors, writes, interactions: 'slider, menu, auth modals, search, room detail, area link passed' });

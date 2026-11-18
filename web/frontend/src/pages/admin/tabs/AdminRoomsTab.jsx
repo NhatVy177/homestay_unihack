@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Icon from '../../../components/common/Icon.jsx';
 import { adminApi } from '../admin.api.js';
+import { extractArray } from '../admin.utils.js';
 import '../admin-nam4.css';
 
 const ROOM_STATUS_META = {
@@ -90,10 +91,10 @@ export default function AdminRoomsTab() {
         adminApi.getRooms()
       ]);
 
-      const rawBranches = branchRes.status === 'fulfilled' ? (branchRes.value?.data || []) : [];
+      const rawBranches = branchRes.status === 'fulfilled' ? extractArray(branchRes.value) : [];
       setBranches(rawBranches);
 
-      const rawRooms = roomRes.status === 'fulfilled' ? (roomRes.value?.data || []) : [];
+      const rawRooms = roomRes.status === 'fulfilled' ? extractArray(roomRes.value) : [];
       const mapped = rawRooms.map((r) => {
         const id = String(r.id || r.maPhong || '');
         const branchObj = rawBranches.find((b) => b.maChiNhanh === (r.branch_id || r.maChiNhanh));
@@ -133,7 +134,7 @@ export default function AdminRoomsTab() {
     setBedsLoading(true);
     try {
       const res = await adminApi.getRoomBeds(roomId);
-      const rawBeds = res?.data || [];
+      const rawBeds = extractArray(res);
       const mapped = rawBeds.map((b) => ({
         id: String(b.id || b.maGiuong || ''),
         name: b.name || b.tenGiuong || b.maGiuong || 'Giường',

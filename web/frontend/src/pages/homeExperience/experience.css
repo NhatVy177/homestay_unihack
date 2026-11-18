@@ -1,8 +1,5 @@
-@font-face {
-  font-family: 'HomeDisplay'; font-style: normal; font-weight: 700; font-display: swap;
-  src: url('/fonts/playfair-display-700.ttf') format('truetype');
-}
-.tc-page { --hx-display: 'HomeDisplay', Georgia, serif; }
+.tc-page { --font-heading: var(--font-body); --hx-display: var(--font-body); }
+.tc-page .maplibregl-map, .tc-page .maplibregl-popup { font-family: var(--font-body); }
 .tc-page .hx-section { padding: 96px 0; }
 .tc-page .tc-container { max-width: 1280px; padding-left: 32px; padding-right: 32px; }
 .tc-page .tc-nav-inner { height: 64px; }
@@ -258,7 +255,6 @@
 .hx-rooms-all:hover .ui-icon { transform: translateX(4px); }
 .tc-page .tc-rooms-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .hx-room-image { position: relative; }
-.hx-room-badge { position: absolute; top: 12px; right: 12px; padding: 4px 12px; border-radius: 999px; background: var(--tc-primary); color: #fff; font-size: 12px; font-weight: 600; }
 .hx-room-tags span { display: inline-flex; align-items: center; gap: 4px; }
 .hx-room-tags .ui-icon { width: 12px; height: 12px; }
 .hx-room-bottom { align-items: center; }
@@ -268,3 +264,7 @@
 .tc-page .hx-room-bottom .tc-room-cta.hx-room-view:hover { background: var(--tc-primary); color: #fff; }
 @media (max-width: 1100px) { .tc-page .tc-rooms-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .tc-page .tc-rooms-grid { grid-template-columns: 1fr; } .hx-rooms-head { margin-bottom: 24px; } }
+
+.tc-page .hx-room-heart { position: absolute; top: 12px; right: 12px; z-index: 2; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: #ffffffe6; color: #b3261e; box-shadow: 0 1px 4px #191c1a33; cursor: pointer; transition: transform .15s; }
+.tc-page .hx-room-heart:hover { transform: scale(1.1); }
+.tc-page .hx-room-heart .kp-line-icon { width: 20px; height: 20px; }

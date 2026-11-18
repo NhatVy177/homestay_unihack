@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Icon } from '../../../components/common/Icon.jsx';
 import { adminApi } from '../admin.api.js';
+import { extractArray, formatVND } from '../admin.utils.js';
 
 export default function AdminDashboardTab() {
   const [data, setData] = useState(null);
@@ -18,15 +19,19 @@ export default function AdminDashboardTab() {
         adminApi.getServices()
       ]);
 
-      const branches = branchRes.status === 'fulfilled' ? (branchRes.value.data || []) : [];
-      const rooms = roomRes.status === 'fulfilled' ? (roomRes.value.data || []) : [];
-      const employees = empRes.status === 'fulfilled' ? (empRes.value.data || []) : [];
-      const services = servRes.status === 'fulfilled' ? (servRes.value.data || []) : [];
+      const branches = branchRes.status === 'fulfilled' ? extractArray(branchRes.value) : [];
+      const rooms = roomRes.status === 'fulfilled' ? extractArray(roomRes.value) : [];
+      const employees = empRes.status === 'fulfilled' ? extractArray(empRes.value) : [];
+      const services = servRes.status === 'fulfilled' ? extractArray(servRes.value) : [];
 
-      const totalBeds = rooms.reduce((sum, r) => sum + Number(r.soGiuong || r.tongSoGiuong || 1), 0);
-      const occupiedRooms = rooms.filter(r => (r.trangThai || r.tinhTrang) === 'Đang ở' || (r.trangThai || r.tinhTrang) === 'Đã đầy').length;
-      const availableRooms = rooms.filter(r => (r.trangThai || r.tinhTrang) === 'Trống' || (r.trangThai || r.tinhTrang) === 'Còn trống').length;
-      const maintenanceRooms = rooms.filter(r => (r.trangThai || r.tinhTrang) === 'Bảo trì').length;
+      const totalBeds = rooms.reduce((sum, r) => sum + (Number(r.soGiuong) || 0), 0);
+      const availableBeds = rooms.reduce((sum, r) => sum + (Number(r.soGiuongTrong) || 0), 0);
+      const occupiedBeds = Math.max(0, totalBeds - availableBeds);
+
+      const availableRooms = rooms.filter(r => (r.tinhTrang || r.status) === 'Trống' || (r.soGiuongTrong && r.soGiuongTrong === r.soGiuong)).length;
+      const occupiedRooms = rooms.filter(r => r.soGiuongTrong === 0).length;
+      const partialRooms = rooms.filter(r => (r.tinhTrang || r.status) === 'Còn chỗ' || ((Number(r.soGiuongTrong) || 0) > 0 && (Number(r.soGiuongTrong) || 0) < (Number(r.soGiuong) || 0))).length;
+      const maintenanceRooms = rooms.filter(r => (r.tinhTrang || r.status) === 'Bảo trì').length;
 
       const activeServices = services.filter(s => s.trangThai !== 'Ngừng' && s.trangThai !== false && s.trangThai !== 'Đã tắt').length;
 
@@ -34,9 +39,9 @@ export default function AdminDashboardTab() {
         branchesCount: branches.length,
         roomsCount: rooms.length,
         capacityCount: totalBeds,
-        occupantsCount: occupiedRooms,
+        occupantsCount: occupiedBeds,
         staffCount: employees.length,
-        customerCount: 0,
+        customerCount: occupiedBeds,
         servicesCount: services.length,
         servicesAvailable: activeServices,
         roomStatus: {
@@ -44,7 +49,7 @@ export default function AdminDashboardTab() {
           occupied: occupiedRooms,
           deposited: 0,
           maintenance: maintenanceRooms,
-          partial: Math.max(0, rooms.length - availableRooms - occupiedRooms - maintenanceRooms)
+          partial: partialRooms
         }
       });
     } catch (err) {
@@ -70,7 +75,6 @@ export default function AdminDashboardTab() {
 
   const stats = useMemo(() => {
     if (!data) return null;
-    const rs = data.roomStatus || {};
     return {
       branchesCount: data.branchesCount,
       roomsCount: data.roomsCount,
@@ -81,7 +85,7 @@ export default function AdminDashboardTab() {
       customerCount: data.customerCount,
       servicesCount: data.servicesCount,
       servicesAvailable: data.servicesAvailable,
-      roomStatus: rs
+      roomStatus: data.roomStatus || {}
     };
   }, [data]);
 
@@ -89,13 +93,12 @@ export default function AdminDashboardTab() {
     ? Math.round((stats.occupantsCount / stats.capacityCount) * 100)
     : 0;
 
-  // Donut chart logic
+  // Donut chart segments
   const donutBase = stats ? [
-    { label: 'Trống', color: '#4C7A4F', count: stats.roomStatus.available },
-    { label: 'Đang ở', color: '#4A6549', count: stats.roomStatus.occupied },
-    { label: 'Đã cọc', color: '#C9AF8F', count: stats.roomStatus.deposited },
-    { label: 'Trống một phần', color: '#8A9E88', count: stats.roomStatus.partial },
-    { label: 'Bảo trì', color: '#9E9489', count: stats.roomStatus.maintenance }
+    { label: 'Trống', color: '#4C7A4F', count: stats.roomStatus.available || 0 },
+    { label: 'Đang ở', color: '#4A6549', count: stats.roomStatus.occupied || 0 },
+    { label: 'Còn chỗ', color: '#8A9E88', count: stats.roomStatus.partial || 0 },
+    { label: 'Bảo trì', color: '#9E9489', count: stats.roomStatus.maintenance || 0 }
   ] : [];
 
   const donutTotal = donutBase.reduce((sum, s) => sum + s.count, 0);
@@ -133,17 +136,17 @@ export default function AdminDashboardTab() {
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--color-primary)', margin: 0 }}>Xin chào, Quản trị viên!</h1>
           <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 500 }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>calendar_today</span>
+            <Icon name="calendar_today" size={16} />
             {todayLabel}
           </p>
         </div>
         <button
-          className="admin-btn secondary"
+          className="admin-btn-sm secondary"
           type="button"
           onClick={loadData}
           style={{ display: 'flex', alignItems: 'center', gap: 6 }}
         >
-          <Icon name="refresh" /> Làm mới dữ liệu
+          <Icon name="refresh" size={16} /> Làm mới dữ liệu
         </button>
       </div>
 
@@ -153,7 +156,7 @@ export default function AdminDashboardTab() {
         <div className="admin-kpi-card" style={{ position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div className="admin-kpi-icon">
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>apartment</span>
+              <Icon name="apartment" size={24} />
             </div>
             <span className="admin-badge type">{stats.branchesCount} CHI NHÁNH</span>
           </div>
@@ -168,7 +171,7 @@ export default function AdminDashboardTab() {
         <div className="admin-kpi-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div className="admin-kpi-icon">
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>bed</span>
+              <Icon name="bed" size={24} />
             </div>
             <span className="admin-badge low">LẤP ĐẦY {occupancyRate}%</span>
           </div>
@@ -191,7 +194,7 @@ export default function AdminDashboardTab() {
         <div className="admin-kpi-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div className="admin-kpi-icon">
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>groups</span>
+              <Icon name="groups" size={24} />
             </div>
             <span className="admin-badge type">HOẠT ĐỘNG</span>
           </div>
@@ -209,7 +212,7 @@ export default function AdminDashboardTab() {
         <div className="admin-kpi-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div className="admin-kpi-icon">
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>bolt</span>
+              <Icon name="bolt" size={24} />
             </div>
             <span className="admin-badge low">{stats.servicesAvailable} ĐANG BẬT</span>
           </div>

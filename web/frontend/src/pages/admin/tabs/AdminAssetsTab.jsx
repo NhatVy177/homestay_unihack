@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Icon from '../../../components/common/Icon.jsx';
 import { adminApi } from '../admin.api.js';
+import { extractArray } from '../admin.utils.js';
 import '../admin-nam4.css';
 
 const STATUS_ASSET = {
@@ -62,10 +63,10 @@ export default function AdminAssetsTab() {
         adminApi.getRooms()
       ]);
 
-      const rawBranches = branchRes.status === 'fulfilled' ? (branchRes.value?.data || []) : [];
+      const rawBranches = branchRes.status === 'fulfilled' ? extractArray(branchRes.value) : [];
       setBranches(rawBranches);
 
-      const rawRooms = roomRes.status === 'fulfilled' ? (roomRes.value?.data || []) : [];
+      const rawRooms = roomRes.status === 'fulfilled' ? extractArray(roomRes.value) : [];
       setRooms(rawRooms);
 
       // Load room assets from all rooms
@@ -74,8 +75,9 @@ export default function AdminAssetsTab() {
         try {
           const rId = r.id || r.maPhong;
           const res = await adminApi.getRoomAssets(rId);
-          if (Array.isArray(res?.data)) {
-            res.data.forEach((item) => {
+          const roomAssetItems = extractArray(res);
+          if (roomAssetItems.length > 0) {
+            roomAssetItems.forEach((item) => {
               const bObj = rawBranches.find((b) => b.maChiNhanh === (r.branch_id || r.maChiNhanh));
               assetList.push({
                 id: String(item.id || item.maTaiSan || Math.random().toString(36).substring(7)),

@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Icon from '../../../components/common/Icon.jsx';
 import { adminApi } from '../admin.api.js';
+import { extractArray } from '../admin.utils.js';
 import '../admin-nam4.css';
 
 const TYPE_LABEL = {
@@ -64,7 +65,7 @@ export default function AdminServicesTab() {
     setError(null);
     try {
       const res = await adminApi.getServices();
-      const raw = res?.data || [];
+      const raw = extractArray(res);
       const mapped = raw.map((s) => {
         const id = String(s.id || s.maDichVu || '');
         const name = s.name || s.tenDichVu || 'Dịch vụ';

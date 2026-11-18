@@ -39,6 +39,8 @@
 
 Hồ sơ cá nhân (D-054, trình bày J-X088): chỉnh ảnh bằng nút cây bút ngay trên ảnh; không còn hai nút chữ đổi/xóa hoặc dòng hướng dẫn dung lượng. File vẫn kiểm PNG/JPG/WebP≤2MB và có báo lỗi/kết quả; không đổi xác thực/quyền/đổi mật khẩu.
 
+Trình bày trang chủ/phòng công khai (D-062/J-X092): dùng cùng họ chữ Inter cho tiêu đề, nội dung và nút trong `.tc-page`; ảnh thẻ phòng chỉ giữ trái tim, bỏ nhãn loại phòng xanh. Sức chứa dưới ảnh và các luồng thuê hiện có giữ nguyên.
+
 ## 1. Vai trò và hệ thống
 
 | Vai trò | Làm gì chính |
