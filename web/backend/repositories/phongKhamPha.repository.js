@@ -39,11 +39,13 @@ export async function layDemGiuongTheoPhong() {
   const pool = await getPool();
   const result = await pool.request().query(`
     SELECT
-      MaPhong AS maPhong,
-      SUM(CASE WHEN TinhTrang = N'Trống' THEN 1 ELSE 0 END) AS soGiuongTrong,
-      SUM(CASE WHEN TinhTrang = N'Giữ chỗ' THEN 1 ELSE 0 END) AS soGiuongChoCoc
-    FROM dbo.Giuong
-    GROUP BY MaPhong;
+      g.MaPhong AS maPhong,
+      SUM(CASE WHEN g.TinhTrang = N'Trống' THEN 1 ELSE 0 END) AS soGiuongTrong,
+      SUM(CASE WHEN g.TinhTrang = N'Giữ chỗ' THEN 1 ELSE 0 END) AS soGiuongChoCoc,
+      MAX(p.GioiTinhChoPhep) AS gioiTinhChoPhep
+    FROM dbo.Giuong g
+    JOIN dbo.Phong p ON p.MaPhong = g.MaPhong
+    GROUP BY g.MaPhong;
   `);
 
   return result.recordset || [];
