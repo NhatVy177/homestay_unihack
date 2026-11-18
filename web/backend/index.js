@@ -21,6 +21,7 @@ import xacNhanPhanHoiRoutes from './routes/xacNhanPhanHoi.routes.js';
 import checkoutClosureRoutes from './routes/checkoutClosure.routes.js';
 import { startCheckoutLifecycleScheduler } from './services/checkoutLifecycleScheduler.service.js';
 import suaChuaBaoTriRoutes from './routes/suaChuaBaoTri.routes.js';
+import chiaSeRoutes from './routes/chiaSe.routes.js';
 import khachMoiRoutes from './routes/khachMoi.routes.js';
 import trangChuRoutes from './routes/trangChu.routes.js';
 import adminRoutes from './routes/admin.routes.js';
@@ -72,6 +73,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/avalanche', avalancheRoutes);
 app.use('/api/thanh-toan-mo-phong', thanhToanMoPhongRoutes); // D-013: cổng ví điện tử mô phỏng (IPN công khai, còn lại cần đăng nhập)
+app.use('/chia-se', chiaSeRoutes); // Link phòng có thẻ Open Graph cho Facebook/Messenger (công khai)
 app.use('/api/trang-chu', trangChuRoutes); // Public — no auth
 
 // Moi luong nghiep vu co route rieng, de nhom tach code de hon
