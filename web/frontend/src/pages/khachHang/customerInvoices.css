@@ -7,7 +7,8 @@
 .cinv-cards strong { font-size: 24px; color: var(--color-text); }
 .cinv-cards strong em { font-size: 14px; font-style: normal; color: var(--color-text-muted); font-weight: 500; }
 .cinv-icon { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--color-surface-alt, #eef0ea); color: var(--color-primary); }
-.cinv-filters { display: grid; gap: var(--space-3, 12px); padding: 16px 20px; }
+.cinv-filters { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3, 12px); padding: 16px 20px; }
+.cinv-selects { justify-content: flex-end; }
 .cinv-selects { display: flex; flex-wrap: wrap; gap: 12px; }
 .cinv-selects select { min-height: 44px; padding: 0 16px; border: 1px solid var(--color-border); border-radius: 999px; background: var(--color-surface); color: var(--color-text); font: inherit; }
 .cinv-table-wrap { padding: 0; overflow-x: auto; }

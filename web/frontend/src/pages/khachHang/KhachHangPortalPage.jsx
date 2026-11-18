@@ -11,10 +11,12 @@ import DepositPolicyPanel from '../../components/common/DepositPolicyPanel.jsx';
 import ResultModal from '../../components/common/ResultModal.jsx';
 import WorkspaceShell from '../../components/common/WorkspaceShell.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
+import StatusBadge from '../../components/common/StatusBadge.jsx';
 import '../khamPhaPhong/khamPhaPhong.css';
 import './khachHangPortal.css';
 import LichXemPhongPage from '../lichXemPhong/LichXemPhongPage.jsx';
 import { httpClient } from '../../api/httpClient.js';
+import MomoSimPanel from './MomoSimPanel.jsx';
 import ThuNhanPhongWalletCard from './ThuNhanPhongWalletCard.jsx';
 import CustomerInvoicesList from './CustomerInvoicesList.jsx';
 import CustomerDepositHistory from './CustomerDepositHistory.jsx';
@@ -1542,9 +1544,7 @@ export default function KhachHangPortalPage() {
               <div className="kh-profile-header">
                 <div className="kh-profile-title-row">
                   <h3>Hồ sơ đăng ký #{profile.maDangKy}</h3>
-                  <span className={`kh-status-chip kh-status-chip--${statusTone(getProfileDisplayStatus(profile))}`}>
-                    {statusIcon(getProfileDisplayStatus(profile))} {getProfileDisplayStatus(profile)}
-                  </span>
+                  <StatusBadge status={getProfileDisplayStatus(profile)} tone={['Hủy', 'Đã hủy'].includes(getProfileDisplayStatus(profile)) ? 'danger' : undefined} />
                 </div>
                 <span className="kh-profile-date">Ngày tạo: {formatDate(profile.ngayDangKy)}</span>
               </div>
@@ -3556,14 +3556,7 @@ export default function KhachHangPortalPage() {
                 <button type="button" aria-pressed={isCash && !walletTab} className={`dpay-tab${isCash && !walletTab ? ' is-active' : ''}`} onClick={() => { setWalletTab(false); if (!isCash) chonPhuongThucCoc('Tiền mặt'); }}><Icon name="profile" /> Tiền mặt tại quầy</button>
                 <button type="button" aria-pressed={walletTab} className={`dpay-tab${walletTab ? ' is-active' : ''}`} onClick={() => setWalletTab(true)}><Icon name="payment" /> Ví điện tử (mô phỏng)</button>
               </div>
-              {walletTab && <div className="dpay-wallet-panel">
-                <div className="dc-bank-info dpay-bank">
-                  <div><span>Nội dung</span><strong>Tiền cọc – phiếu {phieu.maPhieuCoc}</strong></div>
-                  <div><span>Số tiền</span><strong>{amount.toLocaleString('vi-VN')} VNĐ</strong></div>
-                </div>
-                <p className="dc-bank-note">Đây là ví mô phỏng để thử luồng nên không có mã QR thật và không trừ tiền thật. Bấm nút bên dưới để giả lập ví xác nhận; muốn quét mã thật hãy dùng tab QR chuyển khoản.</p>
-                <button type="button" className="kp-btn kp-btn-primary kp-full" disabled={walletBusy} onClick={thanhToanViTaiCho}>{walletBusy ? 'Đang xử lý…' : 'Xác nhận thanh toán (mô phỏng)'}</button>
-              </div>}
+              {walletTab && <MomoSimPanel content={`Tiền cọc – phiếu ${phieu.maPhieuCoc}`} amount={amount} busy={walletBusy} onConfirm={thanhToanViTaiCho} />}
               {!walletTab && isTransfer && <div className="dpay-transfer">
                 <VietQrCode account={account} amount={amount} content={transferContent} />
                 <div className="dc-bank-info dpay-bank">
@@ -3693,14 +3686,7 @@ export default function KhachHangPortalPage() {
                   </div>
                 </div>}
                 {fcMethod === 'cash' && <p className="dc-bank-note">Bạn đến quầy để nộp {amount.toLocaleString('vi-VN')} VNĐ bằng tiền mặt. Kế toán sẽ ghi nhận khoản thu và lập biên nhận.</p>}
-                {fcMethod === 'wallet' && <div className="dpay-wallet-panel">
-                  <div className="dc-bank-info dpay-bank">
-                    <div><span>Nội dung</span><strong>{quote.kind === 'hoaDon' ? `Hóa đơn ${quote.refId}` : `Khoản thu kỳ đầu – hợp đồng ${quote.refId}`}</strong></div>
-                    <div><span>Số tiền</span><strong>{amount.toLocaleString('vi-VN')} VNĐ</strong></div>
-                  </div>
-                  <p className="dc-bank-note">Đây là ví mô phỏng để thử luồng nên không có mã QR thật và không trừ tiền thật. Muốn quét mã thật hãy dùng tab QR chuyển khoản.</p>
-                  <button type="button" className="kp-btn kp-btn-primary kp-full" disabled={fcBusy} onClick={() => thanhToanKyDauViTaiCho(quote)}>{fcBusy ? 'Đang xử lý…' : 'Xác nhận thanh toán (mô phỏng)'}</button>
-                </div>}
+                {fcMethod === 'wallet' && <MomoSimPanel content={quote.kind === 'hoaDon' ? `Hóa đơn ${quote.refId}` : `Khoản thu kỳ đầu – hợp đồng ${quote.refId}`} amount={amount} busy={fcBusy} onConfirm={() => thanhToanKyDauViTaiCho(quote)} />}
                 {fcMethod !== 'wallet' && <p className="dc-bank-note">Sau khi chuyển khoản hoặc nộp tiền, kế toán sẽ xác nhận. Khoản này sẽ chuyển sang "Đã thanh toán" khi được ghi nhận.</p>}
               </section>
               {fcMethod === 'transfer' && <section className="dc-section-card dpay-card">
@@ -4633,9 +4619,7 @@ export default function KhachHangPortalPage() {
             )}
 
             <div className="kh-profile-detail-summary">
-              <span className={`kh-status-chip kh-status-chip--${statusTone(getProfileDisplayStatus(profileDetailModal))}`}>
-                {statusIcon(getProfileDisplayStatus(profileDetailModal))} {getProfileDisplayStatus(profileDetailModal)}
-              </span>
+              <StatusBadge status={getProfileDisplayStatus(profileDetailModal)} tone={['Hủy', 'Đã hủy'].includes(getProfileDisplayStatus(profileDetailModal)) ? 'danger' : undefined} />
               <p>Ngày tạo: {formatDate(profileDetailModal.ngayDangKy)}</p>
             </div>
 
@@ -4694,9 +4678,7 @@ export default function KhachHangPortalPage() {
                 <h2>Lịch xem #{scheduleDetailModal.maDangKy}</h2>
               </div>
               <div className="kh-schedule-head-actions">
-                <span className={`kh-status-chip kh-status-chip--${statusTone(scheduleDetailModal.trangThai)}`}>
-                  {statusIcon(scheduleDetailModal.trangThai)} {scheduleDetailModal.trangThai}
-                </span>
+                <StatusBadge status={scheduleDetailModal.trangThai} tone={['Hủy', 'Đã hủy'].includes(scheduleDetailModal.trangThai) ? 'danger' : undefined} />
                 <button type="button" onClick={() => setScheduleDetailModal(null)}>×</button>
               </div>
             </div>

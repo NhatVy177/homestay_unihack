@@ -232,3 +232,7 @@
 .sale-room-chips .sale-room-free { background: var(--color-success-soft); border-color: transparent; color: var(--color-success); }
 .sale-room-row input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--color-primary); }
 @media (max-width: 600px) { .sale-room-row { grid-template-columns: 64px minmax(0, 1fr) auto; } .sale-room-thumb { width: 64px; height: 52px; } }
+
+.sale-modal-summary { display: grid; gap: 2px; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-surface-alt); }
+.sale-modal-summary span { font-size: 14px; color: var(--color-text-muted); }
+.sale-modal .ui-textarea:focus { box-shadow: 0 0 0 3px var(--color-primary-soft, #E8EDE7); }

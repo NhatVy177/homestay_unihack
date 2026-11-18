@@ -101,6 +101,8 @@ export function Icon({ name, className = '', style = {} }) {
     tune: <><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></>,
     upload_file: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6" /><path d="M12 18v-6M9.5 14.5 12 12l2.5 2.5" /></>,
     wc: <><circle cx="7" cy="4.5" r="1.6" /><path d="M5 8h4v6l-.7.2V21H5.7v-6.8L5 14Z" /><circle cx="17" cy="4.5" r="1.6" /><path d="M17 8l3 7h-2.2V21h-1.6v-6H14l3-7Z" /></>,
+    man: <><circle cx="12" cy="4.5" r="1.8" /><path d="M9 9h6v6l-1 .3V21h-4v-5.7L9 15Z" /></>,
+    woman: <><circle cx="12" cy="4.5" r="1.8" /><path d="M12 8l4 8h-2.4V21h-3.2v-5H8Z" /></>,
     wifi: <><path d="M5 12.5a10 10 0 0 1 14 0" /><path d="M8.5 16a5.5 5.5 0 0 1 7 0" /><path d="M2 9a14.5 14.5 0 0 1 20 0" /><path d="M12 19.5h.01" /></>,
     two_wheeler: <><circle cx="5.5" cy="17" r="3" /><circle cx="18.5" cy="17" r="3" /><path d="M8.5 17h5l2.5-7h-3" /><path d="M16 10l-1-3h-2" /></>,
     cleaning_services: <><path d="M16 3v7" /><path d="M13 10h6l1 4H12l1-4Z" /><path d="M12 14l-1 7h10l-1-7" /><path d="M5 12 3 21h5l1.5-6" /></>,

@@ -52,11 +52,11 @@ try {
     if (width === 390) await page.getByRole('button', { name: 'Mở menu', exact: true }).click();
     await page.locator('aside nav').getByRole('button', { name: 'Lập hợp đồng thuê', exact: true }).click();
     await page.getByText('DCUI01', { exact: true }).waitFor(); await shot('eligible-list');
-    await page.getByRole('button', { name: 'Hợp đồng đã lập', exact: true }).click();
+    await page.getByRole('button', { name: /^Hợp đồng đã lập/ }).click();
     await page.getByRole('button', { name: 'Xem hợp đồng', exact: true }).click();
     await page.locator('#print-area-wrapper').waitFor(); await shot('issued-contract');
     await page.getByRole('button', { name: 'Đóng', exact: true }).click();
-    await page.getByRole('button', { name: 'Phiếu chờ lập hợp đồng', exact: true }).click();
+    await page.getByRole('button', { name: /^Phiếu chờ lập hợp đồng/ }).click();
     await page.getByRole('button', { name: 'Lập hợp đồng', exact: true }).click();
     await page.getByRole('button', { name: 'Tiếp tục lập hợp đồng', exact: true }).waitFor();
     await shot('conditions');

@@ -10,3 +10,4 @@
 .srb .srb-menu .ui-icon { --ui-icon-size: var(--icon-md); flex: none; width: var(--icon-md); height: var(--icon-md); color: var(--color-primary); }
 .srb .srb-error { margin: 0; padding: var(--space-2); color: var(--color-danger); font-size: 13px; line-height: 1.5; }
 .srb-copy-buffer { position: fixed; left: -9999px; top: 0; width: 1px; height: 1px; }
+.srb .srb-copied { display: flex; align-items: center; gap: 8px; margin: 0; padding: 8px 12px; border-radius: var(--radius-sm, 8px); background: var(--color-primary-soft, #E8EDE7); color: var(--color-primary, #4A6549); font-size: 14px; font-weight: 500; }

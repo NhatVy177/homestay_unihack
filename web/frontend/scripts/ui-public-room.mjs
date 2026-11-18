@@ -75,7 +75,7 @@ try {
     assert.equal(await page.getByRole('button', { name: 'Quay lại danh sách phòng', exact: true }).locator('svg circle').count(), 0, 'nút quay lại chỉ có mũi tên, không có biểu tượng tròn');
     await page.getByRole('button', { name: 'Tôi quan tâm phòng này', exact: true }).click();
     const next = new URL(page.url()).searchParams.get('next');
-    assert.equal(next, '/khach-hang?tab=kham-pha&phong=P101&dangKy=1');
+    assert.equal(next, '/khach-hang?phong=P101&dangKy=1');
     await page.getByRole('dialog').waitFor();
     assert.deepEqual(errors, []); assert.deepEqual(writes, []);
     report.push({ width, ...metrics, publicDetail: 'full content and lightbox passed', signup: 'login with selected room preserved', errors, writes });

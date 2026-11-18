@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
+import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import { dateKey, dateLabel } from './salePresentation.js';
 
 export default function SaleContractList({ rows, loading, error, search, onSearch, date, onDate, onSelect, onView, onResidence, branch, formatRent, statusInfo }) {
@@ -11,7 +12,7 @@ export default function SaleContractList({ rows, loading, error, search, onSearc
   const filtered = (mode === 'pending' ? pending : issued).filter(p => (!date || dateKey(p.thoiDiemDatCoc) === date)
     && [p.maPhieuDatCoc, p.hoTenKhachHang, p.sdt, p.viTriThue].join(' ').toLocaleLowerCase('vi-VN').includes(keyword));
   return <div className="sale-view sale-contract-list">
-    <div className="sale-section-heading"><div><p>{mode === 'pending' ? <>Danh sách phiếu cọc đã được duyệt cư trú <span className="ui-badge ui-badge--success">Đạt</span> và đủ điều kiện lập hợp đồng.</> : 'Xem lại hợp đồng thuê đã lập từ phiếu cọc.'}</p><p className="sale-contract-branch"><Icon name="apartment" /> Chi nhánh của bạn: <strong>{branch || 'Chưa phân công'}</strong></p></div><div className="sale-actions"><button className="ui-btn ui-btn--secondary" onClick={() => setMode(mode === 'pending' ? 'issued' : 'pending')}><Icon name="description" />{mode === 'pending' ? 'Hợp đồng đã lập' : 'Phiếu chờ lập hợp đồng'}</button><span className="ui-badge ui-badge--warning">{pending.length} phiếu chờ xử lý</span></div></div>
+    <div className="sale-section-heading"><div><p>{mode === 'pending' ? <>Danh sách phiếu cọc đã được duyệt cư trú <span className="ui-badge ui-badge--success">Đạt</span> và đủ điều kiện lập hợp đồng.</> : 'Xem lại hợp đồng thuê đã lập từ phiếu cọc.'}</p><p className="sale-contract-branch"><Icon name="apartment" /> Chi nhánh của bạn: <strong>{branch || 'Chưa phân công'}</strong></p></div><div className="sale-actions"><StatusFilterTabs ariaLabel="Lọc phiếu hợp đồng" activeKey={mode} onChange={setMode} items={[{ key: 'pending', label: 'Phiếu chờ lập hợp đồng', count: pending.length }, { key: 'issued', label: 'Hợp đồng đã lập', count: issued.length }]} /></div></div>
     <section className="ui-card sale-contract-search" aria-label="Tìm kiếm phiếu hợp đồng"><label className="sale-search"><Icon name="search" /><span className="sale-sr-only">Tìm phiếu hợp đồng</span><input className="ui-input" placeholder="Tìm theo tên khách, mã phiếu, SĐT, mã phòng..." value={search} onChange={e => onSearch(e.target.value)} /></label><label className="ui-form-field">Ngày tạo phiếu<input className="ui-input" type="date" value={date} onChange={e => onDate(e.target.value)} /></label></section>
     {error && <p className="sale-alert sale-alert--danger" role="alert">{error}</p>}
     <section className="ui-card sale-contract-results" aria-label={mode === 'pending' ? 'Phiếu đủ điều kiện lập hợp đồng' : 'Hợp đồng đã lập'}>

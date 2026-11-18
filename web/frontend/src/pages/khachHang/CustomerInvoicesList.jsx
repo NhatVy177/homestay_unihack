@@ -82,13 +82,13 @@ export default function CustomerInvoicesList({ deposits, invoices, firstCharges 
       <article className="ui-card"><span className="cinv-icon"><Icon name="check_circle" /></span><small>Hóa đơn quá hạn</small><strong className={overdueCount ? 'is-danger' : ''}>{overdueCount}</strong></article>
     </div>
     <div className="ui-card cinv-filters">
+      <StatusFilterTabs ariaLabel="Lọc theo trạng thái thanh toán" activeKey={group} onChange={setGroup}
+        items={[{ key: 'all', label: 'Tất cả' }, { key: 'unpaid', label: 'Chưa thanh toán' }, { key: 'paid', label: 'Đã thanh toán' }, { key: 'overdue', label: 'Quá hạn' }]} />
       <div className="cinv-selects">
         <select aria-label="Lọc theo tháng" value={month} onChange={(e) => setMonth(e.target.value)}>{MONTH_OPTIONS.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
         <select aria-label="Lọc theo năm" value={year} onChange={(e) => setYear(e.target.value)}><option value="Tất cả">Tất cả năm</option>{years.map((y) => <option key={y} value={y}>Năm {y}</option>)}</select>
         <select aria-label="Lọc theo loại" value={loai} onChange={(e) => setLoai(e.target.value)}>{TYPE_OPTIONS.map((label) => <option key={label} value={label}>{label}</option>)}</select>
       </div>
-      <StatusFilterTabs ariaLabel="Lọc theo trạng thái thanh toán" activeKey={group} onChange={setGroup}
-        items={[{ key: 'all', label: 'Tất cả' }, { key: 'unpaid', label: 'Chưa thanh toán' }, { key: 'paid', label: 'Đã thanh toán' }, { key: 'overdue', label: 'Quá hạn' }]} />
     </div>
     {error && <p className="customer-viewing-error" role="alert">{error}</p>}
     {loading && <p role="status">Đang tải hóa đơn...</p>}

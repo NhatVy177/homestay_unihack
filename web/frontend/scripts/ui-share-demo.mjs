@@ -28,7 +28,7 @@ try {
     assert.ok(geometry.left >= 0 && geometry.right <= width && geometry.height >= 88, JSON.stringify(geometry));
     assert.equal(geometry.scrollWidth, width, 'share menu does not widen the page');
     await page.keyboard.press('ArrowDown');
-    assert.match(await page.evaluate(() => document.activeElement.textContent), /Sao chép link/);
+    assert.match(await page.evaluate(() => document.activeElement.textContent), /ứng dụng khác/);
     await page.keyboard.press('Escape');
     assert.equal(await menu.count(), 0);
     assert.equal(await page.getByRole('button', { name: 'Chia sẻ', exact: true }).evaluate(button => button === document.activeElement), true);
@@ -37,18 +37,16 @@ try {
     const href = await fb.getAttribute('href');
     assert.match(href, /^https:\/\/www\.facebook\.com\/sharer\/sharer\.php\?u=/);
     assert.ok(decodeURIComponent(href).includes('/phong/P103'), 'link trỏ đúng phòng');
-    await page.getByRole('menuitem', { name: /Sao chép link/ }).click();
-    await page.getByRole('menuitem', { name: 'Đã sao chép link' }).waitFor();
+    await page.getByRole('status').filter({ hasText: 'Đã sao chép link' }).waitFor();
     await page.screenshot({ path: `${folder}/share-${width}.png` });
     await page.keyboard.press('Escape');
-    await page.getByRole('button', { name: 'Chia sẻ', exact: true }).click();
     await page.evaluate(() => {
       Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: () => Promise.reject(new Error('fixture denied')) } });
       document.execCommand = () => false;
     });
-    await page.getByRole('menuitem', { name: /Sao chép link/ }).click();
+    await page.getByRole('button', { name: 'Chia sẻ', exact: true }).click();
     await page.getByRole('alert').filter({ hasText: 'Chưa sao chép được liên kết.' }).waitFor();
-    assert.equal(await page.getByRole('menuitem', { name: 'Đã sao chép link' }).count(), 0, 'failed clipboard does not claim success');
+    assert.equal(await page.getByRole('status').filter({ hasText: 'Đã sao chép link' }).count(), 0, 'failed clipboard does not claim success');
     await page.goto(`${base}/`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Đăng nhập' }).first().click().catch(async () => {
       await page.locator('.tc-nav-toggle, .tc-menu-toggle, .tc-hamburger').first().click();

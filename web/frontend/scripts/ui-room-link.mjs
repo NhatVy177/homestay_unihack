@@ -36,17 +36,6 @@ try {
     const report = page.locator('.src-report');
     await report.locator('table').waitFor();
     assert.match(await report.innerText(), /Sale gửi link\s*4\s*3\s*2\s*50%/);
-    if (width === 390) await page.locator('.ui-navigation-toggle').click();
-    await page.locator('aside nav button', { hasText: 'Gửi phòng cho khách' }).click();
-    await page.getByLabel(/^Phòng/).selectOption('P101');
-    await page.getByLabel('Ngày hẹn xem').fill('2026-11-20');
-    await page.getByLabel('Giờ hẹn').fill('15:00');
-    await page.getByRole('button', { name: 'Tạo link' }).click();
-    const message = page.getByLabel('Tin nhắn gửi khách');
-    await message.waitFor();
-    assert.deepEqual(posts[0], { maPhong: 'P101', ngayXem: '2026-11-20', gioXem: '15:00', ghiChu: '' });
-    assert.match(await message.inputValue(), /Phòng P101, hẹn xem lúc 15:00 ngày 20\/11\/2026.*\/chot\/TOKEN123\.sig/);
-    await page.screenshot({ path: `${folder}/sale-${width}.png`, fullPage: true });
     await ctx.close();
 
     ctx = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' });
@@ -60,7 +49,7 @@ try {
     await page.screenshot({ path: `${folder}/customer-${width}.png` });
     await page.getByRole('button', { name: 'Tôi quan tâm phòng này', exact: true }).click();
     const next = new URL(page.url()).searchParams.get('next');
-    assert.match(next, /^\/khach-hang\?tab=kham-pha&phong=P101&dangKy=1&nguon=Sale/);
+    assert.match(next, /^\/khach-hang\?phong=P101&dangKy=1&nguon=Sale/);
     assert.match(next, /ngayXem=2026-11-20&gioXem=15%3A00&tuSale=NV0005/);
     await page.goto(`${base}/chot/hong`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('heading', { name: 'Link không còn dùng được' }).waitFor();

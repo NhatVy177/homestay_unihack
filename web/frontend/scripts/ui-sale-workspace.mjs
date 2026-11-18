@@ -88,7 +88,7 @@ try {
       assert.equal(await page.getByRole('region', { name: 'Lịch hẹn 24 giờ tới', exact: true }).count(), 1);
     }
     if (phase === 'after') {
-      assert.equal(await page.locator('aside nav button').count(), 6);
+      assert.equal(await page.locator('aside nav button').count(), 5);
       assert.equal(await page.locator('aside nav').getByText('Ghi nhận cư trú').count(), 0);
       const title = await page.locator('.sale-calendar-heading h2').textContent();
       await page.getByRole('button', { name: 'Tháng sau', exact: true }).click();
@@ -125,7 +125,7 @@ try {
       assert.equal(await page.getByRole('checkbox', { name: 'Chọn Phòng 103' }).isChecked(), false);
       assert.match(await page.locator('.sale-alert--danger').first().innerText(), /Phòng 999/);
       assert.equal(await page.locator('.sale-room-card .ui-badge', { hasText: 'Khách quan tâm' }).count(), 1);
-      assert.equal(await page.locator('aside nav button:disabled').count(), 5, 'other tabs stay locked while scheduling');
+      assert.equal(await page.locator('aside nav button:disabled').count(), 4, 'other tabs stay locked while scheduling');
       await page.getByRole('button', { name: 'Quay lại', exact: true }).click();
       await nav('Tra cứu khách hàng'); await page.getByText('Khách thử An', { exact: true }).first().waitFor(); await shot('customers');
       assert.equal(await page.locator('.sale-work-tabs').count(), 0);
@@ -139,7 +139,7 @@ try {
     await nav(phase === 'before' ? 'Hợp đồng thuê' : 'Lập hợp đồng thuê'); await shot('contracts');
     if (phase === 'after') {
       assert.equal(await page.locator('.lhd-stepper').count(), 0, 'contract entry is a list without the editor stepper');
-      await page.getByRole('button', { name: 'Hợp đồng đã lập', exact: true }).click();
+      await page.getByRole('button', { name: /^Hợp đồng đã lập/ }).click();
       await page.getByRole('heading', { name: 'Chưa có hợp đồng đã lập', exact: true }).waitFor(); await shot('contracts-issued-empty');
       await page.getByRole('button', { name: /Hỗ trợ khai thông tin người ở/ }).click(); await shot('residence-context');
       await nav('Tổng quan'); await page.getByRole('button', { name: /Xử lý đặt cọc \/ thu tiền tại quầy/ }).click(); await shot('deposit-context');

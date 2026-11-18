@@ -1901,3 +1901,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - 14–16: thu gọn lề thẻ phiếu chờ xếp lịch, giảm độ đậm/cỡ chữ ô thông tin, tách ghi chú phiếu thành các dòng có nhãn và danh sách thành viên nhóm, làm lại hộp thoại "Đã lập lịch xem phòng". 17: thẻ lọc trạng thái có số đếm thay ô chọn, lịch đang chờ lên đầu.
 - File: SaleBookingView.jsx, LichXemPhongTab.jsx, saleWorkspace.css, ui-sale-workspace/ui-viewing-outcomes/ui-customer-profile (cập nhật giả định cũ).
 - Kiểm tra: build PASS; ui-viewing-outcomes, ui-shell, ui-interested-rooms PASS. ui-sale-workspace và ui-customer-profile còn FAIL do giả định cũ của test (menu Khám phá phòng đã bỏ, import react từ dev server).
+
+## 2026-11-18 16:00:00 +07:00 — J-C184 — Lỗi note 18–28
+
+- Người thực hiện: Claude (Vy cho gộp thẳng). 18 StatusBadge cho trạng thái hồ sơ khách; 19 khung tóm tắt ở hộp thoại Ghi nhận Đã xem; 20 nút "Tôi muốn xem phòng khác"; 21 bỏ tab Sale "Gửi phòng cho khách"; 22 hai thẻ lọc hợp đồng luôn hiện; 23 biểu tượng giới tính theo Nam/Nữ/Unisex; 24 gallery cao theo khung; 25 nút quay lại dạng viên thuốc; 26 ví mô phỏng kiểu MoMo (số điện thoại, mã 6 số); 27 bộ lọc hóa đơn một hàng; 28 bấm Chia sẻ tự sao chép link và báo.
+- Kiểm tra: build PASS; ui-share-demo, ui-public-room, ui-room-link, ui-customer-invoices, avalanche-smoke PASS. ui-sale-contracts FAIL cả trên main trước đợt này; ui-sale-workspace, ui-customer-profile còn giả định cũ.

@@ -53,10 +53,10 @@ export default function ShareRoomButton({ room }) {
     event.preventDefault(); items[next]?.focus();
   }
   return <div className="srb" ref={ref}>
-    <button ref={trigger} type="button" className="srb-trigger" aria-haspopup="menu" aria-controls={open ? menuId : undefined} aria-expanded={open} onClick={() => { setError(''); setCopied(false); clearTimeout(copyTimer.current); setOpen((value) => !value); }}><Icon name="send" />Chia sẻ</button>
+    <button ref={trigger} type="button" className="srb-trigger" aria-haspopup="menu" aria-controls={open ? menuId : undefined} aria-expanded={open} onClick={() => { const opening = !open; setOpen(opening); if (opening) copy(); }}><Icon name="send" />Chia sẻ</button>
     {open && <div id={menuId} className="srb-menu" role="menu" aria-label="Chia sẻ phòng" onKeyDown={navigateMenu}>
       <a role="menuitem" href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`} target="_blank" rel="noreferrer" onClick={() => setOpen(false)}><Icon name="groups" />Chia sẻ lên Facebook</a>
-      <button type="button" role="menuitem" onClick={copy}><Icon name={copied ? 'check' : 'list'} />{copied ? 'Đã sao chép link' : 'Sao chép link (dán vào Messenger, Zalo)'}</button>
+      {copied && <p className="srb-copied" role="status"><Icon name="check" />Đã sao chép link</p>}
       {nativeShare && <button type="button" role="menuitem" onClick={() => { setOpen(false); navigator.share({ title: text, url }).catch(() => {}); }}><Icon name="phone" />Chia sẻ qua ứng dụng khác</button>}
       {error && <p className="srb-error" role="alert">{error}</p>}
     </div>}

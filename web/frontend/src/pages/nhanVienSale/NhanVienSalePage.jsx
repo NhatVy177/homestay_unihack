@@ -11,12 +11,10 @@ import LichXemPhongTab from './LichXemPhongTab.jsx';
 import LapHopDongTab from './LapHopDongTab.jsx';
 import DatCocTab from './DatCocTab.jsx';
 import NhanPhongTab from './NhanPhongTab.jsx';
-import SaleRoomLinkTab from '../../components/linkChot/SaleRoomLinkTab.jsx';
 
 const navigation = [
   { id: 'tong-quan', label: 'Tổng quan', icon: 'home' },
   { id: 'lich-xem', label: 'Lịch hẹn xem phòng', icon: 'event_note' },
-  { id: 'gui-phong', label: 'Gửi phòng cho khách', icon: 'meeting_room' },
   { id: 'hop-dong-thue', label: 'Lập hợp đồng thuê', icon: 'description' },
   { id: 'khach-hang', label: 'Tra cứu khách hàng', icon: 'search' },
   { id: 'ho-so-ca-nhan', label: 'Hồ sơ cá nhân', icon: 'person' },
@@ -39,7 +37,6 @@ export default function NhanVienSalePage() {
     {!task && activeTab === 'tong-quan' && <SaleOverview user={user} onNavigate={navigate} />}
     {!task && activeTab === 'lich-xem' && <LichXemPhongTab onNavigate={navigate} onSchedulingChange={setScheduling} />}
     {!task && activeTab === 'hop-dong-thue' && <LapHopDongTab onResidence={() => navigate('nhan-phong')} />}
-    {!task && activeTab === 'gui-phong' && <SaleRoomLinkTab />}
     {activeTab === 'khach-hang' && <SaleCustomerWorkspace />}
     {activeTab === 'ho-so-ca-nhan' && <SaleProfile user={user} />}
   </WorkspaceShell>;
