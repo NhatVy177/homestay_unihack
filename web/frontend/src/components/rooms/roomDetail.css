@@ -203,11 +203,13 @@ button.kh-gallery-main, button.kh-gallery-thumb, button.kh-all-photo-item {
   line-height: 1.25;
 }
 
+.kh-detail-description { display: grid; gap: var(--space-3); max-width: 74ch; }
 .kh-detail-mota {
   color: var(--kp-muted);
   font-size: 14px;
   line-height: 1.65;
-  margin: 46px 0 0;
+  margin: 0;
+  white-space: pre-line;
 }
 
 .kh-amenity-list {

@@ -3,6 +3,8 @@ import { createPublicClient, http, isAddress } from 'viem';
 import { verifyEvidence } from '@homestaydorm/settlement/evidence';
 import { CLOSURE_SCHEMA, verifyClosureEvidence } from '@homestaydorm/settlement/closure';
 import { HandoverView } from '../../components/xacNhan/DocumentView.jsx';
+import { ConfirmationNotice } from '../../components/xacNhan/ConfirmationFeedback.jsx';
+import StatusBadge from '../../components/common/StatusBadge.jsx';
 import '../../components/xacNhan/xacNhan.css';
 import './avalancheVerify.css';
 
@@ -10,6 +12,12 @@ const chainId = Number(import.meta.env.VITE_AVALANCHE_CHAIN_ID || 43113);
 const address = import.meta.env.VITE_AVALANCHE_CONTRACT_ADDRESS || '';
 const rpcUrl = import.meta.env.VITE_AVALANCHE_RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc';
 const deployment = { chainId, address };
+
+function EvidenceStatus({ result }) {
+  if (result.superseded) return <StatusBadge status="Đã có bản mới hơn" tone="neutral" />;
+  if (result.accepted) return <StatusBadge status="Đã xác nhận" tone="success" />;
+  return <StatusBadge status={result.disputed ? 'Đã phản đối' : 'Chờ xác nhận'} tone="warning" />;
+}
 
 export default function AvalancheVerifyPage() {
   const [result, setResult] = useState(null);
@@ -51,11 +59,12 @@ export default function AvalancheVerifyPage() {
       {chainId === 43113 && isAddress(address) && <p>Mạng thử Avalanche Fuji · <a href={`https://testnet.snowtrace.io/address/${address}`} target="_blank" rel="noreferrer">Xem contract trên Snowtrace ↗</a></p>}
       <label htmlFor="evidence-file">Tệp hồ sơ xác nhận</label>
       <input id="evidence-file" type="file" accept=".json,application/json" onChange={onFile} disabled={busy} />
-      {busy && <p role="status">Đang đọc trạng thái trên chain...</p>}
+      {busy && <ConfirmationNotice>Đang đối chiếu hồ sơ…</ConfirmationNotice>}
       {result && (
-        <section aria-live="polite" className={result.valid ? 'avalanche-verify-ok' : 'avalanche-verify-error'}>
+        <section className="avalanche-verify-result">
           {result.valid ? (
             <>
+              <ConfirmationNotice tone="success">Nội dung khớp với bản đã lưu.</ConfirmationNotice>
               {result.kind === 'closure' ? <>
                 <h2>Gói bằng chứng kết thúc hợp đồng</h2>
                 <p>{result.mode === 'without-consent' ? 'Đóng không có xác nhận của khách.' : 'Bản bàn giao và đối soát được khách xác nhận trên chuỗi.'}</p>
@@ -66,9 +75,14 @@ export default function AvalancheVerifyPage() {
                 <p>Thời điểm ghi nhận đóng: {evidence?.web2.closedAt}</p>
                 {evidence?.web2.reason && <p>Lý do: {evidence.web2.reason}</p>}
                 {evidence?.web2.paymentProofs.map(proof => <div key={proof.id} className="avalanche-proof"><p>Chứng từ: {proof.name} · {proof.amountVnd} đ · {proof.paidAt}</p><p>SHA-256: <code>{proof.sha256}</code></p></div>)}
-                {Object.entries(result.chainResults).map(([kind, checked]) => <p key={kind}>{kind === 'handover' ? 'Bàn giao' : 'Đối soát'}: khớp bản ghi trên chuỗi; {checked.accepted ? 'đã xác nhận' : 'chưa xác nhận'}.</p>)}
+                {Object.entries(result.chainResults).map(([kind, checked]) => <p className="avalanche-verify-state" key={kind}>
+                  <strong>{kind === 'handover' ? 'Bàn giao' : 'Đối soát'}</strong>
+                  <EvidenceStatus result={checked} />
+                </p>)}
                 {result.web2Only && <p>Hồ sơ này không có bản xác nhận trên chuỗi.</p>}
-              </> : <><h2>Nội dung khớp bản ghi trên chain</h2><p>Trạng thái: {result.status}. {result.accepted ? 'Đã được bên cần xác nhận chấp nhận.' : 'Chưa được chấp nhận.'}</p></>}
+              </> : <p className="avalanche-verify-state">
+                <EvidenceStatus result={result} />
+              </p>}
               {result.kind === 'handover' && evidence && <HandoverView showTechnical policy={evidence.documents.policy} handover={evidence.documents.handover} />}
               {result.kind === 'settlement' && (
                 <p>Phiên bản {result.version}{result.superseded ? ' — đã có bản mới hơn' : ' — bản mới nhất'};
@@ -77,7 +91,7 @@ export default function AvalancheVerifyPage() {
               )}
             </>
           ) : (
-            <><h2>Chưa xác minh được</h2><p>{result.reason}</p></>
+            <ConfirmationNotice tone="danger"><strong>Chưa xác minh được</strong><p>{result.reason}</p></ConfirmationNotice>
           )}
         </section>
       )}

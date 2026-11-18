@@ -1,6 +1,12 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 16:53:49 +07:00** (J-X102: chuyển điểm thưởng vào hồ sơ cá nhân và cập nhật bản xem trước). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 17:37:18 +07:00** (J-X103: dữ liệu demo thuê phòng, mô tả phòng và giao diện xác nhận). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+
+## Demo thuê phòng và trạng thái xác nhận — D-072
+
+- Nhánh `feat/demo-data-avalanche-ui` gồm bộ SQL riêng, test nghiệp vụ, mục Mô tả phòng và chuẩn hóa nhãn/thông báo/nút trong các màn Avalanche. Chờ Vy duyệt nhánh.
+- Bản xem trước cổng 5187 nối backend 5017 và SQL Server `HOMEDORM_DEMO_1118_RENT`. Có 4 khách mới, 4 khách đang ở tháng thứ hai với hai kỳ hóa đơn, 6 nhân viên và 11 phòng. [Tài khoản và kịch bản](../docs/cau-hinh.md#dữ-liệu-demo-thuê-phòng--d-072)
+- Đã kiểm qua giao diện với SQL Server demo, gồm ca trống, hóa đơn, báo hỏng và kế toán. Bộ test SQL xác nhận phí sửa đi vào kỳ tiếp theo rồi hoàn tác. Build, fixture Avalanche và bộ test local của backend/blockchain qua. Bản demo thuê phòng tắt ghi chuỗi. Chưa nghiệm thu thay đổi UI trên Fuji.
 
 ## Điểm thưởng hóa đơn tháng — D-070 / D-071
 

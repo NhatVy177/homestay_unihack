@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ConfirmationNotice } from './ConfirmationFeedback.jsx';
 import { errorMessage } from '../../lib/avalanche/api.js';
 import './xacNhan.css';
 
@@ -14,17 +15,17 @@ export default function EmailCodeGate({ signer, onCancel }) {
       {signer.accountEmail ? <p>Email: <strong>{signer.accountEmail}</strong></p>
         : <label>Email nhận mã (tài khoản chưa có email)<input type="text" value={email} onChange={e => setEmail(e.target.value)} /></label>}
       <div className="xn-actions">
-        <button type="button" className="xn-btn" disabled={busy} onClick={() => act(() => signer.sendCode(email))}>{busy ? 'Đang gửi…' : 'Gửi mã'}</button>
-        <button type="button" className="xn-btn secondary" disabled={busy} onClick={onCancel}>Hủy</button>
+        <button type="button" className="ui-btn ui-btn--primary" disabled={busy} onClick={() => act(() => signer.sendCode(email))}>{busy ? 'Đang gửi…' : 'Gửi mã'}</button>
+        <button type="button" className="ui-btn ui-btn--secondary" disabled={busy} onClick={onCancel}>Hủy</button>
       </div>
     </> : <>
       <label>Mã đã gửi tới {signer.codeSentTo}<input type="text" inputMode="numeric" maxLength={6} value={code} onChange={e => setCode(e.target.value.replace(/\D/g, ''))} placeholder="6 chữ số" /></label>
       <div className="xn-actions">
-        <button type="button" className="xn-btn" disabled={busy || code.length !== 6} onClick={() => act(() => signer.verifyCode(code))}>{busy ? 'Đang kiểm tra…' : 'Xác nhận mã'}</button>
+        <button type="button" className="ui-btn ui-btn--primary" disabled={busy || code.length !== 6} onClick={() => act(() => signer.verifyCode(code))}>{busy ? 'Đang kiểm tra…' : 'Xác nhận mã'}</button>
         <button type="button" className="xn-link" disabled={busy} onClick={() => act(() => signer.sendCode(signer.codeSentTo))}>Gửi lại mã</button>
-        <button type="button" className="xn-btn secondary" disabled={busy} onClick={onCancel}>Hủy</button>
+        <button type="button" className="ui-btn ui-btn--secondary" disabled={busy} onClick={onCancel}>Hủy</button>
       </div>
     </>}
-    {error && <div className="xn-alert error">{error}</div>}
+    {error && <ConfirmationNotice tone="danger">{error}</ConfirmationNotice>}
   </div>;
 }

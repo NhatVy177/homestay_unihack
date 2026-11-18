@@ -57,6 +57,23 @@ function normalizeImageItems(source) {
     .filter(Boolean);
 }
 
+export function describeRoom(room) {
+  const description = typeof room.moTa === 'string' ? room.moTa.trim() : '';
+  const location = [room.tang != null ? `tầng ${room.tang}` : '', room.chiNhanh].filter(Boolean).join(', ');
+  const capacity = Number(room.sucChua);
+  const roomName = room.tenPhong || 'Phòng này';
+  const locationText = location ? `${roomName} ở ${location}.` : '';
+  const arrangement = capacity > 1
+    ? `Phòng có sức chứa tối đa ${capacity} người, phù hợp với khách tìm chỗ ở ghép hoặc nhóm muốn ở cùng phòng.`
+    : capacity === 1 ? 'Sức chứa một người phù hợp với khách muốn có không gian ở riêng.' : '';
+  const amenities = [...new Set((room.tienNghi || []).map(item => item.tenTienNghi || item.tenTaiSan).filter(Boolean))].slice(0, 4);
+  const furnishing = amenities.length ? `Trang bị trong phòng gồm ${new Intl.ListFormat('vi-VN').format(amenities.map(name => name.charAt(0).toLocaleLowerCase('vi-VN') + name.slice(1)))}.` : '';
+  const rental = room.coTheThueNguyenPhong === true
+    ? 'Phòng hiện còn trống toàn bộ giường và có thể đăng ký thuê nguyên phòng.'
+    : '';
+  return [description, [locationText, arrangement].filter(Boolean).join(' '), [furnishing, rental].filter(Boolean).join(' ')].filter(Boolean);
+}
+
 export function normalizeRoomDetail(payload, fallback = {}) {
   const raw = unwrapApiPayload(payload);
   const merged = { ...fallback, ...raw };

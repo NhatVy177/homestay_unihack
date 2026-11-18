@@ -46,7 +46,7 @@ try {
   const evidence = join(temp, 'invalid.json');
   await writeFile(evidence, '{}');
   await page.locator('#evidence-file').setInputFiles(evidence);
-  await page.getByText('Ứng dụng chưa cấu hình contract Avalanche để kiểm chứng.').waitFor();
+  await page.getByRole('alert').getByText('Ứng dụng chưa cấu hình contract Avalanche để kiểm chứng.').waitFor();
   await page.goto(base + '/ho-so-xac-nhan', { waitUntil: 'domcontentloaded' });
   await page.waitForURL(base + '/?next=%2Fho-so-xac-nhan');
   await page.route('**/api/auth/toi', route => route.fulfill({ json: { maNguoiDung: 'KHDEMO', vaiTro: 'KhachHang', hoTen: 'Khách thử' } }));
@@ -108,6 +108,11 @@ try {
   await page.getByText('Bạn đã xác nhận biên bản lúc 09:30, 06/11/2026', { exact: false }).waitFor();
   // Both handover and settlement now offer evidence downloads; check the saved handover specifically.
   await page.locator('.xn-saved').filter({ hasText: 'Bạn đã xác nhận biên bản' }).getByRole('button', { name: 'File kiểm chứng (.json)' }).waitFor();
+  await page.locator('.xn-card .ui-badge--success').filter({ hasText: /^Đã xác nhận$/ }).waitFor();
+  await page.setViewportSize({ width: 390, height: 900 });
+  assert.ok(await page.locator('.xn-card').first().evaluate(card => card.scrollWidth <= card.clientWidth + 1));
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390);
+  await page.setViewportSize({ width: 1440, height: 900 });
   assert.equal(await page.locator('.xn-tech').count(), 0);
   assert.equal((await page.locator('.xn-card').textContent()).includes('0x'), false);
   await capture('03-khach-da-xac-nhan.png');
@@ -118,6 +123,7 @@ try {
   await page.getByText('Bạn đã xác nhận biên bản. Biên bản đã được lưu', { exact: false }).waitFor();
   assert.equal((await page.locator('.xn-saved strong').first().textContent()).includes('lúc'), false);
   await openAs({ maNguoiDung: 'NV-DEMO', vaiTro: 'NhanVien', chucVu: 'Quản lý' });
+  await page.locator('.xn-list .ui-badge--success').filter({ hasText: /^Đã thống nhất đối soát$/ }).waitFor();
   await page.getByRole('button', { name: 'Xem', exact: true }).click();
   await page.getByText('email gần nhất:', { exact: false }).waitFor();
   assert.ok((await page.locator('.xn-list').textContent()).includes('chỉ ghi log, chưa gửi'));
@@ -127,6 +133,7 @@ try {
   assert.equal(await page.getByText('Xem trên Snowtrace ↗').count(), 0);
   await capture('04-quan-ly-thong-tin-xac-thuc.png');
   await openAs({ maNguoiDung: 'NV-DEMO', vaiTro: 'NhanVien', chucVu: 'Kế toán' });
+  await page.locator('.xn-list .ui-badge--success').filter({ hasText: /^Đã thống nhất đối soát$/ }).waitFor();
   await page.getByRole('button', { name: 'Xem', exact: true }).click();
   await page.getByText('Thông tin xác thực trên Avalanche').click();
   await page.getByText('Chain thử nghiệm trên máy (local)').waitFor();

@@ -92,6 +92,7 @@ Tình huống demo: nệm đã rách lúc nhận phòng, nhưng khi trả phòng
 
 Bảy việc Vy duyệt (chi tiết ở `spec/scope.md` F-17–F-20, nhật ký J-C180):
 - Báo hỏng kèm ảnh trong thời gian thuê; ảnh và ngày báo được dùng lúc kiểm tra trả phòng, nên hư hỏng "không do khách" không bị tính vào đối soát cọc. Nối thẳng vào câu chuyện bằng chứng của phần Avalanche.
+- D-072 thêm kịch bản bắt đầu với khách mới, sau đó chuyển sang khách đang ở tháng thứ hai. Trình diễn hai kỳ hóa đơn, báo hỏng và kiểm giá kỳ tiếp theo từ vai trò kế toán. Chi tiết phòng có mô tả riêng theo dữ liệu phòng. Khi chuyển sang hồ sơ Avalanche, các nhãn xác nhận và thông báo dùng cùng kiểu giao diện. Dữ liệu demo đặt trong SQL Server cục bộ riêng. [Tài khoản và kịch bản](../docs/cau-hinh.md#dữ-liệu-demo-thuê-phòng--d-072)
 - Link phòng hiện ảnh/giá/địa chỉ khi dán Facebook; Sale gửi "link chốt phòng" qua Messenger, khách đăng ký với thông tin điền sẵn. Câu pitch: chốt trên Messenger như cũ, giấy tờ và tiền cọc thì có bằng chứng.
 - Nguồn khách và tỷ lệ chốt theo nguồn; email nhắc hóa đơn trước hạn.
 - `npm run avalanche:recover` dựng lại hồ sơ chỉ từ chuỗi; `docs/minh-bach-ky-thuat.md` nêu dữ liệu lên chuỗi, gas đo thật (≈430.000 gas một hợp đồng, relayer trả), giới hạn.

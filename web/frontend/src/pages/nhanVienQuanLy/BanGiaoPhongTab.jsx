@@ -5,6 +5,7 @@ import { banGiaoPhongApi } from './banGiaoPhong.api.js';
 import { httpClient } from '../../api/httpClient.js';
 import { avalancheApi, errorMessage } from '../../lib/avalanche/api.js';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
+import { ConfirmationNotice } from '../../components/xacNhan/ConfirmationFeedback.jsx';
 import '../nhanPhong/cuTru.css';
 
 function getErrorMessage(error, fallback) {
@@ -389,11 +390,11 @@ export default function BanGiaoPhongTab() {
                   Mã biên bản: {successDialog.maBienBan}
                 </div>
               )}
-              {successDialog.xacNhan && (
-                <p style={{ margin: '14px 0 0', color: '#3f494a', fontSize: '14px', lineHeight: 1.6 }}>{successDialog.xacNhan}</p>
-              )}
-              {guiLai.message && <p style={{ margin: '12px 0 0', color: '#146236', fontSize: '14px' }} role="status">{guiLai.message}</p>}
-              {guiLai.error && <p style={{ margin: '12px 0 0', color: '#9b1c1c', fontSize: '14px' }} role="alert">{guiLai.error}</p>}
+              {(successDialog.xacNhan || guiLai.message || guiLai.error) && <div className="xn-publish-feedback">
+                {successDialog.xacNhan && !guiLai.message && <ConfirmationNotice tone={successDialog.canGuiLai ? 'warning' : 'success'}>{successDialog.xacNhan}</ConfirmationNotice>}
+                {guiLai.message && <ConfirmationNotice tone="success">{guiLai.message}</ConfirmationNotice>}
+                {guiLai.error && <ConfirmationNotice tone="danger">{guiLai.error}</ConfirmationNotice>}
+              </div>}
             </div>
             <div style={{ padding: '16px 24px', borderTop: '1px solid #e1e3e4', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
               {successDialog.canGuiLai && !guiLai.message && (

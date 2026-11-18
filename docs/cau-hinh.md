@@ -33,6 +33,49 @@ npm run dev
 - Frontend: `http://localhost:5173`
 - Backend: `http://localhost:5000`
 
+## Dữ liệu demo thuê phòng — D-072
+
+Tại `web/backend`, dùng cấu hình kết nối SQL Server cục bộ từ `.env` và đặt tên database mới bắt đầu bằng `HOMEDORM_DEMO_`. Tài khoản SQL cần quyền tạo database. Lệnh tạo đủ schema và dữ liệu mẫu, sau đó có thể chạy lại để kiểm tra mà vẫn giữ dữ liệu đã demo. Muốn làm mới mốc tháng thuê, đổi sang tên demo mới.
+
+```powershell
+$env:DB_NAME = 'HOMEDORM_DEMO_RENT'
+$env:DEMO_SEED_PASSWORD = 'DormDemo2026!'
+npm run demo:db:migrate
+$env:DEMO_SQL_TEST = 'true'
+node --test test/demo-scenarios-sql.test.mjs
+```
+
+Bộ test cần bộ dữ liệu vừa tạo. Test hoàn tác các báo hỏng và hóa đơn do chính nó tạo. Mật khẩu trong ví dụ chỉ dùng cho tài khoản mẫu. Bản xem trước cục bộ ở `http://localhost:5187` dùng cùng mật khẩu trên.
+
+| Đăng nhập | Thao tác demo |
+|---|---|
+| `demo-moi` | Mở Hồ sơ đăng ký hoặc Hóa đơn & thanh toán để thấy tài khoản chưa có giao dịch. Có thêm `demo-moi-02` đến `demo-moi-04` để tập lại. |
+| `demo-dang-o` | Xem hợp đồng `HD9001` sáu tháng, hóa đơn `HO9011` đã trả và `HO9012` chờ trả. Mở Báo hỏng để xem hoặc tạo yêu cầu. Có thêm `demo-dang-o-02` đến `demo-dang-o-04` cùng hai kỳ hóa đơn. |
+| `demo-quan-ly` | Mở Báo hỏng & sửa chữa, tiếp nhận `SC9002` ở P102 hoặc xem `SC9001` đã hoàn tất ở P101. |
+| `demo-ke-toan` | Mở Hóa đơn định kỳ, chọn kỳ mới nhất trong bộ lọc Kỳ thanh toán rồi chọn `HD9001`. Nhập điện **245**, nước **31**. Tổng dự tính **2.748.000đ** gồm tiền phòng, điện nước, dịch vụ và **120.000đ** sửa bản lề tủ. |
+| `demo-sale` | Dùng cùng chi nhánh Quận 1 với hai nhân viên trên. Sale, quản lý và kế toán chi nhánh Bình Thạnh dùng tên tương ứng có hậu tố `-02`. |
+
+Để dựng bản xem trước riêng trên máy, giữ `DB_NAME` ở database demo, chạy backend từ `web/backend` và nối frontend vào cổng đó. Các tiến trình sau dùng cấu hình DB từ `.env` và tắt lịch chạy nền, gửi email thật, MoMo Sandbox và ghi giao dịch Avalanche cho bản demo thuê phòng.
+
+```powershell
+$env:PORT = '5017'
+$env:CLIENT_URL = 'http://localhost:5187'
+$env:AUTH_SECRET = [guid]::NewGuid().ToString('N')
+$env:SCHEDULERS_ENABLED = 'false'
+$env:LOYALTY_SCHEDULER_ENABLED = 'false'
+$env:AVALANCHE_ENABLED = 'false'
+$env:LOYALTY_ENABLED = 'false'
+node --env-file=.env --input-type=module -e "process.env.SMTP_HOST=''; process.env.MOMO_TEST_PARTNER_CODE=''; await import('./index.js');"
+```
+
+Trong một cửa sổ khác, tại `web/frontend`:
+
+```powershell
+$env:VITE_API_URL = 'http://localhost:5017/api'
+$env:VITE_SHOW_DEMO_ACCOUNTS = 'false'
+npm run dev -- --host localhost --port 5187 --strictPort
+```
+
 ## Điểm thưởng hóa đơn tháng — D-070
 
 1. Chuẩn bị ví vận hành riêng có AVAX thử. Đặt khóa ví này trong `LOYALTY_OPERATOR_PRIVATE_KEY`. Trong `blockchain/`, chạy `npm run deploy:loyalty` để deploy lên Fuji, hoặc `npm run deploy:loyalty -- --local` khi RPC local đang chạy. Lệnh đọc `.env` của blockchain nếu có, hoặc nhận đường dẫn cấu hình qua `LOYALTY_DEPLOY_ENV`. Ghi lại địa chỉ contract được in ra.

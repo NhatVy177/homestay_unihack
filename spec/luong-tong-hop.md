@@ -170,6 +170,8 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
 2. **Trang khách "Khoản dự kiến trừ khi trả phòng":** cộng dồn hóa đơn còn nợ, **hư hỏng do khách gây ra** (quản lý ghi kèm ảnh, từ sự cố/bảo trì), **tiền phạt** từ biên bản vi phạm. Để lúc trả phòng không có bất ngờ.
 3. Mỗi khoản phát sinh hoặc vi phạm mới: **email cho khách + khách phản hồi ngay trên web.** Không lên chuỗi riêng; chúng lên chuỗi **gián tiếp** qua mã băm bảng đối soát ở mốc 2.
 
+**Demo từ D-072** có khách chưa phát sinh hồ sơ ở giai đoạn 1 và khách đang ở tháng thứ hai của hợp đồng sáu tháng. Khách đang ở có một kỳ đã trả, một kỳ chờ trả. Quản lý xử lý báo hỏng, còn kế toán xem số điện nước và khoản sửa chữa được cộng vào kỳ tiếp theo. Chi tiết phòng có mục mô tả dùng dữ liệu thực tế của phòng. Các màn xác nhận và kiểm chứng dùng kiểu trạng thái chung của HomeStayDorm. [Cách tạo dữ liệu và tài khoản](../docs/cau-hinh.md#dữ-liệu-demo-thuê-phòng--d-072)
+
 ### 3.8 Giai đoạn 8: Trả phòng và đối soát (D-030)
 
 1. Khách gửi yêu cầu trả phòng. Tỷ lệ hoàn cọc theo bảng chính sách trong hệ thống: 80% (đã cọc, chưa ký hợp đồng), 50% (ở dưới 6 tháng), 70% (ở từ 6 tháng, chưa hết hạn), 100% (hết hạn hợp đồng). Hệ thống hiện **không có** quy định số ngày báo trước.

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ConfirmationNotice } from './ConfirmationFeedback.jsx';
 import { createPublicClient, http } from 'viem';
 import { verifyEvidence } from '@homestaydorm/settlement/evidence';
 import { rpcUrl, trustedDeployment } from '../../lib/avalanche/api.js';
@@ -16,9 +17,9 @@ export default function VerifyNow({ evidence, label = 'Kiểm tra ngay' }) {
       setState({ status: 'bad', reason: `Chưa kiểm tra được lúc này: ${error.message}` });
     }
   }
-  return <span className="xn-verify">
+  return <div className="xn-verify">
     <button type="button" className="xn-link" disabled={state.status === 'busy'} onClick={run}>{state.status === 'busy' ? 'Đang kiểm tra...' : label}</button>
-    {state.status === 'ok' && <span className="xn-verify-ok" role="status">✅ Khớp với bản đã lưu, chưa bị chỉnh sửa (kiểm tra lúc {state.at.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })})</span>}
-    {state.status === 'bad' && <span className="xn-verify-bad" role="alert">⚠️ Chưa xác minh được: {state.reason}</span>}
-  </span>;
+    {state.status === 'ok' && <ConfirmationNotice tone="success">Khớp với bản đã lưu, chưa bị chỉnh sửa (kiểm tra lúc {state.at.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })})</ConfirmationNotice>}
+    {state.status === 'bad' && <ConfirmationNotice tone="danger">Chưa xác minh được: {state.reason}</ConfirmationNotice>}
+  </div>;
 }

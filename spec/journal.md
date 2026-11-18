@@ -1934,3 +1934,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: AccountSecurity.jsx, accountSecurity.css, KhachHangPortalPage.jsx, CustomerProfileRewards.jsx, customerRewards.css và avalanche-smoke.mjs. Giữ đường dẫn cũ vào hồ sơ mở sẵn lịch sử. Không đổi API, SQL hoặc luồng ký.
 - Kiểm tra: build PASS, avalanche UI smoke PASS. Kiểm riêng tại localhost:5186 với dữ liệu giả ở 1440px và 390px, thao tác chuột và bàn phím, số dư sau cập nhật, lịch sử rỗng, đường dẫn cũ, không tràn ngang hoặc lỗi JavaScript. Không chạy giao dịch tích/đổi thật trong lượt kiểm.
 - Nhánh fix/loyalty-profile từ origin/main. Đã đưa phần UI vào worktree đang phục vụ 5186 ở commit 2d9f731 để Vy xem.
+
+## 2026-11-18 17:37:18 +07:00 — J-X103 — Dữ liệu demo thuê phòng, mô tả và trạng thái xác nhận
+
+- Người thực hiện: Codex. Vy yêu cầu thêm tài khoản khách chưa có hồ sơ, khách đang ở tháng thứ hai của hợp đồng sáu tháng, hai kỳ hóa đơn, báo hỏng và bộ test. Chi tiết phòng có khối mô tả riêng theo cách trình bày của dự án Hằng. Trạng thái xác nhận được đồng bộ với HomeStayDorm.
+- File: `database/GenData/demo-scenarios.sql`, công cụ `demo:db:migrate` và `demo-scenarios-sql.test.mjs`. Giao diện cập nhật `components/rooms`, `components/xacNhan`, `CheckoutClosureCard`, `BanGiaoPhongTab` và `pages/avalanche`. Cập nhật hướng dẫn trong `docs/cau-hinh.md`, phạm vi, luồng và kế hoạch demo.
+- Kiểm tra: SQL demo cài mới và chạy lại thành công. Test qua nghiệp vụ đăng nhập, ca chưa thuê, hai kỳ hóa đơn, giới hạn theo chi nhánh, báo hỏng và tính phí, có hoàn tác. Trình duyệt đọc SQL thật ở 1440/390, kiểm tổng tiền kỳ sau 2.748.000đ với chỉ số 245 và 31. Build và smoke Avalanche qua, có kiểm nhãn dùng chung và chiều rộng 390px. Backend 156 pass/5 skip mặc định. Blockchain local 26 pass/1 skip.
+- Còn lại: triển khai hoặc nghiệm thu Fuji là đợt riêng. Bản xem trước ở 5187 và 5017 dùng `HOMEDORM_DEMO_1118_RENT`. Gửi nhánh `feat/demo-data-avalanche-ui` để Vy xem trước khi gộp.

@@ -34,6 +34,7 @@ Vị trí code theo D-008: contract/test/toolchain/shared nằm trong [blockchai
 | F-19 | Nguồn khách và nhắc hóa đơn (D-063) | Phiếu đăng ký ghi nguồn (Facebook/Zalo/người quen/web/Sale gửi link/khác); Sale xem hồ sơ, đã cọc, đã ký và tỷ lệ chốt theo nguồn. Hóa đơn định kỳ chưa trả được nhắc qua email 3 ngày trước hạn, mỗi hóa đơn một lần. |
 | F-20 | Khôi phục từ chuỗi và tài liệu minh bạch (D-063) | `npm run avalanche:recover` dựng lại trạng thái bàn giao/đối soát chỉ từ sự kiện contract và so với DB; `docs/minh-bach-ky-thuat.md` nêu dữ liệu lên chuỗi, gas đo thật, giới hạn. |
 | F-21 | Điểm thưởng hóa đơn tháng (D-070) | Hóa đơn tháng trả đúng hạn kể từ ngày mở chương trình được 100 điểm, mỗi hóa đơn một lần. Ví Privy ký đổi 100 điểm lấy voucher 20.000đ của hợp đồng khách chọn. Giao dịch Fuji được gửi hộ và đối chiếu sự kiện trước khi ghi nhận. Voucher được dùng một lần trong giao dịch lập hóa đơn tiếp theo, kế toán xem dòng ưu đãi và minh chứng. Khách xem số dư trên Thông tin cá nhân và bấm vào ô Điểm thưởng để mở lịch sử và đổi ưu đãi (D-071). |
+| F-22 | Dữ liệu demo thuê phòng (D-072) | SQL Server cục bộ có bộ khách mới, khách thuê sáu tháng đang ở tháng thứ hai và các vai trò nhân viên. Có hai kỳ hóa đơn, chỉ số điện nước, phí dịch vụ, báo hỏng chờ tiếp nhận và phí sửa phát sinh. Bộ test kiểm quyền quản lý, lập kỳ tiếp theo và hoàn tác thay đổi. Tạo bằng `npm run demo:db:migrate` với database riêng `HOMEDORM_DEMO_*`. |
 | F-09 | Triển khai và demo Fuji | Contract deploy và verify source; ABI/address/UI thống nhất; chạy luồng đầy đủ ba vai trò, có tx thật, test phù hợp, README setup và bằng chứng demo. Local pass không thay thế nghiệm thu này. |
 
 
@@ -107,6 +108,8 @@ Bản review D-045 bao gồm code UI của chính Codex ở J-X079/J-X080: cột
 - Đợt này chưa làm khách tự khai cư trú: D-026 vẫn áp dụng cho đợt nghiệp vụ tiếp theo; hiện giữ nhập hộ để không đứt luồng. Không đổi quản lý duyệt ngoại lệ, SQL/SP, luồng ký/verify, quyền hoặc trạng thái; không tự mang code chưa merge của A1/C1/T-22 vào nhánh Sale.
 
 ### Giao diện trước Fuji — D-025 / T-21
+
+- D-072 thêm khối Mô tả phòng với vị trí, sức chứa và tiện nghi đã có vào chi tiết dùng chung F-16. Màn xác nhận bàn giao, đối soát, kết thúc hợp đồng và trang kiểm chứng sử dụng kiểu trạng thái, thông báo và nút dùng chung.
 
 - Đợt 1 (10–11/11): nền tokens sage/nâu gỗ, Lexend cho tiêu đề và Inter cho nội dung; lớp dùng chung cho nút, thẻ, input, bảng, badge, tabs, số liệu, trạng thái rỗng; cập nhật component chung và khung Sale/Quản lý/Kế toán/Admin/khách/trang chủ/đăng nhập. Không thêm thư viện UI, không đổi class/id cũ được script dùng.
 - Menu nhân viên mở/đóng được trên mobile; các màn được chụp ở 1440px và 390px, không cuộn ngang toàn trang. Ảnh local trong `web/frontend/.ui-screens/`, không commit; phân biệt API giả lập với đăng nhập/dữ liệu thật. Frontend build và backend test phải được chạy trong đợt này.

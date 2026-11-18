@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { formatMoney, formatServiceMoney, getDemoRoomImage } from './roomDetail.js';
+import { describeRoom, formatMoney, formatServiceMoney, getDemoRoomImage } from './roomDetail.js';
 import ShareRoomButton from '../common/ShareRoomButton.jsx';
 import { gioiTinhIcon, nhanGioiTinhPhong } from '../../utils/genderRules.js';
 import './roomDetail.css';
@@ -84,6 +84,7 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
   const anh = phong.hinhAnh || [];
   const tienNghi = phong.tienNghi || [];
   const dichVuUocTinh = phong.dichVuUocTinh || [];
+  const description = describeRoom(phong);
   const mainAnh = anh[0];
   const extraAnh = anh.slice(1, 5);
 
@@ -166,8 +167,16 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
               )}
             </div>
 
-            <p className="kh-detail-mota">{phong.moTa || `${phong.tenPhong || 'Phòng'} thuộc ${phong.chiNhanh || 'HomeStayDorm'}${phong.loaiPhong ? `, loại ${phong.loaiPhong.toLowerCase()}` : ''}${phong.sucChua ? `, sức chứa tối đa ${phong.sucChua} người` : ''}. Phòng được dọn dẹp định kỳ, có an ninh và hỗ trợ từ nhân viên quản lý trong suốt thời gian thuê.`}</p>
           </div>
+
+          {description.length > 0 && (
+            <section className="kh-detail-section" aria-labelledby="room-description">
+              <h2 id="room-description">Mô tả phòng</h2>
+              <div className="kh-detail-description">
+                {description.map((paragraph, index) => <p className="kh-detail-mota" key={index}>{paragraph}</p>)}
+              </div>
+            </section>
+          )}
 
           {tienNghi.length > 0 && (
             <div className="kh-detail-section">

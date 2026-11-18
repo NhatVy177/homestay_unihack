@@ -9,6 +9,7 @@
     "start": "node index.js",
     "avalanche:db:check": "node scripts/avalanche-db.mjs check",
     "loyalty:db:migrate": "node scripts/loyalty-db.mjs",
+    "demo:db:migrate": "node scripts/demo-scenarios-db.mjs",
     "periodic-invoice:db:check": "node scripts/periodic-invoice-db.mjs check",
     "periodic-invoice:db:migrate": "node scripts/periodic-invoice-db.mjs migrate",
     "first-charge-proof:db:check": "node scripts/first-charge-proof-db.mjs check",
