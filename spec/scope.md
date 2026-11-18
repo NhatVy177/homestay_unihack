@@ -129,6 +129,18 @@ Vy chọn `D:\Nam4\Contest\Homestay-Dorm` làm mẫu cho cách trình bày, khô
 - Thanh tìm kiếm: một thẻ trắng chứa ô dạng viên có icon, tiếp theo là bộ lọc trạng thái dạng viên có số trong ngoặc; nút xóa lọc và các bộ chọn ngày/trạng thái riêng vẫn hoạt động như cũ. Desktop tự phân bổ chỗ, mobile xuống hàng; bảng dài cuộn trong thẻ, không làm rộng toàn trang.
 - Áp dụng cho các danh sách Sale/Quản lý/Kế toán đang có bộ lọc và số đếm, cùng kiểu thẻ tổng quan/lọc Admin. Trang không có số đếm hoặc không có tìm kiếm trước đó không được thêm số liệu hay control không có xử lý. Không đổi API, phép lọc, handler, native controls, trạng thái hoặc quyền thao tác.
 
+### Bộ chọn ngày giờ và dropdown — D-064 / J-X093
+
+- Toàn frontend dùng một lớp trình bày popup chung cho input `date`, `time`, `datetime-local` và select một giá trị. Lịch tiếng Việt, tuần T2→CN, đổi tháng/năm, Hôm nay/Xóa chọn; chọn giờ 24h, phút/giây theo bước hiện có. Popup bo góc, hover/chọn/focus xanh dịu theo tokens; tự đặt trên/dưới ô nhập để nằm trong viewport và cuộn khi thiếu chỗ.
+- Giữ nguyên các input/select gốc, nhãn, ref, tên, giá trị ISO/local, sự kiện React và validation required/min/max/step; không cho thao tác disabled/readOnly. Có bàn phím, Escape đóng lịch trước modal, dropdown bỏ qua option bị khóa; form được mount sau cũng tự dùng chung. Không đổi API, điều kiện thuê, giới hạn tuổi hoặc múi giờ. Các lịch tổng quan lịch hẹn sẵn có tiếp tục giữ dữ liệu và thao tác nghiệp vụ.
+- Kiểm bốn nhóm helper; kiểm UI1440/390 với form đăng ký React thật và fixture cho ngày/giờ, giới hạn/bước, required/xóa, disabled/readOnly, bàn phím và vị trí popup; hồi quy homepage 5 kích thước, lịch Sale 3 kích thước và modal đăng ký khách 2 kích thước. Không gửi API ghi thật.
+
+### Xác nhận đăng xuất và thêm ảnh Báo hỏng — D-066 / J-X094
+
+- Hộp đăng xuất dùng chung mọi vai trò theo hình2: căn giữa, icon, nút X, câu hỏi/dòng phụ và Hủy/Đăng xuất hai nút bo viên, rộng bằng nhau trên desktop/mobile. Hủy/X/Escape/bấm ngoài giữ phiên; chỉ xác nhận mới đăng xuất, busy giữ nguyên.
+- F-17: nút Thêm ảnh có viền nét đứt, icon và chữ rõ, trạng thái hover/focus theo token. Giữ file input/handler, thu nhỏ JPEG, tối đa3 ảnh, xem trước/bỏ từng ảnh và payload gửi; không đổi điều kiện hợp đồng, xử lý sửa chữa hoặc tính phí.
+- Kiểm UI1440/390, hủy hộp chọn tệp, đủ ảnh/ẩn nút/bỏ ảnh/hiện lại, hủy/xác nhận đăng xuất bằng fixture. Không thao tác hồ sơ thật.
+
 ### Bố cục trang chủ theo 23homestay — D-049
 
 Mức bám mẫu và danh sách mục bên dưới được **D-050 thay thế** ngày 17/11; giữ để tra lịch sử đợt J-058.

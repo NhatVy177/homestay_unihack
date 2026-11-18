@@ -72,7 +72,7 @@ try {
     await page.screenshot({ path: `${folder}/profile-${width}.png` });
     await page.getByRole('menuitem', { name: 'Đăng xuất' }).click();
     await page.getByRole('alertdialog').waitFor();
-    await page.getByRole('button', { name: 'Ở lại' }).click();
+    await page.getByRole('button', { name: 'Hủy', exact: true }).click();
     if (width === 390) await page.locator('.ui-navigation-toggle').click();
     await page.locator('aside nav button', { hasText: 'Thông tin cư trú' }).click();
     await page.getByRole('heading', { name: 'Thông tin cư trú', level: 2 }).waitFor();

@@ -74,7 +74,7 @@ export default function CustomerRepairTab() {
           <div className="scb-pick">
             {photos.map((src, index) => <span className="scb-thumb" key={src.slice(-32) + index}><img src={src} alt={`Ảnh ${index + 1}`} />
               <button type="button" aria-label={`Bỏ ảnh ${index + 1}`} onClick={() => setPhotos((current) => current.filter((_, i) => i !== index))}><Icon name="close" /></button></span>)}
-            {photos.length < MAX_PHOTOS && <button type="button" className="scb-add" onClick={() => fileRef.current?.click()}><Icon name="image" />Thêm ảnh</button>}
+            {photos.length < MAX_PHOTOS && <button type="button" className="scb-add" aria-label="Thêm ảnh hư hỏng" onClick={() => fileRef.current?.click()}><span className="scb-add-icon"><Icon name="image" /></span><span className="scb-add-copy"><strong>Thêm ảnh</strong><span>Chọn ảnh từ thiết bị</span></span></button>}
             <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={pick} />
           </div></div>
         {message && <p className={`scb-message ${message.error ? 'scb-message--error' : 'scb-message--ok'}`} role={message.error ? 'alert' : 'status'}>{message.text}</p>}

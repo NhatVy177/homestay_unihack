@@ -41,6 +41,8 @@ Hồ sơ cá nhân (D-054, trình bày J-X088): chỉnh ảnh bằng nút cây b
 
 Trình bày trang chủ/phòng công khai (D-062/J-X092): dùng cùng họ chữ Inter cho tiêu đề, nội dung và nút trong `.tc-page`; ảnh thẻ phòng chỉ giữ trái tim, bỏ nhãn loại phòng xanh. Sức chứa dưới ảnh và các luồng thuê hiện có giữ nguyên.
 
+Bộ chọn ngày giờ/dropdown toàn frontend (D-064/J-X093): popup tiếng Việt, màu sage, giữ control/giá trị/giới hạn/handler. Đăng xuất (D-066/J-X094): hộp dùng chung icon/nội dung căn giữa, nút X và Hủy/Đăng xuất; chỉ xác nhận mới thoát. Thêm ảnh Báo hỏng dùng ô viền nét đứt/icon rõ, giữ tối đa3 ảnh và xử lý hiện có.
+
 ## 1. Vai trò và hệ thống
 
 | Vai trò | Làm gì chính |

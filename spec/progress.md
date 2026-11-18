@@ -1,6 +1,6 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 10:41:22 +07:00** (J-A003: Khắc phục lỗi tải số liệu tổng quan Admin, đồng bộ tiện ích extractArray cho toàn bộ 8 tab). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 11:26:29 +07:00** (J-X094: đăng xuất, thêm ảnh Báo hỏng và bộ chọn ngày giờ; nhánh riêng chờ duyệt). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4 & sửa lỗi số liệu (J-A002 / J-A003)
 
@@ -20,6 +20,13 @@ Cập nhật: **2026-11-18 10:41:22 +07:00** (J-A003: Khắc phục lỗi tải 
 - Khắc phục lỗi bóc tách response (mảng vs object bọc `{ data }`) bằng `extractArray` trong `admin.utils.js`.
 - Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 127 PASS / 0 FAIL / 4 SKIP, trình duyệt Playwright đọc thực tế trên local5173 xác nhận sạch banner đỏ, 4 thẻ KPI và donut chart tải đầy đủ số liệu thật.
 
+
+## Giao diện dùng chung/Báo hỏng — D-064 / D-066 / J-X094
+
+- `fix/logout-upload-ui`, worktree `D:\HomeStayDorm-logout-upload`, base feat/pre-submit346be1f vì Báo hỏng chưa ở main; cập nhật main24988a6 bằng merge1c011b3, giữ Inter/room card/Admin. Mang8 file frontend của chính Codex từ8aab35b (D-064) vào cùng bản xem, không sửa checkout Claude/root5173. Không tự gom các commit mới ngoài base này.
+- Hộp đăng xuất theo hình2: icon32px, căn giữa, nút X và Hủy/Đăng xuất cùng hàng/rộng bằng nhau; giữ confirm/cancel/busy. Thêm ảnh hư hỏng: nút viền nét đứt, icon24px, chữ chính/phụ rõ và hover/focus; giữ mở/hủy file chooser, đủ3 ảnh/ẩn nút, bỏ ảnh/hiện lại và JPEG gửi đi.
+- Kiểm mới sau cập nhật main: build PASS59.79s và avalanche UI smoke PASS (cảnh báo dependency/chunk cũ); account-menu/repair/form-controls PASS1440/390 trên build5208; customer-profile PASS1440/390 trên dev5207; helper4/4 PASS. Hủy/X/Escape/bấm ngoài giữ phiên, xác nhận mới gọi logout; gửi báo hỏng và quản lý tiếp nhận/hoàn tất vẫn đúng bằng API fixture. Browser exception0/không tràn ngang. Đã xem ảnh logout desktop/mobile và upload mobile. Không ghi backend/SQL thật hoặc nghiệm thu Fuji.
+- Preview **http://127.0.0.1:5208/**: bản build dành cho review trỏ backend5012 của D-063 để có form Báo hỏng (biến VITE_API_URL khi build, không tạo/commit env). Build cấu hình review đã PASS; không đổi source. Nhánh độc lập ngày giờ vẫn ở `fix/shared-date-controls`/8aab35b. Commit UI970fb83, hồ sơ J-X094 đi kèm; push nhánh riêng/chưa gộp main, chờ Vy duyệt do Claude làm song song theo AGENTS/D-063. Không chạy backend/blockchain test vì đợt UI không đổi source đó.
 
 ## Trang chủ/nhà3D trên main
 
