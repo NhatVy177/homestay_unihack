@@ -68,7 +68,8 @@ BEGIN
          AND pdc.GhiChu IS NULL)
        OR pdc.TrangThaiThanhToan IN (N'Đã TT', N'Hết hạn')
     )
-      AND pdc.PhuongThucThanhToan=N'Chuyển khoản'
+      -- Phiếu đã có chứng từ mà chưa ghi phương thức (NULL) vẫn là chuyển khoản: không loại khỏi hàng đợi kế toán.
+      AND (pdc.PhuongThucThanhToan = N'Chuyển khoản' OR (pdc.PhuongThucThanhToan IS NULL AND pdc.ChungTuThanhToan IS NOT NULL))
       -- Phiếu chưa chốt thì không bao giờ có chứng từ hợp lệ (guard 50275).
       -- Loại luôn để phiếu Sale lập rồi bỏ quên (hết hạn chờ chốt) không lẫn vào lịch sử của Quản lý.
       AND pdc.MaNhanVienKeToan IS NOT NULL

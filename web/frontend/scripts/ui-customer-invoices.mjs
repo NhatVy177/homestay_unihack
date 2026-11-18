@@ -62,8 +62,6 @@ try {
     await page.getByRole('button', { name: 'Ví điện tử (mô phỏng)' }).click();
     await page.getByRole('button', { name: 'Tiếp tục' }).waitFor();
     assert.equal(await page.getByRole('heading', { name: 'Minh chứng thanh toán' }).count(), 0);
-    await page.getByRole('button', { name: 'Tiền mặt tại quầy' }).click();
-    await page.getByText('nộp 8.100.000 VNĐ bằng tiền mặt', { exact: false }).waitFor();
     await page.getByRole('button', { name: /Quay lại danh sách/ }).click();
     await page.getByRole('heading', { name: 'Hóa đơn của tôi', level: 2 }).waitFor();
     await page.getByRole('button', { name: 'Quá hạn', exact: true }).click();

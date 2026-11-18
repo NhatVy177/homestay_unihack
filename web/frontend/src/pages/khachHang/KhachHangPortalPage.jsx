@@ -3454,6 +3454,8 @@ export default function KhachHangPortalPage() {
       fd.append('file', uploadForm.file);
 
       // Endpoint khách: gửi file thật + qua SP_CapNhatMinhChungThanhToanCoc (check hạn 24h + sở hữu).
+      // Màn thanh toán mặc định hiện QR chuyển khoản; gửi chứng từ nghĩa là chuyển khoản nên ghi phương thức nếu chưa có (kế toán mới thấy phiếu).
+      if (!datCocSelected.phuongThucThanhToan) await datCocApi.chonPhuongThucKhach(datCocSelected.maPhieuCoc, { phuongThucThanhToan: 'Chuyển khoản' });
       await datCocApi.capNhatMinhChungKhach(datCocSelected.maPhieuCoc, fd);
       setToast('Đã gửi chứng từ. Vui lòng chờ nhân viên kiểm tra.');
       // Gửi chứng từ mới -> backend đã xóa lý do từ chối; đồng bộ state để thoát trạng thái "Bị từ chối".
@@ -3553,7 +3555,6 @@ export default function KhachHangPortalPage() {
               <h3 className="dc-section-title">Phương thức thanh toán</h3>
               <div className="dpay-tabs" role="group" aria-label="Chọn phương thức thanh toán">
                 <button type="button" aria-pressed={isTransfer && !walletTab} className={`dpay-tab${isTransfer && !walletTab ? ' is-active' : ''}`} onClick={() => { setWalletTab(false); if (!isTransfer) chonPhuongThucCoc('Chuyển khoản'); }}><Icon name="invoice" /> QR chuyển khoản</button>
-                <button type="button" aria-pressed={isCash && !walletTab} className={`dpay-tab${isCash && !walletTab ? ' is-active' : ''}`} onClick={() => { setWalletTab(false); if (!isCash) chonPhuongThucCoc('Tiền mặt'); }}><Icon name="profile" /> Tiền mặt tại quầy</button>
                 <button type="button" aria-pressed={walletTab} className={`dpay-tab${walletTab ? ' is-active' : ''}`} onClick={() => setWalletTab(true)}><Icon name="payment" /> Ví điện tử (mô phỏng)</button>
               </div>
               {walletTab && <MomoSimPanel content={`Tiền cọc – phiếu ${phieu.maPhieuCoc}`} amount={amount} busy={walletBusy} onConfirm={thanhToanViTaiCho} />}
@@ -3566,7 +3567,6 @@ export default function KhachHangPortalPage() {
                   <div><span>Nội dung chuyển khoản</span><strong>{transferContent}</strong><button type="button" onClick={() => navigator.clipboard.writeText(transferContent)}>Sao chép</button></div>
                 </div>
               </div>}
-              {!walletTab && isCash && <p className="dc-bank-note">Bạn đến quầy {phieu.tenChiNhanh || 'của cơ sở'} để nộp {amount.toLocaleString('vi-VN')} VNĐ bằng tiền mặt. Nhân viên sẽ lập giấy biên nhận đặt cọc để hai bên cùng ký.</p>}
             </section>
             {!walletTab && isTransfer && <section className="dc-section-card dpay-card">
               <h3 className="dc-section-title"><Icon name="profile" />Minh chứng thanh toán</h3>
@@ -3673,7 +3673,6 @@ export default function KhachHangPortalPage() {
                 <h3 className="dc-section-title">Phương thức thanh toán</h3>
                 <div className="dpay-tabs" role="group" aria-label="Chọn phương thức thanh toán">
                   <button type="button" aria-pressed={fcMethod === 'transfer'} className={`dpay-tab${fcMethod === 'transfer' ? ' is-active' : ''}`} onClick={() => setFcMethod('transfer')}><Icon name="invoice" /> QR chuyển khoản</button>
-                  <button type="button" aria-pressed={fcMethod === 'cash'} className={`dpay-tab${fcMethod === 'cash' ? ' is-active' : ''}`} onClick={() => setFcMethod('cash')}><Icon name="profile" /> Tiền mặt tại quầy</button>
                   <button type="button" aria-pressed={fcMethod === 'wallet'} className={`dpay-tab${fcMethod === 'wallet' ? ' is-active' : ''}`} onClick={() => setFcMethod('wallet')}><Icon name="payment" /> Ví điện tử (mô phỏng)</button>
                 </div>
                 {fcMethod === 'transfer' && <div className="dpay-transfer">
@@ -3685,7 +3684,6 @@ export default function KhachHangPortalPage() {
                     <div><span>Nội dung chuyển khoản</span><strong>{transferContent}</strong><button type="button" onClick={() => navigator.clipboard.writeText(transferContent)}>Sao chép</button></div>
                   </div>
                 </div>}
-                {fcMethod === 'cash' && <p className="dc-bank-note">Bạn đến quầy để nộp {amount.toLocaleString('vi-VN')} VNĐ bằng tiền mặt. Kế toán sẽ ghi nhận khoản thu và lập biên nhận.</p>}
                 {fcMethod === 'wallet' && <MomoSimPanel content={quote.kind === 'hoaDon' ? `Hóa đơn ${quote.refId}` : `Khoản thu kỳ đầu – hợp đồng ${quote.refId}`} amount={amount} busy={fcBusy} onConfirm={() => thanhToanKyDauViTaiCho(quote)} />}
                 {fcMethod !== 'wallet' && <p className="dc-bank-note">Sau khi chuyển khoản hoặc nộp tiền, kế toán sẽ xác nhận. Khoản này sẽ chuyển sang "Đã thanh toán" khi được ghi nhận.</p>}
               </section>
@@ -3838,9 +3836,6 @@ export default function KhachHangPortalPage() {
                 <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
                   <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={() => chonPhuongThucCoc('Chuyển khoản')} style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-primary)', color: 'var(--color-surface)' }}>
                     <Icon name="invoice" /> Chuyển khoản
-                  </button>
-                  <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={() => chonPhuongThucCoc('Tiền mặt')} style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--color-primary)', color: 'var(--color-surface)' }}>
-                    <Icon name="profile" /> Tiền mặt tại quầy
                   </button>
                   <button type="button" className="kp-btn kp-btn-primary kp-full" onClick={thanhToanViMoPhong} style={{ backgroundColor: 'var(--color-accent)', borderColor: 'var(--color-accent)', color: 'var(--color-surface)' }}>
                     <Icon name="payment" /> Ví điện tử (mô phỏng)

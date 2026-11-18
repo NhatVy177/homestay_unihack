@@ -116,8 +116,9 @@ BEGIN
 
     -- Gửi chứng từ mới -> XÓA lý do từ chối cũ (nếu có) để phiếu quay lại hàng đợi duyệt của quản lý.
     UPDATE dbo.PhieuDatCoc
-    SET ChungTuThanhToan = CAST(@ChungTuThanhToan AS VARCHAR(500)),
-        GhiChu           = NULL
+    SET ChungTuThanhToan    = CAST(@ChungTuThanhToan AS VARCHAR(500)),
+        PhuongThucThanhToan = COALESCE(PhuongThucThanhToan, N'Chuyển khoản'), -- gửi chứng từ nghĩa là chuyển khoản
+        GhiChu              = NULL
     WHERE MaPhieuDatCoc = @Ma;
 
     SELECT
