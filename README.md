@@ -165,6 +165,7 @@ Kiểm thử bằng API giả không thay cho chạy thật trên Fuji.
 - **Ví khách:** ví nhúng Privy, mở bằng mã OTP gửi về email tài khoản. Mất quyền vào email thì mất quyền vào ví. Đổi ví không đổi người ký của hồ sơ cũ. Cách ví đi theo phiên đăng nhập (JWT) cần gói Privy trả phí, nên chưa dùng.
 - **Riêng tư:** mã băm có salt, nhưng không khẳng định bảo đảm ẩn danh tuyệt đối.
 - Contract chưa được kiểm toán bảo mật.
+- Chi phí gas đo từ giao dịch thật, dữ liệu nào lên chuỗi và bảng giới hạn chi tiết: [docs/minh-bach-ky-thuat.md](docs/minh-bach-ky-thuat.md). Dựng lại hồ sơ chỉ từ chuỗi: `npm run avalanche:recover` (trong `web/backend`).
 
 ## 8. Phần có sẵn và phần làm trong cuộc thi
 
@@ -197,6 +198,7 @@ Giao diện tham khảo cách bố trí của dự án nhóm khác (không chép
 ## 10. Tài liệu thêm
 
 - [docs/cau-hinh.md](docs/cau-hinh.md): cấu hình chi tiết.
+- [docs/minh-bach-ky-thuat.md](docs/minh-bach-ky-thuat.md): dữ liệu nào lên chuỗi, chi phí gas thật, khôi phục từ chuỗi, giới hạn.
 - [blockchain/README.md](blockchain/README.md): ví Fuji, deploy, cấu trúc module.
 - [spec/luong-tong-hop.md](spec/luong-tong-hop.md): luồng đầy đủ.
 - [spec/decisions.md](spec/decisions.md): các quyết định có ngày và lý do.
