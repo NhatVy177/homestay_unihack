@@ -1,12 +1,15 @@
 import { Router } from 'express';
 import * as controller from '../controllers/suaChuaBaoTri.controller.js';
 
+// Gắn sau requireAuth ở index.js; quyền theo vai trò nằm trong service (khách: của mình; quản lý: chi nhánh của mình).
 const router = Router();
 
-router.post('/', controller.createYeuCauSuaChua);
-router.get('/', controller.getYeuCauSuaChua);
-router.put('/:id/tiep-nhan', controller.tiepNhanYeuCauSuaChua);
-router.put('/:id/hoan-tat', controller.hoanTatYeuCauSuaChua);
-router.put('/:id/tu-choi', controller.tuChoiYeuCauSuaChua);
+router.get('/hop-dong-cua-toi', controller.hopDongCuaKhach);
+router.get('/hop-dong/:maHopDong', controller.theoHopDong);
+router.get('/', controller.danhSach);
+router.post('/', controller.taoYeuCau);
+router.put('/:id/tiep-nhan', controller.tiepNhan);
+router.put('/:id/hoan-tat', controller.hoanTat);
+router.put('/:id/tu-choi', controller.tuChoi);
 
 export default router;

@@ -1,85 +1,175 @@
-import { executeProcedure, sql } from '../database/connection.js';
-import { createServiceError, mapDatabaseError } from './serviceErrors.js';
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { executeQuery, sql } from '../database/connection.js';
+import { createServiceError } from './serviceErrors.js';
 
-function handleDatabaseError(error) {
-  mapDatabaseError(error, {
-    50010: 404
-  });
+// Báo hỏng và sửa chữa trong thời gian thuê (bảng YeuCauSuaChua có sẵn). Khách báo kèm ảnh có ngày giờ; quản lý chi nhánh
+// tiếp nhận, xử lý và ghi rõ "lỗi do khách" hay không. Lúc trả phòng, quản lý và kế toán xem lại lịch sử này theo hợp đồng để
+// không tính lên khách những hư hỏng đã báo từ trước và không do khách gây ra.
+// Không dùng thủ tục SQL (các SP_*YeuCauSuaChua mà bản cũ gọi chưa từng có trong cơ sở dữ liệu) và không đổi cấu trúc bảng.
+const UPLOAD_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'uploads', 'sua-chua');
+const IMAGE_TYPES = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
+export const MAX_PHOTOS = 3;
+const MAX_PHOTO_BYTES = 1.5 * 1024 * 1024;
+export const STATUS = { NEW: 'Chờ tiếp nhận', DOING: 'Đang xử lý', DONE: 'Hoàn tất', REJECTED: 'Từ chối' };
+
+const isCustomer = (user) => user?.vaiTro === 'KhachHang';
+const isManager = (user) => user?.vaiTro === 'NhanVien' && user.chucVu === 'Quản lý' && Boolean(user.maChiNhanh);
+const isStaff = (user) => user?.vaiTro === 'NhanVien' || user?.vaiTro === 'Admin';
+
+const SELECT = `SELECT y.MaYeuCau AS maYeuCau, y.NgayYeuCau AS ngayYeuCau, y.MoTaHuHong AS moTa, y.HinhAnhMinhChung AS anh,
+    y.TrangThai AS trangThai, y.NgayTiepNhan AS ngayTiepNhan, y.NgayHoanTat AS ngayHoanTat, y.ChiPhiSuaChua AS chiPhi,
+    y.LoiDoKhachGayRa AS loiDoKhach, y.GhiChuXuLy AS ghiChu, y.MaHopDong AS maHopDong, y.MaPhong AS maPhong,
+    ph.TenPhong AS tenPhong, ph.MaChiNhanh AS maChiNhanh, nd.HoTen AS hoTenKhach, nd.SDT AS sdtKhach
+  FROM dbo.YeuCauSuaChua y
+  LEFT JOIN dbo.Phong ph ON ph.MaPhong = y.MaPhong
+  LEFT JOIN dbo.HopDongThue h ON h.MaHopDong = y.MaHopDong
+  LEFT JOIN dbo.NguoiDung nd ON nd.MaNguoiDung = h.MaKhachHang`;
+
+export function toItem(row) {
+  let anh = [];
+  try { anh = row.anh ? JSON.parse(row.anh) : []; } catch { anh = []; }
+  return { ...row, anh: Array.isArray(anh) ? anh : [], chiPhi: row.chiPhi == null ? null : Number(row.chiPhi), loiDoKhach: Boolean(row.loiDoKhach) };
 }
 
-function serializeJsonValue(value) {
-  if (value == null) {
-    return null;
-  }
-
-  return typeof value === 'string' ? value : JSON.stringify(value);
+export function parsePhoto(dataUrl) {
+  const match = /^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=]+)$/.exec(String(dataUrl || ''));
+  if (!match) throw createServiceError('Ảnh phải là PNG, JPG hoặc WebP.');
+  const buffer = Buffer.from(match[2], 'base64');
+  if (!buffer.length || buffer.length > MAX_PHOTO_BYTES) throw createServiceError('Mỗi ảnh tối đa 1,5MB.');
+  return { buffer, ext: IMAGE_TYPES[match[1]] };
 }
 
-export async function createYeuCauSuaChua(data = {}) {
-  const khachHangId = String(data.khachHangId || '').trim();
-  const hopDongId = String(data.hopDongId || '').trim();
-  if (!khachHangId || !hopDongId || !data.moTaHuHong) {
-    throw createServiceError('Vui long nhap du thong tin yeu cau sua chua');
-  }
-
-  try {
-    const result = await executeProcedure('dbo.SP_TaoYeuCauSuaChua', [
-      { name: 'KhachHangId', type: sql.NVarChar(20), value: khachHangId },
-      { name: 'HopDongId', type: sql.NVarChar(30), value: hopDongId },
-      { name: 'TaiSanId', type: sql.NVarChar(50), value: data.taiSanId || null },
-      { name: 'MoTaHuHong', type: sql.NVarChar(sql.MAX), value: data.moTaHuHong },
-      { name: 'HinhAnhMinhChung', type: sql.NVarChar(sql.MAX), value: serializeJsonValue(data.hinhAnhMinhChung) }
-    ]);
-
-    return result.recordset[0] || null;
-  } catch (error) {
-    handleDatabaseError(error);
-  }
+async function nextId(query) {
+  const row = (await query(`SELECT ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaYeuCau, 3, 4))), 0) + 1 AS n FROM dbo.YeuCauSuaChua WHERE MaYeuCau LIKE 'SC[0-9][0-9][0-9][0-9]'`)).recordset[0];
+  if (row.n > 9999) throw createServiceError('Không thể sinh thêm mã yêu cầu sửa chữa.', 500);
+  return `SC${String(row.n).padStart(4, '0')}`;
 }
 
-export async function getYeuCauSuaChua() {
-  const result = await executeProcedure('dbo.SP_DanhSachYeuCauSuaChua');
-  return result.recordset;
+export async function savePhotos(maYeuCau, parsed) {
+  if (!parsed.length) return [];
+  await mkdir(UPLOAD_DIR, { recursive: true });
+  const paths = [];
+  for (const [index, photo] of parsed.entries()) {
+    const name = `${maYeuCau}-${index + 1}.${photo.ext}`;
+    await writeFile(path.join(UPLOAD_DIR, name), photo.buffer);
+    paths.push(`/uploads/sua-chua/${name}`);
+  }
+  return paths;
 }
 
-export async function tiepNhanYeuCauSuaChua(id, data = {}) {
-  try {
-    const result = await executeProcedure('dbo.SP_TiepNhanYeuCauSuaChua', [
-      { name: 'YeuCauId', type: sql.NVarChar(30), value: String(id || '').trim() },
-      { name: 'NhanVienQuanLyId', type: sql.NVarChar(20), value: data.nhanVienQuanLyId || null },
-      { name: 'GhiChuTiepNhan', type: sql.NVarChar(sql.MAX), value: data.ghiChuTiepNhan || null }
-    ]);
-
-    return result.recordset[0] || null;
-  } catch (error) {
-    handleDatabaseError(error);
-  }
+async function chiTiet(maYeuCau, { query }) {
+  const row = (await query(`${SELECT} WHERE y.MaYeuCau = @Ma`, [{ name: 'Ma', type: sql.VarChar(6), value: maYeuCau }])).recordset[0];
+  return row ? toItem(row) : null;
 }
 
-export async function hoanTatYeuCauSuaChua(id, data = {}) {
-  try {
-    const result = await executeProcedure('dbo.SP_HoanTatYeuCauSuaChua', [
-      { name: 'YeuCauId', type: sql.NVarChar(30), value: String(id || '').trim() },
-      { name: 'GhiChuXuLy', type: sql.NVarChar(sql.MAX), value: data.ghiChuXuLy || null },
-      { name: 'ChiPhiSuaChua', type: sql.Decimal(18, 2), value: data.chiPhiSuaChua == null ? 0 : Number(data.chiPhiSuaChua) },
-      { name: 'LoiDoKhachGayRa', type: sql.Bit, value: Boolean(data.loiDoKhachGayRa) }
-    ]);
-
-    return result.recordset[0] || null;
-  } catch (error) {
-    handleDatabaseError(error);
-  }
+// Hợp đồng đang hiệu lực của khách (kèm phòng) để chọn khi báo hỏng.
+export async function hopDongCuaKhach(user, { query = executeQuery } = {}) {
+  if (!isCustomer(user)) throw createServiceError('Chỉ khách hàng mới báo hỏng được.', 403);
+  const result = await query(`SELECT h.MaHopDong AS maHopDong, r.MaPhong AS maPhong, ph.TenPhong AS tenPhong
+    FROM dbo.HopDongThue h
+    OUTER APPLY (SELECT TOP 1 c.MaPhong FROM dbo.ChiTietDatCoc c WHERE c.MaPhieuDatCoc = h.MaPhieuCoc ORDER BY c.MaPhong) r
+    LEFT JOIN dbo.Phong ph ON ph.MaPhong = r.MaPhong
+    WHERE h.MaKhachHang = @Kh AND h.TrangThai = N'Hiệu lực' ORDER BY h.MaHopDong DESC`, [{ name: 'Kh', type: sql.VarChar(6), value: user.maNguoiDung }]);
+  return result.recordset || [];
 }
 
-export async function tuChoiYeuCauSuaChua(id, data = {}) {
-  try {
-    const result = await executeProcedure('dbo.SP_TuChoiYeuCauSuaChua', [
-      { name: 'YeuCauId', type: sql.NVarChar(30), value: String(id || '').trim() },
-      { name: 'LyDoTuChoi', type: sql.NVarChar(sql.MAX), value: data.lyDoTuChoi || null }
-    ]);
+export async function taoYeuCau(user, data = {}, { query = executeQuery, save = savePhotos } = {}) {
+  if (!isCustomer(user)) throw createServiceError('Chỉ khách hàng mới báo hỏng được.', 403);
+  const moTa = String(data.moTa || '').trim();
+  if (moTa.length < 5) throw createServiceError('Vui lòng mô tả hư hỏng (ít nhất 5 ký tự).');
+  if (moTa.length > 1000) throw createServiceError('Mô tả tối đa 1000 ký tự.');
+  const photos = Array.isArray(data.anh) ? data.anh : [];
+  if (photos.length > MAX_PHOTOS) throw createServiceError(`Tối đa ${MAX_PHOTOS} ảnh.`);
+  const parsed = photos.map(parsePhoto);
+  const contracts = await hopDongCuaKhach(user, { query });
+  const wanted = String(data.maHopDong || '').trim();
+  const contract = wanted ? contracts.find((item) => item.maHopDong === wanted) : (contracts.length === 1 ? contracts[0] : null);
+  if (!contract) throw createServiceError(contracts.length > 1 ? 'Vui lòng chọn hợp đồng cần báo hỏng.' : 'Bạn chưa có hợp đồng đang hiệu lực để báo hỏng.', contracts.length > 1 ? 400 : 404);
+  const maYeuCau = await nextId(query);
+  const anh = await save(maYeuCau, parsed);
+  await query(`INSERT INTO dbo.YeuCauSuaChua (MaYeuCau, NgayYeuCau, MoTaHuHong, HinhAnhMinhChung, TrangThai, MaHopDong, MaPhong)
+    VALUES (@Ma, CAST(SYSDATETIME() AS DATE), @MoTa, @Anh, N'${STATUS.NEW}', @Hd, @Phong)`, [
+    { name: 'Ma', type: sql.VarChar(6), value: maYeuCau },
+    { name: 'MoTa', type: sql.NVarChar(sql.MAX), value: moTa },
+    { name: 'Anh', type: sql.VarChar(500), value: anh.length ? JSON.stringify(anh) : null },
+    { name: 'Hd', type: sql.VarChar(6), value: contract.maHopDong },
+    { name: 'Phong', type: sql.VarChar(4), value: contract.maPhong || null },
+  ]);
+  return chiTiet(maYeuCau, { query });
+}
 
-    return result.recordset[0] || null;
-  } catch (error) {
-    handleDatabaseError(error);
+export async function danhSach(user, { query = executeQuery } = {}) {
+  if (isCustomer(user)) {
+    const rows = (await query(`${SELECT} WHERE h.MaKhachHang = @Kh ORDER BY y.MaYeuCau DESC`, [{ name: 'Kh', type: sql.VarChar(6), value: user.maNguoiDung }])).recordset || [];
+    return rows.map(toItem);
   }
+  if (isManager(user)) {
+    const rows = (await query(`${SELECT} WHERE ph.MaChiNhanh = @Cn ORDER BY CASE y.TrangThai WHEN N'${STATUS.NEW}' THEN 0 WHEN N'${STATUS.DOING}' THEN 1 ELSE 2 END, y.MaYeuCau DESC`,
+      [{ name: 'Cn', type: sql.VarChar(6), value: user.maChiNhanh }])).recordset || [];
+    return rows.map(toItem);
+  }
+  throw createServiceError('Bạn không có quyền xem danh sách này.', 403);
+}
+
+// Lịch sử báo hỏng của một hợp đồng: dùng lúc kiểm tra trả phòng và đối soát cọc.
+export async function theoHopDong(user, maHopDong, { query = executeQuery } = {}) {
+  const ma = String(maHopDong || '').trim();
+  if (isCustomer(user)) {
+    const own = (await query('SELECT 1 AS ok FROM dbo.HopDongThue WHERE MaHopDong = @Hd AND MaKhachHang = @Kh', [
+      { name: 'Hd', type: sql.VarChar(6), value: ma }, { name: 'Kh', type: sql.VarChar(6), value: user.maNguoiDung }])).recordset[0];
+    if (!own) throw createServiceError('Không tìm thấy hợp đồng.', 404);
+  } else if (!isStaff(user)) throw createServiceError('Bạn không có quyền xem lịch sử này.', 403);
+  const rows = (await query(`${SELECT} WHERE y.MaHopDong = @Hd ORDER BY y.MaYeuCau`, [{ name: 'Hd', type: sql.VarChar(6), value: ma }])).recordset || [];
+  return rows.map(toItem);
+}
+
+async function forManager(user, maYeuCau, query) {
+  if (!isManager(user)) throw createServiceError('Chức năng này chỉ dành cho quản lý chi nhánh.', 403);
+  const item = await chiTiet(String(maYeuCau || '').trim(), { query });
+  if (!item || item.maChiNhanh !== user.maChiNhanh) throw createServiceError('Không tìm thấy yêu cầu sửa chữa.', 404);
+  return item;
+}
+
+export async function tiepNhan(user, maYeuCau, data = {}, { query = executeQuery } = {}) {
+  const item = await forManager(user, maYeuCau, query);
+  if (item.trangThai !== STATUS.NEW) throw createServiceError('Yêu cầu này đã được tiếp nhận hoặc đã xử lý.', 409);
+  await query(`UPDATE dbo.YeuCauSuaChua SET TrangThai = N'${STATUS.DOING}', NgayTiepNhan = CAST(SYSDATETIME() AS DATE), MaNhanVienQuanLy = @Nv,
+      GhiChuXuLy = COALESCE(@GhiChu, GhiChuXuLy) WHERE MaYeuCau = @Ma AND TrangThai = N'${STATUS.NEW}'`, [
+    { name: 'Nv', type: sql.VarChar(6), value: user.maNguoiDung },
+    { name: 'GhiChu', type: sql.NVarChar(sql.MAX), value: String(data.ghiChu || '').trim() || null },
+    { name: 'Ma', type: sql.VarChar(6), value: item.maYeuCau },
+  ]);
+  return chiTiet(item.maYeuCau, { query });
+}
+
+export async function hoanTat(user, maYeuCau, data = {}, { query = executeQuery } = {}) {
+  const item = await forManager(user, maYeuCau, query);
+  if (item.trangThai !== STATUS.DOING) throw createServiceError('Chỉ hoàn tất được yêu cầu đang xử lý.', 409);
+  const chiPhi = Number(data.chiPhi ?? 0);
+  if (!Number.isFinite(chiPhi) || chiPhi < 0 || chiPhi > 1e9) throw createServiceError('Chi phí sửa chữa không hợp lệ.');
+  const loiDoKhach = Boolean(data.loiDoKhach);
+  const ghiChu = String(data.ghiChu || '').trim();
+  if (loiDoKhach && !ghiChu) throw createServiceError('Ghi rõ lý do khi xác định hư hỏng do khách gây ra.');
+  await query(`UPDATE dbo.YeuCauSuaChua SET TrangThai = N'${STATUS.DONE}', NgayHoanTat = CAST(SYSDATETIME() AS DATE), ChiPhiSuaChua = @ChiPhi,
+      LoiDoKhachGayRa = @Loi, GhiChuXuLy = COALESCE(@GhiChu, GhiChuXuLy) WHERE MaYeuCau = @Ma AND TrangThai = N'${STATUS.DOING}'`, [
+    { name: 'ChiPhi', type: sql.Decimal(18, 2), value: chiPhi },
+    { name: 'Loi', type: sql.Bit, value: loiDoKhach },
+    { name: 'GhiChu', type: sql.NVarChar(sql.MAX), value: ghiChu || null },
+    { name: 'Ma', type: sql.VarChar(6), value: item.maYeuCau },
+  ]);
+  return chiTiet(item.maYeuCau, { query });
+}
+
+export async function tuChoi(user, maYeuCau, data = {}, { query = executeQuery } = {}) {
+  const item = await forManager(user, maYeuCau, query);
+  if (![STATUS.NEW, STATUS.DOING].includes(item.trangThai)) throw createServiceError('Yêu cầu này đã đóng.', 409);
+  const lyDo = String(data.lyDo || '').trim();
+  if (!lyDo) throw createServiceError('Vui lòng ghi lý do từ chối.');
+  await query(`UPDATE dbo.YeuCauSuaChua SET TrangThai = N'${STATUS.REJECTED}', GhiChuXuLy = @LyDo WHERE MaYeuCau = @Ma`, [
+    { name: 'LyDo', type: sql.NVarChar(sql.MAX), value: lyDo },
+    { name: 'Ma', type: sql.VarChar(6), value: item.maYeuCau },
+  ]);
+  return chiTiet(item.maYeuCau, { query });
 }

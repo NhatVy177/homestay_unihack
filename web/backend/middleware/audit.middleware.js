@@ -12,7 +12,7 @@ const methodActions = {
 function compactBody(body = {}) {
   if (!body || typeof body !== 'object') return body || null;
 
-  const hiddenKeys = new Set(['matKhau', 'password', 'token', 'base64', 'anhPhong', 'file', 'minhChungBase64']);
+  const hiddenKeys = new Set(['matKhau', 'password', 'token', 'base64', 'anhPhong', 'anh', 'file', 'minhChungBase64']);
   return Object.fromEntries(
     Object.entries(body).map(([key, value]) => {
       if (hiddenKeys.has(key)) return [key, '[ẩn]'];

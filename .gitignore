@@ -44,3 +44,5 @@ web/frontend/.ui-screens/
 
 web/backend/uploads/avatars/*
 !web/backend/uploads/avatars/.gitkeep
+web/backend/uploads/sua-chua/*
+!web/backend/uploads/sua-chua/.gitkeep

@@ -1,4 +1,5 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import CustomerRepairTab from '../../components/suaChua/CustomerRepairTab.jsx';
 import AccountSecurity from '../../components/common/AccountSecurity.jsx';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
@@ -25,7 +26,7 @@ import ThuThemDoiSoatWalletCard from './ThuThemDoiSoatWalletCard.jsx'; // C3 (Cl
 import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.jsx';
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
 const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
-const PORTAL_TABS = ['tai-khoan', 'kham-pha', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'cu-tru', 'hop-dong', 'tra-phong'];
+const PORTAL_TABS = ['tai-khoan', 'kham-pha', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'cu-tru', 'hop-dong', 'bao-hong', 'tra-phong'];
 
 // Gốc backend để mở lại file chứng từ đã upload (DB lưu đường dẫn /uploads/chung-tu/..).
 const FILE_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
@@ -609,6 +610,7 @@ function getNavLocks(state = {}) {
     'lich-su-coc': false,
     'cu-tru': false, // luôn mở: chưa có phiếu cọc thì hiện thông tin người đại diện đã đăng ký
     'hop-dong': !hasContract,
+    'bao-hong': !hasContract,
     'tra-phong': !(hasDeposit || hasContract),
     'tai-khoan': false,
     hasProfile,
@@ -624,6 +626,7 @@ function getLockedMessage(tab) {
     'dat-coc': 'Hóa đơn & thanh toán sẽ mở khi hồ sơ được duyệt và có phiếu đặt cọc.',
     'cu-tru': 'Thông tin cư trú sẽ mở khi bạn có phiếu đặt cọc.',
     'hop-dong': 'Hợp đồng sẽ mở sau khi bạn hoàn tất đặt cọc và ký hợp đồng.',
+    'bao-hong': 'Báo hỏng mở sau khi bạn ký hợp đồng và nhận phòng.',
     'tra-phong': 'Chức năng trả phòng sẽ mở sau khi bạn đã đặt cọc hoặc ký hợp đồng.'
   };
   return messages[tab] || 'Chức năng này chưa khả dụng ở bước hiện tại.';
@@ -813,6 +816,7 @@ export default function KhachHangPortalPage() {
     { id: 'dat-coc', icon: 'payments', title: 'Hóa đơn & thanh toán' },
     { id: 'lich-su-coc', icon: 'receipt_long', title: 'Lịch sử đặt cọc' },
     { id: 'hop-dong', icon: 'article', title: 'Hợp đồng' },
+    { id: 'bao-hong', icon: 'build', title: 'Báo hỏng' },
     { id: 'tra-phong', icon: 'logout', title: 'Trả phòng' }
   ];
   const extraTitles = {};
@@ -4461,6 +4465,7 @@ export default function KhachHangPortalPage() {
     if (activeTab === 'lich-su-coc') return renderDepositHistory();
     if (activeTab === 'cu-tru') return renderResidence();
     if (activeTab === 'hop-dong') return renderHopDongTab();
+    if (activeTab === 'bao-hong') return locks['bao-hong'] ? renderLocked('bao-hong') : <CustomerRepairTab />;
     if (activeTab === 'tra-phong') return renderHopDong();
     if (activeTab === 'tai-khoan') return renderAccount();
     return renderExplore();

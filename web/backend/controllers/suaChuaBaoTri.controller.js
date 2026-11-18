@@ -1,17 +1,13 @@
 import * as service from '../services/suaChuaBaoTri.service.js';
 
-export async function createYeuCauSuaChua(req, res, next) {
-  try { res.status(201).json(await service.createYeuCauSuaChua(req.body)); } catch (err) { next(err); }
-}
-export async function getYeuCauSuaChua(req, res, next) {
-  try { res.json(await service.getYeuCauSuaChua()); } catch (err) { next(err); }
-}
-export async function tiepNhanYeuCauSuaChua(req, res, next) {
-  try { res.json(await service.tiepNhanYeuCauSuaChua(req.params.id, req.body)); } catch (err) { next(err); }
-}
-export async function hoanTatYeuCauSuaChua(req, res, next) {
-  try { res.json(await service.hoanTatYeuCauSuaChua(req.params.id, req.body)); } catch (err) { next(err); }
-}
-export async function tuChoiYeuCauSuaChua(req, res, next) {
-  try { res.json(await service.tuChoiYeuCauSuaChua(req.params.id, req.body)); } catch (err) { next(err); }
-}
+const wrap = (fn, status = 200) => async (req, res, next) => {
+  try { res.status(status).json(await fn(req)); } catch (err) { next(err); }
+};
+
+export const hopDongCuaKhach = wrap((req) => service.hopDongCuaKhach(req.user));
+export const danhSach = wrap((req) => service.danhSach(req.user));
+export const theoHopDong = wrap((req) => service.theoHopDong(req.user, req.params.maHopDong));
+export const taoYeuCau = wrap((req) => service.taoYeuCau(req.user, req.body), 201);
+export const tiepNhan = wrap((req) => service.tiepNhan(req.user, req.params.id, req.body));
+export const hoanTat = wrap((req) => service.hoanTat(req.user, req.params.id, req.body));
+export const tuChoi = wrap((req) => service.tuChoi(req.user, req.params.id, req.body));

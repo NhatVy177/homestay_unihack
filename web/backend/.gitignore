@@ -18,3 +18,5 @@ outbox/
 
 uploads/avatars/*
 !uploads/avatars/.gitkeep
+uploads/sua-chua/*
+!uploads/sua-chua/.gitkeep
