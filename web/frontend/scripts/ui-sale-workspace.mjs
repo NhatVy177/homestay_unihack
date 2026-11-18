@@ -88,13 +88,13 @@ try {
       assert.equal(await page.getByRole('region', { name: 'Lịch hẹn 24 giờ tới', exact: true }).count(), 1);
     }
     if (phase === 'after') {
-      assert.equal(await page.locator('aside nav button').count(), 5);
+      assert.equal(await page.locator('aside nav button').count(), 6);
       assert.equal(await page.locator('aside nav').getByText('Ghi nhận cư trú').count(), 0);
       const title = await page.locator('.sale-calendar-heading h2').textContent();
       await page.getByRole('button', { name: 'Tháng sau', exact: true }).click();
       assert.notEqual(await page.locator('.sale-calendar-heading h2').textContent(), title);
       await page.getByRole('button', { name: 'Tháng trước', exact: true }).click();
-      await page.locator('#schedule-status').selectOption('Đã hủy');
+      await page.getByRole('group', { name: 'Lọc lịch hẹn theo trạng thái' }).getByRole('button', { name: /^Đã hủy/ }).click();
       assert.equal(await page.locator('.sale-schedule-item').count(), 1);
       await page.locator('#schedule-search').fill('không có khách này');
       await page.getByText('Không có lịch hẹn phù hợp.', { exact: false }).waitFor();
@@ -125,7 +125,7 @@ try {
       assert.equal(await page.getByRole('checkbox', { name: 'Chọn Phòng 103' }).isChecked(), false);
       assert.match(await page.locator('.sale-alert--danger').first().innerText(), /Phòng 999/);
       assert.equal(await page.locator('.sale-room-card .ui-badge', { hasText: 'Khách quan tâm' }).count(), 1);
-      assert.equal(await page.locator('aside nav button:disabled').count(), 4, 'other tabs stay locked while scheduling');
+      assert.equal(await page.locator('aside nav button:disabled').count(), 5, 'other tabs stay locked while scheduling');
       await page.getByRole('button', { name: 'Quay lại', exact: true }).click();
       await nav('Tra cứu khách hàng'); await page.getByText('Khách thử An', { exact: true }).first().waitFor(); await shot('customers');
       assert.equal(await page.locator('.sale-work-tabs').count(), 0);

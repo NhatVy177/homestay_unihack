@@ -35,7 +35,7 @@ try {
     await page.getByRole('heading', { name: 'Thông tin cá nhân', level: 1 }).waitFor();
     if (width === 390) await page.locator('.ui-navigation-toggle').click();
     const items = await page.locator('aside nav button').allInnerTexts();
-    assert.deepEqual(items.slice(0, 3).map((t) => t.trim()), ['Thông tin cá nhân', 'Thông tin cư trú', 'Khám phá phòng']);
+    assert.deepEqual(items.slice(0, 3).map((t) => t.trim()), ['Thông tin cá nhân', 'Thông tin cư trú', 'Hồ sơ đăng ký']);
     assert.equal(await page.locator('aside nav button.is-locked', { hasText: 'Thông tin cư trú' }).count(), 0, 'thông tin cư trú không khóa');
     if (width === 390) await page.keyboard.press('Escape');
     assert.equal(await page.locator('.kp-info-panel').count(), 0, 'không còn khối hàng thông tin riêng');
@@ -80,7 +80,8 @@ try {
     assert.match(await page.locator('.cres-page').innerText(), /NGƯỜI ĐẠI DIỆN[\s\S]*Nguyễn Văn A/);
     await page.screenshot({ path: `${folder}/residence-${width}.png` });
     if (width === 390) await page.locator('.ui-navigation-toggle').click();
-    await page.locator('aside nav button', { hasText: 'Khám phá phòng' }).click();
+    // Mục "Khám phá phòng" trong cổng khách đã bỏ (D-067): vào danh sách phòng từ cổng bằng trạng thái điều hướng như trước.
+    await page.evaluate(() => { history.pushState({ usr: { customerPortalTab: 'tai-khoan' }, key: 'fixture', idx: (history.state?.idx || 0) + 1 }, '', '/phong'); dispatchEvent(new PopStateEvent('popstate')); });
     await page.getByRole('heading', { name: 'Danh sách phòng', exact: true }).waitFor();
     const returnToPortal = page.getByRole('button', { name: 'Quay lại', exact: true });
     assert.equal(await returnToPortal.isVisible(), true);

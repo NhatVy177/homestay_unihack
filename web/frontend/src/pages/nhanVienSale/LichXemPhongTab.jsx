@@ -8,6 +8,7 @@ import SaleScheduleCreate from './SaleScheduleCreate.jsx';
 import SaleNewViewingModal from './SaleNewViewingModal.jsx';
 import { AppointmentProgress, UpcomingAppointments } from './SaleAppointmentSummary.jsx';
 import '../../styles/saleAppointmentLayout.css';
+import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import { dateKey as toDateInput, dateLabel, timeLabel } from './salePresentation.js';
 
 function toTimeInput(value) {
@@ -15,6 +16,16 @@ function toTimeInput(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+const STATUS_TABS = ['Chờ xem', 'Yêu cầu đổi lịch', 'Yêu cầu hủy', 'Đã xem', 'Khách không đến', 'Đã hủy'];
+// Lịch đang chờ xử lý (Chờ xem, yêu cầu đổi/hủy) lên đầu, gần giờ hẹn nhất trước; lịch đã xong xuống dưới, mới nhất trước.
+const OPEN_STATUS = ['Chờ xem', 'Yêu cầu đổi lịch', 'Yêu cầu hủy'];
+function byPriority(a, b) {
+  const openA = OPEN_STATUS.includes(a.trangThai), openB = OPEN_STATUS.includes(b.trangThai);
+  if (openA !== openB) return openA ? -1 : 1;
+  const diff = new Date(a.thoiGianHen) - new Date(b.thoiGianHen);
+  return openA ? diff : -diff;
 }
 
 export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
@@ -25,6 +36,12 @@ export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
   const [filters, setFilters] = useState({ keyword: '', status: '', fromDate: '', toDate: '' });
   const [month, setMonth] = useState(new Date()), [selectedDay, setSelectedDay] = useState(''), [detailId, setDetailId] = useState(null), [creating, setCreating] = useState(false), [newViewingFor, setNewViewingFor] = useState(null);
 
+  const baseFiltered = useMemo(() => schedules.filter(schedule => {
+    const keyword = filters.keyword.trim().toLocaleLowerCase('vi-VN');
+    const text = [schedule.id, schedule.maDangKy, schedule.hoTenKhach, schedule.sdtKhach, schedule.danhSachPhong, schedule.maPhong].filter(Boolean).join(' ').toLocaleLowerCase('vi-VN');
+    const day = toDateInput(schedule.thoiGianHen);
+    return (!keyword || text.includes(keyword)) && (!filters.fromDate || (day && day >= filters.fromDate)) && (!filters.toDate || (day && day <= filters.toDate));
+  }), [filters.keyword, filters.fromDate, filters.toDate, schedules]);
   const filteredSchedules = useMemo(() => {
     const keyword = filters.keyword.trim().toLocaleLowerCase('vi-VN');
     return schedules.filter(schedule => {
@@ -77,7 +94,7 @@ export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
     } catch (err) { alert('Lỗi khi hủy lịch: ' + (err.response?.data?.message || err.message)); }
     finally { setSaving(false); }
   };
-  const visible = filteredSchedules.filter(s => !selectedDay || toDateInput(s.thoiGianHen) === selectedDay).sort((a, b) => new Date(a.thoiGianHen) - new Date(b.thoiGianHen));
+  const visible = filteredSchedules.filter(s => !selectedDay || toDateInput(s.thoiGianHen) === selectedDay).sort(byPriority);
   const detail = visible.find(s => s.id === detailId) || visible[0];
   const detailFinished = ['Đã xem', 'Đã hủy', 'Khách không đến'].includes(detail?.trangThai);
   // Chỉ lập lịch mới khi phiếu không còn lịch đang chờ xem nào khác (D-043: mỗi lúc một lịch).
@@ -91,7 +108,6 @@ export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
     <div className="sale-section-heading"><div><p className="sale-eyebrow">LỊCH TRÌNH CỦA BẠN</p><h2>Lịch hẹn xem phòng</h2><p>Theo dõi buổi xem, thông tin khách và các phòng trong lịch hẹn.</p></div><div className="sale-actions"><button className="ui-btn ui-btn--secondary" onClick={fetchSchedules} disabled={loading}><Icon name="refresh" /> Làm mới</button><button className="ui-btn ui-btn--primary" onClick={() => setCreating(true)}><Icon name="add_circle" /> Lập lịch hẹn</button></div></div>
     <section className="ui-card sale-schedule-toolbar" aria-label="Bộ lọc lịch xem phòng">
       <label className="sale-search" htmlFor="schedule-search"><Icon name="search" /><span className="sale-sr-only">Tìm kiếm lịch</span><input id="schedule-search" className="ui-input" value={filters.keyword} onChange={e => setFilters(current => ({ ...current, keyword: e.target.value }))} placeholder="Tên khách, số điện thoại, mã lịch..." /></label>
-      <label className="ui-form-field" htmlFor="schedule-status">Trạng thái<select id="schedule-status" className="ui-select" value={filters.status} onChange={e => setFilters(current => ({ ...current, status: e.target.value }))}><option value="">Tất cả trạng thái</option>{['Chờ xem', 'Yêu cầu đổi lịch', 'Yêu cầu hủy', 'Đã xem', 'Khách không đến', 'Đã hủy'].map(s => <option key={s}>{s}</option>)}</select></label>
       <label className="ui-form-field" htmlFor="schedule-from-date">Từ ngày<input id="schedule-from-date" type="date" className="ui-input" value={filters.fromDate} onChange={e => setFilters(current => ({ ...current, fromDate: e.target.value }))} /></label>
       <label className="ui-form-field" htmlFor="schedule-to-date">Đến ngày<input id="schedule-to-date" type="date" className="ui-input" value={filters.toDate} onChange={e => setFilters(current => ({ ...current, toDate: e.target.value }))} /></label>
       <button className="ui-btn ui-btn--ghost" disabled={!hasActiveFilters && !selectedDay} onClick={clearFilters}>Xóa lọc</button>
@@ -103,6 +119,8 @@ export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
       <div className="sale-appointments-main">
       <SaleCalendar month={month} onMonth={setMonth} schedules={filteredSchedules} selectedDay={selectedDay} onDay={setSelectedDay} />
       <section className="ui-card sale-panel sale-appointments-list" aria-label="Danh sách và chi tiết lịch hẹn"><div className="sale-section-heading"><div><h2>Danh sách lịch hẹn</h2>{selectedDay && <p className="ui-cell-sub">{dateLabel(selectedDay)}</p>}</div><span className="ui-badge ui-badge--neutral">{visible.length} lịch</span></div>
+        <StatusFilterTabs ariaLabel="Lọc lịch hẹn theo trạng thái" activeKey={filters.status} onChange={status => setFilters(current => ({ ...current, status }))}
+          items={[{ key: '', label: 'Tất cả', count: baseFiltered.length }, ...STATUS_TABS.map(key => ({ key, label: key, count: baseFiltered.filter(s => s.trangThai === key).length }))]} />
         {selectedDay && <button className="ui-btn ui-btn--ghost ui-btn--sm" onClick={() => setSelectedDay('')}>Tất cả ngày</button>}
         {!loading && !visible.length && <><EmptyState message="Không có lịch hẹn phù hợp. Chọn ngày khác hoặc xóa bộ lọc." /></>}
         {visible.length > 0 && <div className="sale-schedule-list"><table className="sale-appointments-table"><thead><tr><th>Mã lịch</th><th>Khách hàng</th><th>Phòng / Chi nhánh</th><th>Thời gian</th><th>Trạng thái</th></tr></thead><tbody>{visible.map(s => <tr key={s.id} className={detail?.id === s.id ? 'is-selected' : ''} onClick={() => setDetailId(s.id)}><td><button type="button" className={`sale-schedule-item ${detail?.id === s.id ? 'is-selected' : ''}`} aria-label={`${s.id} · ${s.hoTenKhach}`} onClick={() => setDetailId(s.id)}>{s.id}</button></td><td><strong>{s.hoTenKhach}</strong>{s.sdtKhach && <small>{s.sdtKhach}</small>}</td><td><strong>{s.danhSachPhong || s.maPhong || 'Chưa có phòng'}</strong>{(s.tenChiNhanh || s.maChiNhanh) && <small>{s.tenChiNhanh || s.maChiNhanh}</small>}</td><td>{dateLabel(s.thoiGianHen)}<small>{timeLabel(s.thoiGianHen)}</small></td><td><StatusBadge status={s.trangThai} /></td></tr>)}</tbody></table></div>}
@@ -123,7 +141,7 @@ export default function LichXemPhongTab({ onNavigate, onSchedulingChange }) {
       </aside>
     </div>
     {modalType && selectedSchedule && <div className="ktp-modal-overlay sale-modal" onClick={() => { if (!saving) setModalType(null); }}><div className="ktp-modal" role="dialog" aria-modal="true" aria-labelledby="sale-edit-schedule-title" onClick={e => e.stopPropagation()}><div className="ktp-modal-header"><h3 id="sale-edit-schedule-title">{recordingOutcome ? `Ghi nhận ${outcomeLabel}?` : modalType === 'reschedule' ? 'Đổi lịch xem phòng' : 'Hủy lịch xem phòng?'}</h3><button className="ktp-modal-close" aria-label="Đóng hộp thoại" disabled={saving} onClick={() => setModalType(null)}><Icon name="close" /></button></div>
-      <div className="ktp-modal-body"><p><strong>{selectedSchedule.hoTenKhach}</strong><br />{selectedSchedule.id} · {selectedSchedule.danhSachPhong}</p>{modalType === 'reschedule' && <div className="sale-form-grid"><label className="ui-form-field">Ngày xem mới<input className="ui-input" type="date" value={newDate} onChange={e => setNewDate(e.target.value)} /></label><label className="ui-form-field">Giờ xem mới<input className="ui-input" type="time" value={newTime} onChange={e => setNewTime(e.target.value)} /></label></div>}
+      <div className="ktp-modal-body"><div className="sale-modal-summary"><strong>{selectedSchedule.hoTenKhach}</strong><span>{selectedSchedule.id} · {selectedSchedule.danhSachPhong}</span></div>{modalType === 'reschedule' && <div className="sale-form-grid"><label className="ui-form-field">Ngày xem mới<input className="ui-input" type="date" value={newDate} onChange={e => setNewDate(e.target.value)} /></label><label className="ui-form-field">Giờ xem mới<input className="ui-input" type="time" value={newTime} onChange={e => setNewTime(e.target.value)} /></label></div>}
       <label className="ui-form-field">{recordingOutcome ? 'Ghi chú buổi xem' : modalType === 'reschedule' ? 'Ghi chú xử lý' : 'Ghi chú lý do hủy'}<textarea className="ui-textarea" rows="3" maxLength={recordingOutcome ? 500 : undefined} value={note} onChange={e => setNote(e.target.value)} disabled={saving} /></label>{recordingOutcome && outcomeError && <p className="sale-alert sale-alert--danger" role="alert">{outcomeError}</p>}</div>
       <div className="ktp-modal-footer"><button className="ui-btn ui-btn--secondary" disabled={saving} onClick={() => setModalType(null)}>Quay lại</button>{recordingOutcome ? <button className="ui-btn ui-btn--primary" disabled={saving} onClick={handleOutcome}>{saving ? 'Đang lưu...' : `Xác nhận ${outcomeLabel}`}</button> : modalType === 'reschedule' ? <button className="ui-btn ui-btn--primary" disabled={!newDate || !newTime || saving} onClick={handleReschedule}>{saving ? 'Đang lưu...' : 'Xác nhận đổi lịch'}</button> : <button className="ui-btn ui-btn--danger" disabled={saving || !selectedSchedule.coTheHuy} onClick={handleCancel}>{saving ? 'Đang hủy...' : 'Xác nhận hủy'}</button>}</div>
     </div></div>}

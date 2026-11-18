@@ -147,8 +147,16 @@
 .sale-form-wide { grid-column: 1 / -1; }
 .sale-selection-valid { background: var(--color-success-soft); color: var(--color-success); }
 .sale-booking-footer { justify-content: flex-end; }
-.sale-success { text-align: center; }
-.sale-success .ui-icon { font-size: 42px; color: var(--color-success); }
+.sale-modal .sale-success { width: min(420px, calc(100vw - 32px)); }
+.sale-success .ktp-modal-body { justify-items: center; text-align: center; padding: var(--space-8, 40px) var(--space-6); }
+.sale-success h3 { margin: 0; font-size: 20px; }
+.sale-success p { margin: 0; color: var(--color-text-muted); }
+.sale-success .ui-btn { width: 100%; margin-top: var(--space-2); }
+.sale-success-mark { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--color-primary-soft, #E8EDE7); color: var(--color-primary); }
+.sale-success-mark .ui-icon { width: 32px; height: 32px; }
+.sale-modal-summary { display: grid; gap: 2px; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-surface-alt); }
+.sale-modal-summary span { font-size: 14px; color: var(--color-text-muted); }
+.sale-modal .ui-textarea:focus { box-shadow: 0 0 0 3px var(--color-primary-soft, #E8EDE7); }
 @media (max-width: 1200px) { .sale-shortcuts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sale-calendar-layout { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 800px) { .sale-overview-columns, .sale-customer-columns, .sale-booking-time { grid-template-columns: minmax(0, 1fr); } .sale-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sale-booking-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 1000px) { .sale-lookup-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -180,8 +188,14 @@
 .sale-booking-main { display: grid; gap: var(--space-4); min-width: 0; }
 .sale-booking-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); margin: 0; }
 .sale-booking-facts dt { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: var(--space-1); }
-.sale-booking-facts dd { margin: 0; font-weight: 700; }
-.sale-booking-note { margin: 0; padding: var(--space-3) var(--space-4); background: var(--color-surface-alt); border-radius: var(--radius-md); color: var(--color-text-muted); font-size: 13px; white-space: pre-line; }
+.sale-booking-facts dd { margin: 0; font-size: 15px; font-weight: 600; }
+.sale-booking-note { display: grid; gap: var(--space-2); margin: var(--space-4) 0 0; padding: var(--space-4); background: var(--color-surface-alt); border-radius: var(--radius-md); font-size: 14px; }
+.sale-note-row { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: var(--space-3); align-items: baseline; }
+.sale-note-row:has(> .sale-note-value:only-child) { grid-template-columns: 1fr; }
+.sale-note-label { font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--color-text-muted); }
+.sale-note-value { color: var(--color-text); font-weight: 400; }
+.sale-note-row ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; color: var(--color-text); }
+@media (max-width: 640px) { .sale-note-row { grid-template-columns: 1fr; gap: 2px; } }
 .sale-panel-hint { margin: 0; color: var(--color-text-muted); font-size: 13px; }
 .sale-booking-aside { position: sticky; top: var(--space-4); display: grid; gap: var(--space-4); }
 .sale-booking-aside h3 { display: flex; align-items: center; gap: var(--space-2); margin: 0; }
@@ -198,7 +212,7 @@
 /* D-044: danh sách phiếu đang chờ xếp lịch (không còn bước tiếp nhận riêng) */
 .sale-pending-list { display: grid; gap: var(--space-3); }
 .sale-pending-card { position: relative; padding: 0; }
-.sale-pending-open { display: grid; gap: var(--space-2); width: 100%; padding: var(--space-4) var(--space-6); padding-right: 96px; text-align: left; background: transparent; border: 0; border-radius: var(--radius-lg); cursor: pointer; color: inherit; }
+.sale-pending-open { display: grid; gap: var(--space-2); width: 100%; padding: var(--space-4) var(--space-5); padding-right: 96px; text-align: left; background: transparent; border: 0; border-radius: var(--radius-lg); cursor: pointer; color: inherit; }
 .sale-pending-card:hover { border-color: var(--color-primary); box-shadow: var(--shadow-md); }
 .sale-pending-tags { display: flex; gap: var(--space-2); flex-wrap: wrap; }
 .sale-pending-name { font-family: var(--font-heading); font-size: 18px; }

@@ -11,6 +11,7 @@ import DepositPolicyPanel from '../../components/common/DepositPolicyPanel.jsx';
 import ResultModal from '../../components/common/ResultModal.jsx';
 import WorkspaceShell from '../../components/common/WorkspaceShell.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
+import StatusBadge from '../../components/common/StatusBadge.jsx';
 import '../khamPhaPhong/khamPhaPhong.css';
 import './khachHangPortal.css';
 import LichXemPhongPage from '../lichXemPhong/LichXemPhongPage.jsx';
@@ -1542,9 +1543,7 @@ export default function KhachHangPortalPage() {
               <div className="kh-profile-header">
                 <div className="kh-profile-title-row">
                   <h3>Hồ sơ đăng ký #{profile.maDangKy}</h3>
-                  <span className={`kh-status-chip kh-status-chip--${statusTone(getProfileDisplayStatus(profile))}`}>
-                    {statusIcon(getProfileDisplayStatus(profile))} {getProfileDisplayStatus(profile)}
-                  </span>
+                  <StatusBadge status={getProfileDisplayStatus(profile)} tone={['Hủy', 'Đã hủy'].includes(getProfileDisplayStatus(profile)) ? 'danger' : undefined} />
                 </div>
                 <span className="kh-profile-date">Ngày tạo: {formatDate(profile.ngayDangKy)}</span>
               </div>
@@ -4633,9 +4632,7 @@ export default function KhachHangPortalPage() {
             )}
 
             <div className="kh-profile-detail-summary">
-              <span className={`kh-status-chip kh-status-chip--${statusTone(getProfileDisplayStatus(profileDetailModal))}`}>
-                {statusIcon(getProfileDisplayStatus(profileDetailModal))} {getProfileDisplayStatus(profileDetailModal)}
-              </span>
+              <StatusBadge status={getProfileDisplayStatus(profileDetailModal)} tone={['Hủy', 'Đã hủy'].includes(getProfileDisplayStatus(profileDetailModal)) ? 'danger' : undefined} />
               <p>Ngày tạo: {formatDate(profileDetailModal.ngayDangKy)}</p>
             </div>
 
@@ -4694,9 +4691,7 @@ export default function KhachHangPortalPage() {
                 <h2>Lịch xem #{scheduleDetailModal.maDangKy}</h2>
               </div>
               <div className="kh-schedule-head-actions">
-                <span className={`kh-status-chip kh-status-chip--${statusTone(scheduleDetailModal.trangThai)}`}>
-                  {statusIcon(scheduleDetailModal.trangThai)} {scheduleDetailModal.trangThai}
-                </span>
+                <StatusBadge status={scheduleDetailModal.trangThai} tone={['Hủy', 'Đã hủy'].includes(scheduleDetailModal.trangThai) ? 'danger' : undefined} />
                 <button type="button" onClick={() => setScheduleDetailModal(null)}>×</button>
               </div>
             </div>

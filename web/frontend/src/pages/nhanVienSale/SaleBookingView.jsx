@@ -4,6 +4,23 @@ import EmptyState from '../../components/common/EmptyState.jsx';
 
 // Presentation of the existing booking controller; does not create or validate a schedule itself.
 // D-043: một trang — phòng khách đã chọn (bỏ phòng không phù hợp), phòng phù hợp khác, rồi chọn giờ ở cột phải.
+// Ghi chú phiếu là chuỗi dài do form khách ghép lại: tách thành từng mục có nhãn, danh sách thành viên nhóm riêng cho dễ đọc.
+function NoteBlocks({ text }) {
+  const rows = [];
+  String(text).split(/\r?\n/).map((line) => line.trim()).filter(Boolean).forEach((line) => {
+    const group = line.match(/^(Nhóm \d+ người):\s*(.*)$/);
+    if (group) { rows.push({ label: group[1], members: group[2].split(/;\s*(?=\d+\))/).map((item) => item.replace(/^\d+\)\s*/, '').replace(/\.$/, '')) }); return; }
+    line.split(/\.\s+(?=[A-ZÀ-Ỹ])/).forEach((part) => {
+      const [label, ...rest] = part.replace(/\.$/, '').split(/:\s*/);
+      rows.push(rest.length ? { label, value: rest.join(': ') } : { value: label });
+    });
+  });
+  return <div className="sale-booking-note">{rows.map((row, index) => <div className="sale-note-row" key={index}>
+    {row.label && <span className="sale-note-label">{row.label}</span>}
+    {row.members ? <ul>{row.members.map((member) => <li key={member}>{member}</li>)}</ul> : <span className="sale-note-value">{row.value}</span>}
+  </div>)}</div>;
+}
+
 export default function SaleBookingView({ unfitInterested = [], viewingPreference = null, profile, onBack, rooms, selectedRoomIds, selectedRooms, loadingRooms, regionValid, roomError,
   formDate, setFormDate, formTime, setFormTime, formNote, setFormNote, saving, createdSchedule,
   selectionPlan, minScheduleDate, toggleRoom, handleCreateSchedule, formatMoney, formatGender, getAvailableSlots, isWholeRoomOption }) {
@@ -53,7 +70,7 @@ export default function SaleBookingView({ unfitInterested = [], viewingPreferenc
             <div><dt>Ngày khách muốn xem</dt><dd>{viewingPreference?.dateLabel || 'Chưa chọn'}</dd></div>
             <div><dt>Khung giờ rảnh</dt><dd>{viewingPreference?.slot || 'Chưa chọn'}</dd></div>
           </dl>
-          {profile?.ghiChu && <p className="sale-booking-note">{profile.ghiChu}</p>}
+          {profile?.ghiChu && <NoteBlocks text={profile.ghiChu} />}
         </section>
 
         {!regionValid && <div className="sale-alert" role="status"><Icon name="warning" /> Khu vực mong muốn chưa khớp chi nhánh đang hoạt động. Cần liên hệ lại khách trước khi lập lịch.</div>}
@@ -88,6 +105,6 @@ export default function SaleBookingView({ unfitInterested = [], viewingPreferenc
       </aside>
     </div>
 
-    {createdSchedule && <div className="ktp-modal-overlay sale-modal"><div className="ktp-modal sale-success" role="dialog" aria-modal="true" aria-labelledby="sale-booking-success"><div className="ktp-modal-body"><Icon name="check_circle" /><h3 id="sale-booking-success">Đã lập lịch xem phòng</h3><p>Lịch {createdSchedule.id || profile.maDangKy} đã được lưu cho phiếu {profile.maDangKy}.</p><button className="ui-btn ui-btn--primary" onClick={onBack}>Hoàn tất</button></div></div></div>}
+    {createdSchedule && <div className="ktp-modal-overlay sale-modal"><div className="ktp-modal sale-success" role="dialog" aria-modal="true" aria-labelledby="sale-booking-success"><div className="ktp-modal-body"><span className="sale-success-mark"><Icon name="check_circle" /></span><h3 id="sale-booking-success">Đã lập lịch xem phòng</h3><p>Lịch {createdSchedule.id || profile.maDangKy} đã được lưu cho phiếu {profile.maDangKy}.</p><button className="ui-btn ui-btn--primary" onClick={onBack}>Hoàn tất</button></div></div></div>}
   </div>;
 }

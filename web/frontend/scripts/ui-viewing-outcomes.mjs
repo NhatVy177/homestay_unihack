@@ -70,7 +70,7 @@ try {
     await choose(4);await page.getByRole('button',{name:'Khách không đến',exact:true}).click();
     await page.getByRole('button',{name:'Xác nhận Khách không đến',exact:true}).click();
     await page.getByRole('status').filter({hasText:'Đã ghi nhận DK0004-1: Khách không đến.'}).waitFor();
-    await page.locator('#schedule-status').selectOption('Khách không đến');
+    await page.getByRole('group', { name: 'Lọc lịch hẹn theo trạng thái' }).getByRole('button', { name: /^Khách không đến/ }).click();
     assert.equal(await page.locator('.sale-schedule-item').count(),1);
     assert.equal(await page.getByRole('button',{name:'Khách không đến',exact:true}).count(),0);
     await shot('no-show');
