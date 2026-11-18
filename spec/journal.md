@@ -1913,3 +1913,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 
 - Người thực hiện: Claude (Vy cho gộp thẳng). 18 StatusBadge cho trạng thái hồ sơ khách; 19 khung tóm tắt ở hộp thoại Ghi nhận Đã xem; 20 nút "Tôi muốn xem phòng khác"; 21 bỏ tab Sale "Gửi phòng cho khách"; 22 hai thẻ lọc hợp đồng luôn hiện; 23 biểu tượng giới tính theo Nam/Nữ/Unisex; 24 gallery cao theo khung; 25 nút quay lại dạng viên thuốc; 26 ví mô phỏng kiểu MoMo (số điện thoại, mã 6 số); 27 bộ lọc hóa đơn một hàng; 28 bấm Chia sẻ tự sao chép link và báo.
 - Kiểm tra: build PASS; ui-share-demo, ui-public-room, ui-room-link, ui-customer-invoices, avalanche-smoke PASS. ui-sale-contracts FAIL cả trên main trước đợt này; ui-sale-workspace, ui-customer-profile còn giả định cũ.
+
+## 2026-11-18 16:27:35 +07:00 — J-X100 — Điểm thưởng hóa đơn tháng và voucher
+
+- Người thực hiện: Codex. Vy yêu cầu triển khai kế hoạch 100 điểm cho một hóa đơn tháng trả đúng hạn và đổi 100 điểm lấy ưu đãi 20.000đ cho kỳ sau đủ điều kiện.
+- File: DormPoints.sol, công cụ deploy, ABI và bộ ký loyalty trong blockchain; migration 20261118_loyalty_points.sql, tích hợp loyalty, route, scheduler và nghiệp vụ hóa đơn; mục Điểm thưởng và chi tiết hóa đơn của khách/kế toán.
+- Kiểm tra: blockchain 26 pass, 1 skip và deploy local qua script thành công. Backend 156 pass, 5 skip. Ca SQL chạy riêng PASS cho migration chạy lại, hóa đơn đúng hạn, báo giá khi gọi đồng thời và áp voucher đúng một lần. Build và avalanche UI smoke PASS, phần Điểm thưởng kiểm ở 1440/390 bằng fixture. Code giao diện không thêm style inline.
+- Còn lại: ví vận hành thử riêng, deploy Fuji và cấu hình demo. Chưa chạy migration trên HOMEDORM4 hoặc xác nhận lần đầu qua Privy trong bản chạy hoàn chỉnh. Gửi nhánh riêng để giữ công việc triển khai khác trên main.

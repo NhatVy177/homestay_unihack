@@ -37,6 +37,8 @@ import { startNhacHoaDonScheduler } from './services/nhacHoaDon.service.js';
 import hoaDonDinhKyRoutes from './routes/hoaDonDinhKy.routes.js';
 import hopDongRoutes from './routes/hopDong.routes.js';
 import avalancheRoutes from './routes/avalanche.routes.js';
+import loyaltyRoutes from './routes/loyalty.routes.js';
+import { startLoyaltyScheduler } from './integrations/loyalty/index.js';
 import thanhToanMoPhongRoutes from './routes/thanhToanMoPhong.routes.js';
 
 // Load bien moi truong trong file .env
@@ -81,6 +83,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/avalanche', avalancheRoutes);
+app.use('/api/diem-thuong', requireAuth, loyaltyRoutes);
 app.use('/api/thanh-toan-mo-phong', thanhToanMoPhongRoutes); // D-013: cổng ví điện tử mô phỏng (IPN công khai, còn lại cần đăng nhập)
 app.use('/chia-se', chiaSeRoutes); // Link phòng có thẻ Open Graph cho Facebook/Messenger (công khai)
 app.use('/api/bao-cao', requireAuth, baoCaoRoutes); // Báo cáo nguồn khách cho Sale/quản lý
@@ -123,6 +126,7 @@ async function start() {
       startNhacThuDauKyScheduler();
       startNhacHoaDonScheduler();
       startCheckoutLifecycleScheduler();
+      startLoyaltyScheduler();
     }
   });
 
