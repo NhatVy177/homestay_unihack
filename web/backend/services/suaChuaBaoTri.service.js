@@ -1,4 +1,5 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, unlink, writeFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { executeQuery, sql } from '../database/connection.js';
@@ -61,10 +62,16 @@ export async function savePhotos(maYeuCau, parsed) {
   if (!parsed.length) return [];
   await mkdir(UPLOAD_DIR, { recursive: true });
   const paths = [];
-  for (const [index, photo] of parsed.entries()) {
-    const name = `${maYeuCau}-${index + 1}.${photo.ext}`;
-    await writeFile(path.join(UPLOAD_DIR, name), photo.buffer);
-    paths.push(`/uploads/sua-chua/${name}`);
+  const stamp = randomUUID();
+  try {
+    for (const [index, photo] of parsed.entries()) {
+      const name = `${maYeuCau}-${stamp}-${index + 1}.${photo.ext}`;
+      await writeFile(path.join(UPLOAD_DIR, name), photo.buffer, { flag: 'wx' });
+      paths.push(`/uploads/sua-chua/${name}`);
+    }
+  } catch (error) {
+    await removePhotos(paths);
+    throw error;
   }
   return paths;
 }
@@ -144,6 +151,88 @@ async function forManager(user, maYeuCau, query) {
   return item;
 }
 
+export async function removePhotos(paths = []) {
+  await Promise.all(paths.filter((p) => /^\/uploads\/sua-chua\/[A-Za-z0-9.-]+$/.test(p))
+    .map((p) => unlink(path.join(UPLOAD_DIR, path.basename(p))).catch(() => {})));
+}
+
+// Khách sửa hoặc xóa báo hỏng của mình khi quản lý CHƯA tiếp nhận (D-067). Đã tiếp nhận thì nội dung giữ nguyên.
+async function forOwner(user, maYeuCau, query) {
+  if (!isCustomer(user)) throw createServiceError('Chỉ khách gửi báo hỏng mới sửa hoặc xóa được.', 403);
+  const ma = String(maYeuCau || '').trim();
+  const row = (await query(`${SELECT} WHERE y.MaYeuCau = @Ma AND h.MaKhachHang = @Kh`, [
+    { name: 'Ma', type: sql.VarChar(6), value: ma }, { name: 'Kh', type: sql.VarChar(6), value: user.maNguoiDung },
+  ])).recordset[0];
+  const item = row ? toItem(row) : null;
+  if (!item) throw createServiceError('Không tìm thấy báo hỏng.', 404);
+  if (item.trangThai !== STATUS.NEW) throw createServiceError('Quản lý đã tiếp nhận báo hỏng này nên không sửa hoặc xóa được nữa.', 409);
+  return { item, originalDescription: row.moTa, originalPhotos: row.anh };
+}
+
+// Recheck ownership, status and the snapshot in the write itself. A concurrent
+// acceptance/edit must never report success or remove photos still used by SQL.
+const OWNER_WRITE_GUARD = `MaYeuCau = @Ma AND TrangThai = N'${STATUS.NEW}'
+  AND (MoTaHuHong = @OriginalDescription OR (MoTaHuHong IS NULL AND @OriginalDescription IS NULL))
+  AND (HinhAnhMinhChung = @OriginalPhotos OR (HinhAnhMinhChung IS NULL AND @OriginalPhotos IS NULL))
+  AND EXISTS (SELECT 1 FROM dbo.HopDongThue h WHERE h.MaHopDong = YeuCauSuaChua.MaHopDong AND h.MaKhachHang = @Kh)`;
+function ownerWriteParams(user, snapshot) {
+  return [
+    { name: 'Ma', type: sql.VarChar(6), value: snapshot.item.maYeuCau },
+    { name: 'Kh', type: sql.VarChar(6), value: user.maNguoiDung },
+    { name: 'OriginalDescription', type: sql.NVarChar(sql.MAX), value: snapshot.originalDescription ?? null },
+    { name: 'OriginalPhotos', type: sql.VarChar(500), value: snapshot.originalPhotos ?? null },
+  ];
+}
+const ownerConflict = () => createServiceError('Báo hỏng đã được cập nhật hoặc tiếp nhận. Vui lòng tải lại để xem thông tin mới.', 409);
+
+export async function capNhatYeuCau(user, maYeuCau, data = {}, { query = executeQuery, save = savePhotos, remove = removePhotos } = {}) {
+  const snapshot = await forOwner(user, maYeuCau, query);
+  const { item } = snapshot;
+  const moTa = String(data.moTa || '').trim();
+  if (moTa.length < 5) throw createServiceError('Vui lòng mô tả hư hỏng (ít nhất 5 ký tự).');
+  if (moTa.length > 1000) throw createServiceError('Mô tả tối đa 1000 ký tự.');
+  const loai = String(data.loai || '').trim();
+  if (!LOAI.includes(loai)) throw createServiceError('Vui lòng chọn loại hư hỏng.');
+  const keep = [...new Set((Array.isArray(data.giuAnh) ? data.giuAnh : item.anh).filter((p) => item.anh.includes(p)))];
+  const added = (Array.isArray(data.anhMoi) ? data.anhMoi : []).map(parsePhoto);
+  if (keep.length + added.length > MAX_PHOTOS) throw createServiceError(`Tối đa ${MAX_PHOTOS} ảnh.`);
+  const savedNew = await save(item.maYeuCau, added);
+  const anh = [...keep, ...savedNew];
+  let writeRejected = false;
+  try {
+    const result = await query(`DECLARE @Changed TABLE (maYeuCau VARCHAR(6));
+      UPDATE dbo.YeuCauSuaChua SET MoTaHuHong = @MoTa, HinhAnhMinhChung = @Anh
+      OUTPUT inserted.MaYeuCau INTO @Changed WHERE ${OWNER_WRITE_GUARD};
+      SELECT maYeuCau FROM @Changed;`, [
+      { name: 'MoTa', type: sql.NVarChar(sql.MAX), value: `[${loai}] ${moTa}` },
+      { name: 'Anh', type: sql.VarChar(500), value: anh.length ? JSON.stringify(anh) : null },
+      ...ownerWriteParams(user, snapshot),
+    ]);
+    if (!result.recordset?.length) { writeRejected = true; throw ownerConflict(); }
+  } catch (error) {
+    // A dropped SQL connection can hide a committed update. Only remove new files
+    // when a rejected write or a fresh read proves they are not used by the row.
+    try {
+      const current = writeRejected ? null : await chiTiet(item.maYeuCau, { query });
+      await remove(savedNew.filter(photo => !current?.anh.includes(photo)));
+    } catch { /* Keep files if the database cannot confirm their use. */ }
+    throw error;
+  }
+  await remove(item.anh.filter((p) => !keep.includes(p)));
+  return chiTiet(item.maYeuCau, { query });
+}
+
+export async function xoaYeuCau(user, maYeuCau, { query = executeQuery, remove = removePhotos } = {}) {
+  const snapshot = await forOwner(user, maYeuCau, query);
+  const { item } = snapshot;
+  const result = await query(`DECLARE @Changed TABLE (maYeuCau VARCHAR(6));
+    DELETE FROM dbo.YeuCauSuaChua OUTPUT deleted.MaYeuCau INTO @Changed WHERE ${OWNER_WRITE_GUARD};
+    SELECT maYeuCau FROM @Changed;`, ownerWriteParams(user, snapshot));
+  if (!result.recordset?.length) throw ownerConflict();
+  await remove(item.anh);
+  return { maYeuCau: item.maYeuCau, daXoa: true };
+}
+
 export async function tiepNhan(user, maYeuCau, data = {}, { query = executeQuery } = {}) {
   const item = await forManager(user, maYeuCau, query);
   if (item.trangThai !== STATUS.NEW) throw createServiceError('Yêu cầu này đã được tiếp nhận hoặc đã xử lý.', 409);
@@ -153,7 +242,9 @@ export async function tiepNhan(user, maYeuCau, data = {}, { query = executeQuery
     { name: 'GhiChu', type: sql.NVarChar(sql.MAX), value: String(data.ghiChu || '').trim() || null },
     { name: 'Ma', type: sql.VarChar(6), value: item.maYeuCau },
   ]);
-  return chiTiet(item.maYeuCau, { query });
+  const updated = await chiTiet(item.maYeuCau, { query });
+  if (!updated) throw createServiceError('Báo hỏng đã được xóa. Vui lòng tải lại danh sách.', 409);
+  return updated;
 }
 
 export async function hoanTat(user, maYeuCau, data = {}, { query = executeQuery } = {}) {

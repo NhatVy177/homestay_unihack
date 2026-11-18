@@ -44,7 +44,7 @@ export default function ChiTietPhongPage({ roomCode, banner = null, registerQuer
       {banner}
       {loading && <div className="kp-loading" role="status"><span /><p>Đang tải chi tiết phòng...</p></div>}
       {error && <div className="kp-detail-error" role="alert"><h1>Chưa thể mở phòng</h1><p>{error}</p>
-        <button className="kp-btn kp-btn-soft" type="button" onClick={backToRooms}>Quay lại khám phá phòng</button>
+        <button className="kp-btn kp-btn-soft" type="button" onClick={backToRooms}>Quay lại danh sách phòng</button>
         <button className="kp-btn kp-btn-primary" type="button" onClick={() => setAttempt((value) => value + 1)}>Thử lại</button></div>}
       {room && <RoomDetailView key={room.maPhong} phong={room} onBack={backToRooms} onRent={() => goRegister()} onRentGroup={() => goRegister('nhom')} />}
     </div>

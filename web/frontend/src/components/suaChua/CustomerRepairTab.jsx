@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from '../common/Icon.jsx';
 import EmptyState from '../common/EmptyState.jsx';
 import RepairItem from './RepairItem.jsx';
+import RepairOwnerActions from './RepairOwnerActions.jsx';
 import { errorText, shrinkImage, suaChuaApi } from './suaChua.api.js';
 import './suaChua.css';
 
@@ -81,7 +82,7 @@ export default function CustomerRepairTab() {
         <div className="scb-form-actions"><button type="submit" className="ui-btn ui-btn--primary" disabled={busy}>{busy ? 'Đang gửi...' : 'Gửi báo hỏng'}</button></div>
       </form>}
     <h2 className="scb-section-title">Báo hỏng đã gửi</h2>
-    {items?.length ? <div className="scb-list">{items.map((item) => <RepairItem key={item.maYeuCau} item={item} />)}</div>
+    {items?.length ? <div className="scb-list">{items.map((item) => <RepairItem key={item.maYeuCau} item={item}><RepairOwnerActions item={item} loaiOptions={LOAI} onChanged={(result) => { if (result?.error) setMessage({ error: true, text: result.error }); return load(); }} /></RepairItem>)}</div>
       : <div className="ui-card"><EmptyState message="Chưa có báo hỏng nào." /></div>}
   </section>;
 }

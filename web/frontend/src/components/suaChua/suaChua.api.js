@@ -5,6 +5,8 @@ export const suaChuaApi = {
   danhSach: () => httpClient.get('/sua-chua-bao-tri'),
   theoHopDong: (maHopDong) => httpClient.get(`/sua-chua-bao-tri/hop-dong/${encodeURIComponent(maHopDong)}`),
   tao: (data) => httpClient.post('/sua-chua-bao-tri', data),
+  capNhat: (id, data) => httpClient.put(`/sua-chua-bao-tri/${encodeURIComponent(id)}`, data),
+  xoa: (id) => httpClient.delete(`/sua-chua-bao-tri/${encodeURIComponent(id)}`),
   tiepNhan: (id, data = {}) => httpClient.put(`/sua-chua-bao-tri/${encodeURIComponent(id)}/tiep-nhan`, data),
   hoanTat: (id, data) => httpClient.put(`/sua-chua-bao-tri/${encodeURIComponent(id)}/hoan-tat`, data),
   tuChoi: (id, data) => httpClient.put(`/sua-chua-bao-tri/${encodeURIComponent(id)}/tu-choi`, data),

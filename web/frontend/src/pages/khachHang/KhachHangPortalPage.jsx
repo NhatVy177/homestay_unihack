@@ -695,6 +695,8 @@ export default function KhachHangPortalPage() {
   });
   const [detailPhong, setDetailPhong] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState(null);
+  const detailRequest = useRef(0);
 
   const [overview, setOverview] = useState(null);
   const [rooms, setRooms] = useState([]);
@@ -874,6 +876,26 @@ export default function KhachHangPortalPage() {
     return () => { active = false; };
   }, [loading, overview, location.search]);
 
+  // D-067: màn danh sách "Khám phá phòng" trong cổng khách đã bỏ hẳn. Link có ?phong=<mã> (vd. nút tim ở trang chủ) mở chi tiết
+  // phòng trong cổng để thêm vào hồ sơ quan tâm; không có phòng (hoặc quay lại từ chi tiết, hủy form) thì về /phong.
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const roomId = params.get('phong');
+    if (loading || !overview || params.get('dangKy') || !roomId || incomingRoomHandled.current === `xem:${roomId}`) return;
+    incomingRoomHandled.current = `xem:${roomId}`;
+    setActiveTab('kham-pha');
+    openRoomDetail({ maPhong: roomId });
+    params.delete('phong');
+    navigate({ pathname: location.pathname, search: `?${params.toString()}` }, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, overview, location.search]);
+
+  useEffect(() => {
+    const hasIncomingRoom = new URLSearchParams(location.search).get('phong');
+    if (loading || activeTab !== 'kham-pha' || detailPhong || detailLoading || detailError || rentModal || registrationNoticeOpen || hasIncomingRoom) return;
+    navigate('/phong', { replace: true, state: { customerPortalTab: 'tai-khoan' } });
+  }, [loading, activeTab, detailPhong, detailLoading, detailError, rentModal, registrationNoticeOpen, location.search, navigate]);
+
   useEffect(() => {
     if (!toast) return undefined;
     const timeout = setTimeout(() => setToast(''), 3200);
@@ -916,7 +938,8 @@ export default function KhachHangPortalPage() {
   }, [activeTab]);
 
   function openPublicRooms() {
-    navigate('/phong', { state: { customerPortalTab: activeTab } });
+    detailRequest.current += 1;
+    navigate('/phong', { state: { customerPortalTab: activeTab === 'kham-pha' ? 'tai-khoan' : activeTab } });
   }
 
   function goTo(tab) {
@@ -930,24 +953,28 @@ export default function KhachHangPortalPage() {
   }
 
   async function openRoomDetail(room) {
+    const request = ++detailRequest.current;
     const fallbackRoom = normalizeRoomDetail(room);
     const maPhong = fallbackRoom.maPhong;
-
+    setDetailError(null);
+    setDetailPhong(null);
     if (!maPhong) {
-      setDetailPhong(fallbackRoom);
+      setDetailLoading(false);
+      setDetailError({ message: 'Chưa xác định được phòng. Vui lòng chọn lại từ danh sách.', room });
       return;
     }
 
     setDetailLoading(true);
-    setDetailPhong(fallbackRoom);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     try {
       const { data } = await khachMoiApi.getChiTietPhong(maPhong);
+      if (request !== detailRequest.current) return;
       setDetailPhong(normalizeRoomDetail(data, fallbackRoom));
     } catch (requestError) {
-      setToast(requestError.response?.data?.message || 'Không thể tải chi tiết phòng lúc này.');
+      if (request !== detailRequest.current) return;
+      setDetailError({ message: requestError.response?.data?.message || 'Không thể tải chi tiết phòng lúc này.', room });
     } finally {
-      setDetailLoading(false);
+      if (request === detailRequest.current) setDetailLoading(false);
     }
   }
 
@@ -4461,11 +4488,17 @@ export default function KhachHangPortalPage() {
 
   function renderCurrentTab() {
     if (rentModal) return renderRentRequestPage();
+    if (activeTab === 'kham-pha' && detailLoading) return <div className="kp-loading" role="status"><span /><p>Đang tải chi tiết phòng...</p></div>;
+    if (activeTab === 'kham-pha' && detailError) return <div className="kp-detail-error" role="alert">
+      <h2>Chưa thể mở phòng</h2><p>{detailError.message}</p>
+      <button className="kp-btn kp-btn-soft" type="button" onClick={openPublicRooms}>Quay lại danh sách phòng</button>
+      <button className="kp-btn kp-btn-primary" type="button" onClick={() => openRoomDetail(detailError.room)}>Thử lại</button>
+    </div>;
     if (detailPhong && activeTab === 'kham-pha') {
       return (
         <ChiTietPhongView
           phong={detailPhong}
-          onBack={() => setDetailPhong(null)}
+          onBack={() => { setDetailPhong(null); openPublicRooms(); }}
           onRent={(room) => { setDetailPhong(null); openRentForm(room); }}
           profile={openProfile}
           scheduledMessage={scheduledMessage}
@@ -4478,7 +4511,7 @@ export default function KhachHangPortalPage() {
         />
       );
     }
-    if (activeTab === 'kham-pha') return renderExplore();
+    if (activeTab === 'kham-pha') return <div className="kp-loading" role="status"><span /><p>Đang mở danh sách phòng...</p></div>;
     if (activeTab === 'ho-so') return renderProfiles();
     if (activeTab === 'lich-xem') return renderSchedules();
     if (activeTab === 'dat-coc') return renderDatCoc();
@@ -4488,7 +4521,7 @@ export default function KhachHangPortalPage() {
     if (activeTab === 'bao-hong') return locks['bao-hong'] ? renderLocked('bao-hong') : <CustomerRepairTab />;
     if (activeTab === 'tra-phong') return renderHopDong();
     if (activeTab === 'tai-khoan') return renderAccount();
-    return renderExplore();
+    return renderAccount();
   }
 
   return (
@@ -4502,7 +4535,6 @@ export default function KhachHangPortalPage() {
           {loading && <div className="kp-loading"><span /><p>Đang tải cổng khách hàng...</p></div>}
           {!loading && error && <div className="kp-message error">{error}</div>}
           {!loading && !error && renderCurrentTab()}
-          {detailLoading && <div className="kh-detail-overlay"><span className="kh-detail-spinner" /></div>}
     </WorkspaceShell>
 
       {registrationNoticeOpen && (

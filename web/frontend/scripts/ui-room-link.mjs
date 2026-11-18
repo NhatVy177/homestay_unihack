@@ -58,7 +58,7 @@ try {
     assert.match(await offer.innerText(), /Sale Thử gửi bạn phòng này[\s\S]*15:00 ngày 20\/11\/2026[\s\S]*Nhớ mang CCCD/);
     await page.locator('.kh-detail-title').waitFor();
     await page.screenshot({ path: `${folder}/customer-${width}.png` });
-    await page.getByRole('button', { name: 'Đăng ký thuê ngay', exact: true }).click();
+    await page.getByRole('button', { name: 'Tôi quan tâm phòng này', exact: true }).click();
     const next = new URL(page.url()).searchParams.get('next');
     assert.match(next, /^\/khach-hang\?tab=kham-pha&phong=P101&dangKy=1&nguon=Sale/);
     assert.match(next, /ngayXem=2026-11-20&gioXem=15%3A00&tuSale=NV0005/);

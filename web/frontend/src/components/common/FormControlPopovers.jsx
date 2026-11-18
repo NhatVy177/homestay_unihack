@@ -12,6 +12,7 @@ function supported(element) {
   return element instanceof HTMLInputElement && INPUT_TYPES.includes(element.type)
     || element instanceof HTMLSelectElement && !element.multiple && element.size <= 1;
 }
+const unavailableControl = element => element.matches(':disabled') || element.readOnly;
 function constraints(input) {
   return { type: input.type, min: input.min, max: input.max, step: input.step, initialValue: input.getAttribute('value') || '' };
 }
@@ -165,7 +166,7 @@ export default function FormControlPopovers() {
   useEffect(() => {
     function open(event) {
       const element = event.target;
-      if (!supported(element) || element.disabled || element.readOnly) return;
+      if (!supported(element) || unavailableControl(element)) return;
       if (event.type === 'keydown' && !(event.key === ' ' || event.key === 'Enter' || event.key === 'ArrowDown' && event.altKey || element instanceof HTMLSelectElement && ['ArrowDown', 'ArrowUp'].includes(event.key))) return;
       event.preventDefault();
       if (active.current === element) return;
@@ -186,7 +187,7 @@ export default function FormControlPopovers() {
     if (!input || !popup.current) return undefined;
     const panel = popup.current;
     function position() {
-      if (!input.isConnected || input.disabled || input.readOnly) { close(); return; }
+      if (!input.isConnected || unavailableControl(input)) { close(); return; }
       const rect = input.getBoundingClientRect();
       panel.style.setProperty('--control-popover-width', `${input instanceof HTMLSelectElement ? Math.min(Math.max(rect.width, 200), innerWidth - 24) : Math.min(360, innerWidth - 24)}px`);
       const below = innerHeight - rect.bottom - 20, above = rect.top - 20;
@@ -209,7 +210,7 @@ export default function FormControlPopovers() {
     const focus = panel.querySelector('[data-autofocus]:not(:disabled)') || panel.querySelector('button:not(:disabled)');
     focus?.focus({ preventScroll: true });
     focus?.scrollIntoView({ block: 'nearest' });
-    function outside(event) { if (event.target !== input && !panel.contains(event.target) && !(supported(event.target) && !event.target.disabled && !event.target.readOnly)) close(); }
+    function outside(event) { if (event.target !== input && !panel.contains(event.target) && !(supported(event.target) && !unavailableControl(event.target))) close(); }
     function keys(event) {
       if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(true); }
       // Close after the browser moves focus, so Tab keeps its usual form navigation.
@@ -226,7 +227,7 @@ export default function FormControlPopovers() {
     };
   }, [input, close]);
   if (!input) return null;
-  function commit(value) { if (!input.isConnected || input.disabled || input.readOnly) { close(); return; } setNativeValue(input, value); close(true); }
+  function commit(value) { if (!input.isConnected || unavailableControl(input)) { close(); return; } setNativeValue(input, value); close(true); }
   return createPortal(<div id="ui-control-popover" className={`ui-control-popover${input instanceof HTMLSelectElement ? ' is-select' : ''}`} ref={popup} role={input instanceof HTMLSelectElement ? undefined : 'dialog'} aria-label={input instanceof HTMLSelectElement ? undefined : input.type === 'time' ? 'Chọn giờ' : 'Chọn ngày'} onMouseDown={event => event.stopPropagation()} onClick={event => event.stopPropagation()}>
     {input instanceof HTMLSelectElement ? <Options key={controlKey(input)} input={input} commit={commit} /> : <Calendar key={controlKey(input)} input={input} commit={commit} />}
   </div>, document.body);

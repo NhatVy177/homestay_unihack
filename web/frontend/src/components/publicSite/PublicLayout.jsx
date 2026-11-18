@@ -24,6 +24,7 @@ export default function PublicLayout({ children }) {
         <div id="tc-public-menu" className={`tc-nav-links ${open ? 'tc-nav-links--open' : ''}`} onClick={() => setOpen(false)}>
           <NavLink to="/phong" className={link}>Phòng</NavLink>
           <NavLink to="/dich-vu" className={link}>Dịch vụ</NavLink>
+          <Link to="/#vi-tri" className="tc-nav-link">Vị trí</Link>
           <Link to="/#gioi-thieu" className="tc-nav-link">Giới thiệu</Link>
           <Link to="/#lien-he" className="tc-nav-link">Liên hệ</Link>
         </div>

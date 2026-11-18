@@ -10,3 +10,24 @@
   word-break: normal;
   overflow-wrap: normal;
 }
+
+/* Khối nút ở chi tiết phòng theo mẫu (lỗi 10): nút chính đặc xanh bo tròn có icon, nút nhóm viền bo tròn có icon, dòng giải thích.
+   Đặt ở đây (nạp toàn cục) để trang công khai và cổng khách giống nhau. */
+.kh-detail-view .kh-detail-cta, .kh-detail-view .kh-detail-group {
+  display: flex; align-items: center; justify-content: center; gap: var(--space-2);
+  width: 100%; min-height: calc(var(--control-height) + var(--space-2)); margin-top: var(--space-3); padding: 0 var(--space-4);
+  border-radius: var(--radius-pill); font: inherit; font-size: 1rem; font-weight: 700; cursor: pointer;
+}
+.kh-detail-view .kh-detail-cta .kp-line-icon, .kh-detail-view .kh-detail-group .kp-line-icon { width: var(--icon-md); height: var(--icon-md); flex: none; }
+.kh-detail-view .kh-detail-register:not(:disabled) {
+  border: 1px solid var(--color-primary); background: var(--color-primary); color: var(--color-surface); box-shadow: var(--shadow-md);
+}
+.kh-detail-view .kh-detail-register:not(:disabled):hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.kh-detail-view .kh-detail-group, .kh-detail-view .kh-detail-heart:not(.is-active) {
+  border: 1px solid var(--color-primary); background: transparent; color: var(--color-primary);
+}
+.kh-detail-view .kh-detail-group:hover, .kh-detail-view .kh-detail-heart:not(.is-active):not(:disabled):hover { background: var(--color-primary-soft); }
+.kh-detail-view .kh-detail-heart.is-active { border: 1px solid var(--color-primary); background: var(--color-primary); color: var(--color-surface); }
+.kh-detail-view .kh-detail-flow-help { margin: var(--space-4) 0 0; font-size: 14px; line-height: 1.6; text-align: center; color: var(--color-text-muted); }
+.kh-detail-view .kh-detail-flow-badge { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: var(--space-3) 0 0; font-size: 14px; color: var(--color-text-muted); }
+.kh-detail-view .kh-detail-flow-badge .kp-line-icon { width: var(--icon-md); height: var(--icon-md); color: var(--color-primary); }

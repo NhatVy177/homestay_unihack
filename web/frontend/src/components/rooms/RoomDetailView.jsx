@@ -14,6 +14,8 @@ function getRoomStatusTone(status = '') {
 
 function Icon({ name, className = '' }) {
   const shapes = {
+    clipboard: <><rect x="6" y="4.5" width="12" height="16" rx="2" /><path d="M9.5 4.5V3.5h5v1M9.5 10h5M9.5 14h5M9.5 17.5h3" /></>,
+    shield: <><path d="M12 3.5 5 6.2v5.3c0 4.4 3 7.6 7 9 4-1.4 7-4.6 7-9V6.2z" /><path d="m9 12 2.2 2.2L15.5 10" /></>,
     home: <><path d="M3.5 11.2 12 4l8.5 7.2" /><path d="M5.5 10.4V20h13v-9.6" /><path d="M9.5 20v-5.8h5V20" /></>,
     explore: <><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2.4 5.1-5.1 2.4 2.4-5.1 5.1-2.4Z" /></>,
     search: <><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4 4" /></>,
@@ -104,7 +106,7 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
   return (
     <section className="kh-detail-view">
       <button className="kh-detail-back" type="button" onClick={onBack}>
-        ← Quay lại khám phá phòng
+        <Icon name="arrow-left" />Quay lại danh sách phòng
       </button>
 
       <div className="kh-detail-header">
@@ -237,24 +239,31 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
                 disabled={phong.trangThaiQuanTam === ROOM_FULL_LABEL}
                 onClick={() => onRent(phong)}
               >
-                {phong.trangThaiQuanTam === ROOM_FULL_LABEL ? ROOM_FULL_LABEL : 'Đăng ký thuê ngay'}
+                {phong.trangThaiQuanTam !== ROOM_FULL_LABEL && <Icon name="clipboard" />}
+                {phong.trangThaiQuanTam === ROOM_FULL_LABEL ? ROOM_FULL_LABEL : 'Tôi quan tâm phòng này'}
               </button>
             )}
             {onRentGroup && !scheduledMessage && !profile && phong.trangThaiQuanTam !== ROOM_FULL_LABEL && (
               <button className="kp-btn kp-full kh-detail-group" type="button" onClick={() => onRentGroup(phong)}>
+                <Icon name="people" />
                 Đăng ký thuê theo nhóm
               </button>
             )}
-            <div className="kh-detail-note">
-              <Icon name="info" />
-              <span>
-                {phong.trangThaiQuanTam === ROOM_FULL_LABEL
-                  ? 'Phòng này đã hết chỗ. Vui lòng chọn phòng khác.'
-                  : phong.trangThaiQuanTam === 'Đang chờ cọc'
-                    ? 'Phòng đang có người giữ chỗ. Bạn vẫn có thể gửi nhu cầu; nếu phòng không còn, nhân viên Sale sẽ tư vấn phòng khác.'
-                    : 'Có thể dọn vào ngày sau khi ký hợp đồng và đóng cọc.'}
-              </span>
-            </div>
+            {phong.trangThaiQuanTam === ROOM_FULL_LABEL || phong.trangThaiQuanTam === 'Đang chờ cọc' ? (
+              <div className="kh-detail-note">
+                <Icon name="info" />
+                <span>
+                  {phong.trangThaiQuanTam === ROOM_FULL_LABEL
+                    ? 'Phòng này đã hết chỗ. Vui lòng chọn phòng khác.'
+                    : 'Phòng đang có người giữ chỗ. Bạn vẫn có thể gửi nhu cầu; nếu phòng không còn, nhân viên Sale sẽ tư vấn phòng khác.'}
+                </span>
+              </div>
+            ) : (
+              <>
+                <p className="kh-detail-flow-help">Nhân viên Sale sẽ kiểm tra tình trạng thực tế và sắp xếp lịch xem phòng phù hợp. Khách chỉ đặt cọc sau khi đã xem phòng.</p>
+                <p className="kh-detail-flow-badge"><Icon name="shield" />Gửi phiếu nhu cầu trước, Sale xếp phòng sau</p>
+              </>
+            )}
           </div>
 
           <div className="kh-detail-info-card">

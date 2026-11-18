@@ -64,7 +64,7 @@ try {
     await page.keyboard.press('ArrowRight'); assert.notEqual(await lightbox.locator('img').getAttribute('src'), firstImage);
     await page.keyboard.press('ArrowLeft'); assert.equal(await lightbox.locator('img').getAttribute('src'), firstImage);
     await page.keyboard.press('Escape'); assert.equal(await lightbox.count(), 0);
-    await page.getByRole('button', { name: '← Quay lại khám phá phòng', exact: false }).click();
+    await page.getByRole('button', { name: 'Quay lại danh sách phòng', exact: true }).click();
     assert.equal(new URL(page.url()).pathname, '/phong', 'quay lại về trang danh sách phòng');
     await page.locator('.hx-room-card').first().getByRole('button', { name: 'Xem ngay', exact: true }).click();
     await detailReady(page);
@@ -72,8 +72,8 @@ try {
     await page.goForward(); await detailReady(page);
     // Nút đăng ký theo nhóm có ở trang chi tiết công khai và giữ lại phòng đã chọn khi đăng nhập.
     assert.equal(await page.getByRole('button', { name: 'Đăng ký thuê theo nhóm' }).count(), 1);
-    assert.equal(await page.getByText('Quay lại khám phá phòng').locator('svg').count(), 0, 'nút quay lại chỉ có mũi tên, không có biểu tượng tròn');
-    await page.getByRole('button', { name: 'Đăng ký thuê ngay', exact: true }).click();
+    assert.equal(await page.getByRole('button', { name: 'Quay lại danh sách phòng', exact: true }).locator('svg circle').count(), 0, 'nút quay lại chỉ có mũi tên, không có biểu tượng tròn');
+    await page.getByRole('button', { name: 'Tôi quan tâm phòng này', exact: true }).click();
     const next = new URL(page.url()).searchParams.get('next');
     assert.equal(next, '/khach-hang?tab=kham-pha&phong=P101&dangKy=1');
     await page.getByRole('dialog').waitFor();
@@ -100,14 +100,13 @@ try {
   console.log('PASS public availability rules at 1440/390px');
   {
     const { context, page, errors, writes } = await contextFor(1440, true);
-    await page.goto(`${base}/khach-hang?tab=kham-pha`, { waitUntil: 'domcontentloaded' });
-    await page.locator('.kh-room-card').first().getByRole('button', { name: 'Xem chi tiết', exact: true }).click();
+    await page.goto(`${base}/khach-hang?tab=kham-pha&phong=P101`, { waitUntil: 'domcontentloaded' });
     await detailReady(page);
     await page.screenshot({ path: resolve(output, 'customer-shared-view.png'), fullPage: true });
     await page.goto(`${base}/phong/P101`, { waitUntil: 'domcontentloaded' }); await detailReady(page);
-    await page.getByRole('button', { name: 'Đăng ký thuê ngay', exact: true }).click();
+    await page.getByRole('button', { name: 'Tôi quan tâm phòng này', exact: true }).click();
     await page.getByRole('heading', { name: 'Đăng ký thuê phòng', exact: true }).waitFor();
-    assert.equal(await page.locator('.kh-room-card.selected h3').innerText(), room.tenPhong);
+    assert.match(await page.locator('.kh-rent-interest').innerText(), new RegExp(room.tenPhong));
     assert.equal(await page.locator('.kh-register-modal .kh-room-type-field select').inputValue(), room.loaiPhong);
     assert.equal(await page.locator('.kh-register-modal label').filter({ hasText: 'Mức giá tối đa' }).locator('input').inputValue(), String(room.giaThue));
     assert.deepEqual(errors, []); assert.deepEqual(writes, []);

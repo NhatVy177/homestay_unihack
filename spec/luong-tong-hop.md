@@ -43,6 +43,8 @@ Trình bày trang chủ/phòng công khai (D-062/J-X092): dùng cùng họ chữ
 
 Bộ chọn ngày giờ/dropdown toàn frontend (D-064/J-X093): popup tiếng Việt, màu sage, giữ control/giá trị/giới hạn/handler. Đăng xuất (D-066/J-X094): hộp dùng chung icon/nội dung căn giữa, nút X và Hủy/Đăng xuất; chỉ xác nhận mới thoát. Thêm ảnh Báo hỏng dùng ô viền nét đứt/icon rõ, giữ tối đa3 ảnh và xử lý hiện có.
 
+D-067/J-X096: khách chỉ sửa/xóa báo hỏng của chính mình ở trạng thái Chờ tiếp nhận; sau tiếp nhận/hoàn tất/từ chối là chỉ xem. Sửa giữ giới hạn3 ảnh; xóa cần xác nhận, tranh chấp cập nhật không xóa ảnh đang dùng. Danh sách phòng chỉ ở `/phong`; cổng khách giữ chi tiết để thêm quan tâm hoặc đăng ký, phải tải đủ dữ liệu và giữ thông báo khóa. Chia sẻ/CTA/nút nhóm đồng bộ, giữ quy tắc thuê và D-065.
+
 ## 1. Vai trò và hệ thống
 
 | Vai trò | Làm gì chính |

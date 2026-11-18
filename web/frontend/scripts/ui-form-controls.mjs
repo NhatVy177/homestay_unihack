@@ -58,6 +58,18 @@ try {
       form.addEventListener('change', event => window.controlChanges.push({ type: event.target.type, value: event.target.value }));
     });
     const birth = page.getByLabel('Ngày sinh giới hạn', { exact: true });
+    await page.evaluate(() => document.getElementById('control-fixture').insertAdjacentHTML('beforeend', '<fieldset id="inherited-lock" disabled><label>Ngày khóa theo nhóm<input type="date"></label><label>Nhóm khóa<select><option value="a">A</option><option value="b">B</option></select></label></fieldset>'));
+    await page.locator('#inherited-lock input').dispatchEvent('click');
+    assert.equal(await popup.count(), 0, 'disabled fieldset blocks custom date popup');
+    await page.locator('#inherited-lock select').dispatchEvent('keydown', { key: 'ArrowDown' });
+    assert.equal(await popup.count(), 0, 'disabled fieldset blocks custom select popup');
+    await page.locator('#inherited-lock').evaluate(fieldset => { fieldset.disabled = false; });
+    await page.locator('#inherited-lock select').click();
+    await popup.getByRole('option', { name: 'B', exact: true }).waitFor();
+    await page.locator('#inherited-lock').evaluate(fieldset => { fieldset.disabled = true; });
+    await popup.getByRole('option', { name: 'B', exact: true }).click();
+    assert.equal(await page.locator('#inherited-lock select').inputValue(), 'a', 'a fieldset locked while a popup is open cannot be changed');
+    assert.equal(await popup.count(), 0);
     await birth.click();
     await popup.getByRole('button', { name: '18/11/2008', exact: true }).waitFor();
     assert.equal(await popup.getByRole('button', { name: '19/11/2008', exact: true }).isDisabled(), true);
@@ -88,7 +100,7 @@ try {
     assert.equal(await datetime.evaluate(input => input.validity.valid), true);
     await page.getByLabel('Chỉ đọc', { exact: true }).click();
     assert.equal(await popup.count(), 0);
-    const select = page.locator('#control-fixture select');
+    const select = page.locator('#control-fixture > label select');
     await select.focus(); await page.keyboard.press('ArrowDown');
     await page.keyboard.press('ArrowDown'); await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
     assert.equal(await select.inputValue(), 'c', 'keyboard skips disabled option');

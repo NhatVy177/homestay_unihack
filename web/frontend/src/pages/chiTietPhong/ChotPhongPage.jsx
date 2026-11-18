@@ -27,8 +27,8 @@ export default function ChotPhongPage() {
     <span className="ctp-offer-icon" aria-hidden="true"><Icon name="person" /></span>
     <div>
       <strong>{offer.tenSale || 'Nhân viên HomestayDorm'} gửi bạn phòng này</strong>
-      {when && <p>Hẹn xem phòng lúc {when}. Bấm "Đăng ký thuê ngay" để giữ lịch, thông tin đã được điền sẵn.</p>}
-      {!when && <p>Bấm "Đăng ký thuê ngay" để gửi yêu cầu, thông tin phòng đã được điền sẵn.</p>}
+      {when && <p>Hẹn xem phòng lúc {when}. Bấm "Tôi quan tâm phòng này" để giữ lịch, thông tin đã được điền sẵn.</p>}
+      {!when && <p>Bấm "Tôi quan tâm phòng này" để gửi yêu cầu, thông tin phòng đã được điền sẵn.</p>}
       {offer.ghiChu && <p className="ctp-offer-note">Lời nhắn: {offer.ghiChu}</p>}
       {offer.sdtSale && <p className="ctp-offer-note">Liên hệ: <a href={`tel:${offer.sdtSale}`}>{offer.sdtSale}</a></p>}
     </div>

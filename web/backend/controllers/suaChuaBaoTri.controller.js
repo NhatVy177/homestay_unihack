@@ -11,3 +11,5 @@ export const taoYeuCau = wrap((req) => service.taoYeuCau(req.user, req.body), 20
 export const tiepNhan = wrap((req) => service.tiepNhan(req.user, req.params.id, req.body));
 export const hoanTat = wrap((req) => service.hoanTat(req.user, req.params.id, req.body));
 export const tuChoi = wrap((req) => service.tuChoi(req.user, req.params.id, req.body));
+export const capNhatYeuCau = wrap((req) => service.capNhatYeuCau(req.user, req.params.id, req.body));
+export const xoaYeuCau = wrap((req) => service.xoaYeuCau(req.user, req.params.id));

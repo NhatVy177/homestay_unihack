@@ -48,3 +48,5 @@
 .scb-history { display: grid; gap: var(--space-3); }
 .scb-history h3 { margin: 0; font-size: 15px; }
 @media (max-width: 640px) { .scb-form { padding: var(--space-4); } .scb-inline, .scb-choice { grid-template-columns: 1fr; } .scb-item-head { flex-direction: column; } }
+.scb-edit { display: grid; gap: var(--space-3); min-width: 0; margin: 0; padding: 0; border: 0; }
+.scb-edit textarea { min-height: 80px; resize: vertical; }

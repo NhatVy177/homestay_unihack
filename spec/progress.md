@@ -1,6 +1,6 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 11:35:26 +07:00** (J-X095: Vy duyệt gộp lịch/ngày giờ, đăng xuất và thêm ảnh vào main; giữ cập nhật Admin/Báo hỏng hiện hành). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 13:09:47 +07:00** (J-X096: tiếp nối bản Claude ghi chú7–10, hoàn tất báo hỏng và luồng phòng/chia sẻ). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4, khắc phục giao diện & tối ưu trải nghiệm (J-A002 / J-A003 / J-A004)
 
@@ -21,6 +21,14 @@ Cập nhật: **2026-11-18 11:35:26 +07:00** (J-X095: Vy duyệt gộp lịch/ng
 - Khắc phục lỗi bóc tách response (mảng vs object bọc `{ data }`) bằng `extractArray` trong `admin.utils.js`.
 - Bằng chứng & Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 131 PASS (127 pass, 4 skip, 0 fail), `blockchain` 26 PASS (25 pass, 1 skip, 0 fail), trình duyệt Playwright đọc thực tế trên local5173 tài khoản `nv0013` xác nhận giao diện chuẩn đẹp, sạch lỗi.
 
+
+## Tiếp nối bản Claude ghi chú7–10 — D-067 / J-X096
+
+- Nhận snapshot22 file chưa commit từ `D:\HomeStayDorm-fix`/`fix/notes-7-10`, giữ nguyên worktree gốc. Tiếp tục trong `D:\HomeStayDorm-continue`/`fix/continue-notes` từ origin/main9933895; loại `_tmp`, `_r.txt`, env và dữ liệu ảnh khỏi commit. Claude đã có UI/API sửa-xóa báo hỏng, điều hướng phòng/CTA/chia sẻ và bỏ tiền tố driver; Codex hoàn tất phần còn thiếu và kiểm lại.
+- Đã bổ sung chặn race khi sửa/xóa/tiếp nhận, bảo toàn ảnh khi SQL không xác nhận được, tên ảnh UUID không đè nhau; khóa form và popup khi fieldset disabled, hủy xử lý ảnh không nhập nhầm phiên; lỗi mạng giữ bản nháp,409 tải lại/hết nút. Room detail chờ dữ liệu thật, lỗi có retry/back, không mất thông báo khóa hồ sơ; route quay lại hợp lệ. Share menu320/390/1440 không tràn, hỗ trợ bàn phím/copy thật và báo lỗi đúng.
+- **Kiểm mới:** backend156 pass/0 fail/4 skip; blockchain local25 pass/0 fail/1 skip. Frontend build PASS (cảnh báo dependency/chunk cũ), smoke Verify/D-017/D-018/D-023/D-024 PASS.13 nhóm UI đã qua trong đợt: form-controls, share-demo, repair, interested-rooms, public-room, room-link, customer-register-modal, customer-profile, public-pages, account-menu, shell, email-auth, home. Chủ yếu1440/390; share thêm320, home thêm1024/768/320 +empty/error. Sau sửa guard thông báo và chuẩn hóa CSS, kiểm lại public-room/share trên build5211 PASS. Không gọi sửa/xóa SQL thật, không chạy migration hoặc Fuji.
+- Commit/push hoàn tất lên main theo quy trình sau khi nhận tiếp công việc Claude; code đã kiểm và bản diff32 file độc lập. Root có14 file sửa dở/chưa theo dõi: giữ nguyên11 file ngoài phạm vi bằng hash;3 bản sửa dở chi tiết phòng đã được bản hoàn chỉnh thay thế, lưu stash riêng/patch ngoài repo, không áp lại để tránh2 CTA. Không gom các sửa dở đó vào commit. Bản xem build5211; checkoutmain/cổng5173 dùng source mới sau fast-forward. Không đổi .env hoặc dịch vụ của Hằng.
+- Mức bằng chứng: code + unit/fixture qua; SQL Server CRUD thật/Fuji chưa nghiệm thu. Khi DB không đọc lại được sau lỗi ghi thì ưu tiên giữ file mới; có thể còn file dư chờ dọn, không đánh đổi việc giữ ảnh của báo hỏng.
 
 ## Giao diện dùng chung/Báo hỏng trên main — D-064 / D-066 / J-X095
 

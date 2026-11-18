@@ -7,7 +7,7 @@ await mkdir(folder, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
 const room = { maPhong: 'P103', tenPhong: 'Phòng P103', loaiPhong: 'Phòng 4 người', giaNguyenPhong: 7200000, sucChua: 4, soChoTrong: 4, gioiTinhChoPhep: 'Không phân biệt', chiNhanh: 'HomeDorm Thủ Đức', diaChi: '88 Võ Văn Ngân, Thủ Đức' };
 try {
-  for (const width of [1440, 390]) {
+  for (const width of [1440, 390, 320]) {
     const errors = [];
     const ctx = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' });
     await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: base }).catch(() => {});
@@ -23,6 +23,16 @@ try {
     page.on('pageerror', (e) => errors.push(e.message));
     await page.goto(`${base}/phong/P103`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Chia sẻ', exact: true }).click();
+    const menu = page.getByRole('menu', { name: 'Chia sẻ phòng' });
+    const geometry = await menu.evaluate(element => { const r = element.getBoundingClientRect(); return { left: r.left, right: r.right, height: r.height, scrollWidth: document.documentElement.scrollWidth }; });
+    assert.ok(geometry.left >= 0 && geometry.right <= width && geometry.height >= 88, JSON.stringify(geometry));
+    assert.equal(geometry.scrollWidth, width, 'share menu does not widen the page');
+    await page.keyboard.press('ArrowDown');
+    assert.match(await page.evaluate(() => document.activeElement.textContent), /Sao chép link/);
+    await page.keyboard.press('Escape');
+    assert.equal(await menu.count(), 0);
+    assert.equal(await page.getByRole('button', { name: 'Chia sẻ', exact: true }).evaluate(button => button === document.activeElement), true);
+    await page.getByRole('button', { name: 'Chia sẻ', exact: true }).click();
     const fb = page.getByRole('menuitem', { name: 'Chia sẻ lên Facebook' });
     const href = await fb.getAttribute('href');
     assert.match(href, /^https:\/\/www\.facebook\.com\/sharer\/sharer\.php\?u=/);
@@ -30,6 +40,15 @@ try {
     await page.getByRole('menuitem', { name: /Sao chép link/ }).click();
     await page.getByRole('menuitem', { name: 'Đã sao chép link' }).waitFor();
     await page.screenshot({ path: `${folder}/share-${width}.png` });
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Chia sẻ', exact: true }).click();
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: () => Promise.reject(new Error('fixture denied')) } });
+      document.execCommand = () => false;
+    });
+    await page.getByRole('menuitem', { name: /Sao chép link/ }).click();
+    await page.getByRole('alert').filter({ hasText: 'Chưa sao chép được liên kết.' }).waitFor();
+    assert.equal(await page.getByRole('menuitem', { name: 'Đã sao chép link' }).count(), 0, 'failed clipboard does not claim success');
     await page.goto(`${base}/`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Đăng nhập' }).first().click().catch(async () => {
       await page.locator('.tc-nav-toggle, .tc-menu-toggle, .tc-hamburger').first().click();

@@ -8,6 +8,8 @@ router.get('/hop-dong-cua-toi', controller.hopDongCuaKhach);
 router.get('/hop-dong/:maHopDong', controller.theoHopDong);
 router.get('/', controller.danhSach);
 router.post('/', controller.taoYeuCau);
+router.put('/:id', controller.capNhatYeuCau);
+router.delete('/:id', controller.xoaYeuCau);
 router.put('/:id/tiep-nhan', controller.tiepNhan);
 router.put('/:id/hoan-tat', controller.hoanTat);
 router.put('/:id/tu-choi', controller.tuChoi);
