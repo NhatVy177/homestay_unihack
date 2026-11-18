@@ -59,8 +59,8 @@ try {
     await page.getByText('Đã gửi chứng từ', { exact: false }).first().waitFor();
     assert.equal(proofUploads, 1);
     await page.getByText('Đã nộp minh chứng', { exact: true }).waitFor();
-    await page.getByRole('button', { name: 'Ví điện tử (mô phỏng)' }).click();
-    await page.getByRole('button', { name: 'Tiếp tục' }).waitFor();
+    await page.getByRole('button', { name: 'MoMo (mô phỏng)' }).click();
+    await page.getByRole('button', { name: /Tiếp tục với MoMo/ }).waitFor();
     assert.equal(await page.getByRole('heading', { name: 'Minh chứng thanh toán' }).count(), 0);
     await page.getByRole('button', { name: /Quay lại danh sách/ }).click();
     await page.getByRole('heading', { name: 'Hóa đơn của tôi', level: 2 }).waitFor();
@@ -83,9 +83,9 @@ try {
     await page.getByRole('button', { name: /Quay lại danh sách/ }).waitFor();
     await page.getByRole('heading', { name: 'Thanh toán đặt cọc', level: 2 }).waitFor();
     assert.equal(await page.getByRole('button', { name: 'QR chuyển khoản', exact: true }).getAttribute('aria-pressed'), 'true');
-    assert.equal(await page.getByRole("button", { name: "Ví điện tử (mô phỏng)" }).count(), 1);
-    await page.getByRole("button", { name: "Ví điện tử (mô phỏng)" }).click();
-    await page.getByRole("button", { name: "Tiếp tục" }).waitFor();
+    assert.equal(await page.getByRole("button", { name: "MoMo (mô phỏng)" }).count(), 1);
+    await page.getByRole("button", { name: "MoMo (mô phỏng)" }).click();
+    await page.getByRole("button", { name: /Tiếp tục với MoMo/ }).waitFor();
     assert.equal(await page.locator(".dpay-transfer").count(), 0);
     await page.getByRole("button", { name: "QR chuyển khoản", exact: true }).click();
     assert.match(await page.locator('.dpay-formula').innerText(), /1\.400\.000đ\/giường × 1 giường × 2 tháng = 2\.800\.000đ/);
