@@ -1,14 +1,14 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 10:41:22 +07:00** (J-A003: Khắc phục lỗi tải số liệu tổng quan Admin, đồng bộ tiện ích extractArray cho toàn bộ 8 tab). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 11:29:26 +07:00** (J-A004: Chuẩn hóa icon Admin, sửa lỗi định dạng Quản trị khách hàng, cột Thao tác icon xóa đỏ, gỡ bỏ toàn bộ nút Làm mới trên cả 8 tab). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
-## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4 & sửa lỗi số liệu (J-A002 / J-A003)
+## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4, khắc phục giao diện & tối ưu trải nghiệm (J-A002 / J-A003 / J-A004)
 
 - Loại bỏ hoàn toàn mã nguồn đơn khối cũ hơn 4000 dòng trong `AdminPage.jsx`.
 - Tách thành cấu trúc modular 8 tab sạch sẽ tương ứng 8 trang của Nam4:
-  1. `AdminDashboardTab.jsx`: Tổng quan hệ thống (4 KPI cards, SVG donut chart tỷ lệ phòng, chỉ số công suất vận hành, cảnh báo bảo trì, greeting header, nút refresh).
-  2. `AdminUsersTab.jsx`: Quản trị Khách hàng (4 KPI cards, thanh tìm kiếm & lọc trạng thái, bảng khách hàng, Right Drawer 3 tab: Thông tin cá nhân, Lịch sử hợp đồng, Hóa đơn & thanh toán, modal khóa/mở khóa tài khoản, modal thêm khách hàng).
-  3. `AdminEmployeesTab.jsx`: Quản trị Nhân viên (4 KPI cards phân theo vai trò Sale/Quản lý/Kế toán, bảng nhân viên phân trang, Right Drawer đổi vai trò & chi nhánh phụ trách, modal thêm nhân viên có xem mật khẩu, modal xác nhận khóa tài khoản).
+  1. `AdminDashboardTab.jsx`: Tổng quan hệ thống (4 KPI cards, SVG donut chart tỷ lệ phòng, chỉ số công suất vận hành, cảnh báo bảo trì, greeting header).
+  2. `AdminUsersTab.jsx`: Quản trị Khách hàng (4 KPI cards SVG chuẩn hóa, thanh tìm kiếm & lọc trạng thái không đè icon, bảng khách hàng, cột Thao tác nút Xem/Sửa và Khóa/Xóa màu đỏ, Right Drawer 3 tab: Thông tin cá nhân, Lịch sử hợp đồng, Hóa đơn & thanh toán, modal khóa/mở khóa tài khoản, modal thêm khách hàng).
+  3. `AdminEmployeesTab.jsx`: Quản trị Nhân viên (4 KPI cards phân theo vai trò Sale/Quản lý/Kế toán, bảng nhân viên phân trang, cột Thao tác icon Sửa và icon Thùng rác xóa màu đỏ, Right Drawer đổi vai trò & chi nhánh phụ trách, modal thêm nhân viên có xem mật khẩu, modal xác nhận khóa tài khoản).
   4. `AdminBranchesTab.jsx`: Quản trị Chi nhánh (4 KPI cards, bảng lưới card chi nhánh 3 cột, thanh tiến độ tỷ lệ lấp đầy %, modal thêm/sửa chi nhánh, modal xác nhận ngưng/kích hoạt hoạt động).
   5. `AdminRoomsTab.jsx`: Phòng & Giường (4 KPI cards, bảng danh mục phòng phân trang, Right Drawer quản lý chi tiết phòng và danh sách giường riêng, thêm/sửa giường trực tiếp, modal thêm phòng mới).
   6. `AdminServicesTab.jsx`: Danh mục Dịch vụ (4 KPI cards, lưới card dịch vụ 2 cột, icon động theo dịch vụ điện/nước/wifi/giặt/xe, switch bật/tắt trực tiếp, modal thêm/sửa dịch vụ).
@@ -16,9 +16,10 @@ Cập nhật: **2026-11-18 10:41:22 +07:00** (J-A003: Khắc phục lỗi tải 
   8. `AdminAssetsTab.jsx`: Tài sản dùng chung (4 KPI cards, bảng tài sản phân trang, lọc theo chi nhánh/phòng/loại tài sản/tình trạng, modal thêm/sửa tài sản liên kết chi nhánh và phòng).
 - Menu sidebar rút gọn chuẩn đúng 8 mục của Nam4 (`dashboard`, `users`, `employees`, `branches`, `rooms`, `services`, `conditions`, `assets`).
 - Toàn bộ màu be/nâu từ Nam4 được chuyển thành màu xanh thương hiệu hệ thống (`--color-primary: #4A6549`, tokens.css).
-- Bổ sung các biểu tượng SVG cần thiết (`inventory_2`, `inventory`, `policy`, `gavel`) trong `Icon.jsx`.
+- Bổ sung toàn bộ biểu tượng SVG và aliases trong `Icon.jsx`, triệt để loại bỏ tình trạng fallback về icon ngôi nhà.
+- Gỡ bỏ toàn bộ nút "Làm mới" trên tất cả các tab theo thói quen F5 của người dùng.
 - Khắc phục lỗi bóc tách response (mảng vs object bọc `{ data }`) bằng `extractArray` trong `admin.utils.js`.
-- Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 127 PASS / 0 FAIL / 4 SKIP, trình duyệt Playwright đọc thực tế trên local5173 xác nhận sạch banner đỏ, 4 thẻ KPI và donut chart tải đầy đủ số liệu thật.
+- Bằng chứng & Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 131 PASS (127 pass, 4 skip, 0 fail), `blockchain` 26 PASS (25 pass, 1 skip, 0 fail), trình duyệt Playwright đọc thực tế trên local5173 tài khoản `nv0013` xác nhận giao diện chuẩn đẹp, sạch lỗi.
 
 
 ## Trang chủ/nhà3D trên main

@@ -290,14 +290,6 @@ export default function AdminServicesTab() {
           <option value="available">Đang kích hoạt</option>
           <option value="inactive">Đã tắt</option>
         </select>
-        <button
-          onClick={() => { setSearch(''); setFilterType(''); setFilterStatus(''); }}
-          className="admin-btn-refresh"
-          title="Làm mới bộ lọc"
-        >
-          <Icon name="refresh" size={18} />
-          <span>Làm mới</span>
-        </button>
       </div>
 
       {/* Service 2-Column Grid */}

@@ -86,7 +86,7 @@ export default function AdminUsersTab() {
 
     return [
       { icon: 'groups', label: 'Tổng khách hàng', val: total },
-      { icon: 'home', label: 'Đang thuê', val: renting, cls: 'success' },
+      { icon: 'meeting_room', label: 'Đang thuê', val: renting, cls: 'success' },
       { icon: 'person_off', label: 'Chưa thuê', val: notRenting },
       { icon: 'lock', label: 'Tài khoản bị khóa', val: locked, cls: 'danger' }
     ];
@@ -173,7 +173,7 @@ export default function AdminUsersTab() {
     <div className="admin-fade-in-up" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {toast && (
         <div className="admin-toast">
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>check_circle</span>
+          <Icon name="check_circle" size={18} />
           {toast}
         </div>
       )}
@@ -187,9 +187,6 @@ export default function AdminUsersTab() {
           </p>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button className="admin-btn secondary" type="button" onClick={loadCustomers}>
-            <Icon name="refresh" /> Làm mới
-          </button>
           <button className="admin-btn primary" type="button" onClick={() => setShowAddModal(true)}>
             <Icon name="add_circle" /> Thêm khách hàng
           </button>
@@ -201,7 +198,7 @@ export default function AdminUsersTab() {
         {kpis.map((k, i) => (
           <div className="admin-kpi-card" key={i}>
             <div className={`admin-kpi-icon ${k.cls || ''}`}>
-              <span className="material-symbols-outlined" style={{ fontSize: 22 }}>{k.icon}</span>
+              <Icon name={k.icon} size={22} />
             </div>
             <div>
               <p className="admin-kpi-label">{k.label}</p>
@@ -214,7 +211,7 @@ export default function AdminUsersTab() {
       {/* Filter Bar */}
       <div className="admin-filter-bar">
         <div className="admin-filter-search">
-          <span className="material-symbols-outlined search-icon">search</span>
+          <span className="search-icon"><Icon name="search" size={18} /></span>
           <input
             placeholder="Tìm theo tên, email, CCCD, số điện thoại..."
             value={search}
@@ -231,9 +228,6 @@ export default function AdminUsersTab() {
           <option value="active">Hoạt động</option>
           <option value="locked">Bị khóa</option>
         </select>
-        <button className="admin-btn secondary" type="button" onClick={() => { setSearch(''); setFilterRent(''); setFilterAcct(''); }}>
-          <Icon name="refresh" /> Làm mới
-        </button>
       </div>
 
       {/* Table */}
@@ -263,7 +257,7 @@ export default function AdminUsersTab() {
                 <tr>
                   <td colSpan={8} style={{ textAlign: 'center', padding: 36 }}>
                     <div className="admin-empty-nam4">
-                      <span className="material-symbols-outlined icon">groups</span>
+                      <span className="icon"><Icon name="groups" size={44} /></span>
                       <p>Không tìm thấy khách hàng phù hợp.</p>
                       <small>Dữ liệu khách hàng sẽ hiển thị khi hệ thống có tài khoản đăng ký.</small>
                     </div>
@@ -308,14 +302,24 @@ export default function AdminUsersTab() {
                         </span>
                       </td>
                       <td style={{ textAlign: 'center' }}>
-                        <button
-                          className="admin-icon-btn"
-                          type="button"
-                          title="Xem chi tiết"
-                          onClick={() => { setSelected(c); setDrawerTab('info'); }}
-                        >
-                          <Icon name="visibility" />
-                        </button>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
+                          <button
+                            className="admin-btn-icon"
+                            type="button"
+                            title="Xem & sửa thông tin"
+                            onClick={() => { setSelected(c); setDrawerTab('info'); }}
+                          >
+                            <Icon name="edit" size={16} />
+                          </button>
+                          <button
+                            className="admin-btn-icon danger"
+                            type="button"
+                            title={isLocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản khách hàng'}
+                            onClick={() => setConfirmLockCustomer(c)}
+                          >
+                            <Icon name={isLocked ? 'lock_open' : 'delete'} size={16} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -387,7 +391,7 @@ export default function AdminUsersTab() {
 
               {drawerTab === 'history' && (
                 <div className="admin-empty-nam4">
-                  <span className="material-symbols-outlined icon">history</span>
+                  <span className="icon"><Icon name="history" size={32} /></span>
                   <p>Lịch sử thuê phòng</p>
                   <small>Dữ liệu hợp đồng thuê phòng sẽ được liệt kê tại đây.</small>
                 </div>
@@ -395,7 +399,7 @@ export default function AdminUsersTab() {
 
               {drawerTab === 'invoice' && (
                 <div className="admin-empty-nam4">
-                  <span className="material-symbols-outlined icon">receipt_long</span>
+                  <span className="icon"><Icon name="receipt_long" size={32} /></span>
                   <p>Lịch sử hóa đơn</p>
                   <small>Dữ liệu thanh toán và hóa đơn cọc/phòng của khách hàng.</small>
                 </div>

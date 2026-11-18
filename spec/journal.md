@@ -1821,3 +1821,26 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Sửa: `web/backend/services/suaChuaBaoTri.service.js` (danh sách `LOAI`, bắt buộc chọn loại; hoàn tất "do khách" bắt buộc chi phí nguyên dương + lý do và trong cùng giao dịch tạo `PhiPhatSinh` `SC-<mã>` "Đã xác nhận", chỉ tạo một lần; danh sách trả thêm trạng thái khoản phí và kỳ hóa đơn), `test/sua-chua.test.mjs` (+1 test); frontend `components/suaChua/ManagerRepairTab.jsx` (hai lựa chọn kết quả có mô tả), `CustomerRepairTab.jsx` (ô loại hư hỏng, giải thích ai trả tiền), `RepairItem.jsx` (nhãn loại, dòng "chủ nhà chịu" / "sẽ được cộng vào hóa đơn tháng kế tiếp" / "đã cộng vào hóa đơn kỳ …"), `suaChua.css`, `scripts/ui-repair.mjs`.
 - Kiểm tra: backend 146 pass/0 fail; build OK; `ui-repair` PASS. Chạy thật trên HOMEDORM4 qua backend 5012: `demo4` báo hỏng có loại → `nv0007` tiếp nhận, chốt "do khách" 350.000đ → khoản `SC-SC0002` "Đã xác nhận" hiện trong màn lập hóa đơn HD0001 kỳ 2026-12 của kế toán `nv0008`; chốt lần hai bị chặn (409). Đã xóa bản ghi và khoản phí thử.
 - Còn lại: yêu cầu `SC0001` Vy tạo lúc thử (do khách, 200.000đ) đã hoàn tất trước khi có tính năng này nên chưa có khoản phí; chưa gộp `main`.
+
+## 2026-11-18 11:29:26 +07:00 — J-A004 — Chuẩn hóa icon hệ thống Admin, sửa lỗi định dạng Quản trị khách hàng và gỡ bỏ nút Làm mới
+
+- Người thực hiện: Antigravity theo yêu cầu của Vy:
+  1. Trang Quản trị khách hàng: sửa lỗi hiển thị chữ thay vì icon trong các thẻ KPI (`groups`, `home`, `person_off`, `lock`), sửa lỗi chữ `search` đè lên ô nhập tìm kiếm.
+  2. Cột "Thao tác" trong các bảng quản trị: sửa lỗi hiện icon ngôi nhà thành icon xóa (`delete`) màu đỏ nổi bật (`.admin-btn-icon.danger`).
+  3. Bổ sung các biểu tượng còn thiếu trong `Icon.jsx` (`manage_search`, `visibility_off`, `history`, `copy`, `chat`, `layers`, `sparkle`, `send`, `schedule`, `pending` và các alias `profile`, `people`, `calendar`, `payment`, `contract`, `invoice`, `heart`, `repair`, `support`, `checkout`, `price`, `area`), loại bỏ triệt để việc fallback về icon ngôi nhà.
+  4. Gỡ bỏ toàn bộ nút "Làm mới" trên tất cả các tab Admin (`AdminDashboardTab`, `AdminUsersTab`, `AdminEmployeesTab`, `AdminBranchesTab`, `AdminRoomsTab`, `AdminServicesTab`, `AdminConditionsTab`, `AdminAssetsTab`) theo thói quen F5 của người dùng.
+- File đã sửa:
+  + `web/frontend/src/components/common/Icon.jsx`: Bổ sung toàn bộ SVG shapes và aliases còn thiếu.
+  + `web/frontend/src/pages/admin/admin-nam4.css`: Căn chỉnh `.search-icon`, định nghĩa style chuẩn cho `.admin-btn-icon` và `.admin-btn-icon.danger` (màu đỏ, hover solid đỏ).
+  + `web/frontend/src/pages/admin/tabs/AdminUsersTab.jsx`: Thay thế toàn bộ `material-symbols-outlined` bằng `<Icon name="..." />`, đổi icon "Đang thuê" sang `meeting_room`, gỡ 2 nút Làm mới, cập nhật cột Thao tác thành nút Xem/Sửa (`edit`) và Khóa/Xóa (`delete` màu đỏ).
+  + `web/frontend/src/pages/admin/tabs/AdminEmployeesTab.jsx`: Gỡ nút Làm mới, cập nhật nút thao tác khóa/xóa sang icon `delete` màu đỏ.
+  + `web/frontend/src/pages/admin/tabs/AdminDashboardTab.jsx`, `AdminBranchesTab.jsx`, `AdminRoomsTab.jsx`, `AdminServicesTab.jsx`, `AdminConditionsTab.jsx`, `AdminAssetsTab.jsx`: Gỡ bỏ toàn bộ nút Làm mới dữ liệu / Làm mới bộ lọc.
+- Kiểm tra & Bằng chứng:
+  + Chạy script kiểm thử trình duyệt thực tế với phiên đăng nhập Admin `nv0013` trên `http://localhost:5173`:
+    * `admin-users-fixed.png`: Thẻ KPI hiển thị đúng 4 biểu tượng SVG sắc nét, thanh tìm kiếm hiển thị icon kính lúp chuẩn xác không đè chữ, cột Thao tác hiển thị icon Sửa và Xóa màu đỏ, nút Làm mới đã biến mất.
+    * `admin-employees-fixed.png`: Cột Thao tác hiển thị nút Sửa và icon Thùng rác (`delete`) màu đỏ, sidebar hiển thị đúng toàn bộ icon chức năng (`gavel`, `inventory_2` không còn bị ngôi nhà).
+    * `admin-dashboard-latest.png`: Bảng điều khiển sạch sẽ, không có lỗi, không còn nút làm mới.
+  + Vite build: `npm run build` PASS (`built in 1m 8s`).
+  + Avalanche UI smoke test: `npm run test:avalanche-ui` PASS.
+  + Backend unit tests: `npm test` trong `web/backend` PASS (131 test: 127 pass, 4 skip, 0 fail).
+  + Blockchain unit tests: `npm test` trong `blockchain` PASS (26 test: 25 pass, 1 skip, 0 fail).

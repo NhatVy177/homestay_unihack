@@ -108,7 +108,52 @@ export function Icon({ name, className = '', style = {} }) {
     policy: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></>,
     favorite: <><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8Z" /></>,
     gavel:<><path d="m14 13-7.5 7.5a2.12 2.12 0 0 1-3-3L11 10" /><path d="m16 16 6-6" /><path d="m8 8 6-6" /><path d="m9 7 8 8" /><path d="m21 11-8-8" /></>,
+    block: <><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></>,
+    person_off: <><circle cx="9" cy="7" r="4" /><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><line x1="2" y1="2" x2="22" y2="22" /></>,
+    toggle_on: <><rect x="1" y="5" width="22" height="14" rx="7" fill="currentColor" fillOpacity="0.2" /><circle cx="16" cy="12" r="5" fill="currentColor" /></>,
+    toggle_off: <><rect x="1" y="5" width="22" height="14" rx="7" /><circle cx="8" cy="12" r="5" /></>,
+    chair: <><path d="M6 19v2M18 19v2M5 11a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4H5zM7 9V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4" /></>,
+    devices: <><rect x="2" y="4" width="14" height="11" rx="2" /><path d="M6 19h6M9 15v4" /><rect x="14" y="8" width="8" height="12" rx="2" /></>,
+    dishwasher: <><rect x="3" y="2" width="18" height="20" rx="2" /><line x1="3" y1="8" x2="21" y2="8" /><circle cx="8" cy="5" r="1" /></>,
+    report_problem: <><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></>,
+    support_agent: <><path d="M12 2a9 9 0 0 0-9 9v4a3 3 0 0 0 3 3h1v-6H5v-1a7 7 0 0 1 14 0v1h-2v6h1a3 3 0 0 0 3-3v-4a9 9 0 0 0-9-9z"/><path d="M19 19a2 2 0 0 1-2 2h-3v-2"/></>,
+    manage_accounts: <><circle cx="10" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/><circle cx="19" cy="11" r="2"/></>,
+    add_business: <><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/><line x1="12" y1="5" x2="12" y2="9"/><line x1="10" y1="7" x2="14" y2="7"/></>,
+    category: <><circle cx="6.5" cy="6.5" r="3.5" /><path d="M14 3h7v7h-7zM3 14h7v7H3z" /><circle cx="17.5" cy="17.5" r="3.5" /></>,
+    construction: <><path d="m14 10 7.5-7.5a2.12 2.12 0 0 1 3 3L17 13" /><path d="m15 13-8 8a2 2 0 0 1-3-3l8-8" /><circle cx="7.5" cy="16.5" r="1.5" /></>,
+    location_on: <><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></>,
+    location_city: <><path d="M3 21h18M6 21V7h6v14M12 21V3h6v18" /><path d="M9 10h.01M9 14h.01M9 18h.01M15 6h.01M15 10h.01M15 14h.01M15 18h.01" /></>,
+    percent: <><line x1="19" y1="5" x2="5" y2="19" /><circle cx="6.5" cy="6.5" r="2.5" /><circle cx="17.5" cy="17.5" r="2.5" /></>,
+    workspace_premium: <><circle cx="12" cy="8" r="6" /><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" /></>,
+    build_circle: <><circle cx="12" cy="12" r="10" /><path d="m14.7 9.3-1.4 1.4M9.3 14.7l1.4-1.4M10 10l4 4" /></>,
+    priority_high: <><circle cx="12" cy="19" r="1" /><line x1="12" y1="5" x2="12" y2="15" /></>,
+    manage_search: <><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /><path d="M8 8h6M8 11h4" /></>,
+    visibility_off: <><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" /><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" /><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" /><line x1="2" y1="2" x2="22" y2="22" /></>,
+    history: <><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M12 7v5l4 2" /></>,
+    copy: <><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></>,
+    chat: <><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></>,
+    layers: <><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></>,
+    sparkle: <><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z" /></>,
+    send: <><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></>,
+    schedule: <><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>,
+    pending: <><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></>,
   };
+
+  // Aliases
+  shapes.profile = shapes.person;
+  shapes.people = shapes.groups;
+  shapes.calendar = shapes.calendar_today;
+  shapes.payment = shapes.payments;
+  shapes.contract = shapes.description;
+  shapes.invoice = shapes.receipt_long;
+  shapes.heart = shapes.favorite;
+  shapes.repair = shapes.build;
+  shapes.support = shapes.support_agent;
+  shapes.checkout = shapes.logout;
+  shapes.price_check = shapes.payments;
+  shapes.price = shapes.payments;
+  shapes.area = shapes.map;
+  shapes.explore = shapes.map;
 
   return (
     <svg className={`kp-line-icon ui-icon ${className}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={style}>

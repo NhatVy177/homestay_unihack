@@ -393,14 +393,6 @@ export default function AdminAssetsTab() {
             </option>
           ))}
         </select>
-        <button
-          onClick={() => { setSearch(''); setFilterStatus(''); setFilterCategory(''); setFilterBranchId(''); }}
-          className="admin-btn-refresh"
-          title="Làm mới bộ lọc"
-        >
-          <Icon name="refresh" size={18} />
-          <span>Làm mới</span>
-        </button>
       </div>
 
       {/* Table */}

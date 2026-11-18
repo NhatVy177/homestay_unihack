@@ -275,14 +275,6 @@ export default function AdminConditionsTab() {
           <option value="medium">Quan trọng</option>
           <option value="low">Khuyến nghị</option>
         </select>
-        <button
-          onClick={() => { setSearch(''); setFilterCategory(''); setFilterPriority(''); }}
-          className="admin-btn-refresh"
-          title="Làm mới bộ lọc"
-        >
-          <Icon name="refresh" size={18} />
-          <span>Làm mới</span>
-        </button>
       </div>
 
       {/* Condition Card List */}

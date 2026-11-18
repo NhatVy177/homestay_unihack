@@ -70,9 +70,12 @@
   position: relative;
 }
 .admin-filter-search .search-icon {
+  align-items: center;
   color: var(--color-text-muted);
-  font-size: 20px;
+  display: flex;
+  justify-content: center;
   left: 12px;
+  pointer-events: none;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -487,5 +490,52 @@
   padding: 4px;
   display: inline-flex;
   align-items: center;
+}
+
+/* ── Action buttons in tables and drawers ── */
+.admin-btn-icon,
+.admin-icon-btn {
+  align-items: center;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text);
+  cursor: pointer;
+  display: inline-flex;
+  height: 32px;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.15s ease;
+  width: 32px;
+}
+.admin-btn-icon:hover,
+.admin-icon-btn:hover {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.admin-btn-icon.danger,
+.admin-icon-btn.danger {
+  background: rgba(220, 53, 69, 0.08);
+  border-color: rgba(220, 53, 69, 0.3);
+  color: #dc3545;
+}
+.admin-btn-icon.danger:hover,
+.admin-icon-btn.danger:hover {
+  background: #dc3545;
+  border-color: #dc3545;
+  color: #ffffff;
+}
+.admin-btn-icon.success,
+.admin-icon-btn.success {
+  background: rgba(25, 135, 84, 0.08);
+  border-color: rgba(25, 135, 84, 0.3);
+  color: #198754;
+}
+.admin-btn-icon.success:hover,
+.admin-icon-btn.success:hover {
+  background: #198754;
+  border-color: #198754;
+  color: #ffffff;
 }
 

@@ -140,14 +140,6 @@ export default function AdminDashboardTab() {
             {todayLabel}
           </p>
         </div>
-        <button
-          className="admin-btn-sm secondary"
-          type="button"
-          onClick={loadData}
-          style={{ display: 'flex', alignItems: 'center', gap: 6 }}
-        >
-          <Icon name="refresh" size={16} /> Làm mới dữ liệu
-        </button>
       </div>
 
       {/* ── KPI Grid ── */}

@@ -249,14 +249,6 @@ export default function AdminBranchesTab() {
           <option value="active">Đang hoạt động</option>
           <option value="inactive">Tạm dừng</option>
         </select>
-        <button
-          onClick={() => { setSearch(''); setFilterStatus(''); }}
-          className="admin-btn-refresh"
-          title="Làm mới bộ lọc"
-        >
-          <Icon name="refresh" size={18} />
-          <span>Làm mới</span>
-        </button>
       </div>
 
       {/* Branch Card Grid */}
