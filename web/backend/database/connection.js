@@ -1,10 +1,18 @@
 import dotenv from 'dotenv';
 import tediousSql from 'mssql';
-import msv8Sql from 'mssql/msnodesqlv8.js';
+import { createRequire } from 'node:module';
 
 dotenv.config();
 
+const require = createRequire(import.meta.url);
 let poolPromise;
+
+// Driver ODBC (đăng nhập Windows) chỉ nạp khi cần: trên Linux/Azure không có và không cần, dùng tedious với DB_USER/DB_PASS.
+let msv8Cache;
+function loadMsv8() {
+  msv8Cache ??= require('mssql/msnodesqlv8.js');
+  return msv8Cache;
+}
 
 function readEnv(name, fallback = '', { trim = true } = {}) {
   const value = process.env[name] ?? fallback;
@@ -18,7 +26,7 @@ function isTrustedConnection() {
 }
 
 function getSqlDriver() {
-  return isTrustedConnection() ? msv8Sql : tediousSql;
+  return isTrustedConnection() ? loadMsv8() : tediousSql;
 }
 
 function getConfig() {
@@ -65,8 +73,8 @@ function getConfig() {
     user,
     password,
     options: {
-      encrypt: false,
-      trustServerCertificate: true,
+      encrypt: readEnv('DB_ENCRYPT', 'false').toLowerCase() === 'true',
+      trustServerCertificate: readEnv('DB_TRUST_CERT', 'true').toLowerCase() !== 'false',
       useUTC: false,
       ...(!hasPort && instanceName ? { instanceName } : {})
     }
@@ -109,7 +117,7 @@ export async function executeQuery(sqlString, parameters = []) {
   return request.query(sqlString);
 }
 
-export const sql = new Proxy(msv8Sql, {
+export const sql = new Proxy(tediousSql, {
   get(target, prop) {
     const driver = getSqlDriver();
     return driver[prop] ?? target[prop];

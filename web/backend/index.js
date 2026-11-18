@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import { existsSync } from 'node:fs';
 import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -64,6 +65,11 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '8mb' }));
 app.use('/uploads', express.static(path.join(backendDir, 'uploads')));
+
+// Triển khai một cổng (Azure): backend phục vụ luôn bản build của giao diện. Không có thư mục build thì bỏ qua (chạy dev như cũ).
+const webDist = process.env.WEB_DIST || path.join(backendDir, '..', 'frontend', 'dist');
+const serveWeb = existsSync(path.join(webDist, 'index.html'));
+if (serveWeb) app.use(express.static(webDist, { index: false, maxAge: '1h' }));
 app.use((req, res, next) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   next();
@@ -98,6 +104,9 @@ app.use('/api/accountant/doi-soat', requireAuth, auditMutations({ chucNang: 'Đ�
 app.use('/api/ke-toan/hoa-don-dinh-ky', requireAuth, auditMutations({ chucNang: 'Hóa đơn định kỳ', doiTuong: 'HoaDon' }), hoaDonDinhKyRoutes);
 app.use('/api/hop-dong', requireAuth, auditMutations({ chucNang: 'Hợp đồng thuê', doiTuong: 'HopDongThue' }), hopDongRoutes);
 
+if (serveWeb) {
+  app.get(/^\/(?!api\/|uploads\/|chia-se\/).*/, (req, res) => res.type('html').sendFile(path.join(webDist, 'index.html')));
+}
 app.use(notFound);
 app.use(errorHandler);
 
