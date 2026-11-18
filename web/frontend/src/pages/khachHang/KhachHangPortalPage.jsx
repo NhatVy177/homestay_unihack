@@ -853,7 +853,17 @@ export default function KhachHangPortalPage() {
       incomingRoomHandled.current = roomId;
       setActiveTab('kham-pha');
       openRentForm(normalizeRoomDetail(data), params.get('dangKy') === 'nhom' ? { group: true } : {});
-      params.delete('phong'); params.delete('dangKy');
+      // Link chốt phòng của Sale (/chot/<mã>) mang theo ngày giờ hẹn xem và nguồn khách: điền sẵn vào form.
+      const ngayXem = params.get('ngayXem'), gioXem = params.get('gioXem'), nguon = params.get('nguon'), tuSale = params.get('tuSale');
+      if (ngayXem || gioXem || nguon) {
+        setRentForm((current) => ({
+          ...current,
+          ...(ngayXem ? { ngayXemMongMuon: ngayXem } : {}),
+          ...(gioXem ? { ghiChuThoiGian: `lúc ${gioXem}, đã hẹn với Sale${tuSale ? ` ${tuSale}` : ''}` } : {}),
+          ...(nguon ? { nguonKhach: nguon } : {}),
+        }));
+      }
+      ['phong', 'dangKy', 'ngayXem', 'gioXem', 'nguon', 'tuSale'].forEach((key) => params.delete(key));
       navigate({ pathname: location.pathname, search: `?${params.toString()}` }, { replace: true });
     }).catch(requestError => {
       if (active) setToast(requestError.response?.data?.message || 'Không thể tải phòng đã chọn. Vui lòng chọn lại phòng.');

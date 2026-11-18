@@ -5,6 +5,7 @@ import { getAuthenticatedHomePath } from './auth/auth.routes.js';
 
 import TrangChu from './pages/TrangChu.jsx';
 import ChiTietPhongPage from './pages/chiTietPhong/ChiTietPhongPage.jsx';
+import ChotPhongPage from './pages/chiTietPhong/ChotPhongPage.jsx';
 import DanhSachPhongPage from './pages/danhSachPhong/DanhSachPhongPage.jsx';
 import DichVuPage from './pages/dichVu/DichVuPage.jsx';
 import KhachHangPortalPage from './pages/khachHang/KhachHangPortalPage.jsx';
@@ -72,6 +73,7 @@ export default function App() {
       <Route path="/" element={<TrangChu />} />
       <Route path="/kham-pha-phong" element={<LegacyExploreRedirect />} />
       <Route path="/phong/:maPhong" element={<ChiTietPhongPage />} />
+      <Route path="/chot/:token" element={<ChotPhongPage />} />
       <Route path="/phong" element={<DanhSachPhongPage />} />
       <Route path="/dich-vu" element={<DichVuPage />} />
       <Route path="/ho-so-xac-nhan" element={<ProtectedRoute><Suspense fallback={<LoadingScreen />}><AvalanchePortal /></Suspense></ProtectedRoute>} />

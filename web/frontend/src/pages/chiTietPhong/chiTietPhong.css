@@ -1,1 +1,6 @@
 .ctp { padding-bottom: 24px; }
+.ctp-offer { display: flex; gap: var(--space-4); align-items: flex-start; width: min(980px, 100%); margin: 0 auto var(--space-5); box-sizing: border-box; padding: var(--space-5); border-left: 4px solid var(--color-primary); }
+.ctp-offer-icon { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--radius-pill); background: var(--color-primary-soft); color: var(--color-primary); }
+.ctp-offer strong { font-size: 16px; }
+.ctp-offer p { margin: var(--space-1) 0 0; font-size: 14px; color: var(--color-text-muted); }
+.ctp-offer .ctp-offer-note { color: var(--color-text); }

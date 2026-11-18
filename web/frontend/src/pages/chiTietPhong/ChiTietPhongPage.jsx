@@ -11,8 +11,11 @@ import './chiTietPhong.css';
 
 // Chi tiết một phòng (công khai, không cần tài khoản): /phong/<mã phòng>. Đăng ký thuê (một mình hoặc theo nhóm) cần đăng nhập
 // và giữ lại phòng đã chọn. Trang danh sách phòng nằm ở /phong; liên kết cũ /kham-pha-phong?phong=<mã> được chuyển về đây.
-export default function ChiTietPhongPage() {
-  const { maPhong } = useParams();
+// roomCode/banner/registerQuery: dùng khi mở từ link chốt phòng của Sale (/chot/<mã>): giới thiệu của Sale ở đầu trang, và
+// khi đăng ký thì mang theo giờ hẹn + nguồn khách để form điền sẵn.
+export default function ChiTietPhongPage({ roomCode, banner = null, registerQuery = '' }) {
+  const params = useParams();
+  const maPhong = roomCode || params.maPhong;
   const navigate = useNavigate();
   const location = useLocation();
   const backToRooms = () => navigate('/phong', { state: location.state });
@@ -31,13 +34,14 @@ export default function ChiTietPhongPage() {
   }, [maPhong, attempt]);
 
   function goRegister(mode = '1') {
-    const target = room?.maPhong ? `/khach-hang?tab=kham-pha&phong=${encodeURIComponent(room.maPhong)}&dangKy=${mode === 'nhom' ? 'nhom' : '1'}` : '/khach-hang';
+    const target = room?.maPhong ? `/khach-hang?tab=kham-pha&phong=${encodeURIComponent(room.maPhong)}&dangKy=${mode === 'nhom' ? 'nhom' : '1'}${registerQuery ? `&${registerQuery}` : ''}` : '/khach-hang';
     if (user) navigate(user.vaiTro === 'KhachHang' ? target : getAuthenticatedHomePath(user));
     else navigate(`/?next=${encodeURIComponent(target)}`);
   }
 
   return <PublicLayout>
     <div className="pl-wrap ctp">
+      {banner}
       {loading && <div className="kp-loading" role="status"><span /><p>Đang tải chi tiết phòng...</p></div>}
       {error && <div className="kp-detail-error" role="alert"><h1>Chưa thể mở phòng</h1><p>{error}</p>
         <button className="kp-btn kp-btn-soft" type="button" onClick={backToRooms}>Quay lại khám phá phòng</button>
