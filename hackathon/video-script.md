@@ -1,71 +1,68 @@
-# Kịch bản video demo (2:40)
+# Kịch bản video demo vòng 1 (3:00)
 
-Bản nháp ngày 11/11/2026 (việc D3, J-C063).
+Bản ngày 18/11/2026, thay bản nháp 11/11 (J-C063). Vòng 1 chấm **kỹ thuật** và **mức tích hợp Avalanche**, nên video ưu tiên: hệ thống chạy thật, Avalanche gắn đúng chỗ cần, và bằng chứng kiểm chứng được (Snowtrace, trang kiểm chứng, khôi phục từ chuỗi). Giao diện đẹp để vòng sau.
 
-Theo D-018 mục 3, video bắt đầu từ một hợp đồng chuẩn bị sẵn ở bước "Chờ bàn giao". Phần Web2 phía trước nằm ở slide trang 3. Luồng demo theo bảng kiểm Fuji của việc A3 (`spec/kiem-thu-fuji.md`, chưa viết).
+## Ba điều giám khảo phải nhớ
 
-Chia thời gian:
+1. **Avalanche giải đúng một nỗi đau thật:** cãi nhau tiền cọc. Chỉ hai thời điểm cần cả hai bên đồng ý mới lên chuỗi: khách xác nhận biên bản bàn giao, khách đồng ý bản đối soát cọc.
+2. **Khách không cần biết blockchain:** đăng nhập email, nhập mã OTP, không cài ví, không cần AVAX. Ví nhúng Privy, chữ ký EIP-712, relayer trả gas.
+3. **Kiểm chứng được, không phải lời hứa:** 2 contract trên Fuji (DormSettlement đã verify Sourcify, DormPoints), trang tự kiểm chứng file, dựng lại hồ sơ từ chuỗi khi mất database.
 
-| Đoạn | Thời gian | Thời lượng |
+## Chia thời gian
+
+| Đoạn | Thời gian | Mục đích |
 |---|---|---|
-| Mở đầu | 0:00–0:10 | 10 giây |
-| Demo liền mạch | 0:10–2:00 | 110 giây |
-| Vì sao Avalanche và giới hạn | 2:00–2:30 | 30 giây |
-| Kết | 2:30–2:40 | 10 giây |
+| 1. Mở đầu: vấn đề | 0:00–0:12 | Gây chú ý bằng nỗi đau thật |
+| 2. Nền Web2 chạy thật | 0:12–0:35 | Chứng minh đây là hệ thống đầy đủ, không phải demo một nút |
+| 3. Mốc 1: bàn giao trên Avalanche | 0:35–1:15 | Ví nhúng, EIP-712, relayer, có phiên bản |
+| 4. Mốc 2: đối soát cọc có tranh chấp | 1:15–1:50 | Phản đối, bản mới, giữ bản cũ, contract tự tính tiền |
+| 5. Kiểm chứng độc lập + khôi phục | 1:50–2:12 | Điểm kỹ thuật mạnh nhất |
+| 6. Điểm thưởng DormPoints | 2:12–2:32 | Avalanche dùng cho cả giữ chân khách |
+| 7. Kỹ thuật và vì sao Avalanche | 2:32–2:52 | Kiến trúc, gas đo thật, riêng tư |
+| 8. Kết | 2:52–3:00 | Link repo, contract |
 
-Còn 10–20 giây trống trước mốc 3 phút để bù khi nói chậm.
+Lời nói khoảng 3,5 tiếng mỗi giây. Cắt bỏ mọi đoạn chờ (OTP, giao dịch, tải trang) khi dựng.
 
-Lời nói viết để đọc tự nhiên, không quá 3,5 tiếng mỗi giây. Chữ trên màn hình ở cột giữa là mô tả gần đúng; khi quay, dùng đúng chữ giao diện đang hiện. Đoạn chờ OTP, chờ giao dịch thì cắt khi dựng, không để màn hình đứng yên.
+## Kịch bản chi tiết
 
-## Kịch bản
-
-| Giây | Hình trên màn | Lời nói |
+| Giây | Quay gì trên màn hình | Lời đọc (lồng tiếng) |
 |---|---|---|
-| 0:00–0:10 | Ảnh nệm rách → logo HomeStayDorm. Chữ nhỏ góc dưới: "Fuji testnet · dữ liệu giả · cổng thanh toán mô phỏng" | "Trả phòng là lúc hay cãi nhau về tiền cọc. HomeStayDorm cho người thuê tự xác nhận trên Avalanche. Video dùng mạng thử Fuji, dữ liệu giả và cổng thanh toán mô phỏng." |
-| 0:10–0:22 | **Quản lý**, tab Bàn giao phòng: hợp đồng demo ở "Chờ bàn giao", kỳ đầu đã trả. Bấm lập biên bản, điền tài sản, phát hành. Bản này chưa ghi vết rách nệm | "Khách đã trả kỳ đầu qua ví mô phỏng. Quản lý lập biên bản bàn giao trên web và phát hành, khách nhận ngay trong tài khoản và qua email." |
-| 0:22–0:34 | **Khách**, tab Hợp đồng: đọc biên bản, bấm "Yêu cầu chỉnh sửa", gõ "Nệm có vết rách sẵn ở góc, nhờ ghi vào biên bản" | "Khách thấy biên bản thiếu vết rách có sẵn trên nệm, nên yêu cầu sửa thay vì xác nhận." |
-| 0:34–0:44 | **Quản lý**: mở yêu cầu, thêm dòng "Nệm: rách góc" kèm ảnh, phát hành bản mới. Lịch sử hiện hai bản | "Quản lý phát hành bản mới. Bản cũ vẫn được giữ, không bị ghi đè." |
-| 0:44–1:00 | **Khách**: bấm "Xác nhận", khung nhập mã 6 số hiện trong trang. Cắt sang hộp thư lấy mã, nhập mã. Hiện "Bạn đã xác nhận biên bản lúc …", nút tải bản lưu | "Khách bấm xác nhận và nhập mã gửi về email, chỉ lần đầu. Không cài ví, không cần tiền gas. Khách chỉ thấy đã xác nhận lúc nào và tải được bản lưu." |
-| 1:00–1:08 | **Quản lý**, tab "Khách xác nhận biên bản": dòng "Đã ghi nhận", mã giao dịch; bấm mở explorer Fuji 2 giây | "Phía bên cho thuê thấy giao dịch đã ghi trên Avalanche." |
-| 1:08–1:20 | Chữ chuyển cảnh "Vài tháng sau: trả phòng". **Kế toán**, tab Quyết toán trả phòng: đối soát bản 1, cọc 3.000.000 đ, trừ 500.000 đ khoản khác và 400.000 đ "nệm rách", hoàn 2.100.000 đ. Gửi khách | "Khi trả phòng, kế toán gửi bảng đối soát: cọc 3 triệu, trừ cả 400 nghìn tiền nệm rách." |
-| 1:20–1:32 | **Khách**: mở đối soát, bấm "Phản đối", gõ "Vết rách đã ghi trong biên bản bàn giao tôi đã xác nhận" | "Khách phản đối, vì vết rách đã nằm trong biên bản lúc nhận phòng. Lý do phản đối cũng được ghi lại trên chuỗi dưới dạng mã băm." |
-| 1:32–1:42 | **Kế toán**: xem lý do, lập bản 2 bỏ khoản nệm, hoàn 2.500.000 đ. Lịch sử hiện bản 1 "Khách phản đối", bản 2 "Chờ khách" | "Kế toán xem lại và lập bản hai, hoàn 2 triệu rưỡi. Bản một vẫn còn trong lịch sử." |
-| 1:42–1:50 | **Khách**: bấm "Đồng ý", hiện "Bạn đã đồng ý kết quả đối soát lúc …", tải bản lưu | "Khách đồng ý bản hai và giữ bản lưu trong máy." |
-| 1:50–1:56 | Trang `/kiem-chung-avalanche`: chọn file bản lưu → "Khớp", bản 2 là bản mới nhất | "Ai có file này đều tự kiểm tra được, chỉ cần mạng công khai, không cần hỏi bên cho thuê." |
-| 1:56–2:00 | Mở file trong trình soạn thảo, đổi 2500000 thành 3000000, chọn lại → "File đã bị sửa" | "Sửa một con số là trang báo ngay." |
-| 2:00–2:15 | Explorer: trang contract có dấu đã verify source, danh sách 6 giao dịch của hồ sơ | "Em dùng Avalanche C-Chain vì tương thích EVM, viết contract bằng Solidity với chữ ký có cấu trúc EIP-712. Mã nguồn contract đã verify trên explorer." |
-| 2:15–2:30 | Slide giới hạn (trang 9) | "Giới hạn: đây là xác nhận điện tử bổ sung, hợp đồng vẫn ký giấy. Chuỗi không phán vết rách thật hay giả và không giữ tiền. Khóa vận hành chưa phải multisig, contract chưa kiểm toán." |
-| 2:30–2:40 | Slide kết: repo, link contract trên explorer | "Mã nguồn và địa chỉ contract ở trên màn hình. Cảm ơn ban giám khảo." |
+| 0:00–0:12 | Ảnh cận cảnh nệm rách → bảng trừ cọc viết tay → logo HomeStayDorm. Chữ nhỏ góc dưới: "Avalanche Fuji · dữ liệu demo · thanh toán sandbox" | "Trả phòng ký túc xá, chuyện cãi nhau tiền cọc gần như ai cũng gặp. Vết rách có từ trước bị tính là hư mới, biên bản giấy thì thất lạc. HomeStayDorm giải quyết chuyện đó bằng Avalanche." |
+| 0:12–0:20 | Trang chủ → danh sách phòng → chi tiết phòng (ảnh, giới tính, dịch vụ) → bấm "Tôi quan tâm phòng này" | "Đây là hệ thống quản lý thuê phòng chạy thật: khách tìm phòng, gửi nhu cầu thuê," |
+| 0:20–0:28 | Màn **Sale**: lịch hẹn xem phòng → **Khách**: trang thanh toán cọc, bấm MoMo → mã QR MoMo Sandbox hiện ra | "Sale xếp lịch xem, khách đặt cọc qua QR chuyển khoản hoặc MoMo sandbox," |
+| 0:28–0:35 | Lướt nhanh 5 màn: Quản lý, Kế toán (hóa đơn tháng), Admin. Chữ: "5 vai trò · nhiều chi nhánh · React + Express + SQL Server" | "rồi hợp đồng, hóa đơn hằng tháng, báo hỏng, trả phòng, cho năm vai trò và nhiều chi nhánh." |
+| 0:35–0:45 | **Quản lý**, Bàn giao phòng: hợp đồng ở "Chờ bàn giao", lập biên bản tài sản, bấm Phát hành | "Avalanche chỉ xuất hiện ở hai lúc cần cả hai bên đồng ý. Lúc một: nhận phòng. Quản lý lập biên bản bàn giao và phát hành." |
+| 0:45–0:55 | **Khách**, tab Hợp đồng: đọc biên bản, bấm "Yêu cầu chỉnh sửa", gõ "Nệm có vết rách sẵn ở góc" → **Quản lý** phát hành bản 2, lịch sử hiện 2 bản | "Khách thấy thiếu vết rách có sẵn trên nệm nên yêu cầu sửa. Quản lý phát hành bản hai, bản một vẫn được giữ." |
+| 0:55–1:07 | **Khách** bấm Xác nhận → khung nhập mã 6 số → (cắt) nhập mã từ email → "Bạn đã xác nhận biên bản lúc …" | "Khách bấm xác nhận và nhập mã gửi về email. Phía sau, ví nhúng Privy ký chữ ký EIP-712 gắn đúng phiên bản này. Khách không cài ví, không cần tiền gas." |
+| 1:07–1:15 | **Quản lý** thấy "Đã ghi nhận" + mã giao dịch → bấm mở Snowtrace, giao dịch `confirm` thành công | "Relayer của hệ thống trả phí gas và gửi giao dịch. Relayer không thể giả chữ ký của khách, contract chỉ nhận đúng chữ ký của ví khách." |
+| 1:15–1:25 | Chữ chuyển cảnh "Vài tháng sau: trả phòng". **Kế toán** lập đối soát bản 1: cọc 3.000.000đ, trừ 400.000đ "nệm rách", hoàn còn lại. Gửi khách | "Lúc hai: trả phòng. Kế toán gửi bảng đối soát, trừ cả bốn trăm nghìn tiền nệm rách." |
+| 1:25–1:35 | **Khách** bấm "Phản đối", gõ "Vết rách đã ghi trong biên bản tôi xác nhận lúc nhận phòng" | "Khách phản đối, vì vết rách đã nằm trong biên bản lúc nhận phòng. Lý do phản đối cũng được ghi lên chuỗi dưới dạng mã băm." |
+| 1:35–1:50 | **Kế toán** lập bản 2 bỏ khoản nệm → **Khách** bấm "Đồng ý" → "Bạn đã đồng ý kết quả đối soát lúc …", tải bản lưu | "Kế toán lập bản hai, contract tự tính số tiền hoàn. Khách đồng ý và giữ một bản lưu trong máy. Cả hai phiên bản đều nằm trên chuỗi, không ai sửa kín được." |
+| 1:50–2:02 | Trang `/kiem-chung-avalanche`: chọn file bản lưu → "Khớp". Mở file, đổi số tiền hoàn, chọn lại → "File đã bị sửa" | "Ai có file này đều tự kiểm tra được, chỉ cần mạng công khai, không cần hỏi bên cho thuê. Sửa một con số là trang báo ngay." |
+| 2:02–2:12 | Terminal chạy `npm run avalanche:recover`: liệt kê hồ sơ dựng lại từ sự kiện trên chuỗi, so với database | "Và nếu bên cho thuê mất hay sửa database, lệnh này đọc sự kiện trên chuỗi để dựng lại khách đã đồng ý bản nào, số tiền bao nhiêu." |
+| 2:12–2:22 | **Kế toán** ghi nhận hóa đơn tháng trả đúng hạn → **Khách**, Thông tin cá nhân → ô Điểm thưởng: "+100 điểm", trạng thái "Đã cộng điểm" | "Avalanche còn giúp giữ chân khách. Trả hóa đơn đúng hạn, khách nhận một trăm điểm DormPoints trên Fuji." |
+| 2:22–2:32 | Khách bấm "Đổi ưu đãi" → ký → hóa đơn kỳ sau có dòng "giảm 20.000đ" và link Snowtrace | "Khách ký để đổi điểm lấy ưu đãi hai mươi nghìn ở hóa đơn kỳ sau. Mỗi lần cộng và đổi điểm đều có giao dịch kiểm chứng được." |
+| 2:32–2:44 | Slide kiến trúc: Web2 (React, Express, SQL Server) ↔ relayer ↔ 2 contract trên C-Chain; bảng "lên chuỗi / không lên chuỗi" | "Về kỹ thuật: hai contract Solidity trên Avalanche C-Chain, chữ ký có cấu trúc EIP-712, OpenZeppelin và viem. Tên, CCCD, ảnh không bao giờ lên chuỗi, chỉ có mã băm và số tiền." |
+| 2:44–2:52 | Snowtrace / Sourcify: contract DormSettlement có dấu verify; slide số liệu: gas ≈ 430.000 cho trọn vòng một hợp đồng, số bài test | "Mã nguồn đã verify. Cả vòng đời một hợp đồng chỉ tốn khoảng bốn trăm ba mươi nghìn gas, đo từ giao dịch thật trên Fuji." |
+| 2:52–3:00 | Slide kết: tên đội, link GitHub, địa chỉ 2 contract | "HomeStayDorm: thuê phòng minh bạch, khách tự giữ bằng chứng. Cảm ơn ban giám khảo." |
 
-## Dữ liệu cần chuẩn bị trước khi quay
+## Dữ liệu và tab cần chuẩn bị trước khi quay
 
-Tất cả là dữ liệu giả. Không dùng tên, số điện thoại, CCCD thật.
+1. **Ba cửa sổ Chrome riêng profile:** Quản lý, Kế toán, Khách. Mỗi cửa sổ 1440px, zoom 110%, ẩn thanh dấu trang.
+2. **Hợp đồng demo ở "Chờ bàn giao"** trên HOMEDORM4, kỳ đầu đã trả, khách đã xác nhận chính sách cọc, Sale đã tải ảnh hợp đồng giấy.
+3. **Tài khoản khách chưa từng xác nhận** để quay bước nhập mã lần đầu; một tài khoản dự phòng. Hộp thư nhận OTP mở sẵn ở tab riêng (`MAIL_REDIRECT_TO`).
+4. **Hồ sơ trả phòng** đã qua bước quản lý kiểm tra, để kế toán lập đối soát (cọc 3.000.000đ, bản 1 trừ 400.000đ nệm rách).
+5. **Điểm thưởng:** một hóa đơn tháng (không phải kỳ đầu) của khách demo, chưa trả, để kế toán ghi nhận đúng hạn khi quay. Backend và frontend đã chạy lại sau khi bật `LOYALTY_*`.
+6. **MoMo:** backend đã chạy lại sau khi thêm khóa `MOMO_TEST_*`. Chỉ cần quay cảnh QR hiện ra.
+7. **Tab mở sẵn:** Snowtrace contract DormSettlement và DormPoints, Sourcify verify, trang `/kiem-chung-avalanche`, terminal ở `web/backend`.
+8. **File để thử sửa:** bản sao file lưu đối soát mở sẵn trong trình soạn thảo, con trỏ đặt ở số tiền hoàn.
+9. **Slide** kiến trúc, số liệu và slide kết đã xuất ảnh để chèn.
 
-1. **Contract đã deploy và verify trên Fuji** (việc A2). Ví relayer, "quản lý", "kế toán" còn đủ AVAX thử cho ít nhất 2 lượt quay (mỗi lượt 6 giao dịch).
-2. **Tài khoản khách demo** có email mở được trên máy quay, để nhận mã OTP. Nên dùng tài khoản chưa từng xác nhận, để quay được bước nhập mã lần đầu. Chuẩn bị thêm một tài khoản dự phòng.
-3. **Hợp đồng demo ở "Chờ bàn giao"**, làm theo luồng Web2 thật hoặc theo cách ghi trong `spec/kiem-thu-fuji.md`. Không sửa dữ liệu khác trong CSDL. Hợp đồng cần đủ ba điều kiện:
-   - kỳ đầu đã trả qua ví mô phỏng;
-   - khách đã xác nhận chính sách hoàn cọc;
-   - Sale đã tải ảnh hợp đồng giấy đã ký (điều kiện của gói bàn giao v2, D-034).
-4. **Ảnh nệm có vết rách** để đính vào biên bản.
-5. **Hồ sơ trả phòng:** sau khi quay xong đoạn bàn giao, quản lý làm bước kiểm tra trả phòng trước, để kế toán có dữ liệu lập đối soát. Số tiền dùng đúng như kịch bản:
+## Cách quay và dựng
 
-   | Mục | Số tiền |
-   |---|---|
-   | Cọc | 3.000.000 đ |
-   | Bản 1: trừ khoản khác | 500.000 đ |
-   | Bản 1: trừ nệm rách | 400.000 đ |
-   | Bản 1: hoàn | 2.100.000 đ |
-   | Bản 2: hoàn (bỏ khoản nệm) | 2.500.000 đ |
-6. **Ba cửa sổ trình duyệt dùng hồ sơ (profile) riêng** cho quản lý, kế toán, khách, để phiên đăng nhập và ví không lẫn nhau. Mỗi cửa sổ rộng 1440px, phóng to 110%, ẩn thanh dấu trang.
-7. **Email:** `MAIL_REDIRECT_TO` trỏ về hộp thư demo; mở sẵn hộp thư ở một tab.
-8. **File để thử sửa:** chép sẵn một bản của file bản lưu đối soát, mở trong trình soạn thảo, đặt con trỏ ở số tiền hoàn.
-9. **Explorer:** mở sẵn tab trang contract và tab danh sách giao dịch.
-10. **Slide trang 9 và trang 10** đã dựng xong để chèn vào cuối video.
-
-## Cách quay
-
-- Quay từng đoạn theo bảng, mỗi đoạn một lần thu, rồi ghép. Thu lời nói riêng sau khi ghép hình để khớp giây.
-- Thử trọn luồng một lần trước buổi quay (việc A3). Ghi lại mã giao dịch thật để điền README mục 3.4.
-- Nếu một giao dịch lỗi trong lúc quay, giữ nguyên hồ sơ, không sửa CSDL bằng tay. Dùng hồ sơ dự phòng và quay lại đoạn đó.
-- Xuất 1080p, kiểm tra tiếng rõ. Mở link video bằng cửa sổ ẩn danh trước khi nộp.
+- Quay từng đoạn theo bảng, mỗi đoạn một lần thu, rồi ghép. Thu lời sau khi ghép hình để khớp giây.
+- Chạy thử trọn luồng một lần trước khi quay để chắc các giao dịch Fuji thành công; ví quản lý, kế toán, relayer và ví điểm thưởng phải còn AVAX test.
+- Giao dịch lỗi khi quay: giữ nguyên hồ sơ, dùng hồ sơ dự phòng, không sửa database bằng tay.
+- Khi giao dịch hiện trên Snowtrace, phóng to vùng "Success" và tên hàm 1–2 giây để giám khảo kịp thấy.
+- Phụ đề tiếng Việt chạy dưới; chữ trên màn hình dùng đúng nhãn giao diện đang hiện.
+- Xuất 1080p, nhạc nền nhỏ dưới giọng đọc. Mở link video bằng cửa sổ ẩn danh trước khi nộp.
