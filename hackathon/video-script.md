@@ -12,8 +12,8 @@ Bản ngày 18/11/2026, thay bản nháp 11/11 (J-C063). Vòng 1 chấm **kỹ t
 
 | Đoạn | Thời gian | Nội dung |
 |---|---|---|
-| 1. Vì sao HomeStayDorm | 0:00–0:26 | Nhu cầu thuê phòng, tìm phòng qua Facebook/Zalo, chủ nhà quản lý thủ công, tranh chấp cọc |
-| 2. Luồng thuê phòng trên Web2 | 0:26–1:00 | Lọc phòng, chia sẻ link, quan tâm/thuê nhóm, Sale xếp lịch, cọc MoMo Sandbox, hợp đồng |
+| 1. Vì sao HomeStayDorm | 0:00–0:10 | Tìm phòng qua Facebook/Zalo rời rạc, chủ nhà quản lý thủ công, tranh chấp cọc |
+| 2. Luồng thuê phòng trên Web2 | 0:10–1:00 | Lọc phòng, chia sẻ link, quan tâm/thuê nhóm, Sale xếp lịch, đổi/hủy lịch, kết quả buổi xem, duyệt và thanh toán cọc, cư trú, hợp đồng, kỳ đầu |
 | 3. Mốc 1: bàn giao trên Avalanche | 1:00–1:35 | Phiên bản biên bản, ví nhúng, EIP-712, relayer, Snowtrace |
 | 4. Đang ở và Mốc 2: đối soát cọc | 1:35–2:06 | Hóa đơn, báo hỏng, phản đối, bản 2, contract tự tính tiền |
 | 5. Kiểm chứng độc lập + khôi phục | 2:06–2:20 | Trang kiểm chứng, lệnh khôi phục từ chuỗi |
@@ -21,21 +21,20 @@ Bản ngày 18/11/2026, thay bản nháp 11/11 (J-C063). Vòng 1 chấm **kỹ t
 | 7. Kỹ thuật | 2:34–2:53 | Kiến trúc, riêng tư, verify, gas đo thật |
 | 8. Kết | 2:53–3:00 | Câu chốt |
 
-Lời đọc khoảng 4,5–5 tiếng mỗi giây (tự nhiên, hơi nhanh). Hình chạy theo lời, cắt bỏ mọi đoạn chờ (OTP, giao dịch, tải trang). Nếu thu xong vẫn dư thời gian, cắt dòng 1:35–1:43 hoặc đoạn 6 trước.
+Lời đọc khoảng 4,5–5 tiếng mỗi giây (tự nhiên, hơi nhanh). Hình chạy theo lời, cắt bỏ mọi đoạn chờ (OTP, giao dịch, tải trang). Nếu thu giọng bị gấp, cắt dòng 1:35–1:43 hoặc đoạn 6 trước, không đọc nhanh hơn.
 
 ## Kịch bản chi tiết
 
 | Giây | Quay gì trên màn hình | Lời đọc (lồng tiếng) |
 |---|---|---|
-| 0:00–0:07 | Cảnh cổng trường đại học, khu văn phòng giờ tan, người trẻ kéo vali. Chữ lớn: "Học sinh, sinh viên, người đi làm cần chỗ ở" | "Mỗi năm, hàng loạt học sinh, sinh viên và người đi làm lên thành phố, ai cũng cần một chỗ ở vừa túi tiền, an toàn, gần trường, gần chỗ làm." |
-| 0:07–0:13 | Lướt nhóm Facebook "tìm phòng trọ", mở một khung chat Zalo hỏi giá (che tên, ảnh, số điện thoại) | "Nhưng tìm phòng vẫn chủ yếu qua nhóm Facebook, Zalo: tin đăng trôi nhanh, ảnh không giống thực tế, muốn hỏi giá phải nhắn từng người." |
-| 0:13–0:19 | Bàn chủ trọ: sổ tay, file Excel danh sách người thuê, điện thoại đầy tin nhắc đóng tiền | "Còn chủ nhà quản lý bằng sổ tay, Excel và tin nhắn; có thêm chi nhánh là rối, thu tiền, nhắc nợ, sửa chữa đều làm tay." |
-| 0:19–0:26 | Cận nệm rách → bảng trừ cọc viết tay → logo HomeStayDorm hiện ra. Góc: "Avalanche Fuji · dữ liệu demo · thanh toán sandbox" | "Cuối cùng, lúc trả phòng lại cãi nhau tiền cọc. HomeStayDorm gom cả quá trình thuê phòng về một nền tảng, và dùng Avalanche để hai bên tin nhau." |
-| 0:26–0:33 | **Khách**: trang chủ → danh sách phòng, chọn khu vực và mức giá → mở chi tiết phòng (ảnh, giá/giường, giới tính, dịch vụ đi kèm) | "Khách vào trang chủ, lọc phòng theo khu vực, giá, loại phòng. Mỗi phòng có ảnh, giá theo giường, giới tính phù hợp và các dịch vụ đi kèm." |
-| 0:33–0:39 | Bấm **Chia sẻ** → "Đã sao chép link" → dán vào Messenger/Facebook, thẻ xem trước hiện ảnh, giá, địa chỉ | "Thấy phòng ưng ý, khách bấm Chia sẻ để sao chép link, dán vào Facebook hay Zalo là hiện sẵn ảnh, giá và địa chỉ phòng." |
-| 0:39–0:46 | Bấm **Tôi quan tâm phòng này** → phiếu nhu cầu; lướt sang **Đăng ký thuê theo nhóm** (danh sách thành viên) | "Khách bấm Tôi quan tâm để gửi phiếu nhu cầu, hoặc đăng ký thuê theo nhóm; hệ thống tự kiểm tra giới tính và số giường còn trống." |
-| 0:46–0:53 | **Sale**: danh sách phiếu chờ xếp lịch, lọc trạng thái → chọn phòng, tạo lịch → **Khách** bấm Xác nhận lịch | "Sale nhận phiếu, chọn phòng phù hợp và xếp lịch xem; khách xác nhận lịch ngay trong tài khoản và nhận email nhắc." |
-| 0:53–1:00 | **Khách**: trang thanh toán cọc → tab MoMo → mã QR MoMo Sandbox hiện ra → **Sale** lập hợp đồng | "Xem xong, khách đặt cọc bằng QR chuyển khoản hoặc MoMo, đây là mã QR thật từ MoMo Sandbox, rồi Sale lập hợp đồng." |
+| 0:00–0:10 | Ba cảnh cắt nhanh, mỗi cảnh 3 giây: nhóm Facebook/Zalo tìm trọ (che thông tin) → sổ tay, Excel của chủ trọ → nệm rách và bảng trừ cọc. Giây cuối: logo HomeStayDorm. Góc: "Avalanche Fuji · dữ liệu demo · thanh toán sandbox" | "Sinh viên, người đi làm tìm phòng qua Facebook, Zalo rời rạc; chủ nhà quản lý bằng sổ tay, Excel; trả phòng lại cãi nhau tiền cọc. HomeStayDorm gom tất cả về một nền tảng, dùng Avalanche để hai bên tin nhau." |
+| 0:10–0:17 | **Khách**: trang chủ → danh sách phòng, chọn khu vực và mức giá → chi tiết phòng (ảnh, giá/giường, giới tính, dịch vụ đi kèm) | "Khách vào trang chủ, lọc phòng theo khu vực, giá, loại phòng. Mỗi phòng có ảnh, giá theo giường, giới tính phù hợp và dịch vụ đi kèm." |
+| 0:17–0:22 | Bấm **Chia sẻ** → "Đã sao chép link" → dán vào Messenger/Facebook, thẻ xem trước hiện ảnh, giá | "Bấm Chia sẻ là sao chép link, dán lên Facebook, Zalo hiện sẵn ảnh, giá, địa chỉ phòng." |
+| 0:22–0:29 | Bấm **Tôi quan tâm phòng này** → phiếu nhu cầu; lướt sang **Đăng ký thuê theo nhóm** (danh sách thành viên) | "Khách bấm Tôi quan tâm để gửi phiếu nhu cầu, hoặc đăng ký thuê theo nhóm; hệ thống tự kiểm tra giới tính và số giường còn trống." |
+| 0:29–0:36 | **Sale**: danh sách phiếu chờ xếp lịch → chọn phòng, đặt giờ → **Khách**: lịch xem, nút Xác nhận lịch, Đổi lịch, Hủy lịch | "Phiếu vào hàng chờ của Sale đúng chi nhánh. Sale đối chiếu phòng phù hợp, xếp lịch xem; khách nhận email, xác nhận lịch, có thể xin đổi hoặc hủy." |
+| 0:36–0:42 | **Sale**: thẻ lọc Chờ xem / Đã xem / Khác → ghi nhận "Đã xem" → **Khách** bấm **Tôi muốn đặt cọc** | "Sau buổi xem, Sale ghi kết quả đã xem hoặc khách không đến; khách ưng phòng thì bấm Tôi muốn đặt cọc." |
+| 0:42–0:50 | **Quản lý** duyệt yêu cầu giữ chỗ → **Khách**: trang thanh toán cọc, tab MoMo → mã QR MoMo Sandbox → **Kế toán** xác nhận đã nhận tiền | "Yêu cầu giữ chỗ được quản lý chi nhánh duyệt, kế toán chốt số tiền. Khách trả bằng QR chuyển khoản hoặc MoMo, đây là QR thật từ MoMo Sandbox, kế toán xác nhận đã nhận tiền." |
+| 0:50–1:00 | **Khách** khai người ở cùng (tự duyệt khi đủ điều kiện) → **Sale** lập hợp đồng → khách trả khoản thu kỳ đầu → hộp thư có các email thông báo | "Khách khai người ở cùng, hệ thống tự duyệt cư trú nếu đủ điều kiện. Sale lập hợp đồng, khách trả khoản kỳ đầu; mỗi bước đều có email báo đúng người." |
 | 1:00–1:08 | **Quản lý**, Bàn giao phòng: hợp đồng "Chờ bàn giao" → lập biên bản, điền tài sản và tình trạng → Phát hành | "Avalanche xuất hiện đúng hai lúc cần cả hai bên đồng ý. Lúc thứ nhất là nhận phòng: quản lý lập biên bản bàn giao, liệt kê tài sản và tình trạng, rồi phát hành." |
 | 1:08–1:16 | **Khách**, tab Hợp đồng: đọc biên bản → **Yêu cầu chỉnh sửa**, gõ "Nệm có vết rách sẵn ở góc" → **Quản lý** phát hành bản 2, lịch sử hiện 2 bản | "Khách thấy biên bản thiếu vết rách có sẵn trên nệm, nên bấm yêu cầu chỉnh sửa thay vì xác nhận. Quản lý phát hành bản hai, bản một vẫn được giữ lại." |
 | 1:16–1:26 | **Khách** bấm Xác nhận → khung nhập mã 6 số → (cắt) nhập mã từ email → "Bạn đã xác nhận biên bản lúc …" | "Khách bấm xác nhận và nhập mã gửi về email. Phía sau, ví nhúng Privy tạo chữ ký EIP-712 gắn đúng phiên bản biên bản này. Khách không cần cài ví, không cần mua AVAX." |
@@ -54,10 +53,10 @@ Lời đọc khoảng 4,5–5 tiếng mỗi giây (tự nhiên, hơi nhanh). Hì
 
 ## Cảnh mở đầu: lấy hình ở đâu
 
-- **Người trẻ, cổng trường, khu trọ:** tự quay bằng điện thoại 2–3 giây mỗi cảnh, hoặc lấy video miễn phí bản quyền (Pexels, Pixabay, từ khóa "student city", "dormitory"). Không dùng cảnh có mặt người lạ rõ nét nếu chưa xin phép.
 - **Nhóm Facebook, chat Zalo:** quay màn hình thật nhưng làm mờ tên, ảnh đại diện, số điện thoại, hoặc tự dựng một nhóm/đoạn chat giả bằng tài khoản của đội.
-- **Bàn chủ trọ:** tự dựng cảnh sổ tay, file Excel danh sách giả, điện thoại có vài tin "nhắc đóng tiền phòng".
-- **Không đưa con số thống kê** nếu không có nguồn ghi được trên màn hình.
+- **Sổ tay, Excel của chủ trọ:** tự dựng cảnh với danh sách giả.
+- **Nệm rách, bảng trừ cọc:** tự chụp hoặc dùng ảnh miễn phí bản quyền (Pexels, Pixabay).
+- Không đưa con số thống kê nếu không có nguồn ghi được trên màn hình.
 
 ## Dữ liệu và tab cần chuẩn bị trước khi quay
 
