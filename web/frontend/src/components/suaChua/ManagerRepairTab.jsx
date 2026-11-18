@@ -19,11 +19,19 @@ function Actions({ item, onDone }) {
   }
   if (!['Chờ tiếp nhận', 'Đang xử lý'].includes(item.trangThai)) return null;
   return <div className="scb-actions">
-    {mode === 'done' && <div className="scb-inline">
-      <label className="ui-form-field"><span>Chi phí sửa (đ)</span><input className="ui-input" type="number" min="0" value={chiPhi} onChange={(e) => setChiPhi(e.target.value)} /></label>
-      <label className="ui-form-field"><span>Ghi chú xử lý{loiDoKhach && <span className="ui-required"> *</span>}</span><input className="ui-input" value={ghiChu} onChange={(e) => setGhiChu(e.target.value)} placeholder="Đã thay ron vòi nước" /></label>
-      <label className="scb-check"><input type="checkbox" checked={loiDoKhach} onChange={(e) => setLoiDoKhach(e.target.checked)} />Hư hỏng do khách gây ra</label>
-    </div>}
+    {mode === 'done' && <>
+      <fieldset className="scb-choice">
+        <legend>Kết quả xử lý <span className="ui-required">*</span></legend>
+        <label className={!loiDoKhach ? 'is-active' : ''}><input type="radio" name={`ket-qua-${item.maYeuCau}`} checked={!loiDoKhach} onChange={() => setLoiDoKhach(false)} />
+          <span><strong>Bảo trì thông thường</strong><small>Hư do sử dụng bình thường, hao mòn. Chủ nhà chịu chi phí.</small></span></label>
+        <label className={loiDoKhach ? 'is-active' : ''}><input type="radio" name={`ket-qua-${item.maYeuCau}`} checked={loiDoKhach} onChange={() => setLoiDoKhach(true)} />
+          <span><strong>Do khách gây ra</strong><small>Chi phí sửa được cộng vào hóa đơn tháng kế tiếp của khách.</small></span></label>
+      </fieldset>
+      <div className="scb-inline">
+        <label className="ui-form-field"><span>Chi phí sửa (đ){loiDoKhach && <span className="ui-required"> *</span>}</span><input className="ui-input" type="number" min="0" step="1000" value={chiPhi} onChange={(e) => setChiPhi(e.target.value)} /></label>
+        <label className="ui-form-field"><span>{loiDoKhach ? 'Lý do tính cho khách' : 'Ghi chú xử lý'}{loiDoKhach && <span className="ui-required"> *</span>}</span><input className="ui-input" value={ghiChu} onChange={(e) => setGhiChu(e.target.value)} placeholder={loiDoKhach ? 'Ví dụ: khách làm rơi đồ vỡ bồn rửa' : 'Ví dụ: đã thay ron vòi nước'} /></label>
+      </div>
+    </>}
     {mode === 'reject' && <label className="ui-form-field"><span>Lý do từ chối <span className="ui-required">*</span></span><input className="ui-input" value={ghiChu} onChange={(e) => setGhiChu(e.target.value)} /></label>}
     {error && <p className="scb-message scb-message--error" role="alert">{error}</p>}
     <div className="scb-actions-row">

@@ -7,12 +7,17 @@ import { createServiceError } from './serviceErrors.js';
 // Báo hỏng và sửa chữa trong thời gian thuê (bảng YeuCauSuaChua có sẵn). Khách báo kèm ảnh có ngày giờ; quản lý chi nhánh
 // tiếp nhận, xử lý và ghi rõ "lỗi do khách" hay không. Lúc trả phòng, quản lý và kế toán xem lại lịch sử này theo hợp đồng để
 // không tính lên khách những hư hỏng đã báo từ trước và không do khách gây ra.
+// Hư hỏng do khách gây ra (D-065): khi quản lý chốt, chi phí sửa thành một khoản phí phát sinh "Đã xác nhận" (mã SC-<mã yêu cầu>)
+// trong bảng PhiPhatSinh sẵn có, nên kế toán lập hóa đơn tháng kế tiếp sẽ tự cộng vào. Bảo trì thông thường thì chủ nhà chịu.
+// Loại hư hỏng lưu ở đầu mô tả dạng "[Loại] mô tả" để không phải thêm cột.
 // Không dùng thủ tục SQL (các SP_*YeuCauSuaChua mà bản cũ gọi chưa từng có trong cơ sở dữ liệu) và không đổi cấu trúc bảng.
 const UPLOAD_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'uploads', 'sua-chua');
 const IMAGE_TYPES = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
 export const MAX_PHOTOS = 3;
 const MAX_PHOTO_BYTES = 1.5 * 1024 * 1024;
 export const STATUS = { NEW: 'Chờ tiếp nhận', DOING: 'Đang xử lý', DONE: 'Hoàn tất', REJECTED: 'Từ chối' };
+export const LOAI = ['Điện, đèn, ổ cắm', 'Nước, vòi, bồn cầu', 'Máy lạnh, thiết bị', 'Cửa, khóa', 'Giường, tủ, nội thất', 'Internet, wifi', 'Khác'];
+const feeId = (maYeuCau) => `SC-${maYeuCau}`;
 
 const isCustomer = (user) => user?.vaiTro === 'KhachHang';
 const isManager = (user) => user?.vaiTro === 'NhanVien' && user.chucVu === 'Quản lý' && Boolean(user.maChiNhanh);
@@ -21,16 +26,21 @@ const isStaff = (user) => user?.vaiTro === 'NhanVien' || user?.vaiTro === 'Admin
 const SELECT = `SELECT y.MaYeuCau AS maYeuCau, y.NgayYeuCau AS ngayYeuCau, y.MoTaHuHong AS moTa, y.HinhAnhMinhChung AS anh,
     y.TrangThai AS trangThai, y.NgayTiepNhan AS ngayTiepNhan, y.NgayHoanTat AS ngayHoanTat, y.ChiPhiSuaChua AS chiPhi,
     y.LoiDoKhachGayRa AS loiDoKhach, y.GhiChuXuLy AS ghiChu, y.MaHopDong AS maHopDong, y.MaPhong AS maPhong,
-    ph.TenPhong AS tenPhong, ph.MaChiNhanh AS maChiNhanh, nd.HoTen AS hoTenKhach, nd.SDT AS sdtKhach
+    ph.TenPhong AS tenPhong, ph.MaChiNhanh AS maChiNhanh, nd.HoTen AS hoTenKhach, nd.SDT AS sdtKhach,
+    f.TrangThai AS trangThaiPhi, f.MaHoaDon AS maHoaDonPhi, hdon.KyThanhToan AS kyHoaDonPhi
   FROM dbo.YeuCauSuaChua y
   LEFT JOIN dbo.Phong ph ON ph.MaPhong = y.MaPhong
   LEFT JOIN dbo.HopDongThue h ON h.MaHopDong = y.MaHopDong
-  LEFT JOIN dbo.NguoiDung nd ON nd.MaNguoiDung = h.MaKhachHang`;
+  LEFT JOIN dbo.NguoiDung nd ON nd.MaNguoiDung = h.MaKhachHang
+  LEFT JOIN dbo.PhiPhatSinh f ON f.MaPhi = 'SC-' + y.MaYeuCau
+  LEFT JOIN dbo.HoaDon hdon ON hdon.MaHoaDon = f.MaHoaDon`;
 
 export function toItem(row) {
   let anh = [];
   try { anh = row.anh ? JSON.parse(row.anh) : []; } catch { anh = []; }
-  return { ...row, anh: Array.isArray(anh) ? anh : [], chiPhi: row.chiPhi == null ? null : Number(row.chiPhi), loiDoKhach: Boolean(row.loiDoKhach) };
+  const match = /^\[([^\]]{1,40})\]\s*([\s\S]*)$/.exec(String(row.moTa || ''));
+  return { ...row, loai: match ? match[1] : null, moTa: match ? match[2] : row.moTa, anh: Array.isArray(anh) ? anh : [],
+    chiPhi: row.chiPhi == null ? null : Number(row.chiPhi), loiDoKhach: Boolean(row.loiDoKhach) };
 }
 
 export function parsePhoto(dataUrl) {
@@ -80,6 +90,8 @@ export async function taoYeuCau(user, data = {}, { query = executeQuery, save = 
   const moTa = String(data.moTa || '').trim();
   if (moTa.length < 5) throw createServiceError('Vui lòng mô tả hư hỏng (ít nhất 5 ký tự).');
   if (moTa.length > 1000) throw createServiceError('Mô tả tối đa 1000 ký tự.');
+  const loai = String(data.loai || '').trim();
+  if (!LOAI.includes(loai)) throw createServiceError('Vui lòng chọn loại hư hỏng.');
   const photos = Array.isArray(data.anh) ? data.anh : [];
   if (photos.length > MAX_PHOTOS) throw createServiceError(`Tối đa ${MAX_PHOTOS} ảnh.`);
   const parsed = photos.map(parsePhoto);
@@ -92,7 +104,7 @@ export async function taoYeuCau(user, data = {}, { query = executeQuery, save = 
   await query(`INSERT INTO dbo.YeuCauSuaChua (MaYeuCau, NgayYeuCau, MoTaHuHong, HinhAnhMinhChung, TrangThai, MaHopDong, MaPhong)
     VALUES (@Ma, CAST(SYSDATETIME() AS DATE), @MoTa, @Anh, N'${STATUS.NEW}', @Hd, @Phong)`, [
     { name: 'Ma', type: sql.VarChar(6), value: maYeuCau },
-    { name: 'MoTa', type: sql.NVarChar(sql.MAX), value: moTa },
+    { name: 'MoTa', type: sql.NVarChar(sql.MAX), value: `[${loai}] ${moTa}` },
     { name: 'Anh', type: sql.VarChar(500), value: anh.length ? JSON.stringify(anh) : null },
     { name: 'Hd', type: sql.VarChar(6), value: contract.maHopDong },
     { name: 'Phong', type: sql.VarChar(4), value: contract.maPhong || null },
@@ -152,12 +164,25 @@ export async function hoanTat(user, maYeuCau, data = {}, { query = executeQuery 
   const loiDoKhach = Boolean(data.loiDoKhach);
   const ghiChu = String(data.ghiChu || '').trim();
   if (loiDoKhach && !ghiChu) throw createServiceError('Ghi rõ lý do khi xác định hư hỏng do khách gây ra.');
-  await query(`UPDATE dbo.YeuCauSuaChua SET TrangThai = N'${STATUS.DONE}', NgayHoanTat = CAST(SYSDATETIME() AS DATE), ChiPhiSuaChua = @ChiPhi,
-      LoiDoKhachGayRa = @Loi, GhiChuXuLy = COALESCE(@GhiChu, GhiChuXuLy) WHERE MaYeuCau = @Ma AND TrangThai = N'${STATUS.DOING}'`, [
+  if (loiDoKhach && !(chiPhi > 0)) throw createServiceError('Nhập chi phí sửa để tính vào hóa đơn của khách.');
+  if (loiDoKhach && !Number.isSafeInteger(chiPhi)) throw createServiceError('Chi phí sửa phải là số nguyên (đồng).');
+  const tenPhi = `Sửa chữa ${item.maYeuCau}${item.loai ? ` (${item.loai})` : ''}: ${item.moTa}`.slice(0, 200);
+  await query(`SET XACT_ABORT ON;
+BEGIN TRAN;
+UPDATE dbo.YeuCauSuaChua SET TrangThai = N'${STATUS.DONE}', NgayHoanTat = CAST(SYSDATETIME() AS DATE), ChiPhiSuaChua = @ChiPhi,
+  LoiDoKhachGayRa = @Loi, GhiChuXuLy = COALESCE(@GhiChu, GhiChuXuLy) WHERE MaYeuCau = @Ma AND TrangThai = N'${STATUS.DOING}';
+IF @@ROWCOUNT = 1 AND @Loi = 1 AND NOT EXISTS (SELECT 1 FROM dbo.PhiPhatSinh WITH (UPDLOCK, HOLDLOCK) WHERE MaPhi = @MaPhi)
+  INSERT dbo.PhiPhatSinh (MaPhi, MaHopDong, TenPhi, SoTien, TrangThai, NgayGhiNhan, MaNhanVien)
+  VALUES (@MaPhi, @Hd, @TenPhi, @ChiPhi, N'Đã xác nhận', CAST(SYSDATETIME() AS DATE), @Nv);
+COMMIT;`, [
     { name: 'ChiPhi', type: sql.Decimal(18, 2), value: chiPhi },
     { name: 'Loi', type: sql.Bit, value: loiDoKhach },
     { name: 'GhiChu', type: sql.NVarChar(sql.MAX), value: ghiChu || null },
     { name: 'Ma', type: sql.VarChar(6), value: item.maYeuCau },
+    { name: 'MaPhi', type: sql.VarChar(20), value: feeId(item.maYeuCau) },
+    { name: 'Hd', type: sql.VarChar(6), value: item.maHopDong },
+    { name: 'TenPhi', type: sql.NVarChar(200), value: tenPhi },
+    { name: 'Nv', type: sql.VarChar(6), value: user.maNguoiDung },
   ]);
   return chiTiet(item.maYeuCau, { query });
 }

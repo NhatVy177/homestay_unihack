@@ -26,9 +26,17 @@
 .scb-actions-row { display: flex; flex-wrap: wrap; gap: var(--space-2); justify-content: flex-end; }
 .scb-inline { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
 .scb-check { display: flex; gap: var(--space-2); align-items: center; font-size: 14px; }
+.scb-choice { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin: 0; padding: 0; border: 0; }
+.scb-choice legend { margin-bottom: var(--space-2); padding: 0; font-size: 14px; font-weight: 600; }
+.scb-choice label { display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; }
+.scb-choice label.is-active { border-color: var(--color-primary); background: var(--color-primary-soft); }
+.scb-choice input { margin-top: 3px; accent-color: var(--color-primary); }
+.scb-choice strong { display: block; font-size: 14px; }
+.scb-choice small { display: block; margin-top: 2px; font-size: 13px; color: var(--color-text-muted); }
+.scb-type { margin-top: var(--space-2); }
 .scb-message { margin: 0; font-size: 14px; }
 .scb-message--error { color: var(--color-danger); }
 .scb-message--ok { color: var(--color-primary); }
 .scb-history { display: grid; gap: var(--space-3); }
 .scb-history h3 { margin: 0; font-size: 15px; }
-@media (max-width: 640px) { .scb-form { padding: var(--space-4); } .scb-inline { grid-template-columns: 1fr; } .scb-item-head { flex-direction: column; } }
+@media (max-width: 640px) { .scb-form { padding: var(--space-4); } .scb-inline, .scb-choice { grid-template-columns: 1fr; } .scb-item-head { flex-direction: column; } }

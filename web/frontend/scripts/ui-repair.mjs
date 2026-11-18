@@ -24,13 +24,13 @@ try {
         if (p.endsWith('/sua-chua-bao-tri') && req.method() === 'GET') return route.fulfill({ json: items });
         if (p.endsWith('/sua-chua-bao-tri') && req.method() === 'POST') {
           const body = req.postDataJSON(); writes.push(['tao', body]);
-          items.unshift({ maYeuCau: 'SC0001', ngayYeuCau: '2026-11-18', moTa: body.moTa, anh: body.anh.map((_, i) => `/uploads/sua-chua/SC0001-${i + 1}.png`), trangThai: 'Chờ tiếp nhận', maHopDong: 'HD0001', tenPhong: 'Phòng P101', hoTenKhach: 'Khách thử', sdtKhach: '0900000000' });
+          items.unshift({ maYeuCau: 'SC0001', ngayYeuCau: '2026-11-18', loai: body.loai, moTa: body.moTa, anh: body.anh.map((_, i) => `/uploads/sua-chua/SC0001-${i + 1}.png`), trangThai: 'Chờ tiếp nhận', maHopDong: 'HD0001', tenPhong: 'Phòng P101', hoTenKhach: 'Khách thử', sdtKhach: '0900000000' });
           return route.fulfill({ status: 201, json: items[0] });
         }
         const action = /\/sua-chua-bao-tri\/(SC\d+)\/(tiep-nhan|hoan-tat|tu-choi)$/.exec(p);
         if (action) {
           const body = req.postDataJSON(); writes.push([action[2], body]);
-          Object.assign(items[0], action[2] === 'tiep-nhan' ? { trangThai: 'Đang xử lý', ngayTiepNhan: '2026-11-18' } : { trangThai: 'Hoàn tất', ngayHoanTat: '2026-11-18', chiPhi: body.chiPhi, loiDoKhach: body.loiDoKhach, ghiChu: body.ghiChu });
+          Object.assign(items[0], action[2] === 'tiep-nhan' ? { trangThai: 'Đang xử lý', ngayTiepNhan: '2026-11-18' } : { trangThai: 'Hoàn tất', ngayHoanTat: '2026-11-18', chiPhi: body.chiPhi, loiDoKhach: body.loiDoKhach, ghiChu: body.ghiChu, trangThaiPhi: body.loiDoKhach ? 'Đã xác nhận' : null });
           return route.fulfill({ json: items[0] });
         }
         return route.fulfill({ json: [] });
@@ -41,12 +41,14 @@ try {
       await page.goto(`${base}${path}`, { waitUntil: 'domcontentloaded' });
       if (role === 'customer') {
         await page.getByRole('heading', { name: 'Báo hư hỏng trong phòng' }).waitFor();
+        await page.getByLabel(/Loại hư hỏng/).selectOption('Nước, vòi, bồn cầu');
         await page.getByLabel(/Mô tả hư hỏng/).fill('Vòi nước bồn rửa bị rỉ');
         await page.locator('input[type=file]').setInputFiles({ name: 'hong.png', mimeType: 'image/png', buffer: png });
         await page.locator('.scb-thumb').first().waitFor();
         await page.getByRole('button', { name: 'Gửi báo hỏng' }).click();
         await page.getByText('Đã gửi báo hỏng').waitFor();
         assert.equal(writes[0][1].maHopDong, 'HD0001');
+        assert.equal(writes[0][1].loai, 'Nước, vòi, bồn cầu');
         assert.match(writes[0][1].anh[0], /^data:image\/jpeg;base64,/, 'ảnh được thu nhỏ thành JPEG trước khi gửi');
         assert.equal(await page.locator('.scb-item').count(), 1);
         await page.screenshot({ path: `${folder}/customer-${width}.png`, fullPage: true });
@@ -58,10 +60,12 @@ try {
         assert.match(await item.innerText(), /Khách thử/);
         await item.getByRole('button', { name: 'Tiếp nhận' }).click();
         await item.getByRole('button', { name: 'Đã sửa xong' }).click();
-        await item.getByLabel('Chi phí sửa (đ)').fill('50000');
+        await item.getByText('Do khách gây ra').click();
+        await item.getByRole('spinbutton').fill('350000');
+        await item.getByLabel(/Lý do tính cho khách/).fill('Khách làm vỡ bồn rửa');
         await item.getByRole('button', { name: 'Xác nhận hoàn tất' }).click();
-        await page.getByText('Không do khách gây ra').waitFor();
-        assert.deepEqual(writes.at(-1), ['hoan-tat', { chiPhi: 50000, loiDoKhach: false, ghiChu: '' }]);
+        await page.getByText('350.000đ sẽ được cộng vào hóa đơn tháng kế tiếp.').waitFor();
+        assert.deepEqual(writes.at(-1), ['hoan-tat', { chiPhi: 350000, loiDoKhach: true, ghiChu: 'Khách làm vỡ bồn rửa' }]);
         await page.screenshot({ path: `${folder}/manager-${width}.png`, fullPage: true });
       }
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), width, `${role} không tràn ngang`);
