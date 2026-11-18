@@ -1941,3 +1941,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `database/GenData/demo-scenarios.sql`, công cụ `demo:db:migrate` và `demo-scenarios-sql.test.mjs`. Giao diện cập nhật `components/rooms`, `components/xacNhan`, `CheckoutClosureCard`, `BanGiaoPhongTab` và `pages/avalanche`. Cập nhật hướng dẫn trong `docs/cau-hinh.md`, phạm vi, luồng và kế hoạch demo.
 - Kiểm tra: SQL demo cài mới và chạy lại thành công. Test qua nghiệp vụ đăng nhập, ca chưa thuê, hai kỳ hóa đơn, giới hạn theo chi nhánh, báo hỏng và tính phí, có hoàn tác. Trình duyệt đọc SQL thật ở 1440/390, kiểm tổng tiền kỳ sau 2.748.000đ với chỉ số 245 và 31. Build và smoke Avalanche qua, có kiểm nhãn dùng chung và chiều rộng 390px. Backend 156 pass/5 skip mặc định. Blockchain local 26 pass/1 skip.
 - Còn lại: triển khai hoặc nghiệm thu Fuji là đợt riêng. Bản xem trước ở 5187 và 5017 dùng `HOMEDORM_DEMO_1118_RENT`. Gửi nhánh `feat/demo-data-avalanche-ui` để Vy xem trước khi gộp.
+
+## 2026-11-18 23:24:09 +07:00 — J-X104 — Thay logo và ba ảnh slideshow trang chủ
+
+- Người thực hiện: Codex. Vy gửi trực tiếp logo nhà có giường tầng và ba ảnh phòng, yêu cầu dùng ba ảnh theo đúng thứ tự đã gửi, đồng thời chỉ thực hiện đúng thay đổi này và không tự chạy server/test để tránh tốn bộ nhớ.
+- File: thêm `components/common/BrandLogo.jsx` và CSS dùng chung; cập nhật nhận diện tại `TrangChu.jsx`, `PublicLayout.jsx`, `HomeExperience.jsx`, `WorkspaceShell.jsx`, `index.html` và CSS liên quan. Thêm logo/favicon trong `public/images/brand/` và ba ảnh `public/images/home/slideshow-1.jpg` đến `slideshow-3.jpg`; slideshow dùng đúng thứ tự 1–2–3.
+- Kiểm tra: chỉ đối chiếu đường dẫn tài sản, thứ tự khai báo và thay đổi Git. Không chạy server, build, test tự động hoặc trình duyệt theo yêu cầu của Vy. Các tiến trình xem trước 5187/5017 do Codex mở trong đợt này đã dừng.
+- Còn lại: không.

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { getAuthenticatedHomePath } from '../../auth/auth.routes.js';
 import { Icon } from '../../components/common/Icon.jsx';
+import BrandLogo from '../../components/common/BrandLogo.jsx';
 import { gioiTinhIcon, nhanGioiTinhPhong } from '../../utils/genderRules.js';
 import { CONTACT_PHONE, groupBranches, imageFallback, imageFor, money, priceFor, unitFor } from './homeData.js';
 import { buildBranchLayout } from './houseLayout.js';
@@ -216,7 +217,7 @@ export function FooterPublic({ onOpenAuth }) {
     return () => { document.body.style.overflow = previousOverflow; window.removeEventListener('keydown', close); policyButton.current?.focus(); };
   }, [policyOpen]);
   return <><footer className="tc-footer hx-footer"><div className="tc-container"><div className="hx-footer-grid">
-    <Reveal><a href="#trang-chu" className="tc-logo tc-logo--light"><Icon name="home" />Homestay<strong>Dorm</strong></a><p>Ngôi nhà ấm cúng của bạn tại Sài Gòn.</p></Reveal>
+    <Reveal><a href="#trang-chu" className="tc-logo tc-logo--light"><BrandLogo /></a><p>Ngôi nhà ấm cúng của bạn tại Sài Gòn.</p></Reveal>
     <Reveal delay={120}><h3>Liên kết nhanh</h3><a href="#phong-noi-bat">Phòng</a><button className="hx-policy-link" ref={policyButton} type="button" onClick={() => setPolicyOpen(true)}>Điều khoản và chính sách bảo mật</button></Reveal>
     <Reveal delay={240}><h3>Kết nối với chúng mình</h3><div className="hx-footer-social"><a href={`tel:${CONTACT_PHONE}`} aria-label="Điện thoại"><ContactIcon name="phone" /></a><a href="mailto:q1@homedorm.vn" aria-label="Email"><ContactIcon name="mail" /></a><button type="button" aria-label="Tư vấn" onClick={() => window.dispatchEvent(new Event('homedorm:open-contact'))}><ContactIcon name="chat" /></button></div><div className="hx-footer-auth"><button type="button" onClick={() => onOpenAuth('login')}>Đăng nhập</button><button type="button" onClick={() => onOpenAuth('register')}>Đăng ký</button></div></Reveal>
     </div><Reveal><div className="hx-copyright">© {new Date().getFullYear()} HomestayDorm. Đồ án môn học.</div></Reveal></div></footer>

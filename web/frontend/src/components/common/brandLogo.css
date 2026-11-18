@@ -1,0 +1,14 @@
+.brand-logo-mark {
+  width: var(--brand-logo-size, 36px);
+  height: var(--brand-logo-size, 36px);
+  flex: none;
+  object-fit: contain;
+}
+
+.brand-logo-name {
+  color: inherit;
+}
+
+.brand-logo-name strong {
+  color: var(--tc-accent, var(--color-accent));
+}

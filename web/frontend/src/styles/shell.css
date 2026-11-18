@@ -51,7 +51,7 @@
 .kh-page .kp-topbar { background: var(--color-surface); }
 .kh-page .kh-main { max-width: 1440px; margin: 0 auto; }
 .tc-page .tc-header { background: var(--color-surface); border-color: var(--color-border); box-shadow: var(--shadow-sm); }
-.tc-page .tc-footer .tc-logo-icon { color: var(--color-primary-soft); }
+.tc-page .tc-footer .tc-logo { --brand-logo-size: 46px; }
 .tc-page .tc-footer :focus-visible { outline-color: var(--color-surface); }
 .tc-page h1, .tc-page h2, .tc-page h3, .tc-page h4 { font-family: var(--font-heading); font-weight: 600; }
 .tc-page .tc-room-card, .tc-page .tc-testimonial-card, .tc-modal { border-radius: var(--radius-lg); box-shadow: var(--shadow-md); }
@@ -63,9 +63,8 @@
 /* Shared workspace frame (WorkspaceShell, D-037 B0): one look for Sale, Quản lý, Kế toán, Khách, Admin. */
 .ui-workspace.ui-employee-shell .kp-sidebar { background: var(--color-bg); border-right: 1px solid var(--color-border); }
 .ui-workspace .ui-role-label { color: var(--color-primary); }
-.ui-workspace-brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; font-family: var(--font-heading); font-size: 20px; font-weight: 600; color: var(--color-primary); }
-.ui-workspace-brand > .ui-icon { width: 28px; height: 28px; }
-.ui-workspace-brand > span > span { color: var(--color-accent); }
+.ui-workspace-brand { --brand-logo-size: 42px; display: flex; align-items: center; gap: var(--space-3); text-decoration: none; font-family: var(--font-heading); font-size: 20px; font-weight: 600; color: var(--color-primary); }
+.ui-workspace-brand .brand-logo-name strong { color: var(--color-accent); }
 .ui-workspace.ui-employee-shell .ktp-sidebar-nav { flex: 1; overflow-y: auto; margin-top: 0; }
 .ui-workspace.ui-employee-shell .ktp-side-item { min-height: 52px; border-radius: var(--radius-pill); font-family: var(--font-body); font-size: 15px; font-weight: 500; letter-spacing: 0; white-space: normal; color: var(--color-text-muted); }
 .ui-workspace.ui-employee-shell .ktp-side-item .ui-icon { width: var(--icon-md); height: var(--icon-md); flex-shrink: 0; }
