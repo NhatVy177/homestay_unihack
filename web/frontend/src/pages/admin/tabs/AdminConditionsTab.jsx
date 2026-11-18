@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Icon from '../../../components/common/Icon.jsx';
 import { adminApi } from '../admin.api.js';
+import { extractArray } from '../admin.utils.js';
 import '../admin-nam4.css';
 
 const PRIORITY_MAP = {
@@ -63,7 +64,7 @@ export default function AdminConditionsTab() {
     setError(null);
     try {
       const res = await adminApi.getRules();
-      const raw = res?.data || [];
+      const raw = extractArray(res);
       const mapped = raw.map((c) => {
         const id = String(c.id || c.maQuyDinh || '');
         const title = c.title || c.tieuDe || 'Điều kiện lưu trú';

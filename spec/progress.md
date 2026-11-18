@@ -1,8 +1,8 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 10:33:30 +07:00** (J-X092: bỏ nhãn trên ảnh phòng, giữ trái tim và thống nhất font Inter trang chủ). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 10:41:22 +07:00** (J-A003: Khắc phục lỗi tải số liệu tổng quan Admin, đồng bộ tiện ích extractArray cho toàn bộ 8 tab). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
-## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4 (J-A002)
+## Quản trị viên (Admin) — chuẩn hóa toàn diện theo Nam4 & sửa lỗi số liệu (J-A002 / J-A003)
 
 - Loại bỏ hoàn toàn mã nguồn đơn khối cũ hơn 4000 dòng trong `AdminPage.jsx`.
 - Tách thành cấu trúc modular 8 tab sạch sẽ tương ứng 8 trang của Nam4:
@@ -17,7 +17,8 @@ Cập nhật: **2026-11-18 10:33:30 +07:00** (J-X092: bỏ nhãn trên ảnh ph�
 - Menu sidebar rút gọn chuẩn đúng 8 mục của Nam4 (`dashboard`, `users`, `employees`, `branches`, `rooms`, `services`, `conditions`, `assets`).
 - Toàn bộ màu be/nâu từ Nam4 được chuyển thành màu xanh thương hiệu hệ thống (`--color-primary: #4A6549`, tokens.css).
 - Bổ sung các biểu tượng SVG cần thiết (`inventory_2`, `inventory`, `policy`, `gavel`) trong `Icon.jsx`.
-- Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 127 PASS / 0 FAIL / 4 SKIP, `blockchain` 25 PASS / 0 FAIL / 1 SKIP.
+- Khắc phục lỗi bóc tách response (mảng vs object bọc `{ data }`) bằng `extractArray` trong `admin.utils.js`.
+- Kiểm thử: Frontend Vite build PASS, `test:avalanche-ui` PASS, `web/backend` 127 PASS / 0 FAIL / 4 SKIP, trình duyệt Playwright đọc thực tế trên local5173 xác nhận sạch banner đỏ, 4 thẻ KPI và donut chart tải đầy đủ số liệu thật.
 
 
 ## Trang chủ/nhà3D trên main

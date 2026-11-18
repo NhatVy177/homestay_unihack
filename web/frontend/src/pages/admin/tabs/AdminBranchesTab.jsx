@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Icon from '../../../components/common/Icon.jsx';
 import { adminApi } from '../admin.api.js';
+import { extractArray } from '../admin.utils.js';
 import '../admin-nam4.css';
 
 export default function AdminBranchesTab() {
@@ -39,10 +40,10 @@ export default function AdminBranchesTab() {
         adminApi.getRooms()
       ]);
 
-      const rawRooms = roomRes.status === 'fulfilled' ? (roomRes.value?.data || []) : [];
+      const rawRooms = roomRes.status === 'fulfilled' ? extractArray(roomRes.value) : [];
       setRooms(rawRooms);
 
-      const rawBranches = branchRes.status === 'fulfilled' ? (branchRes.value?.data || []) : [];
+      const rawBranches = branchRes.status === 'fulfilled' ? extractArray(branchRes.value) : [];
       const mapped = rawBranches.map((b) => {
         const id = b.id || b.maChiNhanh || '';
         const branchRooms = rawRooms.filter((r) => (r.branch_id || r.maChiNhanh) === id);

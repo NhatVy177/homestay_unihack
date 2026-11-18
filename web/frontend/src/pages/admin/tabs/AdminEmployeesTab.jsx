@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Icon from '../../../components/common/Icon.jsx';
 import { adminApi } from '../admin.api.js';
+import { extractArray } from '../admin.utils.js';
 import '../admin-nam4.css';
 
 const ROLES = {
@@ -61,10 +62,10 @@ export default function AdminEmployeesTab() {
         adminApi.getBranches()
       ]);
 
-      const rawBranches = branchRes.status === 'fulfilled' ? (branchRes.value?.data || []) : [];
+      const rawBranches = branchRes.status === 'fulfilled' ? extractArray(branchRes.value) : [];
       setBranches(rawBranches);
 
-      const rawEmployees = empRes.status === 'fulfilled' ? (empRes.value?.data || []) : [];
+      const rawEmployees = empRes.status === 'fulfilled' ? extractArray(empRes.value) : [];
       const mapped = rawEmployees.map((e) => {
         const id = String(e.id || e.maNhanVien || '');
         const role = normalizeRole(e.role || e.chucVu);
