@@ -1921,6 +1921,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: blockchain 26 pass, 1 skip và deploy local qua script thành công. Backend 156 pass, 5 skip. Ca SQL chạy riêng PASS cho migration chạy lại, hóa đơn đúng hạn, báo giá khi gọi đồng thời và áp voucher đúng một lần. Build và avalanche UI smoke PASS, phần Điểm thưởng kiểm ở 1440/390 bằng fixture. Code giao diện không thêm style inline.
 - Còn lại: ví vận hành thử riêng, deploy Fuji và cấu hình demo. Chưa chạy migration trên HOMEDORM4 hoặc xác nhận lần đầu qua Privy trong bản chạy hoàn chỉnh. Gửi nhánh riêng để giữ công việc triển khai khác trên main.
 
+## 2026-11-18 16:40:50 +07:00 — J-X101 — Bật bản xem trước điểm thưởng trên HOMEDORM4
+
+- Người thực hiện: Codex. Vy duyệt chạy migration và mở bản thử. Cài bảng cùng thủ tục điểm thưởng trên HOMEDORM4. Dùng worktree feat/loyalty-points, frontend 5186, backend 5016, chain Hardhat 8559. Giữ bộ hẹn giờ chung tắt ở bản thử và bật riêng hàng chờ điểm. Giới hạn phạm vi thử HD0001.
+- File: cấu hình mẫu, backend index.js, các mô-đun chain/store/service của loyalty, test SQL và tài liệu cấu hình/tiến độ. Cấu hình tiến trình đọc env có sẵn theo cổng riêng, không sửa file khóa.
+- Kiểm tra: backend 156 pass, 5 skip và SQL riêng PASS, có ca xác nhận hóa đơn hợp lệ ngoài hợp đồng thử không được đưa vào hàng chờ. Frontend 5186 trả 200 và bật cờ Điểm thưởng. Backend nối HOMEDORM4, cấu hình chain 31337. Đọc số dư ban đầu 0, hợp đồng mẫu hiện đúng và hợp đồng ngoài phạm vi không xuất hiện trong danh sách đổi điểm.
+- Còn lại: Vy thử lập và thu hóa đơn, tích điểm, ký đổi và lập kỳ sau từ giao diện. Đợt này chỉ cài schema, không lập hoặc thu hóa đơn mẫu. DormPoints dùng chain local trong lượt thử này.
+
 ## 2026-11-18 16:53:49 +07:00 — J-X102 — Đưa số dư và lịch sử điểm thưởng vào hồ sơ cá nhân
 
 - Người thực hiện: Codex. Vy muốn hiện Điểm thưởng trên Thông tin cá nhân và bấm vào xem chi tiết. Hồ sơ có số dư, mở/thu lịch sử, ngày giao dịch, số điểm tăng/giảm và trạng thái voucher. Thao tác đổi điểm nằm trong phần mở rộng.

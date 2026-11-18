@@ -41,6 +41,8 @@ npm run dev
 4. Frontend đặt `VITE_LOYALTY_ENABLED=true` rồi chạy lại hoặc build lại. Khách mở **Thông tin cá nhân** và bấm ô **Điểm thưởng** để xem lịch sử hoặc đổi ưu đãi.
 5. Dùng hóa đơn tháng của hợp đồng thử còn kỳ sau. Kế toán ghi nhận trả đúng hạn. Khách xác thực email để kết nối tài khoản nếu cần, nhận 100 điểm rồi chọn đổi voucher. Kế toán lập hóa đơn kế tiếp và mở chi tiết để kiểm tra dòng giảm và liên kết giao dịch. Nếu backend gián đoạn sau khi gửi giao dịch, worker đọc lại cùng giao dịch khi khởi động lại.
 
+Bản xem trước dùng chung HOMEDORM4 với bản chính có thể đặt `SCHEDULERS_ENABLED=false`, `LOYALTY_SCHEDULER_ENABLED=true` và `LOYALTY_DEMO_CONTRACT_ID` là mã hợp đồng đã chọn để thử. Chỉ thưởng và đổi điểm trong phạm vi hợp đồng đó. Bản xem trước ngày 18/11 chạy frontend cổng 5186, backend 5016 và Hardhat 8559. Giữ tiến trình Hardhat chạy trong lúc demo để không làm mất số dư thử.
+
 Bài kiểm tra thật trên SQL local dùng `LOYALTY_SQL_TEST=true` và `node --test test/loyalty-sql.test.mjs` từ backend. Ca chạy riêng tạo cơ sở dữ liệu dùng một lần.
 
 ## Lịch xem phòng — C5-a / D-026
