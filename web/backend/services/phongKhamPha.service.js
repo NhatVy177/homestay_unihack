@@ -24,13 +24,14 @@ export async function ganTrangThaiQuanTam(rooms = []) {
   const byRoom = new Map(rows.map((row) => [String(row.maPhong || '').trim(), row]));
 
   return rooms.map((room) => {
-    const row = byRoom.get(String(room.maPhong ?? room.id ?? '').trim());
+    const row = byRoom.get(String(room.maPhong ?? room.MaPhong ?? room.id ?? '').trim());
     const soGiuongTrong = Number(row?.soGiuongTrong || 0);
     const soGiuongChoCoc = Number(row?.soGiuongChoCoc || 0);
     return {
       ...room,
       soGiuongTrong,
       soGiuongChoCoc,
+      gioiTinhChoPhep: room.gioiTinhChoPhep ?? room.GioiTinhChoPhep ?? row?.gioiTinhChoPhep ?? null,
       trangThaiQuanTam: tinhTrangThaiQuanTam(soGiuongTrong, soGiuongChoCoc)
     };
   });

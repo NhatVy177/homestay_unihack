@@ -14,6 +14,7 @@ function getRoomStatusTone(status = '') {
 
 function Icon({ name, className = '' }) {
   const shapes = {
+    wc: <><circle cx="7" cy="4.5" r="1.6" /><path d="M5 8h4v6l-.7.2V21H5.7v-6.8L5 14Z" /><circle cx="17" cy="4.5" r="1.6" /><path d="M17 8l3 7h-2.2V21h-1.6v-6H14l3-7Z" /></>,
     clipboard: <><rect x="6" y="4.5" width="12" height="16" rx="2" /><path d="M9.5 4.5V3.5h5v1M9.5 10h5M9.5 14h5M9.5 17.5h3" /></>,
     shield: <><path d="M12 3.5 5 6.2v5.3c0 4.4 3 7.6 7 9 4-1.4 7-4.6 7-9V6.2z" /><path d="m9 12 2.2 2.2L15.5 10" /></>,
     home: <><path d="M3.5 11.2 12 4l8.5 7.2" /><path d="M5.5 10.4V20h13v-9.6" /><path d="M9.5 20v-5.8h5V20" /></>,
@@ -73,6 +74,11 @@ function GalleryPhoto({ urlAnh, fallbackUrl, moTa, index }) {
 
 // Các prop sau chỉ dùng ở trang khách đã đăng nhập (D-042/D-043): lịch xem đang có, hồ sơ đang mở để thêm phòng quan tâm,
 // đăng ký theo nhóm. Trang công khai không truyền thì giữ nguyên nút "Đăng ký thuê ngay".
+// Phòng không khóa giới (hoặc chưa có dữ liệu) hiển thị là Unisex.
+export function gioiTinhHienThi(value) {
+  return value === 'Nam' || value === 'Nữ' ? value : 'Unisex';
+}
+
 export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, heartState = null, scheduledMessage = '', profile = null, isInProfile = false, profileBusy = false, onAddToProfile, onRemoveFromProfile }) {
   const [lightbox, setLightbox] = useState(null);
   const lightboxRef = useRef(null);
@@ -144,13 +150,18 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
             <div className="kh-detail-stats">
               <div>
                 <Icon name="people" />
-                <span>Tối đa</span>
-                <strong>{phong.sucChua} Người</strong>
+                <span>Sức chứa tối đa</span>
+                <strong>{phong.sucChua} người</strong>
+              </div>
+              <div>
+                <Icon name="wc" />
+                <span>Giới tính phù hợp</span>
+                <strong>{gioiTinhHienThi(phong.gioiTinhChoPhep)}</strong>
               </div>
               {phong.tang != null && (
                 <div>
                   <Icon name="layers" />
-                  <span>Tầng</span>
+                  <span>Vị trí tầng</span>
                   <strong>Tầng {phong.tang}</strong>
                 </div>
               )}
