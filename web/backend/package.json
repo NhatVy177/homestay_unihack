@@ -14,6 +14,7 @@
     "services-catalog:db:migrate": "node scripts/services-catalog-db.mjs migrate",
     "customer-source:db:migrate": "node scripts/customer-source-db.mjs migrate",
     "first-charge-proof:db:migrate": "node scripts/first-charge-proof-db.mjs migrate",
+    "avalanche:recover": "node scripts/avalanche-recover.mjs",
     "avalanche:db:migrate": "node scripts/avalanche-db.mjs migrate",
     "auto-deposit:db:migrate": "node scripts/auto-deposit-db.mjs",
     "deposit-flow:db:migrate": "node scripts/deposit-flow-db.mjs",
