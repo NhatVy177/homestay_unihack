@@ -33,7 +33,8 @@ test('loyalty SQL: award eligibility, duplicate quote and applying a voucher exa
         ('HO0002','HD0001','2026-09','2026-10-10',NULL,'2026-10-11',N'Đã TT',1000000),
         ('HO0003','HD0001','2026-10','2026-11-20',NULL,'2026-11-18',N'Đã TT',1000000),
         ('HO0004','HD0001','2026-11','2026-12-10',NULL,NULL,N'Chưa TT',1000000),
-        ('HO0005','HD0001','2026-12','2027-01-10',NULL,NULL,N'Chưa TT',1000000);
+        ('HO0005','HD0001','2026-12','2027-01-10',NULL,NULL,N'Chưa TT',1000000),
+        ('HO0006','HD0002','2026-10','2026-11-20',NULL,'2026-11-18',N'Đã TT',1000000);
     `);
     const user = { vaiTro: 'KhachHang', maNguoiDung: 'KH0001' };
     assert.equal((await getHoaDonCuaKhach(user)).length, 5);
@@ -43,11 +44,15 @@ test('loyalty SQL: award eligibility, duplicate quote and applying a voucher exa
     }
     const store = new LoyaltyStore();
     const address = '0x' + '12'.repeat(20);
-    const deployment = { chainId: 31337, address, startDate: '2026-08-01' };
+    const deployment = { chainId: 31337, address, startDate: '2026-08-01', demoContract: 'HD0001' };
     for (let repeat = 0; repeat < 2; repeat++) {
       await store.locked('test-discovery', tx => store.discoverAwards(deployment, tx));
     }
     assert.deepEqual((await store.history('KH0001', deployment)).map(row => row.invoiceId), ['HO0003']);
+    const allContracts = { ...deployment, demoContract: null };
+    assert.equal((await store.history('KH0002', allContracts)).length, 0);
+    assert.deepEqual(await store.contracts('KH0002', deployment), []);
+    assert.deepEqual(await store.contracts('KH0002', allContracts), [{ id: 'HD0002' }]);
     assert.equal(await store.next(deployment), undefined);
     await pool.request().input('wallet', address).query("INSERT dbo.AvalancheWallet VALUES('KH0001',@wallet)");
     assert.equal((await store.next(deployment)).invoiceId, 'HO0003');

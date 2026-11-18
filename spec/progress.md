@@ -1,11 +1,12 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 16:27:35 +07:00** (J-X100: hoàn tất code điểm thưởng và kiểm trên chain cùng SQL local). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-18 16:40:50 +07:00** (J-X101: mở bản xem trước điểm thưởng và cài schema trên HOMEDORM4 theo Vy duyệt). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## Điểm thưởng hóa đơn tháng — D-070 / J-X100
 
 - Nhánh feat/loyalty-points. Đã có token DormPoints, ví nhúng ký đổi điểm, hàng chờ dùng lại giao dịch đã ký, voucher SQL và giao diện Điểm thưởng. Kế toán xem khoản giảm khi lập hóa đơn và minh chứng trong chi tiết.
-- Mức bằng chứng: code, kiểm tự động trên Hardhat local, SQL Server riêng và giao diện fixture đã qua. Chưa triển khai DormPoints lên Fuji hoặc cài migration trên HOMEDORM4. Chuẩn bị ví vận hành riêng và triển khai theo [cấu hình](../docs/cau-hinh.md#điểm-thưởng-hóa-đơn-tháng--d-070).
+- Vy duyệt cài migration lên HOMEDORM4. Bản xem trước frontend 5186, backend 5016 và Hardhat 8559. Chỉ bật scheduler điểm thưởng và giới hạn vào hợp đồng demo HD0001. Đọc được hồ sơ thử, ví đã liên kết và số dư ban đầu 0 từ môi trường chạy thật.
+- Mức bằng chứng: Hardhat local, SQL Server riêng, build và giao diện fixture đã qua. HOMEDORM4 đã có schema và dịch vụ bản xem trước sẵn sàng. Vy sẽ thử hóa đơn, tích điểm và đổi qua giao diện. DormPoints chưa triển khai trên Fuji. Cấu hình ở [hướng dẫn](../docs/cau-hinh.md#điểm-thưởng-hóa-đơn-tháng--d-070).
 
 ## Ghi chú 11–13 và QR MoMo Sandbox — D-068 / D-069 / J-X099
 
