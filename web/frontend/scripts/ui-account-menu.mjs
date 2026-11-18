@@ -41,11 +41,32 @@ try {
     await page.screenshot({ path: `${folder}/menu-${width}.png` });
     await page.getByRole('menuitem', { name: 'Đăng xuất' }).click();
     const dialog = page.getByRole('alertdialog');
-    await dialog.getByText('Bạn muốn đăng xuất?').waitFor();
+    await dialog.getByText('Xác nhận đăng xuất', { exact: true }).waitFor();
+    const layout = await dialog.evaluate(element => {
+      const actions = [...element.querySelectorAll('.lc-actions button')].map(button => { const r = button.getBoundingClientRect(); return { top: r.top, width: r.width, height: r.height }; });
+      const rect = element.getBoundingClientRect();
+      return { actions, left: rect.left, right: rect.right, align: getComputedStyle(element).textAlign, icon: Boolean(element.querySelector('.lc-symbol .ui-icon')) };
+    });
+    assert.equal(layout.align, 'center');
+    assert.equal(layout.icon, true);
+    assert.equal(await dialog.locator('.lc-symbol .ui-icon').evaluate(icon => getComputedStyle(icon).width), '32px');
+    assert.ok(layout.left >= 0 && layout.right <= width);
+    assert.equal(layout.actions[0].top, layout.actions[1].top, 'two balanced actions stay on the same row');
+    assert.equal(layout.actions[0].width, layout.actions[1].width);
+    assert.ok(layout.actions.every(button => button.height >= 44));
     await page.screenshot({ path: `${folder}/confirm-${width}.png` });
-    await dialog.getByRole('button', { name: 'Ở lại' }).click();
+    await dialog.getByRole('button', { name: 'Hủy', exact: true }).click();
     await dialog.waitFor({ state: 'detached' });
     assert.equal(loggedOut, false, 'hủy thì chưa đăng xuất');
+    for (const cancel of ['close', 'escape', 'backdrop']) {
+      await trigger.click();
+      await page.getByRole('menuitem', { name: 'Đăng xuất' }).click();
+      if (cancel === 'close') await dialog.getByRole('button', { name: 'Đóng hộp thoại đăng xuất' }).click();
+      if (cancel === 'escape') await page.keyboard.press('Escape');
+      if (cancel === 'backdrop') await page.locator('.lc-overlay').click({ position: { x: 4, y: 4 } });
+      await dialog.waitFor({ state: 'detached' });
+      assert.equal(loggedOut, false, `${cancel} keeps session`);
+    }
     await trigger.waitFor();
     await trigger.click();
     await page.getByRole('menuitem', { name: 'Tài khoản của tôi' }).click();
@@ -54,7 +75,7 @@ try {
     await page.goto(`${base}/`, { waitUntil: 'domcontentloaded' });
     await page.locator('.acm-trigger').click();
     await page.getByRole('menuitem', { name: 'Đăng xuất' }).click();
-    await page.getByRole('alertdialog').getByRole('button', { name: 'Đăng xuất' }).click();
+    await page.getByRole('alertdialog').getByRole('button', { name: 'Đăng xuất', exact: true }).click();
     await page.locator('.tc-nav-actions').getByRole('button', { name: 'Đăng nhập' }).or(page.getByRole('button', { name: 'Đăng nhập' }).first()).waitFor();
     assert.equal(loggedOut, true, 'xác nhận thì mới đăng xuất');
     assert.deepEqual(errors, []);

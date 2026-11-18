@@ -85,6 +85,8 @@ export function Icon({ name, className = '', style = {} }) {
     calendar_today: <><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9.5h18M8 3v3M16 3v3" /></>,
     event_available: <><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9.5h18M8 3v3M16 3v3" /><path d="m9 15 2 2 4-4" /></>,
     expand_less: <><path d="m6 15 6-6 6 6" /></>,
+    expand_more: <><path d="m6 9 6 6 6-6" /></>,
+    schedule: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
     feedback: <><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" /><path d="M12 7.5v4M12 14.5h.01" /></>,
     list_alt: <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M7 9h2M7 13h2M7 17h2M12 9h5M12 13h5M12 17h5" /></>,
     lock_open: <><rect x="5" y="10" width="14" height="11" rx="3" /><path d="M8 10V7a4 4 0 0 1 7.5-2" /></>,

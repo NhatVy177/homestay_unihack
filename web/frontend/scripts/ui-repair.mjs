@@ -42,8 +42,23 @@ try {
       if (role === 'customer') {
         await page.getByRole('heading', { name: 'Báo hư hỏng trong phòng' }).waitFor();
         await page.getByLabel(/Mô tả hư hỏng/).fill('Vòi nước bồn rửa bị rỉ');
-        await page.locator('input[type=file]').setInputFiles({ name: 'hong.png', mimeType: 'image/png', buffer: png });
+        const add = page.getByRole('button', { name: 'Thêm ảnh hư hỏng', exact: true });
+        await add.waitFor();
+        assert.equal(await add.locator('.ui-icon').evaluate(icon => getComputedStyle(icon).width), '24px');
+        await add.screenshot({ path: `${folder}/add-photo-${width}.png` });
+        const [cancelledChooser] = await Promise.all([page.waitForEvent('filechooser'), add.click()]);
+        await cancelledChooser.setFiles([]);
+        assert.equal(await page.locator('.scb-thumb').count(), 0);
+        const [chooser] = await Promise.all([page.waitForEvent('filechooser'), add.click()]);
+        await chooser.setFiles([1, 2, 3].map(index => ({ name: `hong-${index}.png`, mimeType: 'image/png', buffer: png })));
         await page.locator('.scb-thumb').first().waitFor();
+        await add.waitFor({ state: 'detached' });
+        assert.equal(await page.locator('.scb-thumb').count(), 3);
+        await page.getByRole('button', { name: 'Bỏ ảnh 3', exact: true }).click();
+        await page.getByRole('button', { name: 'Bỏ ảnh 2', exact: true }).click();
+        await add.waitFor();
+        assert.equal(await page.locator('.scb-thumb').count(), 1);
+        await page.locator('.scb-form').screenshot({ path: `${folder}/upload-${width}.png` });
         await page.getByRole('button', { name: 'Gửi báo hỏng' }).click();
         await page.getByText('Đã gửi báo hỏng').waitFor();
         assert.equal(writes[0][1].maHopDong, 'HD0001');
