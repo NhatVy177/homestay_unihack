@@ -154,9 +154,6 @@
 .sale-success .ui-btn { width: 100%; margin-top: var(--space-2); }
 .sale-success-mark { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--color-primary-soft, #E8EDE7); color: var(--color-primary); }
 .sale-success-mark .ui-icon { width: 32px; height: 32px; }
-.sale-modal-summary { display: grid; gap: 2px; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-surface-alt); }
-.sale-modal-summary span { font-size: 14px; color: var(--color-text-muted); }
-.sale-modal .ui-textarea:focus { box-shadow: 0 0 0 3px var(--color-primary-soft, #E8EDE7); }
 @media (max-width: 1200px) { .sale-shortcuts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sale-calendar-layout { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 800px) { .sale-overview-columns, .sale-customer-columns, .sale-booking-time { grid-template-columns: minmax(0, 1fr); } .sale-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sale-booking-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 1000px) { .sale-lookup-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

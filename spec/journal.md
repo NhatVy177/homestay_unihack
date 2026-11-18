@@ -1894,9 +1894,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `phongKhamPha.repository.js` (đếm giường kèm `GioiTinhChoPhep`), `phongKhamPha.service.js` (gắn `gioiTinhChoPhep`, nhận cả khóa `MaPhong`), `RoomDetailView.jsx` (ô giới tính, `gioiTinhHienThi`: Nam/Nữ, còn lại "Unisex"), `HomeExperience.jsx` (thẻ phòng), `Icon.jsx` (icon `wc`), `roomDetail.css` và `chiTietPhong.css` (bỏ giới hạn 980px).
 - Kiểm tra: backend 156 pass/4 skip/0 fail; frontend build PASS; ui-interested-rooms, ui-public-room, ui-share-demo PASS. Chưa chạy trên SQL Server thật (không đổi schema, chỉ thêm JOIN Phong).
 
-## 2026-11-18 15:00:00 +07:00 — J-C183 — Lỗi note 13–20 (chờ Vy duyệt, chưa gộp main)
+## 2026-11-18 15:00:00 +07:00 — J-C183 — Lỗi note 13–17
 
-- Người thực hiện: Claude. Vy dặn mỗi lượt chỉ sửa 5 lỗi trong note rồi chờ duyệt; lượt này đã lỡ làm tới lỗi 20 nên để trên nhánh `fix/notes-13-21`, không gộp main. Lỗi 21 chưa làm (ảnh không rõ yêu cầu).
-- 13: kiểm tra luật giới tính đã có sẵn (genderRules.js: phòng trống hẳn = Không phân biệt, nhóm hỗn hợp chỉ chọn phòng không phân biệt, nhóm cùng giới chọn phòng cùng giới hoặc không phân biệt); phần hiển thị giới tính ngoài thẻ và trong chi tiết đã ở J-C182.
-- 14–16: thu gọn lề thẻ phiếu chờ xếp lịch, giảm độ đậm/cỡ chữ ô thông tin, tách ghi chú phiếu thành các dòng có nhãn và danh sách thành viên nhóm, làm lại hộp thoại "Đã lập lịch xem phòng". 17: thay ô chọn trạng thái bằng thẻ lọc có số đếm, lịch đang chờ lên đầu. 18: trạng thái hồ sơ khách dùng StatusBadge chung. 19: hộp thoại Ghi nhận Đã xem có khung tóm tắt khách/phòng. 20: nút "Tôi muốn xem phòng khác" ở lịch đã xem chưa đặt cọc.
-- Kiểm tra: build PASS; ui-viewing-outcomes, ui-shell, ui-interested-rooms PASS. ui-sale-workspace và ui-customer-profile còn FAIL do giả định cũ của test (menu Khám phá phòng đã bỏ, import react từ dev server), đã sửa một phần, chưa xong.
+- Người thực hiện: Claude. Vy duyệt gộp 13–17 (mỗi lượt chỉ 5 lỗi); 18–20 làm sẵn trên nhánh `fix/notes-13-21`, chưa gộp; 21 chưa làm.
+- 13: luật giới tính đã có sẵn ở genderRules.js (phòng trống hẳn = Không phân biệt; nhóm hỗn hợp chỉ chọn phòng không phân biệt; nhóm cùng giới chọn phòng cùng giới hoặc không phân biệt); hiển thị giới tính ngoài thẻ và trong chi tiết ở J-C182. Chưa thấy chỗ nào bắt nhóm thuê nguyên căn.
+- 14–16: thu gọn lề thẻ phiếu chờ xếp lịch, giảm độ đậm/cỡ chữ ô thông tin, tách ghi chú phiếu thành các dòng có nhãn và danh sách thành viên nhóm, làm lại hộp thoại "Đã lập lịch xem phòng". 17: thẻ lọc trạng thái có số đếm thay ô chọn, lịch đang chờ lên đầu.
+- File: SaleBookingView.jsx, LichXemPhongTab.jsx, saleWorkspace.css, ui-sale-workspace/ui-viewing-outcomes/ui-customer-profile (cập nhật giả định cũ).
+- Kiểm tra: build PASS; ui-viewing-outcomes, ui-shell, ui-interested-rooms PASS. ui-sale-workspace và ui-customer-profile còn FAIL do giả định cũ của test (menu Khám phá phòng đã bỏ, import react từ dev server).

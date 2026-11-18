@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Icon } from '../../components/common/Icon.jsx';
 import StatusBadge from '../../components/common/StatusBadge.jsx';
 import { canUseReschedule } from './ViewingRequestModals.jsx';
 import { endedViewing, viewingDate, viewingTime, viewingRoom, viewingState, asViewingAppointment } from './viewingPresentation.js';
 export default function CustomerAppointmentCard({row,busy,onConfirm,onReschedule,onCancel,onViewDetail,onDeposit}){
-  const navigate=useNavigate();
-  const onRescheduleNew=()=>navigate('/phong',{state:{customerPortalTab:'lich-xem'}});
   const [failedImage,setFailedImage]=useState(false);
   const roomCode=String(row.maPhong||'').split(',')[0].trim();
   const image=row.hinhAnhPhong||(roomCode?`/images/phong/${roomCode}/cover.jpg`:null);
@@ -28,7 +25,6 @@ export default function CustomerAppointmentCard({row,busy,onConfirm,onReschedule
     </ol>
     {row.khachDaXacNhanLich&&row.thoiGianKhachXacNhan&&<p className="customer-viewing-hint">Đã xác nhận lúc {viewingTime(row.thoiGianKhachXacNhan)} · {viewingDate(row.thoiGianKhachXacNhan)}</p>}
     {row.trangThai==='Đã xem'&&!row.daGuiYeuCauDatCoc&&onDeposit&&<div className="customer-viewing-card-actions"><button type="button" className="ui-btn ui-btn--primary customer-deposit-cta" onClick={()=>onDeposit(row)}><Icon name="payments"/>Tôi muốn đặt cọc</button></div>}
-    {row.trangThai==='Đã xem'&&!row.daGuiYeuCauDatCoc&&onDeposit&&<div className="customer-viewing-card-actions"><button type="button" className="ui-btn ui-btn--secondary" onClick={onRescheduleNew}><Icon name="event_repeat"/>Tôi muốn xem phòng khác</button></div>}
     {row.trangThai==='Đã xem'&&row.daGuiYeuCauDatCoc&&<p className="customer-viewing-hint">Bạn đã gửi yêu cầu giữ chỗ. Theo dõi tiếp ở mục Đặt cọc.</p>}
     {!ended&&<div className="customer-viewing-card-actions">
       <button type="button" className={`ui-btn ${row.khachDaXacNhanLich?'ui-btn--secondary':'ui-btn--primary'}`} disabled={!confirmable||busy} onClick={()=>onConfirm(row)}><Icon name="check_circle"/>{busy?'Đang xác nhận...':row.khachDaXacNhanLich?'Đã xác nhận':'Xác nhận lịch'}</button>
