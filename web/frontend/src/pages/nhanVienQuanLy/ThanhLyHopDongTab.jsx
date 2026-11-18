@@ -80,12 +80,20 @@ export default function ThanhLyHopDongTab() {
       {modalType === 'thanh-ly' && (
         <div className="ktp-modal-overlay" onClick={() => setModalType(null)}>
           <div className="ktp-modal" style={{ maxWidth: '1000px', width: '95%', padding: '0', backgroundColor: '#ffffff', borderRadius: '12px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="ktp-modal-header" style={{ padding: '16px 24px', backgroundColor: '#4A6549', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '12px 12px 0 0' }}>
+            <div className="ktp-modal-header" style={{ padding: '20px 24px', backgroundColor: '#ffffff', borderBottom: '1px solid #e1e3e4', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: '12px 12px 0 0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h3 style={{ fontSize: '20px', margin: 0, color: '#ffffff', fontWeight: '700' }}>Thanh lý hợp đồng thuê</h3>
-                <span style={{ backgroundColor: '#ffffff', color: '#a43c12', padding: '4px 12px', borderRadius: '16px', fontSize: '13px', fontWeight: '600' }}>Chờ thanh lý</span>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F1F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4A6549' }}>
+                  <Icon name="description" />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <h3 style={{ fontSize: '18px', margin: 0, color: '#191c1d', fontWeight: '700' }}>Thanh lý hợp đồng thuê</h3>
+                    <span style={{ backgroundColor: '#feedec', color: '#a43c12', padding: '4px 12px', borderRadius: '16px', fontSize: '13px', fontWeight: '600' }}>Chờ thanh lý</span>
+                  </div>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#6f797a' }}>Mã HĐ: HDT001</p>
+                </div>
               </div>
-              <button className="ktp-modal-close" onClick={() => setModalType(null)} style={{ color: '#ffffff', background: 'transparent', border: 'none', cursor: 'pointer' }}><Icon name="close" /></button>
+              <button className="ktp-modal-close" onClick={() => setModalType(null)} style={{ color: '#6f797a', background: 'transparent', border: 'none', cursor: 'pointer' }}><Icon name="close" /></button>
             </div>
             <div className="ktp-modal-body" style={{ padding: '24px', maxHeight: '70vh', overflowY: 'auto', backgroundColor: '#f8f9fa' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

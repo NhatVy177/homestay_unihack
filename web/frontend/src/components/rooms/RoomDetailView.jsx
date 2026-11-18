@@ -172,12 +172,7 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
                 </div>
               )}
             </div>
-            <div className="kh-detail-stats kh-detail-stats--more">
-              {phong.loaiPhong && <div><Icon name="room" /><span>Loại phòng</span><strong>{phong.loaiPhong}</strong></div>}
-              {phong.chiNhanh && <div><Icon name="map" /><span>Chi nhánh</span><strong>{phong.chiNhanh}</strong></div>}
-              {phong.giaThueTheoGiuong ? <div><Icon name="payment" /><span>Giá mỗi giường</span><strong>{Number(phong.giaThueTheoGiuong).toLocaleString('vi-VN')}đ/tháng</strong></div> : null}
-              {Number(phong.soGiuongTrong) > 0 && <div><Icon name="bed" /><span>Giường còn trống</span><strong>{phong.soGiuongTrong} giường</strong></div>}
-            </div>
+
             <p className="kh-detail-mota">{phong.moTa || `${phong.tenPhong || 'Phòng'} thuộc ${phong.chiNhanh || 'HomeStayDorm'}${phong.loaiPhong ? `, loại ${phong.loaiPhong.toLowerCase()}` : ''}${phong.sucChua ? `, sức chứa tối đa ${phong.sucChua} người` : ''}. Phòng được dọn dẹp định kỳ, có an ninh và hỗ trợ từ nhân viên quản lý trong suốt thời gian thuê.`}</p>
           </div>
 
@@ -209,16 +204,7 @@ export default function RoomDetailView({ phong, onBack, onRent, onRentGroup, hea
               </div>
             </div>
           )}
-          {dichVuUocTinh.length > 0 && (
-            <div className="kh-detail-section">
-              <h2>Dịch vụ đi kèm</h2>
-              <div className="kh-extra-services">
-                {dichVuUocTinh.map((item) => (
-                  <div key={item.maDichVu || item.tenDichVu}><span>{item.tenDichVu}</span><strong>{formatServiceMoney(item.donGia, item.donViTinh)}</strong></div>
-                ))}
-              </div>
-            </div>
-          )}
+
         </div>
 
         {/* Sidebar */}

@@ -208,11 +208,17 @@ export default function XacNhanThanhToanTab() {
         <div className="ktp-modal-overlay" onClick={() => !submitting && setSelected(null)}>
           <div className="ktp-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '850px', width: '100%', maxHeight: '90vh', overflowY: 'auto', backgroundColor: '#ffffff', borderRadius: '12px' }}>
 
-            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#4A6549', color: '#ffffff', borderBottom: 'none', padding: '24px 32px' }}>
+            <div className="ktp-modal-header" style={{ alignItems: 'center', backgroundColor: '#ffffff', borderBottom: '1px solid #e1e3e4', padding: '20px 32px', display: 'flex', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <h3 style={{ fontSize: '20px', margin: 0, color: '#ffffff', fontWeight: '700' }}>Chi tiết thanh toán cọc</h3>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F1F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4A6549' }}>
+                  <Icon name="receipt_long" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '18px', margin: 0, color: '#191c1d', fontWeight: '700' }}>Chi tiết thanh toán cọc</h3>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#6f797a' }}>Mã phiếu: {selected.maPhieuDatCoc}</p>
+                </div>
               </div>
-              <button className="ktp-modal-close" onClick={() => setSelected(null)} style={{ color: '#ffffff' }}><Icon name="close" /></button>
+              <button className="ktp-modal-close" onClick={() => setSelected(null)} style={{ color: '#6f797a', background: 'transparent', border: 'none', cursor: 'pointer' }}><Icon name="close" /></button>
             </div>
 
             <div className="ktp-modal-body" style={{ padding: '32px' }}>

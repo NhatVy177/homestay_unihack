@@ -141,13 +141,18 @@ export default function BaoTriSuaChuaTab() {
           <div className="ktp-modal-content" onClick={(e) => e.stopPropagation()} style={{ width: '900px', maxWidth: '95%', maxHeight: '90vh', backgroundColor: '#f8f9fa', overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: '12px', animation: 'fadeIn 0.2s forwards' }}>
             
             {/* Header */}
-            <div style={{ padding: '16px 24px', backgroundColor: '#4A6549', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '20px', fontWeight: '600' }}>Chi tiết yêu cầu bảo trì: {selectedItem.id}</h3>
-                <p style={{ margin: '4px 0 0 0', opacity: 0.9, fontSize: '14px' }}>Mức độ: {selectedItem.mucDo}</p>
+            <div style={{ padding: '20px 24px', backgroundColor: '#ffffff', color: '#191c1d', borderBottom: '1px solid #e1e3e4', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10, borderRadius: '12px 12px 0 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F1F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4A6549' }}>
+                  <Icon name="build" />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#191c1d' }}>Chi tiết yêu cầu bảo trì: {selectedItem.id}</h3>
+                  <p style={{ margin: '2px 0 0 0', color: '#6f797a', fontSize: '13px' }}>Mức độ: {selectedItem.mucDo}</p>
+                </div>
               </div>
-              <button onClick={() => setShowDetailModal(false)} style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer', display: 'flex' }}>
-                <span style={{ display: 'flex', fontSize: '28px' }}><Icon name="close" /></span>
+              <button onClick={() => setShowDetailModal(false)} style={{ background: 'none', border: 'none', color: '#6f797a', cursor: 'pointer', display: 'flex', padding: '6px' }}>
+                <Icon name="close" />
               </button>
             </div>
 

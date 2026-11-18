@@ -468,17 +468,22 @@ export default function XacNhanPhanHoi({ focusPhieuTra = null } = {}) {
             style={{ width: 'calc(100vw - 64px)', maxWidth: 1200, maxHeight: '88vh', padding: 0, backgroundColor: '#fff', borderRadius: 12, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="ktp-modal-header" style={{ flex: '0 0 auto', padding: '16px 24px', backgroundColor: '#4A6549', borderRadius: '12px 12px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 'none' }}>
-              <div>
-                <h3 style={{ margin: 0, color: '#fff', fontSize: 20, fontWeight: 700 }}>
-                  {selected?.trangThaiDoiSoat === 'Chờ phản hồi' ? 'Xử lý phản hồi đối soát' : 'Chi tiết phản hồi đối soát'}
-                </h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4, color: 'rgba(255,255,255,0.86)', fontSize: 13 }}>
-                  <span>Mã đối soát: <strong style={{ color: '#fff' }}>{selected?.maDoiSoat || '—'}</strong></span>
-                  <TrangThaiBadge trangThai={chiTiet?.trangThaiDoiSoat || selected?.trangThaiDoiSoat || 'Chờ phản hồi'} />
+            <div className="ktp-modal-header" style={{ flex: '0 0 auto', padding: '20px 24px', backgroundColor: '#ffffff', borderRadius: '12px 12px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e1e3e4' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#F1F4F0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4A6549' }}>
+                  <Icon name="fact_check" />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, color: '#191c1d', fontSize: 18, fontWeight: 700 }}>
+                    {selected?.trangThaiDoiSoat === 'Chờ phản hồi' ? 'Xử lý phản hồi đối soát' : 'Chi tiết phản hồi đối soát'}
+                  </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4, color: '#6f797a', fontSize: 13 }}>
+                    <span>Mã đối soát: <strong style={{ color: '#191c1d' }}>{selected?.maDoiSoat || '—'}</strong></span>
+                    <TrangThaiBadge trangThai={chiTiet?.trangThaiDoiSoat || selected?.trangThaiDoiSoat || 'Chờ phản hồi'} />
+                  </div>
                 </div>
               </div>
-              <button type="button" onClick={() => setModalOpen(false)} disabled={submitting} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: submitting ? 'not-allowed' : 'pointer' }}>
+              <button type="button" onClick={() => setModalOpen(false)} disabled={submitting} style={{ background: 'transparent', border: 'none', color: '#6f797a', cursor: submitting ? 'not-allowed' : 'pointer' }}>
                 <Icon name="close" />
               </button>
             </div>
