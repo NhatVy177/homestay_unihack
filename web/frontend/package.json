@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "check:ui-tokens": "node scripts/check-ui-tokens.mjs",
     "test:avalanche-ui": "node scripts/avalanche-smoke.mjs",
     "test:handover-ui": "node scripts/handover-bundle-ui.mjs",
     "test:shell-ui": "node scripts/ui-shell.mjs",

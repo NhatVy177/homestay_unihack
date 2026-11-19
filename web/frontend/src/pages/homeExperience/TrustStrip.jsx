@@ -78,7 +78,7 @@ export default function TrustStrip() {
               aria-label={`Mở bản gốc: ${item.room || 'hồ sơ'}`} title="Mở bản gốc đã lưu"><Icon name="arrow_forward" /></a>}
           </li>)}
         </ul>
-        <p className="ts-own">Bạn luôn giữ một bản biên bản của mình và có thể đối chiếu bất cứ lúc nào, kể cả khi không đăng nhập. <Link to="/kiem-chung-avalanche">Kiểm tra một biên bản →</Link></p>
+        <p className="ts-own">Bạn luôn giữ một bản biên bản của mình (file tải về sau khi xác nhận) và có thể tự đối chiếu bất cứ lúc nào, kể cả khi không đăng nhập. <Link to="/kiem-chung-avalanche">Tự kiểm tra biên bản của bạn →</Link></p>
       </div>}
     </div>
   </section>;

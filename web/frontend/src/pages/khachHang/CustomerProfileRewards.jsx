@@ -122,11 +122,22 @@ function RewardActions({ data, refresh }) {
     } catch (error) { setError(message(error, 'Chưa đổi được ưu đãi. Vui lòng thử lại.')); }
     finally { setBusy(false); }
   }
+  if (!data.history.length && data.balance < data.voucherPoints) {
+    return <section className="ui-card reward-card">
+      <h3>Bạn chưa có điểm thưởng</h3>
+      <p>Mỗi hóa đơn tháng thanh toán đúng hạn được {data.awardPoints} điểm. Đủ {data.voucherPoints} điểm có thể đổi giảm {money(data.voucherVnd)} cho hóa đơn kế tiếp.</p>
+    </section>;
+  }
+  const missing = Math.max(0, data.voucherPoints - data.balance);
   return <section className="ui-card reward-card">
     <h3>Giảm {money(data.voucherVnd)} hóa đơn tháng</h3>
     {error && <p role="alert" className="reward-feedback is-error">{error}</p>}
     {notice && <p role="status" className="reward-feedback">{notice}</p>}
     <p>Đổi {data.voucherPoints} điểm để áp dụng ưu đãi cho hóa đơn kế tiếp đủ điều kiện.</p>
+    {missing > 0 && <div className="reward-progress">
+      <p>Bạn có {data.balance}/{data.voucherPoints} điểm, còn thiếu {missing} điểm để đổi.</p>
+      <span className="reward-progress-bar" aria-hidden="true"><span style={{ width: `${Math.min(100, (data.balance / data.voucherPoints) * 100)}%` }} /></span>
+    </div>}
     {data.contracts.length > 0 && <label className="reward-field">Hợp đồng áp dụng
       <select className="ui-input" value={contract} disabled={busy} onChange={event => setSelectedContract(event.target.value)}>
         {data.contracts.map(row => <option value={row.id} key={row.id}>{row.id}</option>)}
@@ -136,7 +147,7 @@ function RewardActions({ data, refresh }) {
       <button type="button" className="ui-btn ui-btn--secondary" onClick={() => setVerifyOpen(true)}>Xác nhận email để nhận điểm</button>}
     {data.linked && !ready && signer?.status === 'needs-email' && !verifyOpen && data.balance >= data.voucherPoints &&
       <button type="button" className="ui-btn ui-btn--secondary" onClick={() => setVerifyOpen(true)}>Xác nhận email để đổi điểm</button>}
-    {verifyOpen && signer?.status === 'needs-email' && <EmailCodeGate signer={signer} onCancel={() => setVerifyOpen(false)} />}
+    {verifyOpen && signer?.status === 'needs-email' && <div className="reward-gate"><EmailCodeGate signer={signer} onCancel={() => setVerifyOpen(false)} /></div>}
     {signer?.status === 'preparing' && <p role="status">Đang chuẩn bị xác nhận tài khoản…</p>}
     {signer?.status === 'error' && <p role="alert" className="reward-feedback is-error">{signer.error}</p>}
     {!signer && <p>Xác nhận qua email hiện chưa sẵn sàng.</p>}

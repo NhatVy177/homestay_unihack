@@ -1,4 +1,4 @@
-.kpi-report { display: grid; gap: var(--space-4); padding: var(--space-6); margin-top: var(--space-5); }
+.kpi-report { display: grid; gap: var(--space-4); padding: var(--space-6); margin-top: var(--space-6); }
 .kpi-eyebrow { margin: 0 0 var(--space-2); font-size: 10px; font-weight: 600; letter-spacing: .1em; color: var(--color-accent); }
 .kpi-report h2 { margin: 0; }
 .kpi-head { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: flex-end; justify-content: space-between; }
