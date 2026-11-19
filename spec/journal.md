@@ -2202,3 +2202,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `database/migrations/20261119_asset_transfer.sql` (khóa chỉ khi đã có biên bản bàn giao vào; thêm cờ `choBanGiao`), `database/migrations/20261119_seed_branch_warehouse.sql`, `web/backend/scripts/warehouse-seed-db.mjs`, `web/backend/package.json` (`warehouse-seed:db:migrate`), `BanGiaoPhongTab.jsx` + `nhanVienQuanLy.css` (cảnh báo đỏ, nút), `NhanVienQuanLyPage.jsx` (chuyển tab kèm món cần thay), `AssetTransferWorkspace.jsx` + `assetTransfer.css` (hướng dẫn ba bước, nhãn "Chờ bàn giao"), `hackathon/video-script.md` (bỏ cảnh điều phối, mọi món mặc định "Tốt", cảnh lịch xem tiếp đã có code, đổi lý do yêu cầu sửa biên bản và phản đối đối soát), spec.
 - Kiểm tra: `npm run build` qua; backend test 167 qua, 0 lỗi. Đã chạy lên HOMEDORM4 với sự đồng ý của Vy: `warehouse-seed:db:migrate` (mỗi chi nhánh 4 loại, 11 dùng được, 1 chờ sửa; chỉ thêm dòng) và `assets:db:migrate` (áp lại thủ tục). Đối chiếu dữ liệu thật: P101 (hợp đồng hiệu lực, chưa bàn giao) giờ điều phối được, P105 (đã bàn giao) vẫn khóa.
 - Còn lại: Vy bấm thử luồng bàn giao → món hư → Điều phối → quay lại. Không cần khởi động lại backend vì chỉ đổi SQL và frontend.
+
+## 2026-11-19 21:14:33 +07:00 — J-C211 — Đính chính J-C210: giữ lý do "vết rách" trong kịch bản
+
+- Người thực hiện: Claude, theo bình luận của Vy: quản lý ghi "Tốt" hết, lỗi để khách phát hiện qua "Yêu cầu chỉnh sửa".
+- `hackathon/video-script.md`: cảnh 1:13 khách yêu cầu sửa vì "Nệm có vết rách sẵn" (bản 2 ghi vết rách), cảnh 2:19 khách phản đối "Vết rách đã có trong biên bản nhận phòng"; lời đọc 1:08 thêm "khách đọc lại trước khi xác nhận". Thay phần đổi lý do sang "2 ghế" và "hao mòn" ghi ở J-C210.
+- Kiểm tra: không có (chỉ đổi kịch bản).
