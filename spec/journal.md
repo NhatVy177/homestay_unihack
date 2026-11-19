@@ -2062,3 +2062,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: `build`, `test:avalanche-ui`, `check:ui-tokens` qua; Playwright 1280/390 với khung modal dựng lại và API giả lập: thẻ nằm trên tờ, rộng bằng tờ, không tràn ngang, không lỗi JavaScript, chọn tệp và lưu thành công. `test:handover-ui` chạy qua bước tải hợp đồng nhưng **vẫn fail** ở bước sau (đợi tiêu đề "Nội dung khớp bản ghi trên chain" đã không còn trong mã từ trước, không do đợt này); chưa sửa.
 - Chưa kiểm: chưa mở modal thật trong luồng Sale với dữ liệu HOMEDORM4.
 - Còn lại: Vy xem lại trong luồng Sale; cập nhật `handover-bundle-ui.mjs` cho khớp trang xác minh hiện tại khi có dịp.
+
+## 2026-11-19 14:54:39 +07:00 — J-C194 — Mã OTP xác nhận điện tử gửi về hộp thư demo
+
+- Người thực hiện: Claude, nhánh `feat/otp-demo-inbox`, theo yêu cầu của Vy (cần nhận mã OTP của tài khoản khách demo).
+- Thay đổi: `AccountSignerProvider.jsx` gửi mã Privy tới `hop-thu+<tên-email-khách>@gmail.com` khi đặt `VITE_OTP_DEMO_INBOX` (Gmail chuyển về một hộp thư); so khớp phiên Privy cũng dùng địa chỉ này nên không bị hỏi lại mỗi lần. Giao diện vẫn hiện email gốc của khách. Để trống biến này thì gửi tới email thật. `.env.example` thêm dòng giải thích; giá trị thật nằm trong `web/frontend/.env` (không commit).
+- File: `web/frontend/src/components/xacNhan/AccountSignerProvider.jsx`, `web/frontend/.env.example`.
+- Kiểm tra: `npm run build` qua theo yêu cầu gấp của Vy, chưa chạy thử gửi mã thật qua Privy.
+- Lưu ý: Privy coi địa chỉ có "+" là email khác nên tạo ví nhúng mới; tài khoản đã gắn ví bằng email thật trước đó sẽ báo "gắn với khóa khác" (cần tài khoản chưa từng xác nhận hoặc liên hệ quản lý gỡ liên kết). Cần khởi động lại Vite để đọc biến môi trường.
+- Còn lại: Vy khởi động lại frontend và thử gửi mã.
