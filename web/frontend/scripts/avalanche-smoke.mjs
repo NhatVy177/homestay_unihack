@@ -59,11 +59,12 @@ try {
   await page.getByRole('heading', { name: 'Biên bản bàn giao & đối soát' }).waitFor();
   await page.getByText('Chưa có biên bản hay bảng đối soát nào cần bạn xem.', { exact: false }).waitFor();
   assert.equal(await page.getByRole('button', { name: /Xác nhận biên bản/ }).count(), 0);
-  // D-013: simulated e-wallet page is clearly labelled and drives the order API only.
+  // D-013: simulated e-wallet page drives the order API only; the MoMo QR appears on arrival (no extra click, no banner).
+  await page.route('**/api/thanh-toan-mo-phong/SIM*/momo/qr', route => route.fulfill({ json: { qrCode: 'momo-sandbox-qr-ui-test' } }));
   await page.route('**/api/thanh-toan-mo-phong/SIMTEST', route => route.fulfill({ json: { id: 'SIMTEST', refId: 'PC0001', amountVnd: 3000000, status: 'Pending' } }));
   await page.goto(base + '/thanh-toan-mo-phong/SIMTEST', { waitUntil: 'domcontentloaded' });
-  await page.getByText('Giao dịch mô phỏng không trừ tiền thật.').waitFor();
-  await page.getByRole('button', { name: 'Tạo mã QR MoMo' }).waitFor();
+  await page.getByRole('img', { name: /Mã QR MoMo/ }).waitFor();
+  assert.equal(await page.getByText('Giao dịch mô phỏng không trừ tiền thật.').count(), 0);
   assert.ok((await page.textContent('body')).includes('3.000.000'));
   await capture('01-cong-tien-coc.png');
   await page.route('**/api/thanh-toan-mo-phong/SIMFIRST', route => route.fulfill({ json: {
