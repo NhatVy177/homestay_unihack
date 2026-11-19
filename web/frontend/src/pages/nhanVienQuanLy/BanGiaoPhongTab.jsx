@@ -110,7 +110,7 @@ export default function BanGiaoPhongTab() {
   const [loadingDanhSach, setLoadingDanhSach] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [filterState, setFilterState] = useState('all'); // 'all' | 'cho-thu-tien' | 'da-thanh-toan'
+  const [filterState, setFilterState] = useState('chua-ban-giao'); // 'chua-ban-giao' | 'da-thanh-toan' (chờ bàn giao) | 'cho-thu-tien' | 'da-ban-giao' | 'all'
   const [searchQuery, setSearchQuery] = useState('');
 
   const isReadOnlyHandover = Boolean(hopDong?.daCoBienBanBanGiaoVao || Number(dieuKien?.maLoi) === -5);
@@ -138,7 +138,7 @@ export default function BanGiaoPhongTab() {
     const choThuTien = danhSachChoBanGiao.filter((item) => !item.daDongTienDauKy && !item.daBanGiao).length;
     const daThanhToan = danhSachChoBanGiao.filter((item) => item.daDongTienDauKy && !item.daBanGiao).length;
     const daBanGiao = danhSachChoBanGiao.filter((item) => item.daBanGiao).length;
-    return { all, 'cho-thu-tien': choThuTien, 'da-thanh-toan': daThanhToan, 'da-ban-giao': daBanGiao };
+    return { all, 'chua-ban-giao': choThuTien + daThanhToan, 'cho-thu-tien': choThuTien, 'da-thanh-toan': daThanhToan, 'da-ban-giao': daBanGiao };
   }, [danhSachChoBanGiao]);
 
   const filteredList = useMemo(() => {
@@ -152,16 +152,13 @@ export default function BanGiaoPhongTab() {
         String(item.tenPhong || item.maPhong || '').toLowerCase().includes(q)
       ));
     }
-    if (filterState === 'cho-thu-tien') {
-      return list.filter((item) => !item.daDongTienDauKy && !item.daBanGiao);
-    }
-    if (filterState === 'da-thanh-toan') {
-      return list.filter((item) => item.daDongTienDauKy && !item.daBanGiao);
-    }
-    if (filterState === 'da-ban-giao') {
-      return list.filter((item) => item.daBanGiao);
-    }
-    return list;
+    if (filterState === 'chua-ban-giao') list = list.filter((item) => !item.daBanGiao);
+    else if (filterState === 'cho-thu-tien') list = list.filter((item) => !item.daDongTienDauKy && !item.daBanGiao);
+    else if (filterState === 'da-thanh-toan') list = list.filter((item) => item.daDongTienDauKy && !item.daBanGiao);
+    else if (filterState === 'da-ban-giao') list = list.filter((item) => item.daBanGiao);
+    // Ưu tiên: sẵn sàng bàn giao (đã thanh toán) trước, rồi chờ thanh toán, đã bàn giao xuống cuối.
+    const rank = (item) => (item.daBanGiao ? 2 : item.daDongTienDauKy ? 0 : 1);
+    return [...list].sort((a, b) => rank(a) - rank(b));
   }, [danhSachChoBanGiao, filterState, searchQuery]);
 
   const fetchDanhSachChoBanGiao = async () => {
@@ -440,9 +437,9 @@ export default function BanGiaoPhongTab() {
       {!hopDong && (
         <>
 <OverviewCards items={[
-              { key: 'all', label: 'Tất cả' },
-              { key: 'cho-thu-tien', label: 'Chờ thanh toán' },
+              { key: 'chua-ban-giao', label: 'Chưa bàn giao' },
               { key: 'da-thanh-toan', label: 'Chờ bàn giao' },
+              { key: 'cho-thu-tien', label: 'Chờ thanh toán' },
               { key: 'da-ban-giao', label: 'Đã bàn giao' }
             ]} counts={counts} />
 <div className="ui-list-toolbar">
@@ -465,10 +462,11 @@ export default function BanGiaoPhongTab() {
 <StatusFilterTabs
             className="status-pill-tabs-offset"
             items={[
-              { key: 'all', label: 'Tất cả' },
-              { key: 'cho-thu-tien', label: 'Chờ thanh toán' },
+              { key: 'chua-ban-giao', label: 'Chưa bàn giao' },
               { key: 'da-thanh-toan', label: 'Chờ bàn giao' },
-              { key: 'da-ban-giao', label: 'Đã bàn giao' }
+              { key: 'cho-thu-tien', label: 'Chờ thanh toán' },
+              { key: 'da-ban-giao', label: 'Đã bàn giao' },
+              { key: 'all', label: 'Tất cả' }
             ]}
             activeKey={filterState}
             counts={counts}

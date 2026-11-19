@@ -5,15 +5,11 @@ import './hoaDonDinhKy.css';
 
 // Màn "Hóa đơn định kỳ" của kế toán, theo bố cục và chức năng màn cùng tên của nhóm Hằng (AccountantMonthlyPage):
 // thẻ tổng quan theo kỳ, tab "Lập hóa đơn định kỳ" (chọn hợp đồng, chốt chỉ số, dịch vụ, phí phát sinh) và tab "Danh sách hóa đơn".
+// Hư hỏng do khách gây ra đã được tính qua luồng báo hỏng/sửa chữa (D-072), nên không nhập lại ở đây.
 const STANDARD_FEES = [
-  { value: 'voi_sen', label: 'Đền bù làm hỏng vòi sen tắm', code: 'CPPS-8821', amount: 150000 },
   { value: 'the_tu', label: 'Đền bù làm mất thẻ từ/chìa khóa', code: 'CPPS-4102', amount: 100000 },
   { value: 've_sinh', label: 'Phạt vi phạm nội quy vệ sinh', code: 'CPPS-1104', amount: 200000 },
-  { value: 'tu_ao', label: 'Đền bù hư hỏng tủ quần áo', code: 'CPPS-5531', amount: 500000 },
   { value: 'phu_thu', label: 'Phí phụ thu vệ sinh phòng thêm', code: 'CPPS-3211', amount: 300000 },
-  { value: 'ban_hoc', label: 'Đền bù làm hư hỏng bàn học + ghế', code: 'CPPS-6204', amount: 150000 },
-  { value: 'khoa_cua', label: 'Đền bù làm hỏng khóa cửa điện tử', code: 'CPPS-7128', amount: 800000 },
-  { value: 'giuong_nem', label: 'Đền bù hư hỏng giường đơn + nệm', code: 'CPPS-9901', amount: 200000 },
   { value: 'other', label: 'Khác (Tự nhập chi tiết)', code: 'CPPS', amount: 0 },
 ];
 const STATUS_LABEL = { paid: 'Đã thu', pending: 'Chờ TT', overdue: 'Quá hạn', review: 'Chờ xác nhận' };
@@ -142,7 +138,7 @@ export default function HoaDonDinhKyTab() {
     await loadDetail(selectedId, false);
   });
   const deleteFee = (maPhi) => run(async () => { await hoaDonDinhKyApi.xoaPhi(maPhi); await loadDetail(selectedId, false); });
-  const openFeeModal = () => setFeeModal({ type: 'voi_sen', code: `${STANDARD_FEES[0].code}-${suffix()}`, name: STANDARD_FEES[0].label, amount: STANDARD_FEES[0].amount, status: 'Đã xác nhận', date: today() });
+  const openFeeModal = () => setFeeModal({ type: STANDARD_FEES[0].value, code: `${STANDARD_FEES[0].code}-${suffix()}`, name: STANDARD_FEES[0].label, amount: STANDARD_FEES[0].amount, status: 'Đã xác nhận', date: today() });
   const changeFeeType = (value) => {
     const s = STANDARD_FEES.find((x) => x.value === value);
     setFeeModal((m) => ({ ...m, type: value, code: `${s.code}-${suffix()}`, name: value === 'other' ? '' : s.label, amount: s.amount }));

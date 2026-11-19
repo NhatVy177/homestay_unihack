@@ -1,6 +1,10 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-19 15:45:24 +07:00** (J-C197: kế toán Thu tiền mặt, bỏ tab Kết quả đối soát). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-19 16:00:15 +07:00** (J-C198: sửa mục 11, 12, 13 của ghi chú lỗi homedorm). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+
+## Ghi chú lỗi homedorm, mục 11–13 — D-081
+
+- Nhánh `fix/note-items-11-13` (J-C198): bộ lọc/ưu tiên "Chưa bàn giao", bỏ mục đền bù hư hỏng khỏi chi phí phát sinh, chặn lập hóa đơn định kỳ khi chưa thu kỳ đầu. Backend 166 qua, build qua, đọc thử chỉ đọc trên HOMEDORM4. Hóa đơn HO0005 (HD0003, kỳ đầu) do lần lập trước vẫn còn, chưa xử lý.
 
 ## Kế toán thu tiền mặt — D-080
 

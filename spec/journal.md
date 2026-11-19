@@ -2099,3 +2099,14 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `web/backend/services/thuTienMat.service.js`, `routes/thuTienMat.routes.js`, `index.js`; `web/frontend/src/pages/nhanVienKeToan/TienMatChoNopQuyTab.jsx`, `thuTienMat.api.js`, `thuTienMat.css`, `NhanVienKeToanPage.jsx`, `QuyetToanTraPhongTab.jsx`; `spec/*`.
 - Kiểm tra: `npm run build`, `check:ui-tokens` qua; gọi thẳng dịch vụ chỉ đọc trên HOMEDORM4 với kế toán NV0004: trả 1 khoản (nhận phòng HD0003, 4.681.000 đ), chặn người không phải kế toán (403) và số tiền trống (400). Theo yêu cầu gấp của Vy, chưa viết test tự động cho phần ghi và chưa thu tiền thật qua giao diện.
 - Còn lại: Vy thử thu tiền mặt thật bằng một phiếu cọc hoặc HD0003; nếu muốn bỏ hẳn đường Sale thu tiền mặt cọc và ô "Tiền mặt" ở tab Hóa đơn nhận phòng thì báo để làm tiếp. Cần khởi động lại backend để có đường mới.
+
+## 2026-11-19 16:00:15 +07:00 — J-C198 — Sửa mục 11, 12, 13 của ghi chú "lỗi homedorm" (D-081)
+
+- Người thực hiện: Claude, nhánh `fix/note-items-11-13` (worktree `D:\HomeStayDorm-n1113`), theo yêu cầu của Vy ("đọc note từ 11 - 13 và sửa"). Hình trong ghi chú đọc được ở thư mục ứng dụng đóng gói (`%LOCALAPPDATA%\Packages\Lovebasicsagain.OpenNoteStickyNotes_397akh0xk2en6\LocalCache\Local\OpenNote\images`).
+- Mục 11 (`BanGiaoPhongTab.jsx`): thêm bộ lọc "Chưa bàn giao" đứng đầu và làm mặc định, thẻ tổng quan và chip theo thứ tự Chưa bàn giao, Chờ bàn giao, Chờ thanh toán, Đã bàn giao, Tất cả; danh sách sắp theo ưu tiên (sẵn sàng bàn giao trước, đã bàn giao cuối).
+- Mục 12 (`HoaDonDinhKyTab.jsx`): bỏ 5 mục "Đền bù hư hỏng/làm hỏng" khỏi `STANDARD_FEES`, mặc định đổi sang "Đền bù làm mất thẻ từ/chìa khóa".
+- Mục 13 (`hoaDonDinhKy.service.js`): thêm cờ `daThuKyDau` (hóa đơn của tháng bắt đầu hợp đồng đã Đã TT); danh sách lập chỉ gồm hợp đồng đã thu kỳ đầu, và `loadContract` trả 409 "chưa thanh toán khoản thu kỳ đầu" cho hợp đồng chưa thu. Trước đây hợp đồng chưa thu kỳ đầu vẫn lập được hóa đơn định kỳ cho đúng tháng kỳ đầu, nên HD0003 có hóa đơn HO0005 lạ.
+- Test: `test/hoa-don-dinh-ky.test.mjs` thêm ca hợp đồng chưa thu kỳ đầu (không vào danh sách, chi tiết lập bị từ chối) và hàng mẫu có `daThuKyDau`.
+- Kiểm tra: backend 166 qua, 0 lỗi, 7 bỏ qua; `npm run build`, `check:ui-tokens` qua. Đọc thử chỉ đọc trên HOMEDORM4 với kế toán NV0004: chỉ HD0004 được đề nghị lập (kỳ 2026-12), HD0003 (chưa thu kỳ đầu) không còn. Chưa xem giao diện Bàn giao tài sản ở 1440/390.
+- Không làm: hai hình thứ hai của mục 11 (danh sách "Loại hư hỏng" có hai dòng cùng tô nền) không có lời nhắn kèm nên không sửa; hóa đơn HO0005 đã tạo từ lần trước vẫn nằm trong HOMEDORM4 (không xóa khi chưa được đồng ý).
+- Còn lại: Vy xem lại màn Bàn giao tài sản; quyết định xử lý HO0005 (HD0003 đang ở trạng thái chờ thanh toán với hóa đơn kỳ đầu lạ 5.393.000 đ trong khi khoản thu kỳ đầu tính ra 4.681.000 đ).

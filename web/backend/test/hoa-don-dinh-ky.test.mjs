@@ -2,14 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   nextPeriod, dueDateFor, readingDateFor, periodToBill, statusGroup,
-  danhSachHopDong, lapHoaDon, thuTien, themPhiPhatSinh, xoaPhiPhatSinh,
+  danhSachHopDong, chiTietLapHoaDon, lapHoaDon, thuTien, themPhiPhatSinh, xoaPhiPhatSinh,
 } from '../services/hoaDonDinhKy.service.js';
 
 const keToan = { vaiTro: 'NhanVien', chucVu: 'Kế toán', maNguoiDung: 'NV0008', maChiNhanh: 'CN0002' };
 const contractRow = {
   maHopDong: 'HD0002', giaThue: 7200000, soGiuongThue: 1, ngayBatDau: new Date('2026-11-15T00:00:00Z'),
   ngayKetThuc: new Date('2027-11-15T00:00:00Z'), hinhThucThue: 'Nguyên phòng', hoTen: 'demo5', sdt: '0897564321',
-  maPhong: 'P103', tenPhong: 'Phòng P103', maChiNhanh: 'CN0002', tenChiNhanh: 'HomeDorm Thủ Đức', giuong: null, kyCuoi: '2026-11',
+  maPhong: 'P103', tenPhong: 'Phòng P103', maChiNhanh: 'CN0002', tenChiNhanh: 'HomeDorm Thủ Đức', giuong: null, kyCuoi: '2026-11', daThuKyDau: 1,
 };
 
 test('period helpers follow the reference rules (next month, due on the 10th but at least 7 days)', () => {
@@ -30,6 +30,13 @@ test('period helpers follow the reference rules (next month, due on the 10th but
 test('only accountants of a branch can use periodic invoices', async () => {
   await assert.rejects(danhSachHopDong({ vaiTro: 'NhanVien', chucVu: 'Sale', maChiNhanh: 'CN0002' }, { query: async () => ({ recordset: [] }) }), /kế toán/);
   await assert.rejects(danhSachHopDong({ vaiTro: 'KhachHang', maNguoiDung: 'KH0001' }), /kế toán/);
+});
+
+test('contracts whose first-period (move-in) invoice is unpaid are not offered for periodic billing', async () => {
+  const unpaid = { ...contractRow, maHopDong: 'HD0009', kyCuoi: null, daThuKyDau: 0 };
+  const list = await danhSachHopDong(keToan, { query: async () => ({ recordset: [unpaid, contractRow] }) });
+  assert.deepEqual(list.map((c) => c.maHopDong), ['HD0002']);
+  await assert.rejects(chiTietLapHoaDon(keToan, 'HD0009', { query: async () => ({ recordset: [unpaid] }) }), /kỳ đầu/);
 });
 
 test('contract list shows the next period to bill', async () => {
