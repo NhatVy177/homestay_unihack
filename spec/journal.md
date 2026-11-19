@@ -2220,3 +2220,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo hai bình luận của Vy trên trang kịch bản.
 - `hackathon/video-script.md`: 0:00–0:04 Vy tự giới thiệu tên, đội trên logo và sơ đồ luồng; 0:04–0:08 slide tĩnh "Chế độ demo đang bật" (bảng bản demo / bản thật: ghi "Đã xem" trước giờ hẹn, lập hóa đơn định kỳ ngay, MoMo mô phỏng tự trả sau 3 phút, VietQR không kèm số tiền, email dồn một hộp thư, Fuji + relayer, dữ liệu và tài khoản mẫu); rút bốn cảnh 0:08–0:24 để giữ 3:00. Cảnh thuê nhóm thêm lời đọc và lướt bộ lọc: nhóm nam nữ chọn phòng "Không phân biệt".
 - Kiểm tra: đối chiếu code `demoMode.js` (`DEMO_BO_QUA_GIO_HEN=1` đang bật), `HoaDonDinhKyTab.jsx` (J-C199), `MomoQrPanel.jsx`, `config/payment.js` (`PAYMENT_VIETQR_HIEN_SO_TIEN=false`), `mailer.js`, `DemoAccounts.jsx`; HOMEDORM4 có 37 phòng "Không phân biệt".
+
+## 2026-11-19 21:42:19 +07:00 — J-C214 — Kịch bản demo: nói rõ mức cọc
+
+- Người thực hiện: Claude, theo bình luận của Vy ("nói rõ hệ thống đang cho cọc bao nhiêu").
+- `hackathon/video-script.md` cảnh 0:35–0:40: phiếu cọc hiện "giá thuê 1 tháng × 2 = tiền cọc"; lời đọc nêu cọc bằng hai tháng tiền thuê (giá giường nếu ở ghép, giá nguyên phòng nếu thuê nguyên phòng).
+- Kiểm tra: đối chiếu `web/backend/services/tienCoc.js` (`SO_THANG_COC = 2`) và trigger `TRG_ChiTietDatCoc_TinhGiaThue_Va_SoTienCoc`.
