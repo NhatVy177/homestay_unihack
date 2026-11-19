@@ -98,6 +98,11 @@ Bảy việc Vy duyệt (chi tiết ở `spec/scope.md` F-17–F-20, nhật ký 
 - `npm run avalanche:recover` dựng lại hồ sơ chỉ từ chuỗi; `docs/minh-bach-ky-thuat.md` nêu dữ liệu lên chuỗi, gas đo thật (≈430.000 gas một hợp đồng, relayer trả), giới hạn.
 - Không làm: chatbot Messenger thật (phải chờ Meta duyệt), ghép bạn cùng phòng.
 
+### Bổ sung vận hành — D-075 / D-076 (19/11/2026)
+
+- KPI Sale theo tháng (tỷ lệ đặt cọc, tỷ lệ chốt) cho Sale, Quản lý chi nhánh và Admin; khách xem lại chi tiết biên bản tài sản đã bàn giao. Claude làm (F-23).
+- Điều phối tài sản giữa phòng và kho chi nhánh, có lịch sử, chặn phòng đang có khách. Codex làm song song (F-24).
+
 ### Luồng nhận phòng và ký điện tử đã chốt — D-009 (05/11/2026)
 
 HomeStayDorm hướng tới **sinh viên có smartphone**. Giữ nhân viên dẫn khách đến xem phòng và kiểm tra thiết bị/tài sản trực tiếp; **không chuyển sang mô hình tự check-in**.

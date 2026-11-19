@@ -1,6 +1,11 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-18 23:53:47 +07:00** (J-X105: thay logo mái nhà/nhánh lá màu xanh sage). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-19 10:18:41 +07:00** (J-C185: chốt KPI Sale, tài sản bàn giao và điều phối tài sản). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+
+## KPI Sale, tài sản bàn giao và điều phối tài sản — D-075 / D-076
+
+- Claude làm KPI Sale và thẻ tài sản bàn giao của khách trên nhánh `feat/sale-kpi` (worktree `D:\HomeStayDorm-kpi`). Codex làm điều phối tài sản trên nhánh `feat/asset-transfer`. Hai nhánh chờ Vy duyệt rồi mới gộp.
+- Sau khi gộp, Vy kiểm lại luồng; Claude quay video demo không tiếng để Vy lồng tiếng.
 
 ## Nhận diện và slideshow trang chủ — D-073 / D-074
 

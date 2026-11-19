@@ -1955,3 +1955,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: thay trực tiếp `web/frontend/public/images/brand/homestaydorm-logo.png` và `homestaydorm-favicon.png` bằng bản nền trong suốt màu xanh sage chính `#4A6549`. Các component, kích thước hiển thị, chữ HomeStayDorm và ba ảnh slideshow giữ nguyên.
 - Kiểm tra: đối chiếu trực tiếp tài sản PNG sau khi xuất. Không chạy server, build, test tự động hoặc trình duyệt theo yêu cầu của Vy.
 - Còn lại: không.
+
+## 2026-11-19 10:18:41 +07:00 — J-C185 — Chốt KPI Sale, tài sản bàn giao và điều phối tài sản
+
+- Người thực hiện: Claude. Vy muốn khách xem lại tài sản đã bàn giao, quản lý điều phối tài sản và có KPI Sale (tỷ lệ đặt cọc, tỷ lệ chốt). Vy duyệt chia việc: Claude làm KPI Sale và thẻ tài sản bàn giao (D-075), Codex làm điều phối tài sản (D-076).
+- Rà code: thẻ "Danh sách tài sản bàn giao" của khách đã đọc số lượng từ `ChiTietBanGiao` nhưng chưa hiện ghi chú, ngày và người bàn giao. `TaiSan` chỉ có số lượng theo phòng, chưa có kho hay lịch sử chuyển. Tab Tài sản của Admin tự sinh dữ liệu mẫu khi trống và gửi các ô database không lưu. Báo cáo hiện có chỉ theo nguồn khách, chưa theo từng Sale.
+- File: `spec/decisions.md`, `spec/scope.md`, `spec/luong-tong-hop.md`, `spec/progress.md`, `hackathon/plan.md`, `spec/journal.md`.
+- Kiểm tra: chỉ đổi hồ sơ, không chạy test.
+- Còn lại: Claude code D-075 trên `feat/sale-kpi`; Codex code D-076 theo prompt Vy chuyển.

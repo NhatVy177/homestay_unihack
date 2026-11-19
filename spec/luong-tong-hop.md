@@ -53,9 +53,9 @@ D-067/J-X096: khách chỉ sửa/xóa báo hỏng của chính mình ở trạng
 |---|---|
 | **Khách thuê** (cần tài khoản + email, D-016) | Đăng ký hồ sơ, xem phòng, tự gửi "Giữ chỗ", trả cọc, khai người ở, trả kỳ đầu và hóa đơn tháng, xác nhận biên bản bàn giao và đối soát (ký điện tử), xem khoản dự kiến trừ |
 | **Sale** | Tiếp nhận hồ sơ, hẹn lịch xem, ghi trạng thái buổi xem, gửi giữ chỗ thay khách, thu tiền mặt cọc, lập hợp đồng, đối chiếu CCCD gốc, tải ảnh hợp đồng đã ký |
-| **Quản lý chi nhánh** | Duyệt giữ chỗ (kiểm tra phòng thật), duyệt cư trú bất thường, lập biên bản bàn giao, kiểm tra trả phòng, bấm "Đã thu chìa khóa", theo dõi danh sách "Chờ khách xác nhận" |
+| **Quản lý chi nhánh** | Duyệt giữ chỗ (kiểm tra phòng thật), duyệt cư trú bất thường, lập biên bản bàn giao, kiểm tra trả phòng, bấm "Đã thu chìa khóa", theo dõi danh sách "Chờ khách xác nhận", xem KPI Sale chi nhánh (D-075), điều phối tài sản phòng/kho (D-076) |
 | **Kế toán** | Xác nhận chuyển khoản tay, ghi nhận tiền mặt nộp quỹ, nhập chỉ số điện nước, rà bản nháp đối soát, chi hoàn cọc kèm chứng từ |
-| **Admin** | Quản lý nhân viên, cấu hình hệ thống |
+| **Admin** | Quản lý nhân viên, cấu hình hệ thống, xem KPI Sale mọi chi nhánh (D-075) |
 | **NVAUTO ("Hệ thống tự động")** | Tài khoản hệ thống, không đăng nhập được, đứng tên các bước máy tự làm (chốt phiếu cọc, duyệt cư trú bình thường, hết hạn tự động) |
 
 **Hệ thống:** frontend React/Vite; backend Express + SQL Server (nhiều logic nằm trong stored procedure); relayer backend trả gas; ví nhúng Privy (khách nhập OTP email); contract `DormSettlement.sol` (EIP-712) trên Fuji; Verify độc lập; gói bằng chứng; email có chống trùng (`MAIL_REDIRECT_TO` để thử).
@@ -163,6 +163,8 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
 4. Khi khách bấm xác nhận: trình duyệt đối chiếu nội dung đang xem với snapshot → backend ghi đúng bản đó lên chuỗi → khách ký → **bản bị khóa**. **← MỐC CHUỖI 1.**
 5. **Không ép xác nhận tại chỗ.** Giao chìa khóa là trạng thái Web2 riêng, **không chờ chữ ký**. Chưa xác nhận → **email nhắc sau 24 giờ và 72 giờ**. **Không tự xác nhận thay khách.** Quản lý thấy danh sách **"Chờ khách xác nhận"**.
 6. **OTP (D-015, giữ nguyên):** Privy cần gói trả phí mới bỏ được OTP. Để giảm vướng: thẻ **"Kích hoạt xác nhận điện tử"** hiện ngay sau khi khách trả cọc, để lúc bàn giao thường chỉ còn bấm Xác nhận; nút **"Gửi lại mã"** có đếm ngược, nhắc kiểm tra thư rác. Thời hạn phiên Privy sẽ thử thật ở đợt Fuji. Vẫn hỏi BTC (Q-10); có gói thì bật lại D-011 (bỏ OTP). Không dùng ví do máy chủ giữ hộ.
+
+7. **Xem lại tài sản đã bàn giao (D-075):** thẻ tài sản trong tab Hợp đồng của khách hiện mã biên bản, ngày, quản lý bàn giao, ghi chú chung và tình trạng từng món.
 
 ### 3.7 Giai đoạn 7: Đang ở (D-029)
 
