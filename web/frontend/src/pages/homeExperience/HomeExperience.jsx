@@ -116,11 +116,11 @@ export function RoomCard({ room, onViewDetail, index = 0 }) {
     card.current.style.setProperty('--glow-y', `${y * 100}%`);
   }
   function reset() { card.current.style.setProperty('--rx', '0deg'); card.current.style.setProperty('--ry', '0deg'); }
-  // Dấu tim: khách có hồ sơ đang mở thì thêm/gỡ phòng ngay tại thẻ; chưa đăng nhập thì yêu cầu đăng nhập, khách chưa có hồ sơ mở
-  // thì vào đúng phòng trong cổng khách để tạo hồ sơ.
+  // Dấu tim: khách có hồ sơ đang mở (chưa lập lịch) thì thêm/gỡ phòng ngay tại thẻ; chưa đăng nhập thì yêu cầu đăng nhập;
+  // khách chưa có hồ sơ mở thì mở thẳng form lập hồ sơ đăng ký với phòng này (dangKy=1), không dừng ở trang chi tiết.
   async function interest() {
     if (interested.profile) { setNote(await interested.toggle(room)); return; }
-    const target = `/khach-hang?phong=${encodeURIComponent(room.MaPhong)}`;
+    const target = `/khach-hang?phong=${encodeURIComponent(room.MaPhong)}&dangKy=1`;
     window.location.assign(user ? (user.vaiTro === 'KhachHang' ? target : getAuthenticatedHomePath(user)) : `/?next=${encodeURIComponent(target)}`);
   }
   return <Reveal delay={(index % 3) * 100} kind="spring">
