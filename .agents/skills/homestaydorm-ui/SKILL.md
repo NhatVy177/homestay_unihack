@@ -1,6 +1,6 @@
 ---
 name: homestaydorm-ui
-description: Quy chuẩn giao diện HomeStayDorm (React + CSS thường). Dùng khi sửa hoặc thêm bất kỳ màn hình, component, CSS nào trong web/frontend.
+description: Quy chuẩn giao diện HomeStayDorm (React + CSS thường). Dùng khi thêm chức năng mới, sửa hoặc thêm bất kỳ màn hình, component, CSS nào trong web/frontend, để giao diện mới đồng bộ với phần đang có.
 ---
 
 # Giao diện HomeStayDorm
@@ -43,3 +43,31 @@ Thiếu thì thêm vào lớp/component chung, không viết riêng trong trang.
 - `npm run test:avalanche-ui` qua (màn xác nhận không hỏng).
 - Mở màn ở 1440px và 390px: không tràn ngang, không lỗi console.
 - Đếm `style={{` trong file đã sửa: báo số trước và sau.
+
+## Biến token có thật (chỉ dùng các biến này)
+
+- Màu: `--color-primary`, `-primary-hover`, `-primary-soft`, `-accent`, `-accent-soft`, `-bg`, `-surface`, `-surface-alt`, `-border`, `-text`, `-text-muted`, `-success/-warning/-danger/-info` và bản `-soft`.
+- Khoảng cách: **`--space-1`, `-2`, `-3`, `-4`, `-6`, `-8`, `-10` (không có `--space-5`, `--space-7`)**.
+- Bo góc `--radius-sm/-md/-lg/-pill`; bóng `--shadow-sm/-md`; cỡ icon `--icon-sm/-md/-lg`; ô nhập `--control-height`, `--control-height-lg`; font `--font-heading`, `--font-body`.
+- Biến không tồn tại không báo lỗi build mà làm thuộc tính bị bỏ qua (padding thành 0, chữ dính sát viền). Cần giá trị mới thì thêm vào `src/styles/tokens.css`, đừng bịa tên.
+
+## Thêm chức năng mới: bắt chước màn có sẵn
+
+| Cần làm | Chép bố cục từ |
+|---|---|
+| Bảng thống kê có lọc kỳ/chi nhánh | `components/kpiSale/SaleKpiReport.jsx` + `saleKpi.css` |
+| Bảng báo cáo có thanh tỷ lệ | `components/nguonKhach/SourceReport.jsx` |
+| Thẻ trong hợp đồng của khách | khối "Danh sách tài sản bàn giao" trong `KhachHangPortalPage.jsx` (`hd-card`, `hd-table`) |
+| Thẻ điểm thưởng / trạng thái chưa có dữ liệu | `pages/khachHang/CustomerProfileRewards.jsx` |
+| Menu quản lý/Admin | thêm một mục vào `navItems`, tab id dạng `kebab-case` |
+
+Quy tắc cho màn mới:
+- Thẻ dùng `ui-card`, mỗi thẻ có `padding: var(--space-6)` (`--space-4` ở ≤640px); khoảng cách giữa phần tử `--space-3`/`--space-4`.
+- **Trạng thái rỗng phải giải thích cách có dữ liệu** (vd "Mỗi hóa đơn trả đúng hạn được 100 điểm"), không để nút mờ vô nghĩa. Có tiến độ thì hiện "40/100".
+- Mọi số liệu theo vai trò: kiểm quyền ở backend, giao diện chỉ ẩn/hiện, không là hàng rào bảo mật.
+- Tên lớp CSS có tiền tố theo component (`kpi-`, `src-`, `reward-`), không dùng lớp trần như `.card`, `.title`.
+
+## Kiểm tự động trước khi báo xong
+
+- `npm run check:ui-tokens` (trong `web/frontend`): báo mọi `var(--...)` chưa khai báo. Phải báo OK cho file mình sửa.
+- Nếu còn lỗi cũ ở file khác (ghi ở journal), không tự sửa lan; báo Vy.
