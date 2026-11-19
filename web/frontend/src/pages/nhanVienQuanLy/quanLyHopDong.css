@@ -13,10 +13,10 @@
 .qlhd-code { color: var(--color-primary); }
 .qlhd-warn { color: var(--color-warning) !important; font-weight: 600; }
 .qlhd-none { color: var(--color-text-muted); }
-.qlhd-modal.ktp-modal { width: min(1240px, calc(100vw - 32px)); max-height: 92dvh; display: flex; flex-direction: column; overflow: hidden; }
+.qlhd-modal.ktp-modal { width: min(1240px, calc(100vw - 32px)); max-width: none; max-height: 92dvh; display: flex; flex-direction: column; overflow: hidden; }
 .qlhd-modal .ktp-modal-header p { margin: 4px 0 0; font-size: 13px; color: var(--color-text-muted); }
 .qlhd-modal-body { overflow-y: auto; padding: var(--space-4) var(--space-6) var(--space-6); background: var(--color-bg); }
 @media (max-width: 640px) { .qlhd-toolbar { padding: var(--space-3); } .qlhd-modal-body { padding: var(--space-3); } }
 .qlhd-table .ui-status-badge, .qlhd-table [class*="status-badge"] { white-space: nowrap; }
 .qlhd-toolbar .ui-list-toolbar { margin: 0; padding: 0; border: none; box-shadow: none; background: transparent; }
-.qlhd-modal.ktp-modal.is-compact { width: min(720px, calc(100vw - 32px)); }
+.qlhd-modal.ktp-modal.is-compact { width: min(720px, calc(100vw - 32px)); max-width: none; }
