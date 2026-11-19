@@ -2175,3 +2175,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Ghi chú câu hỏi của Vy: ảnh bước khách đồng ý hỏi xác nhận email vì trình duyệt tự động chưa từng đăng nhập ví; phiên Privy lưu theo trình duyệt, trên máy Vy (đã xác nhận) không hỏi lại.
 - File: `web/backend/services/quanLyHopDong.service.js`, `web/backend/test/quan-ly-hop-dong.test.mjs`, `web/frontend/src/pages/nhanVienQuanLy/XuLyTraPhongTab.jsx`, `quanLyHopDong.css`, `web/frontend/src/pages/nhanVienKeToan/NhanVienKeToanPage.jsx`.
 - Kiểm tra: backend 167 qua, 0 lỗi (thêm test chặn kết thúc); `npm run build`, `check:ui-tokens` qua. Cần khởi động lại backend.
+
+## 2026-11-19 19:27:39 +07:00 — J-C207 — Áp hướng dẫn quay video của workshop vào kịch bản demo
+
+- Người thực hiện: Claude, theo yêu cầu của Vy (xem record workshop "From Idea to Working MVP" buổi 11/11 và 12/11).
+- Đọc bản chép lời Fathom (tải được một phần, nhiều chỗ sai chữ). Ý chính buổi 12/11 khoảng phút 1:03: video dưới 3 phút đủ tính năng; quay localhost được, không lộ khóa; cho agent tự chạy và quay, gặp lỗi thì sửa; thêm motion cho luồng quan trọng theo một phong cách thống nhất; có thể dùng TTS cho giọng rõ.
+- `hackathon/video-script.md`: thêm mục "Theo hướng dẫn workshop", 3 đoạn motion (sơ đồ luồng mở đầu, thẻ Mốc 1, thẻ Mốc 2), cảnh terminal không mở `.env`, tùy chọn TTS.
+- Chưa làm: tạo dữ liệu demo, dựng motion, quay.

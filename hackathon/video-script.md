@@ -4,6 +4,19 @@ Bản ngày 19/11/2026, thay bản 18/11 (J-C205). Đã thêm các phần làm s
 
 Vòng 1 chấm **kỹ thuật** và **mức tích hợp Avalanche**. Slide đã giới thiệu vấn đề, nên video vào thẳng sản phẩm. Claude quay màn hình tự động theo từng cảnh, Vy lồng tiếng sau.
 
+## Theo hướng dẫn workshop (buổi 12/11, khoảng phút 1:03)
+
+Mentor hướng dẫn cách làm video demo. Bản chép tự động của Fathom có nhiều chỗ sai chữ, các ý dưới đây là phần đọc được rõ:
+
+- **Dưới 3 phút**, quay đủ các tính năng đang có.
+- **Quay trên localhost là được**, không bắt buộc deploy. Không để lộ khóa (file `.env`, private key) trên màn hình.
+- **Cho agent tự chạy app và tự quay**; trong lúc quay thấy lỗi thì sửa rồi quay lại.
+- **Thêm motion cho các luồng quan trọng** để người xem dễ hiểu, có thể dựa trên một clip mẫu rồi giữ một phong cách thống nhất.
+- **Giọng đọc:** có thể dùng TTS cho rõ ràng, chọn giọng dễ nghe.
+- Sản phẩm phải dễ dùng; chụp hoặc quay từng màn rồi ghép.
+
+Áp vào kịch bản này: thêm 3 đoạn motion ngắn (sơ đồ luồng ở 0:00–0:05, thẻ "Mốc 1" ở 1:06, thẻ "Mốc 2" ở 2:06), mỗi đoạn 2–4 giây, cùng màu xanh lá của HomeStayDorm; cảnh terminal chỉ hiện lệnh và kết quả, không mở `.env`. Lời đọc: Vy tự lồng tiếng, nếu muốn dùng TTS thì Claude xuất file lời đọc theo từng cảnh.
+
 ## Cách đạt 3 phút mà vẫn đủ trường hợp
 
 - **Luồng chính** đi liền một mạch: tìm phòng → hồ sơ → lịch xem → cọc → cư trú, hợp đồng → bàn giao (mốc chuỗi 1) → đang ở → trả phòng (mốc chuỗi 2) → kiểm chứng.
@@ -31,7 +44,7 @@ Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, *
 
 | Giây | Vai | Quay gì | Tốc độ | Lời đọc |
 |---|---|---|---|---|
-| 0:00–0:05 | | Logo HomeStayDorm, góc dưới: "Avalanche Fuji · dữ liệu demo · thanh toán sandbox" | 1× | "HomeStayDorm: một nền tảng cho cả người thuê và nhà trọ, dùng Avalanche để hai bên tin nhau." |
+| 0:00–0:05 | | Motion: logo HomeStayDorm, rồi dải sơ đồ luồng chạy từ trái sang phải (Tìm phòng → Cọc → Hợp đồng → **Bàn giao ⛓** → Đang ở → **Trả phòng ⛓**), hai mốc chuỗi sáng lên. Góc dưới: "Avalanche Fuji · dữ liệu demo · thanh toán sandbox" | 1× | "HomeStayDorm: một nền tảng cho cả người thuê và nhà trọ, dùng Avalanche để hai bên tin nhau." |
 | 0:05–0:12 | K1 | Trang chủ → lọc khu vực, giá → chi tiết phòng (ảnh, giá/giường, giới tính) → bấm **tim** trên thẻ phòng, tim chuyển đỏ, "Đã thêm vào hồ sơ" | 1,5× | "Khách lọc phòng theo khu vực và giá. Thả tim là phòng vào ngay hồ sơ đăng ký, không phải điền lại." |
 | 0:12–0:16 | K1 | Hồ sơ đăng ký: mục "Phòng quan tâm" liệt kê các phòng đã thả tim; lướt **Đăng ký thuê theo nhóm** | 2× | "Thuê theo nhóm thì hệ thống tự kiểm tra giới tính và số giường còn trống." |
 | 0:16–0:18 | | Cảnh cắt "Nhánh: phòng theo giới tính": phòng ghi "Nam" vì người đang ở là nam | 1× | |
@@ -45,7 +58,7 @@ Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, *
 | 0:52–0:57 | K2 | Khai người ở cùng → tự duyệt khi đủ điều kiện | 2× | "Khách khai người ở cùng, đủ điều kiện thì hệ thống tự duyệt cư trú." |
 | 0:57–1:03 | S | Lập hợp đồng → bản xem hợp đồng → ô kéo thả **Bản hợp đồng đã ký** → "Đã lưu" | 1,5× | "Sale lập hợp đồng, hai bên ký giấy, Sale tải bản ký; mã băm của file đi vào gói bằng chứng." |
 | 1:03–1:06 | K2 | Trả khoản thu kỳ đầu bằng MoMo; hộp thư có email báo | 2× | "Khách trả khoản kỳ đầu, mỗi bước đều có email báo đúng người." |
-| 1:06–1:14 | QL | Bàn giao tài sản: bộ lọc **Chưa bàn giao** → lập biên bản, chọn tình trạng từng món; chọn "Hư hỏng" thì dòng đỏ, bắt buộc ghi chú → Phát hành | 1,5× | "Avalanche xuất hiện đúng hai lúc cần cả hai bên đồng ý. Lúc thứ nhất là nhận phòng: quản lý ghi tình trạng từng món rồi phát hành biên bản." |
+| 1:06–1:14 | QL | Motion 2 giây: thẻ "Mốc 1 · Nhận phòng · ghi lên Avalanche". Rồi Bàn giao tài sản: bộ lọc **Chưa bàn giao** → lập biên bản, chọn tình trạng từng món; chọn "Hư hỏng" thì dòng đỏ, bắt buộc ghi chú → Phát hành | 1,5× | "Avalanche xuất hiện đúng hai lúc cần cả hai bên đồng ý. Lúc thứ nhất là nhận phòng: quản lý ghi tình trạng từng món rồi phát hành biên bản." |
 | 1:14–1:21 | K2 | Tab Hợp đồng: đọc biên bản → **Yêu cầu chỉnh sửa** "Nệm có vết rách sẵn" → QL phát hành bản 2, lịch sử 2 bản | 1,5× | "Khách thấy thiếu vết rách có sẵn nên yêu cầu sửa; quản lý phát hành bản hai, bản một vẫn được giữ." |
 | 1:21–1:29 | K2 | Bấm **Xác nhận** → chỉ một lần bấm (email đã xác nhận lúc vào cổng) → "Bạn đã xác nhận biên bản lúc …" | 1× | "Khách đã xác nhận email từ lúc vào cổng, nên giờ chỉ cần bấm. Ví nhúng Privy ký EIP-712 đúng phiên bản này; khách không cài ví, không cần AVAX." |
 | 1:29–1:36 | QL | "Đã ghi nhận" + mã giao dịch → Snowtrace, phóng to "Success" và hàm `confirm` | 1× | "Relayer trả phí gas nhưng không thể giả chữ ký, vì contract chỉ nhận đúng chữ ký của ví khách." |
@@ -55,7 +68,7 @@ Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, *
 | 1:55–2:00 | K6 | Hóa đơn của tôi: nhãn màu theo loại, bấm xem → hộp thoại chi tiết thanh toán; Thông tin cá nhân: "+100 điểm" | 2× | "Khách xem lại từng khoản đã trả, minh chứng và lịch sử điểm." |
 | 2:00–2:03 | K6 → QL | Báo hỏng có ảnh → QL hoàn tất "do khách gây ra". Cảnh cắt "Nhánh: không do khách gây ra" | 2× | "Báo hỏng có ảnh; do khách gây ra thì phí vào kỳ sau, không do khách thì không tính." |
 | 2:03–2:06 | QL | Cảnh cắt "Điều phối tài sản" (chuyển món hư về kho chờ sửa) và "KPI Sale" | 2× | "Quản lý điều phối tài sản giữa phòng và kho, theo dõi KPI của Sale." |
-| 2:06–2:13 | K7 → QL | Khách gửi yêu cầu trả phòng → QL Quản lý hợp đồng → **Kiểm tra trả phòng**: form một màn, cột "Lúc nhận", chọn hiện trạng, tạm tính bên phải → Lưu | 1,5× | "Lúc thứ hai là trả phòng. Quản lý so từng món với lúc nhận, chỉ tính phần hư thêm." |
+| 2:06–2:13 | K7 → QL | Motion 2 giây: thẻ "Mốc 2 · Trả phòng · đối soát cọc". Rồi khách gửi yêu cầu trả phòng → QL Quản lý hợp đồng → **Kiểm tra trả phòng**: form một màn, cột "Lúc nhận", chọn hiện trạng, tạm tính bên phải → Lưu | 1,5× | "Lúc thứ hai là trả phòng. Quản lý so từng món với lúc nhận, chỉ tính phần hư thêm." |
 | 2:13–2:19 | KT | Đối soát hoàn cọc → phiếu tự soạn: tỷ lệ hoàn theo chính sách đã khóa, khấu trừ, số tiền hoàn → Lập | 1× | "Hệ thống tự soạn đối soát theo chính sách cọc khách đã nhận; kế toán rà và gửi." |
 | 2:19–2:26 | K7 | Kết quả đối soát → **Không đồng ý / phản hồi** "Vết rách đã có trong biên bản nhận phòng" → KT lập bản 2 bỏ khoản đó | 1,5× | "Khách phản đối kèm lý do; lý do cũng lên chuỗi dưới dạng mã băm. Kế toán lập bản hai." |
 | 2:26–2:32 | K7 | **Đồng ý đối soát** → "Bạn đã đồng ý kết quả đối soát lúc …" → Snowtrace | 1× | "Khách đồng ý, contract ghi kết quả. Cả hai phiên bản đều trên chuỗi, không bên nào sửa kín được." |
