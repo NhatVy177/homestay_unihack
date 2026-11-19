@@ -2158,3 +2158,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Nguyên nhân: quy tắc chung `.ktp-modal { max-width: 680px }` (từ `nhanVienKeToanPortal.css`) đè lên modal Quản lý hợp đồng nên form hai cột (J-C203) chen chúc. Sửa: `.qlhd-modal.ktp-modal` đặt `max-width: none`; form tự xếp một cột khi khung hẹp hơn 860px (container query).
 - File: `web/frontend/src/pages/nhanVienQuanLy/quanLyHopDong.css`, `kiemTraTraPhong.css`.
 - Kiểm tra: `npm run build`, `check:ui-tokens` qua; xem lại bằng ảnh chụp trên 5173.
+
+## 2026-11-19 18:53:06 +07:00 — J-C205 — Kịch bản video demo 3 phút bản 19/11 và kế hoạch dữ liệu demo
+
+- Người thực hiện: Claude, theo yêu cầu của Vy (kịch bản 3 phút đủ mọi trường hợp, tua 1,5–2×, Claude quay, Vy lồng tiếng).
+- `hackathon/video-script.md` viết lại thay bản 18/11: luồng chính một mạch, nhánh phụ thành cảnh cắt 2–3 giây có nhãn "Nhánh: …", cột tốc độ cho người dựng; thêm các phần sau 18/11 (tim quan tâm, MoMo hiện ngay, thu tiền mặt, tình trạng tài sản khi bàn giao, xác nhận email lúc vào cổng, đổi điểm lúc thanh toán, form kiểm tra trả phòng, điều phối tài sản, KPI Sale); bảng dữ liệu demo K1–K8 theo từng cảnh; việc cần có trước khi quay (OTP Privy: test account hoặc Vy nhập mã); cách Claude quay bằng Playwright.
+- Đã đối chiếu code: `npm run avalanche:recover` và thao tác thanh lý không có xác nhận của khách có trong repo; máy chưa có ffmpeg nên giao từng đoạn video riêng.
+- Chưa làm: tạo tài khoản và dữ liệu demo (chờ Vy duyệt kịch bản), quay video.
