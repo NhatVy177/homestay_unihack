@@ -112,7 +112,7 @@ try {
     assert.equal(confirmCount, 1);
     await capture('confirmed-policy');
     await page.evaluate(() => window.renderC1('upload'));
-    await page.getByText('Chưa có bản hợp đồng đã ký.').waitFor();
+    await page.getByText('Chưa có', { exact: true }).waitFor();
     await page.locator('input[type=file]').setInputFiles({ name: 'synthetic.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.7\nSynthetic test document') });
     await page.getByRole('button', { name: 'Lưu bản hợp đồng đã ký' }).click();
     await page.getByText('Đã lưu:', { exact: false }).waitFor();
