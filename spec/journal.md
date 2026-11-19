@@ -2136,3 +2136,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `web/backend/integrations/loyalty/store.js`, `service.js`; `web/frontend/src/pages/khachHang/InvoiceRewardBox.jsx`, `KhachHangPortalPage.jsx`, `customerRewards.css`, `components/payment/MomoQrPanel.jsx`, `pages/nhanVienKeToan/HoaDonDinhKyTab.jsx`, `hoaDonDinhKy.css`; `spec/*`.
 - Kiểm tra: backend 166 qua, 0 lỗi; `blockchain` 26 qua, 0 lỗi, 1 bỏ qua (lần đầu fail do thư mục thử thiếu `node_modules`, nối đủ thì qua); `npm run build`, `check:ui-tokens`, `test:avalanche-ui` qua. Chưa đổi điểm thật trên Fuji qua giao diện, chưa có test tự động riêng cho `applyToOpenInvoice`.
 - Còn lại: khởi động lại backend; Vy thử với tài khoản có đủ 100 điểm (Ivan hiện chưa có điểm vì chưa có hóa đơn tháng nào trả đúng hạn).
+
+## 2026-11-19 16:52:54 +07:00 — J-C202 — Hộp thoại chi tiết thanh toán trong "Hóa đơn của tôi"
+
+- Người thực hiện: Claude, nhánh `feat/invoice-detail-modal`, theo yêu cầu của Vy.
+- Thay đổi: nút xem (con mắt) ở tab Hóa đơn & thanh toán không còn nhảy sang trang Hợp đồng mà mở hộp thoại `InvoiceDetailModal.jsx`: thanh toán cho việc gì (tiền cọc giữ chỗ, khoản thu kỳ đầu khi nhận phòng, tiền phòng và dịch vụ tháng), số tiền (kèm ưu đãi điểm nếu có), phiếu cọc/hợp đồng, phòng (cọc), kỳ, hạn, trạng thái, ngày thanh toán, cách trả, minh chứng (tải file đã gửi; trả MoMo hoặc tiền mặt thì ghi rõ không cần minh chứng). Nút "Xem hợp đồng", "Thanh toán" (nếu còn nợ), "Đóng". Backend `khachHoaDon.service.js` trả thêm `phuongThuc` của hóa đơn.
+- File: `web/frontend/src/pages/khachHang/InvoiceDetailModal.jsx` (mới), `CustomerInvoicesList.jsx`, `customerInvoices.css`, `web/backend/services/khachHoaDon.service.js`.
+- Kiểm tra: `npm run build`, `check:ui-tokens` qua; backend 166 qua, 0 lỗi. Chưa xem hộp thoại trên giao diện thật.
+- Còn lại: khởi động lại backend để hiện dòng "Cách trả" của hóa đơn tháng.
