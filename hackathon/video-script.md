@@ -35,8 +35,8 @@ Mentor hướng dẫn cách làm video demo. Bản chép tự động của Fath
 
 | Đoạn | Thời gian | Nội dung | Nhánh phụ hiện bằng cảnh cắt |
 |---|---|---|---|
-| 0. Mở | 0:00–0:05 | Motion sơ đồ luồng, logo | |
-| 1. Đăng ký, tìm phòng và hồ sơ | 0:05–0:30 | Đăng ký tài khoản, xác nhận email một lần, lọc phòng, tim quan tâm, thuê nhóm, Sale xếp lịch (thêm phòng), kết quả buổi xem | Nhóm có Nữ vào phòng Nam → báo lỗi; khách đổi/hủy lịch; khách không đến; xem xong không ưng → lịch mới với phòng chưa xem |
+| 0. Mở | 0:00–0:08 | Vy giới thiệu tên, đội trên logo và sơ đồ luồng; slide "Chế độ demo đang bật" để giám khảo tạm dừng đọc | |
+| 1. Đăng ký, tìm phòng và hồ sơ | 0:08–0:30 | Đăng ký tài khoản, xác nhận email một lần, lọc phòng, tim quan tâm, thuê nhóm, Sale xếp lịch (thêm phòng), kết quả buổi xem | Nhóm có Nữ vào phòng Nam → báo lỗi; khách đổi/hủy lịch; khách không đến; xem xong không ưng → lịch mới với phòng chưa xem |
 | 2. Giữ chỗ và cọc | 0:30–0:52 | Khách muốn đặt cọc, quản lý duyệt (ưu tiên người gửi trước), hệ thống tự tính cọc, phòng "Giữ chỗ" 1 ngày, trả MoMo | Chuyển khoản kèm minh chứng → kế toán duyệt; tiền mặt → kế toán "Thu tiền mặt" |
 | 3. Cư trú, hợp đồng, kỳ đầu | 0:52–1:08 | Khai người ở cùng, Sale lập hợp đồng, tải bản ký, trả kỳ đầu | Thành viên không đạt: bỏ người đó rồi khai tiếp, hoặc cả nhóm dừng → trả phòng, hoàn 80% cọc |
 | 4. Mốc 1: bàn giao trên Avalanche | 1:08–1:38 | Biên bản có tình trạng từng món (mặc định "Tốt"), khách yêu cầu sửa, bản 2, khách xác nhận, Snowtrace | |
@@ -51,11 +51,12 @@ Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, *
 
 | Giây | Vai | Quay gì | Tốc độ | Lời đọc |
 |---|---|---|---|---|
-| 0:00–0:05 | | Motion: logo HomeStayDorm, rồi dải sơ đồ luồng chạy từ trái sang phải (Tìm phòng → Cọc → Hợp đồng → **Bàn giao ⛓** → Đang ở → **Trả phòng ⛓**), hai mốc chuỗi sáng lên. Dải dưới: "Avalanche Fuji · dữ liệu demo · thanh toán sandbox" | 1× | "HomeStayDorm: một nền tảng cho cả người thuê và nhà trọ, dùng Avalanche để hai bên tin nhau." |
-| 0:05–0:10 | K1 | Trang chủ → **Đăng ký tài khoản** (họ tên, email, số điện thoại, mật khẩu) → vào cổng khách → thẻ **Xác nhận email của bạn** → nhập mã OTP gửi về email → "Email đã xác nhận. Bạn sẵn sàng xác nhận biên bản chỉ bằng một lần bấm." | 1,5× (tua đoạn chờ mã) | "Khách đăng ký và xác nhận email một lần ngay khi vào cổng. Hệ thống tạo sẵn ví nhúng cho khách, nên về sau ký biên bản trên Avalanche chỉ cần một lần bấm, không cài ví, không cần AVAX." |
-| 0:10–0:15 | K1 | Trang chủ → lọc khu vực, giá → chi tiết phòng (ảnh, giá/giường, giới tính) → bấm **tim** trên thẻ phòng, tim chuyển đỏ, "Đã thêm vào hồ sơ" | 2× | "Khách lọc phòng theo khu vực và giá. Thả tim là phòng vào ngay hồ sơ đăng ký." |
-| 0:15–0:19 | K1 | **Đăng ký thuê theo nhóm** vào phòng Nam: thêm một thành viên Nữ → bấm **Tiếp tục** → báo lỗi phòng chỉ nhận Nam → sửa lại thành viên → qua bước 2 | 2× | "Thuê nhóm thì hệ thống kiểm tra giới tính và số giường trống; nhóm có nữ vào phòng nam bị chặn ngay." |
-| 0:19–0:24 | S | Hồ sơ chờ xếp lịch → phòng khách thả tim được chọn sẵn, Sale **tích thêm phòng khác** để dẫn khách xem thêm → đặt giờ | 2× | "Sale thấy phòng khách quan tâm, có thể thêm phòng khác để dẫn khách xem, rồi đặt giờ." |
+| 0:00–0:04 | | Motion: logo HomeStayDorm, rồi dải sơ đồ luồng chạy từ trái sang phải (Tìm phòng → Cọc → Hợp đồng → **Bàn giao ⛓** → Đang ở → **Trả phòng ⛓**), hai mốc chuỗi sáng lên. Dải dưới: "Avalanche Fuji · dữ liệu demo · thanh toán sandbox" | 1× | Vy tự giới thiệu: "Xin chào, mình là [tên], đội SnowDorm. Đây là HomeStayDorm: một nền tảng cho cả người thuê và nhà trọ, dùng Avalanche ở đúng hai lúc cần hai bên cùng đồng ý." |
+| 0:04–0:08 | | **Slide tĩnh "Chế độ demo đang bật"** (ảnh, chữ to, không có giao diện app phía sau). Nội dung xem mục "Slide chế độ demo" ngay dưới bảng | 1× | "Để quay gọn trong ba phút, một số điều kiện thời gian được bật chế độ demo, liệt kê trên màn hình này; mời ban giám khảo tạm dừng nếu muốn đọc." |
+| 0:08–0:12 | K1 | Trang chủ → **Đăng ký tài khoản** (họ tên, email, số điện thoại, mật khẩu) → vào cổng khách → thẻ **Xác nhận email của bạn** → nhập mã OTP gửi về email → "Email đã xác nhận. Bạn sẵn sàng xác nhận biên bản chỉ bằng một lần bấm." | 1,5× (tua đoạn chờ mã) | "Khách đăng ký và xác nhận email một lần ngay khi vào cổng. Hệ thống tạo sẵn ví nhúng cho khách, nên về sau ký biên bản trên Avalanche chỉ cần một lần bấm, không cài ví, không cần AVAX." |
+| 0:12–0:16 | K1 | Trang chủ → lọc khu vực, giá → chi tiết phòng (ảnh, giá/giường, giới tính) → bấm **tim** trên thẻ phòng, tim chuyển đỏ, "Đã thêm vào hồ sơ" | 2× | "Khách lọc phòng theo khu vực và giá. Thả tim là phòng vào ngay hồ sơ đăng ký." |
+| 0:16–0:20 | K1 | **Đăng ký thuê theo nhóm** vào phòng Nam: thêm một thành viên Nữ → bấm **Tiếp tục** → báo lỗi phòng chỉ nhận Nam → sửa lại thành viên → qua bước 2. Lướt nhanh bộ lọc giới tính có mục **Không phân biệt** | 2× | "Thuê nhóm thì hệ thống kiểm tra giới tính và số giường trống: nhóm có nữ vào phòng nam bị chặn ngay; nhóm có cả nam lẫn nữ thì chọn phòng không phân biệt giới tính." |
+| 0:20–0:24 | S | Hồ sơ chờ xếp lịch → phòng khách thả tim được chọn sẵn, Sale **tích thêm phòng khác** để dẫn khách xem thêm → đặt giờ | 2× | "Sale thấy phòng khách quan tâm, có thể thêm phòng khác để dẫn khách xem, rồi đặt giờ." |
 | 0:24–0:26 | K1 | Lịch xem: Xác nhận / Đổi lịch / Hủy lịch | 2× | "Khách nhận email, xác nhận hoặc xin đổi, hủy lịch." |
 | 0:26–0:28 | S | Ghi kết quả "Đã xem". Cảnh cắt "Nhánh: khách không đến" | 2× | "Sau buổi xem, Sale ghi đã xem hoặc khách không đến." |
 | 0:28–0:30 | S | Cảnh cắt "Nhánh: xem xong chưa ưng": Sale lập lịch xem tiếp, danh sách chỉ còn phòng chưa xem | 2× | "Khách chưa ưng thì Sale lập lịch xem tiếp với các phòng chưa xem." |
@@ -86,6 +87,20 @@ Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, *
 | 2:44–2:50 | | `/kiem-chung-avalanche`: chọn file → "Nội dung khớp với bản đã lưu." Sửa số tiền trong file, chọn lại → "Chưa xác minh được" | 1× | "Ai có file bản lưu cũng tự kiểm tra được bằng mạng công khai; sửa một con số là trang báo ngay." |
 | 2:50–2:55 | | Terminal `npm run avalanche:recover` dựng lại hồ sơ từ chuỗi (không mở `.env`) | 2× | "Mất hay sửa database, lệnh khôi phục đọc lại chuỗi để dựng lại hồ sơ đã xác nhận." |
 | 2:55–3:00 | | Slide kết: tên đội, GitHub, địa chỉ DormSettlement và DormPoints | 1× | "HomeStayDorm: tìm phòng dễ, quản lý gọn, khách tự giữ bằng chứng. Cảm ơn ban giám khảo." |
+
+**Slide chế độ demo (0:04–0:08)**
+
+Ảnh tĩnh 1920×1080, nền xanh lá nhạt, tiêu đề "Chế độ demo đang bật", mỗi dòng ghi **bản demo** và **bản thật** để giám khảo hiểu không phải lỗi:
+
+| Chỗ | Bản demo | Bản thật |
+|---|---|---|
+| Kết quả buổi xem | Sale ghi "Đã xem" ngay, không chờ giờ hẹn | Chỉ ghi được sau giờ hẹn |
+| Hóa đơn định kỳ | Kế toán lập ngay, không chờ hết kỳ | Lập khi tới kỳ thanh toán |
+| MoMo | Mã QR mô phỏng kiểu MoMo, tự báo "Đã thanh toán" sau 3 phút | MoMo báo về khi khách quét và trả |
+| Chuyển khoản | Mã VietQR không kèm số tiền để chuyển thử số nhỏ | Mã khóa đúng số tiền |
+| Email | Mọi email gửi về một hộp thư thử; mã OTP về hộp thư của đội | Gửi đúng email từng người |
+| Avalanche | Mạng thử Fuji, relayer trả phí gas | Mạng chính, cùng cơ chế |
+| Dữ liệu | Khách, phòng, ảnh phòng là dữ liệu mẫu; trang đăng nhập có tài khoản mẫu (mật khẩu 123) để giám khảo thử | Dữ liệu thật |
 
 ## Dữ liệu demo cần chuẩn bị
 

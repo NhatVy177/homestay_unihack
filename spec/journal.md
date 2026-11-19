@@ -2214,3 +2214,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo bình luận của Vy ("làm đăng ký để có xác nhận email từ đầu, nói rõ làm vậy để làm gì").
 - `hackathon/video-script.md`: cảnh 0:05–0:10 K1 đăng ký tài khoản → thẻ "Xác nhận email của bạn" → nhập OTP → "Email đã xác nhận"; lời đọc nêu lý do (ví nhúng tạo sẵn, sau này ký trên Avalanche chỉ một lần bấm). Rút các cảnh 0:10–0:28 cho vừa 25 giây; cảnh 1:20 chỉ nhắc lại ngắn. K1 đăng ký trong cảnh bằng `vynhat2k5+k1@gmail.com`, K2 dùng tài khoản đã xác nhận sẵn.
 - Kiểm tra: đối chiếu code `TrangChu.jsx` (form Tạo tài khoản) và `EmailActivationCard.jsx` (thẻ xác nhận email ở cổng khách).
+
+## 2026-11-19 21:36:41 +07:00 — J-C213 — Kịch bản demo: phần tự giới thiệu, slide chế độ demo, nhóm nam nữ
+
+- Người thực hiện: Claude, theo hai bình luận của Vy trên trang kịch bản.
+- `hackathon/video-script.md`: 0:00–0:04 Vy tự giới thiệu tên, đội trên logo và sơ đồ luồng; 0:04–0:08 slide tĩnh "Chế độ demo đang bật" (bảng bản demo / bản thật: ghi "Đã xem" trước giờ hẹn, lập hóa đơn định kỳ ngay, MoMo mô phỏng tự trả sau 3 phút, VietQR không kèm số tiền, email dồn một hộp thư, Fuji + relayer, dữ liệu và tài khoản mẫu); rút bốn cảnh 0:08–0:24 để giữ 3:00. Cảnh thuê nhóm thêm lời đọc và lướt bộ lọc: nhóm nam nữ chọn phòng "Không phân biệt".
+- Kiểm tra: đối chiếu code `demoMode.js` (`DEMO_BO_QUA_GIO_HEN=1` đang bật), `HoaDonDinhKyTab.jsx` (J-C199), `MomoQrPanel.jsx`, `config/payment.js` (`PAYMENT_VIETQR_HIEN_SO_TIEN=false`), `mailer.js`, `DemoAccounts.jsx`; HOMEDORM4 có 37 phòng "Không phân biệt".
