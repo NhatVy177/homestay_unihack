@@ -7,6 +7,7 @@ import BrandLogo from '../../components/common/BrandLogo.jsx';
 import { gioiTinhIcon, nhanGioiTinhPhong } from '../../utils/genderRules.js';
 import { CONTACT_PHONE, groupBranches, imageFallback, imageFor, money, priceFor, unitFor } from './homeData.js';
 import { buildBranchLayout } from './houseLayout.js';
+import { useInterestedRooms } from './useInterestedRooms.js';
 import './experience.css';
 
 const CurvedGallery = lazy(() => import('./HomeScenes.jsx').then(module => ({ default: module.CurvedGallery })));
@@ -96,6 +97,14 @@ export function RoomCard({ room, onViewDetail, index = 0 }) {
   const card = useRef(null);
   const reduced = useReducedMotion();
   const { user } = useAuth();
+  const interested = useInterestedRooms();
+  const [note, setNote] = useState('');
+  const active = interested.has(room.MaPhong);
+  useEffect(() => {
+    if (!note) return undefined;
+    const timer = setTimeout(() => setNote(''), 3200);
+    return () => clearTimeout(timer);
+  }, [note]);
   function tilt(event) {
     if (reduced || event.pointerType !== 'mouse') return;
     const rect = event.currentTarget.getBoundingClientRect();
@@ -107,14 +116,17 @@ export function RoomCard({ room, onViewDetail, index = 0 }) {
     card.current.style.setProperty('--glow-y', `${y * 100}%`);
   }
   function reset() { card.current.style.setProperty('--rx', '0deg'); card.current.style.setProperty('--ry', '0deg'); }
-  // Dấu tim: chưa đăng nhập thì yêu cầu đăng nhập, rồi vào đúng phòng trong cổng khách để thêm vào hồ sơ quan tâm.
-  function interest() {
+  // Dấu tim: khách có hồ sơ đang mở thì thêm/gỡ phòng ngay tại thẻ; chưa đăng nhập thì yêu cầu đăng nhập, khách chưa có hồ sơ mở
+  // thì vào đúng phòng trong cổng khách để tạo hồ sơ.
+  async function interest() {
+    if (interested.profile) { setNote(await interested.toggle(room)); return; }
     const target = `/khach-hang?phong=${encodeURIComponent(room.MaPhong)}`;
     window.location.assign(user ? (user.vaiTro === 'KhachHang' ? target : getAuthenticatedHomePath(user)) : `/?next=${encodeURIComponent(target)}`);
   }
   return <Reveal delay={(index % 3) * 100} kind="spring">
     <article className="hx-room-card tc-room-card" ref={card} onPointerMove={tilt} onPointerLeave={reset}>
-      <button className="hx-room-heart" type="button" aria-label={`Quan tâm ${room.TenPhong}`} title="Quan tâm phòng này" onClick={interest}><Icon name="favorite" /></button>
+      <button className={`hx-room-heart${active ? ' is-active' : ''}`} type="button" aria-pressed={active} aria-label={`${active ? 'Bỏ quan tâm' : 'Quan tâm'} ${room.TenPhong}`} title={active ? `Bỏ quan tâm (gỡ khỏi hồ sơ ${interested.profile?.maDangKy})` : interested.profile ? `Quan tâm (thêm vào hồ sơ ${interested.profile.maDangKy})` : 'Quan tâm phòng này'} onClick={interest}><Icon name="favorite" /></button>
+      {note && <span className="hx-heart-note" role="status">{note}</span>}
       <button className="hx-room-image" type="button" onClick={() => onViewDetail(room)} aria-label={`Xem ${room.TenPhong}`}><img src={imageFor(room)} alt={room.TenPhong} loading="lazy" onError={imageFallback} /></button>
       <div className="hx-room-body"><h3>{room.TenPhong}</h3><p className="hx-room-area"><Icon name="home" />{room.TenChiNhanh}</p>
         <div className="hx-room-tags"><span><Icon name="wifi" />Wifi miễn phí</span>{room.SucChuaToiDa && <span><Icon name="group" />{room.SucChuaToiDa} người</span>}{genderLabel && <span><Icon name={gioiTinhIcon(genderLabel)} />{genderLabel}</span>}</div>

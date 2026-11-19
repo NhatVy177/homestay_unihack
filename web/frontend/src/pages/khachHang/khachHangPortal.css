@@ -4718,3 +4718,13 @@
 .dpay-wallet-panel { display: grid; gap: 12px; margin-top: 16px; }
 
 .dc-edit-icon { display: inline-flex; vertical-align: middle; color: var(--color-primary, #4A6549); }
+
+.kh-profile-interest { display: grid; gap: var(--space-2); margin-bottom: var(--space-4); }
+.kh-profile-interest strong { font-size: 13px; }
+.kh-profile-interest ul { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.kh-profile-interest li { display: inline-flex; align-items: center; border: 1px solid var(--kp-border); border-radius: 999px; background: var(--color-surface); }
+.kh-interest-link { display: inline-flex; align-items: baseline; gap: var(--space-2); padding: var(--space-2) var(--space-3); border: 0; background: none; font-size: 13px; font-weight: 600; cursor: pointer; }
+.kh-interest-link span { color: var(--kp-muted); font-weight: 400; }
+.kh-interest-remove { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 50%; background: none; color: var(--kp-muted); cursor: pointer; }
+.kh-interest-remove:hover { color: var(--color-danger); }
+.kh-interest-empty { margin: 0; color: var(--kp-muted); font-size: 13px; }

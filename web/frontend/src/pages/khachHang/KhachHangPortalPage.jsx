@@ -1393,6 +1393,26 @@ export default function KhachHangPortalPage() {
                 )}
               </div>
 
+              {(profile.danhSachPhongQuanTam?.length > 0 || profile.maDangKy === openProfile?.maDangKy) && (
+                <div className="kh-profile-interest">
+                  <strong>Phòng quan tâm</strong>
+                  {profile.danhSachPhongQuanTam?.length > 0 ? (
+                    <ul>
+                      {profile.danhSachPhongQuanTam.map((room) => (
+                        <li key={room.maPhong}>
+                          <button className="kh-interest-link" type="button" onClick={() => { setActiveTab('chi-tiet-phong'); openRoomDetail({ maPhong: room.maPhong }); }}>
+                            {room.tenPhong}<span>{room.chiNhanh}</span>
+                          </button>
+                          {profile.maDangKy === openProfile?.maDangKy && (
+                            <button className="kh-interest-remove" type="button" aria-label={`Bỏ quan tâm ${room.tenPhong}`} title="Bỏ quan tâm" disabled={profileBusy} onClick={() => removeRoomFromProfile(room)}><Icon name="close" /></button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : <p className="kh-interest-empty">Chưa có phòng nào. Bấm biểu tượng tim ở phòng bạn thích để thêm vào hồ sơ này.</p>}
+                </div>
+              )}
+
               {getProfileDisplayStatus(profile) === 'Từ chối' && profile.ghiChu && (
                 <div className="kh-profile-reject-reason">
                   <Icon name="lock" />
