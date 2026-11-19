@@ -20,3 +20,10 @@
 .qlhd-table .ui-status-badge, .qlhd-table [class*="status-badge"] { white-space: nowrap; }
 .qlhd-toolbar .ui-list-toolbar { margin: 0; padding: 0; border: none; box-shadow: none; background: transparent; }
 .qlhd-modal.ktp-modal.is-compact { width: min(720px, calc(100vw - 32px)); max-width: none; }
+
+/* Cột Hành động: nút xuống dòng thay vì bị cắt; nhãn "đang chờ" khi chưa tới lượt quản lý. */
+.qlhd-table { min-width: 900px; }
+.qlhd-table td:last-child { width: 170px; }
+.qlhd-table td:last-child .ui-btn { white-space: normal; line-height: 1.3; text-align: center; }
+.qlhd-wait { display: grid; gap: var(--space-1); color: var(--color-text-muted); font-size: 13px; }
+.qlhd-link { justify-self: start; padding: 0; border: 0; background: none; color: var(--color-primary); font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; }

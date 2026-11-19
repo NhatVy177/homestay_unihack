@@ -13,12 +13,33 @@ export function nhomTrangThai(row) {
 }
 
 // Việc quản lý cần làm tiếp với hợp đồng này (mở đúng màn xử lý có sẵn).
+// "Kết thúc hợp đồng" chỉ mở khi tiền đã xong: đối soát "Đã quyết toán" (đã hoàn cọc, đã thu thêm hoặc không phát sinh).
 export function viecCanLam(row) {
   if (row.trangThaiPhieuTra === 'Chờ xử lý') return 'kiem-tra';
   if (row.trangThaiDoiSoat === 'Chờ phản hồi') return 'phan-hoi';
-  if (row.maPhieuTra && row.trangThaiPhieuTra !== 'Hủy' && !row.daThuChiaKhoa) return 'ket-thuc';
   if (row.trangThai === 'Đã thanh lý') return 'ket-thuc';
+  const traPhongDangMo = row.maPhieuTra && !['Hủy'].includes(row.trangThaiPhieuTra);
+  if (traPhongDangMo && row.trangThaiDoiSoat === 'Đã quyết toán' && !row.daThuChiaKhoa) return 'ket-thuc';
   return null;
+}
+
+// Khi chưa có việc cho quản lý: cho biết đang chờ ai, để quản lý không bấm nhầm bước.
+const CHO_DOI_SOAT = {
+  'Chờ xác nhận': 'Chờ khách xác nhận đối soát',
+  'Cần điều chỉnh': 'Chờ kế toán điều chỉnh đối soát',
+  'Chờ hoàn cọc': 'Chờ kế toán hoàn cọc',
+  'Chờ thanh toán thêm': 'Chờ khách trả thêm',
+};
+export function dangCho(row) {
+  if (viecCanLam(row) || !row.maPhieuTra || ['Hủy', 'Hoàn tất'].includes(row.trangThaiPhieuTra) || row.trangThai === 'Đã thanh lý') return null;
+  if (!row.trangThaiDoiSoat) return 'Chờ kế toán lập đối soát';
+  return CHO_DOI_SOAT[row.trangThaiDoiSoat] || null;
+}
+
+// Khách chưa đồng ý đối soát: quản lý vẫn mở được màn kết thúc để dùng đường "thanh lý không có xác nhận" (D-038),
+// màn đó tự khóa khi chưa đủ điều kiện quá hạn.
+export function coTheNgoaiLe(row) {
+  return Boolean(row.maPhieuTra) && ['Chờ xác nhận', 'Cần điều chỉnh'].includes(row.trangThaiDoiSoat);
 }
 
 export async function danhSachHopDongQuanLy(user, { query = executeQuery } = {}) {
@@ -46,6 +67,6 @@ export async function danhSachHopDongQuanLy(user, { query = executeQuery } = {})
   return (result.recordset || []).map((row) => ({
     ...row, giaThue: Number(row.giaThue) || 0, giuong: row.giuong || '',
     daThuKyDau: Boolean(row.daThuKyDau), daThuChiaKhoa: Boolean(row.daThuChiaKhoa),
-    nhom: nhomTrangThai(row), viecCanLam: viecCanLam(row),
+    nhom: nhomTrangThai(row), viecCanLam: viecCanLam(row), dangCho: dangCho(row), coTheNgoaiLe: coTheNgoaiLe(row),
   }));
 }

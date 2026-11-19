@@ -19,7 +19,7 @@ const navItems = [
   { id: 'thu-nhan-phong', label: 'Hóa đơn nhận phòng', icon: 'login' },
   { id: 'hoa-don-dinh-ky', label: 'Hóa đơn định kỳ', icon: 'payments' },
   { id: 'nop-quy', label: 'Thu tiền mặt', icon: 'account_balance' },
-  { id: 'quyet-toan', label: 'Đối soát hoàn cọc', icon: 'account_balance_wallet' },
+  { id: 'quyet-toan', label: 'Đối soát trả phòng', icon: 'account_balance_wallet' },
   { id: 'chi-tien-thanh-ly', label: 'Chi tiền thanh lý', icon: 'price_check' },
   { id: 'xac-nhan-doi-soat', label: 'Khách xác nhận đối soát', icon: 'receipt_long' },
   { id: 'khach-hang', label: 'Tra cứu khách hàng', icon: 'search' },

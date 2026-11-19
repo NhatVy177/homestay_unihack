@@ -49,7 +49,7 @@ export default function XuLyTraPhongTab() {
   const q = query.trim().toLocaleLowerCase('vi-VN');
   const visible = rows.filter((r) => (filter === 'all' || r.nhom === filter)
     && (!q || [r.maHopDong, r.hoTen, r.sdt, r.tenPhong].join(' ').toLocaleLowerCase('vi-VN').includes(q)));
-  const hasAction = visible.some((r) => r.viecCanLam); // không có việc nào cần làm thì ẩn cả cột Hành động
+  const hasAction = visible.some((r) => r.viecCanLam || r.dangCho); // không có việc nào cần làm thì ẩn cả cột Hành động
   const current = Math.min(page, Math.max(1, Math.ceil(visible.length / PAGE)));
   const close = () => { setOpen(null); load(); };
   const pick = (key) => { setFilter(key); setPage(1); };
@@ -87,6 +87,7 @@ export default function XuLyTraPhongTab() {
                   <td><StatusBadge status={label} tone={tone} />{r.nhom === 'thanh-ly' && !r.daThuChiaKhoa && <small className="qlhd-warn">Chưa thu chìa khóa</small>}</td>
                   {hasAction && <td>{r.viecCanLam
                     ? <button type="button" className={`ui-btn ui-btn--sm ${done ? 'ui-btn--secondary' : 'ui-btn--primary'}`} onClick={() => setOpen(r)}>{done ? 'Xem hồ sơ' : ACTIONS[r.viecCanLam]}</button>
+                    : r.dangCho ? <span className="qlhd-wait">{r.dangCho}{r.coTheNgoaiLe && <button type="button" className="qlhd-link" onClick={() => setOpen({ ...r, viecCanLam: 'ket-thuc' })}>Thanh lý ngoại lệ</button>}</span>
                     : <span className="qlhd-none">—</span>}</td>}
                 </tr>;
               })}
