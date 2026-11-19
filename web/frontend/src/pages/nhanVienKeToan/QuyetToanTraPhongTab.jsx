@@ -20,8 +20,7 @@ const LOAI_HO_SO = {
 const QUYET_TOAN_TABS = [
   { id: 'lap-doi-soat', label: 'Lập phiếu đối soát', group: 'doi-soat' },
   { id: 'ghi-nhan-thu-them', label: 'Ghi nhận thu thêm', group: 'chi-tien' },
-  { id: 'ghi-nhan-hoan-coc', label: 'Ghi nhận hoàn cọc', group: 'chi-tien' },
-  { id: 'ket-qua-doi-soat', label: 'Kết quả đối soát', group: 'doi-soat' }
+  { id: 'ghi-nhan-hoan-coc', label: 'Ghi nhận hoàn cọc', group: 'chi-tien' }
 ];
 
 const THU_THEM_FILTERS = [
@@ -968,7 +967,7 @@ function GhiNhanThanhToanPanel({ type }) {
       title: isThuThem ? activeThuThemFilterMeta.title : `Chờ ghi nhận ${settlementName}`,
       subtitle: isThuThem
         ? activeThuThemFilterMeta.subtitle
-        : `Chỉ hiển thị các phiếu chưa được kế toán xác nhận ${settlementName}. Phiếu đã xác nhận nằm ở tab Kết quả đối soát.`,
+        : `Chỉ hiển thị các phiếu chưa được kế toán xác nhận ${settlementName}. Phiếu đã xác nhận nằm ở bộ lọc Đã đối soát.`,
       empty: isThuThem ? activeThuThemFilterMeta.empty : emptyText,
       icon: isThuThem ? 'payments' : 'account_balance_wallet'
     };
@@ -1274,253 +1273,6 @@ function GhiNhanThanhToanPanel({ type }) {
   );
 }
 
-function KetQuaDoiSoatPanel() {
-  const [rows, setRows] = useState([]);
-  const [searchText, setSearchText] = useState('');
-  const [ketQuaFilter, setKetQuaFilter] = useState('all');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [selected, setSelected] = useState(null);
-  const [detail, setDetail] = useState(null);
-  const [rooms, setRooms] = useState([]);
-  const [loadingDetail, setLoadingDetail] = useState(false);
-
-  async function loadRows() {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await doiSoatApi.getKetQuaDoiSoat();
-      setRows(response.data.danhSach || []);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Không tải được danh sách kết quả đối soát.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadRows();
-  }, []);
-
-  const searchedRows = useMemo(() => {
-    const keyword = searchText.trim().toLowerCase();
-    if (!keyword) return rows;
-
-    return rows.filter((row) =>
-      row.maDoiSoat?.toLowerCase().includes(keyword) ||
-      row.maPhieuTra?.toLowerCase().includes(keyword) ||
-      row.maHoSo?.toLowerCase().includes(keyword) ||
-      row.hoTenKhachHang?.toLowerCase().includes(keyword) ||
-      row.sdtKhachHang?.toLowerCase().includes(keyword) ||
-      row.trangThaiDoiSoat?.toLowerCase().includes(keyword)
-    );
-  }, [rows, searchText]);
-
-  const ketQuaFilterItems = useMemo(() => {
-    const counts = searchedRows.reduce((acc, row) => {
-      const key = ketQuaFilterKey(row);
-      acc[key] = (acc[key] || 0) + 1;
-      acc.all += 1;
-      return acc;
-    }, { all: 0, 'thu-them': 0, 'hoan-coc': 0, 'khong-phat-sinh': 0 });
-
-    return KET_QUA_FILTERS.map((filter) => ({
-      ...filter,
-      count: counts[filter.key] ?? 0
-    }));
-  }, [searchedRows]);
-
-  const filteredRows = useMemo(() => {
-    if (ketQuaFilter === 'all') return searchedRows;
-    return searchedRows.filter((row) => ketQuaFilterKey(row) === ketQuaFilter);
-  }, [ketQuaFilter, searchedRows]);
-
-  const [page, setPage] = useState(1);
-  useEffect(() => { setPage(1); }, [searchText, ketQuaFilter]);
-  const pagedRows = useMemo(() => filteredRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filteredRows, page]);
-
-  async function openDetail(row) {
-    setSelected(row);
-    setDetail(null);
-    setRooms([]);
-    setError('');
-    setLoadingDetail(true);
-
-    try {
-      const response = row.ketQuaDoiSoat === 'hoan-coc'
-        ? await doiSoatApi.getChiTietHoanCoc(row.maDoiSoat)
-        : await doiSoatApi.getChiTietThuThem(row.maDoiSoat);
-      setDetail(response.data.chiTiet);
-      setRooms(response.data.danhSachPhong || []);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Không tải được chi tiết kết quả đối soát.');
-      setSelected(null);
-    } finally {
-      setLoadingDetail(false);
-    }
-  }
-
-  const selectedKetQuaKey = selected ? ketQuaFilterKey(selected) : '';
-  const shouldShowPaymentInfo = selectedKetQuaKey !== 'khong-phat-sinh';
-
-  return (
-    <>
-      {error && (
-        <div className="ui-list-alert qt-alert" role="alert">
-          <Icon name="error_outline" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      <>
-<OverviewCards items={ketQuaFilterItems} />
-<div className="ui-list-toolbar">
-          <ListSearch value={searchText} onChange={setSearchText} placeholder="Tìm theo mã, tên hoặc số điện thoại" />
-
-<StatusFilterTabs
-          className="status-pill-tabs-offset"
-          ariaLabel="Bộ lọc kết quả đối soát"
-          items={ketQuaFilterItems}
-          activeKey={ketQuaFilter}
-          onChange={setKetQuaFilter}
-        />
-</div>
-<section className="ktp-table-section qt-settlement-section ui-list-table-card">
-
-
-
-
-        <div className="qt-settlement-section-head">
-          <div>
-            <h4>Kết quả đối soát</h4>
-            <p>Danh sách phiếu đã quyết toán hoặc đã hoàn cọc.</p>
-          </div>
-        </div>
-        <table className="ktp-table">
-          <thead>
-            <tr>
-              <th>Mã đối soát</th>
-              <th>Khách hàng</th>
-              <th>Hồ sơ</th>
-              <th>Kết quả</th>
-              <th>Số tiền</th>
-              <th>Trạng thái</th>
-              <th>Ngày xử lý</th>
-              <th className="text-center">Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <TableState kind="loading" colSpan={8} />
-            ) : filteredRows.length === 0 ? (
-              <tr>
-                <td colSpan="8" className="text-center">
-                  <div className="qt-empty-workflow">
-                    <Icon name="task_alt" />
-                    <strong>Kết quả đối soát</strong>
-                    <span>{rows.length ? 'Không có phiếu phù hợp với bộ lọc.' : 'Chưa có phiếu đã quyết toán hoặc đã hoàn cọc.'}</span>
-                  </div>
-                </td>
-              </tr>
-            ) : pagedRows.map((row) => {
-              const meta = ketQuaMeta(row);
-
-              return (
-                <tr key={row.maDoiSoat}>
-                  <td className="ui-cell-code">{row.maDoiSoat}</td>
-                  <td>
-                    <p className="ui-cell-main">{row.hoTenKhachHang || '--'}</p>
-                    <p className="ui-cell-sub">{row.sdtKhachHang || '--'}</p>
-                  </td>
-                  <td>
-                    <span className="ktp-badge ktp-badge-outline">{row.maHoSo || '--'}</span>
-                    <p className="ui-cell-sub">
-                      {row.tenPhong || '--'}{row.maGiuong ? ` - ${row.maGiuong}` : ''}
-                      {safeNumber(row.soLuongPhongGiuong) > 1 ? ` và ${safeNumber(row.soLuongPhongGiuong) - 1} mục khác` : ''}
-                    </p>
-                  </td>
-                  <td><span className={`ktp-badge qt-result-badge ${meta.badgeClass}`}>{meta.label}</span></td>
-                  <td className={`ui-num ${meta.amountTone}`}>{formatMoney(meta.amount)}</td>
-                  <td>
-                    <StatusBadge status={row.trangThaiDoiSoat} tone={getDoiSoatStatusTone(row.trangThaiDoiSoat)} />
-                  </td>
-                  <td>{formatDate(row.ngayThanhToan || row.ngayLap)}</td>
-                  <td className="text-center">
-                    <button className="ktp-btn-action-fill" type="button" onClick={() => openDetail(row)}>
-                      Chi tiết
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        {!loading && <ListPagination page={page} pageSize={PAGE_SIZE} total={filteredRows.length} noun="phiếu" onChange={setPage} />}
-      </section>
-</>
-
-      {selected && (
-        <div className="ktp-modal-overlay" onClick={() => setSelected(null)}>
-          <div className="ktp-modal qt-refund-modal" onClick={(event) => event.stopPropagation()}>
-            <div className="ktp-modal-header qt-modal-header">
-              <div>
-                <h3>Chi tiết kết quả đối soát</h3>
-                <p className="ktp-modal-header-sub">
-                  Mã đối soát: <span className="qt-modal-code">{selected.maDoiSoat}</span>
-                </p>
-              </div>
-              <button className="ktp-modal-close" type="button" onClick={() => setSelected(null)} aria-label="Đóng hộp thoại">
-                <Icon name="close" />
-              </button>
-            </div>
-
-            <div className="ktp-modal-body qt-refund-body">
-              {loadingDetail ? (
-                <div className="text-center qt-loading">Đang tải chi tiết...</div>
-              ) : detail ? (
-                <>
-                  <section className="ktp-section ktp-info-box-outline">
-                    <h4 className="ktp-section-title"><Icon name="person" /> Thông tin hồ sơ</h4>
-                    <InfoRow label="Khách hàng" value={detail.hoTenKhachHang} />
-                    <InfoRow label="Số điện thoại" value={detail.sdtKhachHang} />
-                    <InfoRow label="Mã hồ sơ" value={detail.maHoSo} />
-                    <InfoRow label="Phòng/Giường" value={rooms.map((room) => `${room.tenPhong || room.maPhong}${room.maGiuong ? ` - ${room.maGiuong}` : ''}`).join(', ') || '--'} />
-                  </section>
-
-                  <section className="ktp-section ktp-info-box-outline">
-                    <h4 className="ktp-section-title"><Icon name="task_alt" /> Kết quả đối soát</h4>
-                    <InfoRow label="Trạng thái đối soát" value={detail.trangThaiDoiSoat} />
-                    <InfoRow label="Trạng thái trả phòng" value={detail.trangThaiPhieuTra} />
-                    <InfoRow label="Tiền cọc ban đầu" value={formatMoney(detail.tienCocBanDau)} />
-                    <InfoRow label="Tổng khấu trừ" value={formatMoney(detail.tongKhauTru)} />
-                    <InfoRow label="Số tiền hoàn thực tế" value={formatMoney(detail.soTienHoanThucTe)} strong />
-                    <InfoRow label="Số tiền khách thanh toán thêm" value={formatMoney(detail.soTienKhachPhaiTT)} strong />
-                  </section>
-
-                  {shouldShowPaymentInfo && (
-                    <section className="ktp-section ktp-info-box-outline">
-                      <h4 className="ktp-section-title"><Icon name="payments" /> Thông tin thanh toán</h4>
-                      <InfoRow label="Phương thức thanh toán" value={detail.phuongThucThanhToan} />
-                      <InfoRow label="Ngày thanh toán" value={formatDate(detail.ngayThanhToan)} />
-                      <InfoRow label="Chứng từ thanh toán" value={<EvidenceValue value={detail.chungTuThanhToan} />} />
-                    </section>
-                  )}
-                </>
-              ) : null}
-            </div>
-
-            <div className="ktp-modal-footer">
-              <button className="ktp-btn-cancel" type="button" onClick={() => setSelected(null)}>
-                Đóng
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
-
 // group 'doi-soat' = "Đối soát hoàn cọc", group 'chi-tien' = "Chi tiền thanh lý" (menu split as in Hang's layout).
 export default function QuyetToanTraPhongTab({ group = 'doi-soat' }) {
   const visibleTabs = QUYET_TOAN_TABS.filter((tab) => tab.group === group);
@@ -1811,7 +1563,7 @@ export default function QuyetToanTraPhongTab({ group = 'doi-soat' }) {
 
   return (
     <div className="ktp-container">
-      <nav className="qt-subtab-bar" aria-label="Nghiệp vụ quyết toán trả phòng">
+      {visibleTabs.length > 1 && <nav className="qt-subtab-bar" aria-label="Nghiệp vụ quyết toán trả phòng">
         {visibleTabs.map((tab) => (
           <button
             key={tab.id}
@@ -1826,7 +1578,7 @@ export default function QuyetToanTraPhongTab({ group = 'doi-soat' }) {
             {tab.label}
           </button>
         ))}
-      </nav>
+      </nav>}
 
       {activeQuyetToanTab === 'lap-doi-soat' && (
         <>
@@ -1964,10 +1716,6 @@ export default function QuyetToanTraPhongTab({ group = 'doi-soat' }) {
 
       {activeQuyetToanTab === 'ghi-nhan-hoan-coc' && (
         <GhiNhanThanhToanPanel type="hoan-coc" />
-      )}
-
-      {activeQuyetToanTab === 'ket-qua-doi-soat' && (
-        <KetQuaDoiSoatPanel />
       )}
 
       {activeQuyetToanTab === 'lap-doi-soat' && selected && (

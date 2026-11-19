@@ -1,6 +1,10 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-19 15:16:47 +07:00** (J-C195: tình trạng tài sản bàn giao và xác nhận email lúc vào cổng). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-19 15:45:24 +07:00** (J-C197: kế toán Thu tiền mặt, bỏ tab Kết quả đối soát). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+
+## Kế toán thu tiền mặt — D-080
+
+- Nhánh `feat/cash-collection` (J-C197): tab "Thu tiền mặt" cho hóa đơn đặt cọc và nhận phòng, tab "Đối soát hoàn cọc" chỉ còn "Lập phiếu đối soát". Build và đọc thử chỉ đọc trên HOMEDORM4 qua; chưa thu tiền thật qua giao diện, chưa thêm test tự động cho luồng ghi.
 
 ## Tình trạng tài sản bàn giao và xác nhận email lúc vào cổng — D-079
 
