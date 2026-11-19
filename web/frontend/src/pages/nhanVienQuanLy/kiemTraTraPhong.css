@@ -75,3 +75,44 @@ tr[data-status="Hư hỏng nặng"] .kttp-control--status, tr[data-status="Mất
 .kttp-compare { display: flex; flex-direction: column; gap: var(--space-3); }
 .kttp-compare .kttp-footer-note { margin: var(--space-3) 0 0; }
 .qt-rate-source { margin: calc(var(--space-1) * -1) 0 var(--space-2); color: var(--color-text-muted); font-size: 12px; line-height: 1.45; }
+
+/* Form kiểm tra trả phòng mở từ Quản lý hợp đồng: một modal, 3 bước bên trái, tạm tính bên phải. */
+.kttp-focus { display: grid; gap: var(--space-4); }
+.kttp-focus-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); margin: 0; padding: var(--space-4) var(--space-6); border-radius: var(--radius-md); background: var(--color-surface); border: 1px solid var(--color-border); }
+.kttp-focus-facts dt { color: var(--color-text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+.kttp-focus-facts dd { margin: var(--space-1) 0 0; font-weight: 700; }
+.kttp-focus-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--space-4); align-items: start; }
+.kttp-focus-main, .kttp-focus-side { display: grid; gap: var(--space-4); min-width: 0; }
+.kttp-focus-side { position: sticky; top: 0; }
+.kttp-step { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--color-primary-soft); color: var(--color-primary); font-size: 13px; }
+.kttp-focus-row { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: var(--space-4); align-items: start; }
+.kttp-focus-row .ui-form-field { display: grid; gap: var(--space-2); margin: 0; }
+.kttp-focus-row .ui-input { width: 100%; box-sizing: border-box; min-height: 44px; }
+.kttp-focus-row textarea.ui-input { resize: vertical; }
+.kttp-assets.is-compact th, .kttp-assets.is-compact td { vertical-align: top; }
+.kttp-asset-qty { color: var(--color-text-muted); font-weight: 400; }
+.kttp-movein-chip { display: inline-flex; padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill); background: var(--color-success-soft); color: var(--color-success); font-size: 13px; font-weight: 600; }
+.kttp-movein-chip.is-defect { background: var(--color-warning-soft); color: var(--color-warning); }
+.kttp-movein-chip.is-missing { background: var(--color-surface-alt); color: var(--color-text-muted); }
+.kttp-note { margin-top: var(--space-2); width: 100%; }
+.kttp-qty { width: 64px; }
+.kttp-sum div { display: flex; justify-content: space-between; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px dashed var(--color-border); font-size: 14px; }
+.kttp-sum div.is-total { border-bottom: 0; font-weight: 700; font-size: 16px; }
+.kttp-sum div.is-total span:last-child { color: var(--color-danger); }
+.kttp-focus-foot { position: sticky; bottom: calc(-1 * var(--space-6)); display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap; margin: 0 calc(-1 * var(--space-6)) calc(-1 * var(--space-6)); padding: var(--space-4) var(--space-6); border-top: 1px solid var(--color-border); background: var(--color-surface); }
+.kttp-focus-foot p { margin: 0; color: var(--color-text-muted); font-size: 13px; }
+@media (max-width: 900px) {
+  .kttp-focus-grid { grid-template-columns: 1fr; }
+  .kttp-focus-side { position: static; }
+  .kttp-focus-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kttp-focus-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) { .kttp-focus-foot { bottom: calc(-1 * var(--space-3)); margin: 0 calc(-1 * var(--space-3)) calc(-1 * var(--space-3)); padding: var(--space-3); } }
+/* Bảng gọn vừa khung, không cuộn ngang trên máy tính: nhẹ tô vàng, nặng/mất tô đỏ (giữ quy ước cũ). */
+.kttp-assets.is-compact { min-width: 640px; table-layout: fixed; }
+.kttp-assets.is-compact th:nth-child(1) { width: 28%; }
+.kttp-assets.is-compact th:nth-child(2) { width: 15%; }
+.kttp-assets.is-compact th:nth-child(3) { width: 33%; }
+.kttp-assets.is-compact th:nth-child(4) { width: 10%; }
+.kttp-assets.is-compact th:nth-child(5) { width: 14%; }
+.kttp-assets.is-compact .kttp-control--status { text-align: left; }
