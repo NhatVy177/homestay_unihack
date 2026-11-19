@@ -1,8 +1,37 @@
-.momo-qr { --momo-brand: #a50064; --momo-brand-soft: #fbe9f3; display: grid; justify-items: center; }
-.momo-qr-status { margin: 0; padding: var(--space-6) 0; color: var(--color-text-muted); font-size: 14px; }
-.momo-qr-figure { display: grid; justify-items: center; gap: var(--space-3); margin: 0; padding: var(--space-4); border: 2px solid var(--momo-brand); border-radius: 16px; background: var(--color-surface); text-align: center; }
-.momo-qr-badge { padding: var(--space-1) var(--space-4); border-radius: 999px; background: var(--momo-brand); color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 0.02em; }
-.momo-qr-figure img { display: block; width: min(100%, 280px); height: auto; }
-.momo-qr-figure figcaption { max-width: 280px; color: var(--color-text-muted); font-size: 13px; line-height: 1.5; }
-.momo-qr-error { display: grid; gap: var(--space-3); justify-items: center; padding: var(--space-4); border-radius: 12px; background: var(--momo-brand-soft); text-align: center; font-size: 14px; }
+.momo-qr { --momo-brand: #a50064; --momo-brand-soft: #fbe9f3; display: grid; gap: var(--space-4); width: min(100%, 380px); margin-inline: auto; padding: var(--space-6) var(--space-4); border-radius: 20px; background: var(--momo-brand); color: #fff; }
+.momo-qr-top { display: grid; justify-items: center; gap: var(--space-2); text-align: center; }
+.momo-qr-top p { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.02em; }
+.momo-qr-brand { display: inline-flex; align-items: center; gap: var(--space-3); }
+.momo-qr-brand strong { font-size: 22px; font-weight: 800; }
+.momo-qr-logo, .momo-qr-mini { display: inline-grid; grid-template-columns: 1fr; line-height: 0.8; font-weight: 900; letter-spacing: -0.04em; }
+.momo-qr-logo { font-size: 22px; color: #fff; }
+.momo-qr-mini { font-size: 14px; color: var(--momo-brand); }
+.momo-qr-logo i, .momo-qr-mini i { font-style: normal; }
+.momo-qr-sep { align-self: stretch; width: 1px; min-height: 28px; background: currentColor; opacity: 0.45; }
+.momo-qr-card { display: grid; justify-items: center; gap: var(--space-3); padding: var(--space-4); border-radius: 20px; background: #fff; color: #191c1a; text-align: center; }
+.momo-qr-card h3 { margin: 0; color: #3c3c3c; font-size: 17px; font-weight: 800; letter-spacing: 0.04em; }
+.momo-qr-amount { margin: 0; color: var(--momo-brand); font-size: 24px; font-weight: 800; line-height: 1.1; }
+.momo-qr-desc { margin: 0; color: var(--color-text-muted); font-size: 13px; overflow-wrap: anywhere; }
+.momo-qr-status { margin: 0; padding: var(--space-8) 0; color: var(--color-text-muted); font-size: 14px; }
+.momo-qr-figure { position: relative; margin: 0; width: min(100%, 280px); }
+.momo-qr-figure img { display: block; width: 100%; height: auto; }
+.momo-qr-center { position: absolute; top: 50%; left: 50%; display: grid; place-items: center; width: 22%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px #fff; color: var(--color-primary); font-size: 13px; font-weight: 800; }
+.momo-qr-code { display: inline-flex; align-items: center; gap: var(--space-3); margin: 0; color: #8a8a8a; font-size: 14px; letter-spacing: 0.02em; }
+.momo-qr-code button { display: grid; place-items: center; width: 32px; height: 32px; border: 0; background: none; color: #6b6b6b; cursor: pointer; }
+.momo-qr-banks { display: grid; justify-items: center; gap: var(--space-2); width: 100%; padding: var(--space-3) var(--space-4); border-radius: 14px; background: #f4f4f4; }
+.momo-qr-banks p { margin: 0; font-size: 14px; font-weight: 700; }
+.momo-qr-banks > div { display: inline-flex; align-items: center; gap: var(--space-3); color: #6b6b6b; font-size: 13px; font-weight: 700; }
+.momo-qr-foot { display: grid; justify-items: center; gap: var(--space-2); text-align: center; }
+.momo-qr-timer { display: inline-flex; align-items: center; gap: var(--space-2); margin: 0; padding: var(--space-2) var(--space-4); border-radius: 999px; background: #ffffff26; color: #fff; font-size: 14px; }
+.momo-qr-timer strong { font-variant-numeric: tabular-nums; }
+.momo-qr-timer.is-urgent { background: #fff; color: var(--color-danger); }
+.momo-qr-wait { display: inline-flex; align-items: center; gap: var(--space-2); margin: 0; font-size: 13px; opacity: 0.92; }
+.momo-qr-dot { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: momo-pulse 1.2s ease-in-out infinite; }
+@keyframes momo-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+.momo-qr-done { display: grid; justify-items: center; gap: var(--space-2); padding: var(--space-6) 0; color: var(--color-success); }
+.momo-qr-done strong { font-size: 20px; }
+.momo-qr-done span:last-child { color: var(--color-text-muted); font-size: 13px; }
+.momo-qr-check .ui-icon { --ui-icon-size: 56px; }
+.momo-qr-error { display: grid; gap: var(--space-3); justify-items: center; padding: var(--space-4); border-radius: 12px; background: var(--momo-brand-soft); font-size: 14px; }
 .momo-qr-error p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .momo-qr-dot { animation: none; } }

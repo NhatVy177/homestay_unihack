@@ -2044,3 +2044,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra (Claude): `npm run build`, `test:avalanche-ui`, `check:ui-tokens` qua; chạy modal đặt cọc ở 1440 và 390 với API giả lập: header, nút đóng tròn, thân cuộn trên điện thoại, footer luôn thấy, không tràn ngang, không lỗi JavaScript. Codex chưa chạy build hay test giao diện.
 - Chưa kiểm: khung chung dùng `!important` và áp cho 5 họ modal còn lại (`ktp, kp, km, dktp, admin`); chưa mở từng modal đó xem có bị lệch.
 - Còn lại: Vy lướt các modal thuộc 5 họ kia; nếu lệch thì báo để sửa.
+
+## 2026-11-19 14:33:40 +07:00 — J-C192 — Mã MoMo theo mẫu "QR Đa Năng", đếm ngược và tự báo đã thanh toán (D-078)
+
+- Người thực hiện: Claude, nhánh `feat/momo-countdown` (worktree `D:\HomeStayDorm-momo2`), theo yêu cầu và hình mẫu của Vy.
+- Lý do: Vy không tải được MoMo Test và MoMo Sandbox báo 403, nên cần luồng demo không phụ thuộc app. `MomoQrPanel` làm lại theo mẫu MoMo: nền hồng, thẻ trắng tên HOMESTAYDORM, mã QR đen (mức sửa lỗi H) có logo tròn giữa, "COM-QRC ID" có nút sao chép, dải "Nhận tiền từ mọi Ví Điện Tử và Ngân Hàng", đồng hồ "Mã hết hạn sau mm:ss" (10 phút, dưới 1 phút đổi màu), hết hạn có nút "Tạo mã mới". Sau khoảng 3 phút tự gọi `POST /thanh-toan-mo-phong/:id/thanh-toan` (đường xác nhận mô phỏng sẵn có, đi qua đúng luồng ghi nhận), hiện "Đã thanh toán" 1,6 giây rồi chuyển tới trang kết quả. Đồng hồ và mốc 3 phút tính từ lúc tạo mã, nhớ trong sessionStorage nên đổi tab hay tải lại không đặt lại. Quét thật bằng MoMo Test vẫn được ghi nhận qua kiểm tra trạng thái 4 giây một lần.
+- Trang `/thanh-toan-mo-phong/:id` dùng chung `MomoQrPanel` (bỏ logic tạo mã riêng và các nút "Kiểm tra thanh toán"); chỉ còn nút "Hủy thanh toán".
+- File: `web/frontend/src/components/payment/MomoQrPanel.jsx`, `momoQrPanel.css`, `web/frontend/src/pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx`, `spec/decisions.md`.
+- Kiểm tra: `npm run build`, `test:avalanche-ui`, `check:ui-tokens` qua; Playwright 1440/390 với API giả lập: mã hiện, một đơn một lần lấy mã, đồng hồ 09:58, không tràn ngang, không lỗi JavaScript; đơn đặt sẵn đã trôi 2:52 thì sau vài giây tự gọi xác nhận một lần rồi chuyển kết quả. Chưa chờ đủ 3 phút thật, chưa quét bằng app MoMo thật, chưa thử với MoMo Sandbox thật.
+- Còn lại: Vy xem thử bằng đơn thật; nếu muốn mốc khác (3 phút, 10 phút) thì báo để đổi hằng số `AUTO_PAY_MS`, `EXPIRE_MS`.
