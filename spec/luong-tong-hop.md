@@ -142,7 +142,7 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
 ### 3.5 Giai đoạn 5: Hợp đồng và kỳ đầu, "một lần đến" (D-027, D-024, D-018)
 
 1. Cư trú đã duyệt → **Sale lập hợp đồng ở trạng thái "Chờ ký"**. Khách nhận **email có link xem trước** hợp đồng và **số tiền kỳ đầu** (tháng thuê đầu + phí ban đầu, trừ phần hoàn cọc giường thừa).
-2. Khách **trả kỳ đầu trước ngày đến** qua ví mô phỏng. **Vẫn cho trả tại quầy.** Nhắc khi còn ≤ 1 ngày tới lịch nhận phòng. Trả xong → khách "sẵn sàng bàn giao", quản lý "hợp đồng sẵn sàng bàn giao".
+2. Khách **trả kỳ đầu trước ngày đến** qua ví mô phỏng. **Vẫn cho trả tại quầy:** kế toán vào tab "Thu tiền mặt", chọn hóa đơn (đặt cọc hoặc nhận phòng), nhập đúng số tiền đã nhận (D-080). Nhắc khi còn ≤ 1 ngày tới lịch nhận phòng. Trả xong → khách "sẵn sàng bàn giao", quản lý "hợp đồng sẵn sàng bàn giao".
 3. **Ngày nhận phòng là một lần đến:**
    - Sale **xem CCCD gốc** của mọi thành viên, tích **"Đã đối chiếu CCCD gốc"** (bắt buộc).
    - Hai bên **ký hợp đồng giấy** → hợp đồng "Đã ký".

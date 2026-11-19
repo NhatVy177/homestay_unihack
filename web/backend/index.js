@@ -14,6 +14,7 @@ import authRoutes from './routes/auth.routes.js';
 import dangKyThueRoutes from './routes/dangKyThue.routes.js';
 import lichXemPhongRoutes from './routes/lichXemPhong.routes.js';
 import datCocRoutes from './routes/datCoc.routes.js';
+import thuTienMatRoutes from './routes/thuTienMat.routes.js';
 import nhanPhongRoutes from './routes/nhanPhong.routes.js';
 import dangKyTraPhongRoutes from './routes/dangKyTraPhong.routes.js';
 import kiemTraTraPhongRoutes from './routes/kiemTraTraPhong.routes.js';
@@ -95,6 +96,7 @@ app.use('/api/trang-chu', trangChuRoutes); // Public — no auth
 app.use('/api/dang-ky-thue', requireAuth, auditMutations({ chucNang: 'Đăng ký thuê', doiTuong: 'PhieuDangKy' }), dangKyThueRoutes);
 app.use('/api/lich-xem-phong', requireAuth, auditMutations({ chucNang: 'Lịch xem phòng', doiTuong: 'LichXemPhong' }), lichXemPhongRoutes);
 app.use('/api/dat-coc', requireAuth, auditMutations({ chucNang: 'Đặt cọc và thanh toán cọc', doiTuong: 'PhieuDatCoc' }), datCocRoutes);
+app.use('/api/thu-tien-mat', requireAuth, auditMutations({ chucNang: 'Kế toán thu tiền mặt', doiTuong: 'ThuTienMat' }), thuTienMatRoutes);
 app.use('/api/nhan-phong', requireAuth, auditMutations({ chucNang: 'Nhận phòng và bàn giao', doiTuong: 'NhanPhong' }), nhanPhongRoutes);
 app.use('/api/dang-ky-tra-phong', requireAuth, auditMutations({ chucNang: 'Đăng ký trả phòng', doiTuong: 'PhieuTraPhong' }), dangKyTraPhongRoutes);
 app.use('/api/kiem-tra-tra-phong', requireAuth, auditMutations({ chucNang: 'Kiểm tra trả phòng', doiTuong: 'BienBanKiemTra' }), kiemTraTraPhongRoutes);
