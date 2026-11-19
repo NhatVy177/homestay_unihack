@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import CustomerRepairTab from '../../components/suaChua/CustomerRepairTab.jsx';
 import AccountSecurity from '../../components/common/AccountSecurity.jsx';
 import { useLocation, useNavigate } from 'react-router-dom';
+import MomoQrPanel from '../../components/payment/MomoQrPanel.jsx';
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { khachMoiApi } from '../khachMoi/khachMoi.api.js';
 import { datCocApi } from '../datCoc/datCoc.api.js';
@@ -3405,8 +3406,7 @@ export default function KhachHangPortalPage() {
                   <div><span>Nội dung</span><strong>Tiền cọc – phiếu {phieu.maPhieuCoc}</strong></div>
                   <div><span>Số tiền</span><strong>{amount.toLocaleString('vi-VN')} VNĐ</strong></div>
                 </div>
-                <p className="dc-bank-note">Xem lại số tiền và xác nhận ở cổng mô phỏng. Giao dịch thử không trừ tiền thật.</p>
-                <button type="button" className="kp-btn kp-btn-primary kp-full" disabled={walletBusy} onClick={() => thanhToanViMoPhong(phieu)}>{walletBusy ? 'Đang mở cổng…' : 'Tiếp tục với MoMo mô phỏng'}</button>
+                <MomoQrPanel createPath={`/thanh-toan-mo-phong/dat-coc/${encodeURIComponent(phieu.maPhieuCoc)}`} onPaid={(orderId) => navigate(`/thanh-toan-mo-phong/${encodeURIComponent(orderId)}`)} />
               </div>}
               {!walletTab && isTransfer && <div className="dpay-transfer">
                 <VietQrCode account={account} amount={amount} content={transferContent} />
@@ -3537,8 +3537,7 @@ export default function KhachHangPortalPage() {
                     <div><span>Nội dung</span><strong>{quote.kind === 'hoaDon' ? `Hóa đơn ${quote.refId}` : `Khoản thu kỳ đầu – hợp đồng ${quote.refId}`}</strong></div>
                     <div><span>Số tiền</span><strong>{amount.toLocaleString('vi-VN')} VNĐ</strong></div>
                   </div>
-                  <p className="dc-bank-note">Quét bằng ứng dụng MoMo Test. Đơn thử không trừ tiền thật.</p>
-                  <button type="button" className="kp-btn kp-btn-primary kp-full" disabled={fcBusy} onClick={() => moCongViKyDau(quote)}>{fcBusy ? 'Đang mở cổng…' : 'Tiếp tục với MoMo mô phỏng'}</button>
+                  <MomoQrPanel createPath={`/thanh-toan-mo-phong/${quote.kind === 'hoaDon' ? 'hoa-don' : 'thu-nhan-phong'}/${encodeURIComponent(quote.refId)}`} onPaid={(orderId) => navigate(`/thanh-toan-mo-phong/${encodeURIComponent(orderId)}`)} />
                 </div>}
                 {fcMethod !== 'wallet' && <p className="dc-bank-note">Sau khi chuyển khoản hoặc nộp tiền, kế toán sẽ xác nhận. Khoản này sẽ chuyển sang "Đã thanh toán" khi được ghi nhận.</p>}
               </section>

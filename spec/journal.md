@@ -2026,3 +2026,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `web/frontend/src/pages/homeExperience/useInterestedRooms.js` (mới), `HomeExperience.jsx`, `experience.css`, `pages/khachHang/KhachHangPortalPage.jsx`, `khachHangPortal.css`.
 - Kiểm tra: build và `test:avalanche-ui` qua; Playwright 1440/390 với API tong-quan và phong-quan-tam giả lập (không ghi HOMEDORM4): thêm, gỡ, hiện danh sách trong hồ sơ, không tràn ngang, không lỗi JavaScript. Chưa thử với tài khoản khách thật trên SQL Server.
 - Còn lại: Vy thử bằng tài khoản khách có hồ sơ mở; duyệt gộp.
+
+## 2026-11-19 14:01:03 +07:00 — J-C190 — Chọn tab MoMo là hiện mã QR ngay, bỏ dòng "mô phỏng không trừ tiền thật"
+
+- Người thực hiện: Claude, nhánh `feat/momo-inline-qr` (worktree `D:\HomeStayDorm-momo`), theo yêu cầu của Vy.
+- Lý do: thanh toán MoMo phải qua 3 bước (Tiếp tục, Tạo mã QR, quét). Nay chọn tab MoMo ở Đặt cọc và Khoản thu kỳ đầu/Hóa đơn là mã hiện luôn trong trang, màu MoMo (#A50064), tự kiểm tra kết quả mỗi 4 giây; thanh toán xong tự chuyển sang trang kết quả. Đơn đã tạo được nhớ trong sessionStorage nên đổi tab qua lại không tạo thêm đơn; nếu MoMo báo đơn cũ còn chờ mà không trả lại mã thì có nút "Tạo lại mã" (hủy đơn cũ, tạo mới).
+- Trang `/thanh-toan-mo-phong/:id` (vào từ các nút MoMo khác): bỏ dải chữ "Giao dịch mô phỏng không trừ tiền thật", tự tạo mã khi vào trang, mã cùng màu MoMo. Bỏ luôn hai dòng ghi chú tương tự trong cổng khách. Nhãn tab "MoMo (mô phỏng)" giữ nguyên. Không đổi backend, SQL.
+- File: `web/frontend/scripts/avalanche-smoke.mjs` (bỏ kiểm dòng chữ cũ, kiểm mã QR tự hiện), `web/frontend/src/components/payment/MomoQrPanel.jsx`, `momoQrPanel.css` (mới), `pages/khachHang/KhachHangPortalPage.jsx`, `pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx`.
+- Kiểm tra: build, `test:avalanche-ui` (đã sửa theo trang mới; lần chạy đầu fail vì còn kiểm dòng chữ cũ), `check:ui-tokens` qua; Playwright 1440/390 với API MoMo giả lập: một đơn và một lần lấy mã (kể cả React StrictMode), tự kiểm tra rồi báo đã thanh toán, không tràn ngang, không lỗi JavaScript. Chưa quét bằng app MoMo Test thật và chưa thử với MoMo Sandbox thật.
+- Còn lại: Vy thử với MoMo Sandbox thật (cần backend có khóa Sandbox); duyệt gộp.

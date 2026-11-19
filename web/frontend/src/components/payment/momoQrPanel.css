@@ -1,0 +1,8 @@
+.momo-qr { --momo-brand: #a50064; --momo-brand-soft: #fbe9f3; display: grid; justify-items: center; }
+.momo-qr-status { margin: 0; padding: var(--space-6) 0; color: var(--color-text-muted); font-size: 14px; }
+.momo-qr-figure { display: grid; justify-items: center; gap: var(--space-3); margin: 0; padding: var(--space-4); border: 2px solid var(--momo-brand); border-radius: 16px; background: var(--color-surface); text-align: center; }
+.momo-qr-badge { padding: var(--space-1) var(--space-4); border-radius: 999px; background: var(--momo-brand); color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 0.02em; }
+.momo-qr-figure img { display: block; width: min(100%, 280px); height: auto; }
+.momo-qr-figure figcaption { max-width: 280px; color: var(--color-text-muted); font-size: 13px; line-height: 1.5; }
+.momo-qr-error { display: grid; gap: var(--space-3); justify-items: center; padding: var(--space-4); border-radius: 12px; background: var(--momo-brand-soft); text-align: center; font-size: 14px; }
+.momo-qr-error p { margin: 0; }
