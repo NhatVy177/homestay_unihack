@@ -51,7 +51,7 @@ export default function ThanhToanMoPhongPage() {
     setPendingMessage('');
     try {
       const { data } = await httpClient.post(`${endpoint}/momo/qr`);
-      const image = data.qrCode ? await QRCode.toDataURL(data.qrCode, { width: 320, margin: 4, errorCorrectionLevel: 'M' }) : null;
+      const image = data.qrCode ? await QRCode.toDataURL(data.qrCode, { width: 320, margin: 4, errorCorrectionLevel: 'M', color: { dark: '#A50064', light: '#FFFFFF' } }) : null;
       const checkout = { image, payUrl: data.payUrl, existing: data.existing };
       setMomo(checkout);
       if (image || data.payUrl) {
@@ -62,6 +62,12 @@ export default function ThanhToanMoPhongPage() {
       setError(message(e, 'Chưa tạo được mã QR MoMo thử nghiệm.'));
     } finally { setBusy(false); }
   }
+
+  // Vào trang là hiện mã luôn, khách không phải bấm tạo mã.
+  useEffect(() => {
+    if (order?.status === 'Pending' && !momo && !returnedFromMomo) createQr();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order?.status]);
 
   async function act(path) {
     if (busy || order?.status !== 'Pending') return;
@@ -86,7 +92,6 @@ export default function ThanhToanMoPhongPage() {
   }
   const purpose = purposes[order?.purpose || 'dat-coc'] || { label: 'Thanh toán', reference: 'Mã tham chiếu', tab: 'dat-coc' };
   return <main className="tm-page">
-    <p className="tm-sim-banner">Giao dịch mô phỏng không trừ tiền thật.</p>
     <section className="tm-card">
       <header><span className="tm-wallet-icon"><Icon name="payments" /></span><div><h1>MoMo mô phỏng</h1><p>Thanh toán cho HomeStayDorm</p></div></header>
       {error && <p className="tm-error" role="alert">{error}</p>}
@@ -110,7 +115,7 @@ export default function ThanhToanMoPhongPage() {
             <button type="button" className="ui-btn ui-btn--secondary" disabled={busy} onClick={() => act('huy')}>Hủy</button>
             {momo
               ? <button type="button" className="ui-btn ui-btn--primary" disabled={busy} onClick={() => act('momo/trang-thai')}>{busy ? 'Đang đối chiếu…' : 'Kiểm tra thanh toán'}</button>
-              : <button type="button" className="ui-btn ui-btn--primary" disabled={busy} onClick={createQr}>{busy ? 'Đang tạo mã…' : 'Tạo mã QR MoMo'}</button>}
+              : <button type="button" className="ui-btn ui-btn--primary" disabled={busy} onClick={createQr}>{busy ? 'Đang tạo mã…' : 'Tạo lại mã MoMo'}</button>}
           </div>
           {!momo && <button type="button" className="ui-btn ui-btn--ghost" disabled={busy} onClick={() => act('momo/trang-thai')}>Kiểm tra giao dịch đã quét</button>}
         </>}
