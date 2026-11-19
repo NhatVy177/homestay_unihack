@@ -2009,3 +2009,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `web/frontend/src/styles/tokens.css`, `web/frontend/src/pages/khachMoi/KhachMoiPage.jsx`.
 - Kiểm tra: trên code đã gộp D-076, backend 165 qua/7 bỏ qua/0 lỗi; `npm run build` và `test:avalanche-ui` qua. Chưa xem lại bằng mắt các trang có `--space-5` (sourceReport, suaChua, chiTietPhong, saleWorkspace).
 - Còn lại: Vy xem nhanh 4 trang trên.
+
+## 2026-11-19 13:45:19 +07:00 — J-C189 — Tim ở thẻ phòng thêm/gỡ phòng quan tâm ngay; hồ sơ hiện danh sách phòng quan tâm
+
+- Người thực hiện: Claude, nhánh `feat/heart-interest` (worktree `D:\HomeStayDorm-heart`), theo yêu cầu của Vy.
+- Lý do: tim ở thẻ phòng trang chủ chỉ chuyển trang, trông như để trang trí. Nay khách đã đăng nhập có hồ sơ còn mở (D-043) bấm tim là thêm/gỡ phòng khỏi hồ sơ ngay (tim đỏ đặc khi đã quan tâm, thông báo ngay tại thẻ, lỗi loại phòng/chi nhánh/giới tính của máy chủ hiện nguyên văn). Chưa đăng nhập hoặc chưa có hồ sơ mở thì giữ cách cũ.
+- Tab "Hồ sơ đăng ký" của khách: thẻ hồ sơ có mục "Phòng quan tâm" (bấm tên mở chi tiết phòng; hồ sơ còn mở có nút bỏ quan tâm). Không đổi backend hay SQL.
+- File: `web/frontend/src/pages/homeExperience/useInterestedRooms.js` (mới), `HomeExperience.jsx`, `experience.css`, `pages/khachHang/KhachHangPortalPage.jsx`, `khachHangPortal.css`.
+- Kiểm tra: build và `test:avalanche-ui` qua; Playwright 1440/390 với API tong-quan và phong-quan-tam giả lập (không ghi HOMEDORM4): thêm, gỡ, hiện danh sách trong hồ sơ, không tràn ngang, không lỗi JavaScript. Chưa thử với tài khoản khách thật trên SQL Server.
+- Còn lại: Vy thử bằng tài khoản khách có hồ sơ mở; duyệt gộp.

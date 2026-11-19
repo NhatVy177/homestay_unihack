@@ -268,3 +268,5 @@
 .tc-page .hx-room-heart { position: absolute; top: 12px; right: 12px; z-index: 2; display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: #ffffffe6; color: #b3261e; box-shadow: 0 1px 4px #191c1a33; cursor: pointer; transition: transform .15s; }
 .tc-page .hx-room-heart:hover { transform: scale(1.1); }
 .tc-page .hx-room-heart .kp-line-icon { width: 20px; height: 20px; }
+.tc-page .hx-room-heart.is-active .kp-line-icon { fill: currentColor; }
+.tc-page .hx-heart-note { position: absolute; top: 14px; left: 12px; right: 56px; z-index: 2; padding: var(--space-2) var(--space-3); border-radius: 8px; background: #191c1af0; color: #fff; font-size: 13px; line-height: 1.4; }
