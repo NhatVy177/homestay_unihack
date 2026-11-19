@@ -11,6 +11,16 @@ import { avalancheApi, errorMessage, trustedDeployment } from '../../lib/avalanc
 // Khách không thấy ví, địa chỉ hay popup của Privy.
 const silent = { showWalletUIs: false };
 const same = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+// Bản demo: đặt VITE_OTP_DEMO_INBOX=hop-thu@gmail.com thì mã OTP của mọi khách gửi tới hop-thu+<tên-email-khách>@gmail.com
+// (Gmail chuyển về cùng một hộp thư), để người demo nhận được mã. Để trống thì gửi thẳng tới email của khách.
+const demoInbox = String(import.meta.env.VITE_OTP_DEMO_INBOX || '').trim().toLowerCase();
+const otpTarget = (email) => {
+  const real = String(email || '').trim().toLowerCase();
+  const [inboxName, inboxDomain] = demoInbox.split('@');
+  if (!inboxName || !inboxDomain || !real.includes('@')) return real;
+  const tag = real.split('@')[0].replace(/[^a-z0-9._-]/g, '');
+  return `${inboxName}+${tag}@${inboxDomain}`;
+};
 function JwtSync() {
   const getExternalJwt = useCallback(async () => {
     try { return (await avalancheApi.get('/privy/token')).token; } catch { return undefined; }
@@ -37,10 +47,10 @@ function Bridge({ mode, accountEmail, children }) {
   useEffect(() => {
     if (mode !== 'email' || !ready || staleChecked.current) return;
     staleChecked.current = true;
-    if (authenticated && (!accountEmail || !same(privyEmail, accountEmail))) logout().catch(() => {});
+    if (authenticated && (!accountEmail || !same(privyEmail, otpTarget(accountEmail)))) logout().catch(() => {});
   }, [mode, ready, authenticated, privyEmail, accountEmail, logout]);
   useEffect(() => { avalancheApi.get('/wallet').then(r => setLinked(r.address)).catch(e => setError(errorMessage(e))); }, []);
-  const sessionOk = authenticated && (mode !== 'email' || (accountEmail && same(privyEmail, accountEmail)) || codeSentTo);
+  const sessionOk = authenticated && (mode !== 'email' || (accountEmail && same(privyEmail, otpTarget(accountEmail))) || codeSentTo);
   // Headless login does not auto-create a wallet: create it silently once.
   useEffect(() => {
     if (!ready || !sessionOk || wallet || busy.current.create) return;
@@ -72,7 +82,7 @@ function Bridge({ mode, accountEmail, children }) {
     async sendCode(email) {
       const target = String(accountEmail || email || '').trim();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)) throw new Error('Email chưa hợp lệ.');
-      await sendCode({ email: target });
+      await sendCode({ email: otpTarget(target) });
       setCodeSentTo(target);
     },
     async verifyCode(code) {
