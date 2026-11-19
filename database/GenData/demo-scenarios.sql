@@ -72,6 +72,23 @@ CROSS JOIN (VALUES ('TS0001',N'Giường đơn',1300000),('TS0002',N'Tủ cá nh
 INSERT dbo.TaiSan (MaPhong,MaTaiSan,TenTaiSan,SoLuong,DonGia)
 SELECT RoomId,'TS0004',CASE WHEN RoomType='LP0003' THEN N'Quạt' ELSE N'Điều hòa' END,1,
   CASE WHEN RoomType='LP0003' THEN 350000 ELSE 4500000 END FROM @rooms;
+
+IF OBJECT_ID(N'dbo.KhoTaiSanChiNhanh', N'U') IS NOT NULL
+BEGIN
+  MERGE dbo.KhoTaiSanChiNhanh AS target
+  USING (VALUES
+    ('CN0001','TS0001',N'Giường đơn',8,1,1300000),
+    ('CN0001','TS0002',N'Tủ cá nhân',5,2,850000),
+    ('CN0001','TS0003',N'Bàn học',4,0,450000),
+    ('CN0002','TS0001',N'Giường đơn',4,1,1300000),
+    ('CN0002','TS0004',N'Điều hòa',2,1,4500000)
+  ) AS source(MaChiNhanh,MaTaiSan,TenTaiSan,SoLuongDungDuoc,SoLuongChoSua,DonGia)
+  ON target.MaChiNhanh=source.MaChiNhanh AND target.MaTaiSan=source.MaTaiSan
+  WHEN MATCHED THEN UPDATE SET TenTaiSan=source.TenTaiSan,SoLuongDungDuoc=source.SoLuongDungDuoc,
+    SoLuongChoSua=source.SoLuongChoSua,DonGia=source.DonGia,CapNhatLuc=SYSDATETIME()
+  WHEN NOT MATCHED THEN INSERT (MaChiNhanh,MaTaiSan,TenTaiSan,SoLuongDungDuoc,SoLuongChoSua,DonGia)
+    VALUES (source.MaChiNhanh,source.MaTaiSan,source.TenTaiSan,source.SoLuongDungDuoc,source.SoLuongChoSua,source.DonGia);
+END;
 INSERT dbo.DichVu (MaDichVu,TenDichVu,DonViTinh,DonGia,Nhom) VALUES
 ('DV0001',N'Điện','kWh',4000,N'Thiết yếu'),('DV0002',N'Nước','m3',18000,N'Thiết yếu'),
 ('DV0003',N'Wifi',N'tháng',100000,N'Thiết yếu'),('DV0004',N'Vệ sinh',N'tháng',80000,N'Thiết yếu'),

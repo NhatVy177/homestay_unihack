@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test:avalanche-ui": "node scripts/avalanche-smoke.mjs",
+    "test:asset-transfer-ui": "node scripts/asset-transfer-ui.mjs",
     "test:handover-ui": "node scripts/handover-bundle-ui.mjs",
     "test:shell-ui": "node scripts/ui-shell.mjs",
     "test:list-kit": "node scripts/ui-list-kit.mjs",

@@ -40,6 +40,7 @@ import avalancheRoutes from './routes/avalanche.routes.js';
 import loyaltyRoutes from './routes/loyalty.routes.js';
 import { startLoyaltyScheduler } from './integrations/loyalty/index.js';
 import thanhToanMoPhongRoutes from './routes/thanhToanMoPhong.routes.js';
+import dieuPhoiTaiSanRoutes from './routes/dieuPhoiTaiSan.routes.js';
 
 // Load bien moi truong trong file .env
 dotenv.config();
@@ -106,6 +107,7 @@ app.use('/api/admin', requireAuth, adminRoutes);
 app.use('/api/accountant/doi-soat', requireAuth, auditMutations({ chucNang: 'Đối soát và thanh toán', doiTuong: 'DoiSoat' }), doiSoatRoutes);
 app.use('/api/ke-toan/hoa-don-dinh-ky', requireAuth, auditMutations({ chucNang: 'Hóa đơn định kỳ', doiTuong: 'HoaDon' }), hoaDonDinhKyRoutes);
 app.use('/api/hop-dong', requireAuth, auditMutations({ chucNang: 'Hợp đồng thuê', doiTuong: 'HopDongThue' }), hopDongRoutes);
+app.use('/api/dieu-phoi-tai-san', requireAuth, auditMutations({ chucNang: 'Điều phối tài sản', doiTuong: 'PhieuDieuChuyenTaiSan' }), dieuPhoiTaiSanRoutes);
 
 if (serveWeb) {
   app.get(/^\/(?!api\/|uploads\/|chia-se\/).*/, (req, res) => res.type('html').sendFile(path.join(webDist, 'index.html')));

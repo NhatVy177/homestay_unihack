@@ -1,0 +1,34 @@
+.asset-transfer-page { display: flex; flex-direction: column; gap: var(--space-6); min-width: 0; }
+.asset-transfer-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); }
+.asset-transfer-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(20rem, .85fr); gap: var(--space-6); align-items: start; }
+.asset-transfer-card { min-width: 0; padding: var(--space-6); }
+.asset-transfer-section-title { display: flex; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+.asset-transfer-section-title h2 { margin: 0; color: var(--color-text); font-size: 1.05rem; }
+.asset-transfer-section-title p { margin: var(--space-1) 0 0; color: var(--color-text-muted); font-size: .875rem; }
+.asset-transfer-form { display: grid; gap: var(--space-4); scroll-margin-top: var(--space-6); }
+.asset-transfer-form-actions { display: flex; justify-content: flex-end; }
+.asset-transfer-table-wrap { max-width: 100%; overflow-x: auto; }
+.asset-transfer-table-wrap .ui-table { min-width: 38rem; }
+.asset-room-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+.asset-room { border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-4); background: var(--color-surface); min-width: 0; }
+.asset-room.is-occupied { background: var(--color-warning-soft); }
+.asset-room-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-2); }
+.asset-room-head strong, .asset-room-head span { display: block; }
+.asset-room-head > div > span { margin-top: var(--space-1); color: var(--color-text-muted); font-size: .8rem; }
+.asset-room > p { color: var(--color-text-muted); font-size: .875rem; line-height: 1.5; min-height: 2.6rem; }
+.asset-room-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.asset-transfer-page .ui-list-alert { display: flex; align-items: center; gap: var(--space-2); }
+.asset-transfer-page .ui-list-alert--success { color: var(--color-success); border-color: var(--color-success); }
+
+@media (max-width: 960px) {
+  .asset-transfer-grid { grid-template-columns: 1fr; }
+  .asset-room-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+  .asset-transfer-heading { flex-direction: column; }
+  .asset-transfer-heading .ui-btn { width: 100%; justify-content: center; }
+  .asset-transfer-card { padding: var(--space-4); }
+  .asset-room-grid { grid-template-columns: 1fr; }
+  .asset-transfer-form-actions .ui-btn { width: 100%; justify-content: center; }
+}

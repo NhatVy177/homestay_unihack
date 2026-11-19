@@ -1,10 +1,11 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-19 10:54:35 +07:00** (J-C186: code KPI Sale và thẻ tài sản bàn giao trên nhánh). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-19 11:26:22 +07:00** (J-X106: hoàn tất code và kiểm thử điều phối tài sản trên nhánh). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## KPI Sale, tài sản bàn giao và điều phối tài sản — D-075 / D-076
 
-- KPI Sale và thẻ tài sản bàn giao (D-075) đã có code trên nhánh `feat/sale-kpi` (worktree `D:\HomeStayDorm-kpi`): test tự động qua, đã xem giao diện với SQL Server HOMEDORM4 ở chế độ chỉ đọc (J-C186). Chờ Vy duyệt gộp. Codex làm điều phối tài sản trên nhánh `feat/asset-transfer`. Hai nhánh chờ Vy duyệt rồi mới gộp.
+- KPI Sale và thẻ tài sản bàn giao (D-075) đã có code trên nhánh `feat/sale-kpi` (worktree `D:\HomeStayDorm-kpi`): test tự động qua, đã xem giao diện với SQL Server HOMEDORM4 ở chế độ chỉ đọc (J-C186). Chờ Vy duyệt gộp.
+- Điều phối tài sản (D-076) đã có code trên nhánh `feat/asset-transfer` (worktree `D:\HomeStayDorm-assets`): kho dùng được/chờ sửa theo chi nhánh, đủ sáu loại chuyển, lịch sử bất biến và chặn phòng có hợp đồng hiệu lực. API khóa quản lý trong chi nhánh; Admin chỉ đọc và tab Tài sản dùng dữ liệu thật của toàn bộ phòng. Unit test, SQL trên database dùng một lần, backend, blockchain, build/smoke và giao diện SQL demo 1440/390 đều qua (J-X106). Chưa chạy migration lên HOMEDORM4; chờ Vy duyệt gộp.
 - Sau khi gộp, Vy kiểm lại luồng; Claude quay video demo không tiếng để Vy lồng tiếng.
 
 ## Nhận diện và slideshow trang chủ — D-073 / D-074
