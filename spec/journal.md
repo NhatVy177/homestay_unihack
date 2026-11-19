@@ -2165,3 +2165,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - `hackathon/video-script.md` viết lại thay bản 18/11: luồng chính một mạch, nhánh phụ thành cảnh cắt 2–3 giây có nhãn "Nhánh: …", cột tốc độ cho người dựng; thêm các phần sau 18/11 (tim quan tâm, MoMo hiện ngay, thu tiền mặt, tình trạng tài sản khi bàn giao, xác nhận email lúc vào cổng, đổi điểm lúc thanh toán, form kiểm tra trả phòng, điều phối tài sản, KPI Sale); bảng dữ liệu demo K1–K8 theo từng cảnh; việc cần có trước khi quay (OTP Privy: test account hoặc Vy nhập mã); cách Claude quay bằng Playwright.
 - Đã đối chiếu code: `npm run avalanche:recover` và thao tác thanh lý không có xác nhận của khách có trong repo; máy chưa có ffmpeg nên giao từng đoạn video riêng.
 - Chưa làm: tạo tài khoản và dữ liệu demo (chờ Vy duyệt kịch bản), quay video.
+
+## 2026-11-19 19:24:26 +07:00 — J-C206 — Chỉ kết thúc hợp đồng khi tiền đã xong; đổi tên "Đối soát trả phòng"
+
+- Người thực hiện: Claude, nhánh `fix/checkout-close-gate`, theo góp ý của Vy trên ảnh luồng trả phòng.
+- `quanLyHopDong.service.js`: "Kết thúc hợp đồng" chỉ hiện khi đối soát "Đã quyết toán" (đã hoàn cọc, đã thu thêm hoặc không phát sinh); trước đó dòng hiện "đang chờ" (chờ kế toán lập đối soát, chờ khách xác nhận, chờ kế toán điều chỉnh, chờ kế toán hoàn cọc, chờ khách trả thêm). Khi khách chưa đồng ý vẫn có liên kết "Thanh lý ngoại lệ" mở màn kết thúc để dùng đường thanh lý không có xác nhận (D-038), màn đó tự khóa khi chưa đủ điều kiện. Trước đây nút hiện ngay sau khi quản lý kiểm tra phòng.
+- `XuLyTraPhongTab.jsx`, `quanLyHopDong.css`: nút trong cột Hành động xuống dòng thay vì bị cắt chữ; nhãn đang chờ.
+- `NhanVienKeToanPage.jsx`: menu "Đối soát hoàn cọc" đổi thành "Đối soát trả phòng".
+- Ghi chú câu hỏi của Vy: ảnh bước khách đồng ý hỏi xác nhận email vì trình duyệt tự động chưa từng đăng nhập ví; phiên Privy lưu theo trình duyệt, trên máy Vy (đã xác nhận) không hỏi lại.
+- File: `web/backend/services/quanLyHopDong.service.js`, `web/backend/test/quan-ly-hop-dong.test.mjs`, `web/frontend/src/pages/nhanVienQuanLy/XuLyTraPhongTab.jsx`, `quanLyHopDong.css`, `web/frontend/src/pages/nhanVienKeToan/NhanVienKeToanPage.jsx`.
+- Kiểm tra: backend 167 qua, 0 lỗi (thêm test chặn kết thúc); `npm run build`, `check:ui-tokens` qua. Cần khởi động lại backend.

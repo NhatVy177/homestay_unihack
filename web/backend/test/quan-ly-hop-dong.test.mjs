@@ -1,6 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { nhomTrangThai, viecCanLam, danhSachHopDongQuanLy } from '../services/quanLyHopDong.service.js';
+import { nhomTrangThai, viecCanLam, dangCho, coTheNgoaiLe, danhSachHopDongQuanLy } from '../services/quanLyHopDong.service.js';
+
+test('contract closing opens only after the money is settled', () => {
+  const base = { maPhieuTra: 'TP1', trangThaiPhieuTra: 'Chờ ký biên bản', daThuChiaKhoa: false, trangThai: 'Hiệu lực' };
+  assert.equal(viecCanLam(base), null);
+  assert.equal(dangCho(base), 'Chờ kế toán lập đối soát');
+  assert.equal(viecCanLam({ ...base, trangThaiDoiSoat: 'Chờ xác nhận' }), null);
+  assert.equal(dangCho({ ...base, trangThaiDoiSoat: 'Chờ xác nhận' }), 'Chờ khách xác nhận đối soát');
+  assert.equal(coTheNgoaiLe({ ...base, trangThaiDoiSoat: 'Chờ xác nhận' }), true);
+  assert.equal(dangCho({ ...base, trangThaiDoiSoat: 'Chờ hoàn cọc' }), 'Chờ kế toán hoàn cọc');
+  assert.equal(dangCho({ ...base, trangThaiDoiSoat: 'Chờ thanh toán thêm' }), 'Chờ khách trả thêm');
+  assert.equal(viecCanLam({ ...base, trangThaiDoiSoat: 'Đã quyết toán' }), 'ket-thuc');
+  assert.equal(dangCho({ ...base, trangThaiDoiSoat: 'Đã quyết toán' }), null);
+});
 
 test('contract buckets and next action for the manager list', () => {
   assert.equal(nhomTrangThai({ trangThai: 'Hiệu lực', daThuKyDau: false }), 'cho-thanh-toan');
