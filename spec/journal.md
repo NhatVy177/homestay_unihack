@@ -2053,3 +2053,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `web/frontend/src/components/payment/MomoQrPanel.jsx`, `momoQrPanel.css`, `web/frontend/src/pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx`, `spec/decisions.md`.
 - Kiểm tra: `npm run build`, `test:avalanche-ui`, `check:ui-tokens` qua; Playwright 1440/390 với API giả lập: mã hiện, một đơn một lần lấy mã, đồng hồ 09:58, không tràn ngang, không lỗi JavaScript; đơn đặt sẵn đã trôi 2:52 thì sau vài giây tự gọi xác nhận một lần rồi chuyển kết quả. Chưa chờ đủ 3 phút thật, chưa quét bằng app MoMo thật, chưa thử với MoMo Sandbox thật.
 - Còn lại: Vy xem thử bằng đơn thật; nếu muốn mốc khác (3 phút, 10 phút) thì báo để đổi hằng số `AUTO_PAY_MS`, `EXPIRE_MS`.
+
+## 2026-11-19 14:46:06 +07:00 — J-C193 — Thiết kế lại thẻ "Bản hợp đồng đã ký" và ô chọn tệp trong Bản xem hợp đồng thuê
+
+- Người thực hiện: Claude, nhánh `feat/contract-upload-ui` (worktree `D:\HomeStayDorm-contract`), theo yêu cầu của Vy (trang bị chen chúc, nút "Chọn tệp" mặc định không hợp dự án).
+- Thay đổi: thẻ tải bản ký nay là một dải rộng bằng tờ hợp đồng, nằm phía trên tờ (trước đó nằm cạnh nên bị bóp hẹp). Đầu thẻ có biểu tượng, tiêu đề, mô tả và nhãn trạng thái "Chưa có/Đã lưu". File đã lưu hiện một dòng xanh cắt tên dài bằng dấu "…". Nút "Chọn tệp" mặc định thay bằng ô kéo thả viền đứt (chọn hoặc kéo tệp, hiện tên và dung lượng, báo ngay nếu quá 5 MB), có nút "Bỏ chọn"; đã có bản lưu thì nút đổi thành "Thay bản đã lưu". Lớp dùng chung `ui-file-drop`, `ui-signed-*` trong `styles/evidence.css`. Vùng cuộn của modal đổi sang cột dọc (`lhd-print-overlay`).
+- File: `web/frontend/src/components/common/SignedContractUpload.jsx`, `web/frontend/src/styles/evidence.css`, `web/frontend/src/pages/nhanVienSale/lapHopDongTab.css`, `web/frontend/scripts/handover-bundle-ui.mjs` (đổi câu chờ "Chưa có bản hợp đồng đã ký." thành nhãn "Chưa có").
+- Kiểm tra: `build`, `test:avalanche-ui`, `check:ui-tokens` qua; Playwright 1280/390 với khung modal dựng lại và API giả lập: thẻ nằm trên tờ, rộng bằng tờ, không tràn ngang, không lỗi JavaScript, chọn tệp và lưu thành công. `test:handover-ui` chạy qua bước tải hợp đồng nhưng **vẫn fail** ở bước sau (đợi tiêu đề "Nội dung khớp bản ghi trên chain" đã không còn trong mã từ trước, không do đợt này); chưa sửa.
+- Chưa kiểm: chưa mở modal thật trong luồng Sale với dữ liệu HOMEDORM4.
+- Còn lại: Vy xem lại trong luồng Sale; cập nhật `handover-bundle-ui.mjs` cho khớp trang xác minh hiện tại khi có dịp.
