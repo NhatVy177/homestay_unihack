@@ -9,6 +9,8 @@ const MONTH_OPTIONS = [['Tất cả', 'Tất cả các tháng'], ...Array.from({
   const m = String(i + 1).padStart(2, '0');
   return [m, `Tháng ${m}`];
 })];
+// Màu nhãn loại hóa đơn: cọc nâu nhạt, nhận phòng xanh lá, định kỳ xanh dương.
+const TYPE_TONE = { 'Đặt cọc': 'deposit', 'Nhận phòng': 'movein', 'Định kỳ': 'period' };
 const TYPE_OPTIONS = ['Tất cả loại', 'Đặt cọc', 'Nhận phòng', 'Định kỳ', 'Dịch vụ', 'Phát sinh', 'Hoàn cọc'];
 const STATUS_LABEL = { paid: 'Đã thanh toán', unpaid: 'Chờ thanh toán', pending: 'Chờ xác nhận', overdue: 'Quá hạn' };
 
@@ -98,7 +100,7 @@ export default function CustomerInvoicesList({ deposits, invoices, firstCharges 
       <tbody>{visible.map((row) => <tr key={row.key}>
         <td data-label="Mã hóa đơn"><strong>{row.id}</strong></td>
         <td data-label="Kỳ thanh toán">{periodLabel(row.period)}</td>
-        <td data-label="Loại"><span className={`cinv-type cinv-type--${row.kind === 'deposit' ? 'deposit' : 'period'}`}>{row.loai}</span></td>
+        <td data-label="Loại"><span className={`cinv-type cinv-type--${TYPE_TONE[row.loai] || 'period'}`}>{row.loai}</span></td>
         <td data-label="Số tiền"><strong>{money(row.amount)}</strong>
           {row.source.giamDiemThuong > 0 && <small className="ui-cell-sub">Ưu đãi đã áp dụng −{money(row.source.giamDiemThuong)}</small>}
         </td>

@@ -49,6 +49,7 @@ export default function XuLyTraPhongTab() {
   const q = query.trim().toLocaleLowerCase('vi-VN');
   const visible = rows.filter((r) => (filter === 'all' || r.nhom === filter)
     && (!q || [r.maHopDong, r.hoTen, r.sdt, r.tenPhong].join(' ').toLocaleLowerCase('vi-VN').includes(q)));
+  const hasAction = visible.some((r) => r.viecCanLam); // không có việc nào cần làm thì ẩn cả cột Hành động
   const current = Math.min(page, Math.max(1, Math.ceil(visible.length / PAGE)));
   const close = () => { setOpen(null); load(); };
   const pick = (key) => { setFilter(key); setPage(1); };
@@ -69,10 +70,10 @@ export default function XuLyTraPhongTab() {
     {error && <p className="checkout-error" role="alert">{error}</p>}
     <section className="ui-card qlhd-table-card">
       <div className="qlhd-table-wrap"><table className="ui-table qlhd-table">
-        <thead><tr><th>Mã hợp đồng</th><th>Khách hàng</th><th>Phòng / Giường</th><th>Loại thuê</th><th className="num">Tiền thuê / tháng</th><th>Thời hạn</th><th>Trạng thái</th><th>Hành động</th></tr></thead>
+        <thead><tr><th>Mã hợp đồng</th><th>Khách hàng</th><th>Phòng / Giường</th><th>Loại thuê</th><th className="num">Tiền thuê / tháng</th><th>Thời hạn</th><th>Trạng thái</th>{hasAction && <th>Hành động</th>}</tr></thead>
         <tbody>
-          {loading ? <TableState kind="loading" colSpan={8} />
-            : !visible.length ? <TableState kind={error ? 'error' : 'empty'} colSpan={8} message="Không tìm thấy hợp đồng nào." />
+          {loading ? <TableState kind="loading" colSpan={hasAction ? 8 : 7} />
+            : !visible.length ? <TableState kind={error ? 'error' : 'empty'} colSpan={hasAction ? 8 : 7} message="Không tìm thấy hợp đồng nào." />
               : visible.slice((current - 1) * PAGE, current * PAGE).map((r) => {
                 const [label, tone] = STATUS[r.nhom] || [r.trangThai, 'neutral'];
                 const done = r.viecCanLam === 'ket-thuc' && r.nhom === 'thanh-ly' && r.daThuChiaKhoa;
@@ -84,9 +85,9 @@ export default function XuLyTraPhongTab() {
                   <td className="num">{money(r.giaThue)}</td>
                   <td>{day(r.ngayBatDau)}<small>đến {day(r.ngayKetThuc)}</small></td>
                   <td><StatusBadge status={label} tone={tone} />{r.nhom === 'thanh-ly' && !r.daThuChiaKhoa && <small className="qlhd-warn">Chưa thu chìa khóa</small>}</td>
-                  <td>{r.viecCanLam
+                  {hasAction && <td>{r.viecCanLam
                     ? <button type="button" className={`ui-btn ui-btn--sm ${done ? 'ui-btn--secondary' : 'ui-btn--primary'}`} onClick={() => setOpen(r)}>{done ? 'Xem hồ sơ' : ACTIONS[r.viecCanLam]}</button>
-                    : <span className="qlhd-none">—</span>}</td>
+                    : <span className="qlhd-none">—</span>}</td>}
                 </tr>;
               })}
         </tbody>

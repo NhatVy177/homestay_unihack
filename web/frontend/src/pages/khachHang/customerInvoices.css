@@ -36,3 +36,5 @@
 .cinv-cards strong.is-danger { color: #b3261e; }
 .cinv-actions .ui-btn { white-space: nowrap; }
 .cinv-table td:nth-child(2), .cinv-table td:nth-child(4), .cinv-table td:nth-child(5) { white-space: nowrap; }
+.cinv-type--movein { background: var(--color-success-soft); border-color: #c9dfc6; color: var(--color-success); font-weight: 600; }
+.cinv-type--period { background: var(--color-info-soft); border-color: #c4d9e6; color: var(--color-info); font-weight: 600; }
