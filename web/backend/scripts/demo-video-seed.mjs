@@ -38,6 +38,8 @@ export const CUSTOMERS = {
   k2b: { hoTen: 'Lê Quốc Bảo', gioiTinh: 'Nam', ngaySinh: '2003-08-21', soDienThoai: '0907100022', phong: 'P103' },
   k3: { hoTen: 'Phạm Thu Hà', gioiTinh: 'Nữ', ngaySinh: '2004-11-02', soDienThoai: '0907100003', phong: 'P107' },
   k4: { hoTen: 'Đỗ Gia Huy', gioiTinh: 'Nam', ngaySinh: '2002-05-30', soDienThoai: '0907100004', phong: 'P401' },
+  k5: { hoTen: 'Bùi Đức Anh', gioiTinh: 'Nam', ngaySinh: '2004-02-17', soDienThoai: '0907100005', phong: 'P104' },
+  k5b: { hoTen: 'Hồ Minh Trí', gioiTinh: 'Nam', ngaySinh: '2003-10-04', soDienThoai: '0907100055', phong: 'P104' },
   k8: { hoTen: 'Võ Hoàng Phúc', gioiTinh: 'Nam', ngaySinh: '2003-06-09', soDienThoai: '0907100008', phong: 'P412', loaiPhong: 'Phòng 6 người' },
   k1b: { hoTen: 'Ngô Thanh Tâm', gioiTinh: 'Nữ', ngaySinh: '2003-01-15', soDienThoai: '0907100011', phong: 'P409', soNguoi: 3, soNam: 1, soNu: 2 },
 };
