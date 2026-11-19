@@ -724,7 +724,7 @@ export default function KhachMoiPage() {
                 </div>
                 <div className="km-info-row">
                   <span>Tình trạng</span>
-                  <strong style={{ color: 'var(--success)' }}>Còn trống</strong>
+                  <strong style={{ color: 'var(--color-success)' }}>Còn trống</strong>
                 </div>
                 <div className="km-info-row">
                   <span>Chi nhánh</span>
