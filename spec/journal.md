@@ -2234,3 +2234,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kết quả trên HOMEDORM4: K2 KH9326 (DK0011, đã xem P103), K2b KH9327 (DK0012, đã xem P103), K3 KH9328 (DC0007 chờ TT), K4 KH9329 (DC0008 chờ TT), K1b KH9330 (DC0009 nhóm 3 người, đã trả cọc P409), K8 KH9331 (HD0005 P412: xác nhận bàn giao trên Fuji, TP0004, DS0004 thu thêm 2.020.000đ, khách đã đồng ý trên Fuji). Email `vynhat2k5+<mã>@gmail.com`, mật khẩu 123. K2 và K8 đã xác nhận email Privy bằng OTP của Vy. demo4 không ký được (ví gắn danh tính email cũ) nên không dùng.
 - Điều phối D-083 chạy thật lần đầu: P412 chưa có tài sản, quản lý chuyển 4 món từ kho vào phòng có hợp đồng chưa bàn giao, thành công.
 - Còn lại: quay video. DC0007/DC0008 hết hạn thanh toán khoảng 05:00 ngày 21/11.
+
+## 2026-11-20 01:37:27 +07:00 — J-C216 — Tim ở thẻ phòng: chưa có hồ sơ mở thì mở thẳng form lập hồ sơ
+
+- Người thực hiện: Claude, Vy báo lỗi khi quay demo: chưa có hồ sơ đăng ký mà bấm tim chỉ mở trang chi tiết phòng.
+- `web/frontend/src/pages/homeExperience/HomeExperience.jsx`: khách chưa có hồ sơ mở → chuyển tới `/khach-hang?phong=<mã>&dangKy=1` để cổng khách mở form lập hồ sơ với phòng đó; khách có hồ sơ mở (chưa lập lịch) vẫn thêm/gỡ phòng quan tâm tại thẻ như cũ.
+- Kiểm tra: `npm run build` qua; khớp kỳ vọng sẵn có của `scripts/ui-public-room.mjs` (`&dangKy=1`).
