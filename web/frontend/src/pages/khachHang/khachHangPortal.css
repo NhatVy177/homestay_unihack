@@ -1167,6 +1167,118 @@
   max-width: 720px;
 }
 
+/* Đồng bộ modal chi tiết hồ sơ với ngôn ngữ thị giác của ResultModal. */
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  max-width: 760px;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kp-modal-head {
+  align-items: flex-start;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  margin: 0;
+  padding: var(--space-6) var(--space-8) var(--space-4);
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kp-eyebrow {
+  background: var(--color-primary-soft);
+  border-radius: var(--radius-pill);
+  color: var(--color-primary);
+  display: inline-flex;
+  margin-bottom: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kp-modal-head h2 {
+  color: var(--color-text);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kp-modal-head button {
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  flex: 0 0 auto;
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kp-modal-head button:hover {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-loading {
+  margin: var(--space-4) var(--space-8) 0;
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-summary {
+  margin: 0;
+  padding: var(--space-4) var(--space-8) 0;
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-grid {
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-8) 0;
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-grid > div,
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-note,
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-room-row {
+  background: var(--color-surface-alt);
+  border-color: var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-grid > div {
+  min-height: calc(var(--space-10) + var(--space-8));
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-grid span,
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-note span {
+  color: var(--color-text-muted);
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-grid strong,
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-note p {
+  color: var(--color-text);
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-note {
+  margin: var(--space-3) var(--space-8) 0;
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-note p {
+  max-height: calc(var(--space-10) + var(--space-10) + var(--space-8));
+  overflow-y: auto;
+  padding-right: var(--space-2);
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-rooms {
+  margin: var(--space-4) var(--space-8) 0;
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kp-modal-actions {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-6);
+  padding: var(--space-4) var(--space-8);
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kp-modal-actions .kp-btn-soft {
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+}
+
+.kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kp-modal-actions .kp-btn-soft:hover {
+  background: var(--color-primary-soft);
+}
+
 .kh-schedule-detail-modal {
   max-width: 600px;
   padding: 22px;
@@ -1507,6 +1619,32 @@
   .kh-profile-room-row {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .kh-profile-detail-modal:not(.kh-schedule-detail-modal) {
+    max-height: calc(100vh - 24px);
+    max-width: calc(100vw - 24px);
+  }
+
+  .kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kp-modal-head {
+    padding: var(--space-4);
+  }
+
+  .kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-loading,
+  .kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-note,
+  .kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-rooms {
+    margin-left: var(--space-4);
+    margin-right: var(--space-4);
+  }
+
+  .kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-summary,
+  .kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kh-profile-detail-grid {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+
+  .kh-profile-detail-modal:not(.kh-schedule-detail-modal) .kp-modal-actions {
+    padding: var(--space-4);
   }
 
   .kh-profile-room-row span {

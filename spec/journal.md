@@ -2009,3 +2009,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `web/frontend/src/styles/tokens.css`, `web/frontend/src/pages/khachMoi/KhachMoiPage.jsx`.
 - Kiểm tra: trên code đã gộp D-076, backend 165 qua/7 bỏ qua/0 lỗi; `npm run build` và `test:avalanche-ui` qua. Chưa xem lại bằng mắt các trang có `--space-5` (sourceReport, suaChua, chiTietPhong, saleWorkspace).
 - Còn lại: Vy xem nhanh 4 trang trên.
+
+## 2026-11-19 13:39:18 +07:00 — J-X108 — Đồng bộ modal chi tiết hồ sơ khách
+
+- Người thực hiện: Codex. Vy gửi ảnh popup gửi hồ sơ thành công làm mẫu và yêu cầu sửa modal chi tiết hồ sơ để các form đồng bộ hơn.
+- Giao diện: bỏ dải tiêu đề xanh nặng ở modal chi tiết, dùng nền sáng, bo góc, bóng, nút đóng, nhãn phần và nhịp khoảng cách cùng ngôn ngữ với `ResultModal`; thẻ thông tin gọn hơn, nút Đóng thành nút viền. Ghi chú dài có vùng cuộn riêng để không kéo modal quá dài; màn hẹp chuyển một cột và không tràn ngang. Giữ nguyên dữ liệu, API và hành vi nút.
+- File: `web/frontend/src/pages/khachHang/khachHangPortal.css`, `web/frontend/scripts/ui-customer-profile-detail.mjs`.
+- Kiểm tra: `npm run check:ui-tokens` OK; build production PASS; `test:avalanche-ui` PASS. Fixture chỉ đọc mở modal ở 1440/390 PASS, không lỗi trình duyệt hoặc tràn ngang, ghi chú dài cuộn được; đã xem trực tiếp hai ảnh. File CSS sửa có `style={{` 0 trước → 0 sau.
+- Còn lại: Vy tải lại cổng khách và xem nhanh modal bằng dữ liệu thật.
