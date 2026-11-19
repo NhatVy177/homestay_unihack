@@ -2119,3 +2119,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `web/frontend/src/pages/nhanVienKeToan/HoaDonDinhKyTab.jsx`.
 - Kiểm tra: `npm run build` qua; đọc thử chỉ đọc trên HOMEDORM4: `chiTietLapHoaDon` của HD0004 với kế toán NV0004 chạy được (kỳ 2026-12, chưa có chỉ số, có 1 khoản phí phát sinh). Chưa lập hóa đơn thật.
 - Lưu ý: nếu khoản phí phát sinh của HD0004 đang "Chưa xác nhận" thì phải xác nhận hoặc xóa trước khi lập; kỳ chưa có chỉ số nên cần nhập chỉ số điện nước mới.
+
+## 2026-11-19 16:19:57 +07:00 — J-C200 — Nhãn loại hóa đơn có màu; ẩn cột Hành động khi trống
+
+- Người thực hiện: Claude, nhánh `fix/badges-actions`, theo yêu cầu của Vy (hai ảnh).
+- Quản lý hợp đồng (`XuLyTraPhongTab.jsx`): cột "Hành động" chỉ hiện khi có ít nhất một hợp đồng trong danh sách đang lọc có việc cần làm (kiểm tra/phản hồi/kết thúc trả phòng); trước đó cả cột chỉ toàn dấu gạch.
+- Hóa đơn của khách (`CustomerInvoicesList.jsx`, `customerInvoices.css`): nhãn "Nhận phòng" xanh lá, "Định kỳ" xanh dương, "Đặt cọc" giữ nâu nhạt; trước đó hai loại sau không có màu riêng.
+- Kiểm tra: `npm run build`, `check:ui-tokens` qua; chưa xem lại trên giao diện thật.
