@@ -2226,3 +2226,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo bình luận của Vy ("nói rõ hệ thống đang cho cọc bao nhiêu").
 - `hackathon/video-script.md` cảnh 0:35–0:40: phiếu cọc hiện "giá thuê 1 tháng × 2 = tiền cọc"; lời đọc nêu cọc bằng hai tháng tiền thuê (giá giường nếu ở ghép, giá nguyên phòng nếu thuê nguyên phòng).
 - Kiểm tra: đối chiếu `web/backend/services/tienCoc.js` (`SO_THANG_COC = 2`) và trigger `TRG_ChiTietDatCoc_TinhGiaThue_Va_SoTienCoc`.
+
+## 2026-11-19 22:22:14 +07:00 — J-C215 — Dựng dữ liệu video demo bằng API thật
+
+- Người thực hiện: Claude, Vy đồng ý tạo dữ liệu demo trên HOMEDORM4 (chỉ thêm mới, không đụng dữ liệu cũ).
+- File: `web/backend/scripts/demo-video-seed.mjs` (5 chặng: tài khoản → đăng ký thuê → lịch xem "Đã xem"; giữ chỗ → duyệt cọc → trả cọc mô phỏng; cư trú → hợp đồng; bản ký → thu kỳ đầu → điều phối tài sản vào phòng → biên bản bàn giao; trả phòng → kiểm tra → đối soát), `.gitignore` (bỏ qua file trạng thái).
+- Kết quả trên HOMEDORM4: K2 KH9326 (DK0011, đã xem P103), K2b KH9327 (DK0012, đã xem P103), K3 KH9328 (DC0007 chờ TT), K4 KH9329 (DC0008 chờ TT), K1b KH9330 (DC0009 nhóm 3 người, đã trả cọc P409), K8 KH9331 (HD0005 P412: xác nhận bàn giao trên Fuji, TP0004, DS0004 thu thêm 2.020.000đ, khách đã đồng ý trên Fuji). Email `vynhat2k5+<mã>@gmail.com`, mật khẩu 123. K2 và K8 đã xác nhận email Privy bằng OTP của Vy. demo4 không ký được (ví gắn danh tính email cũ) nên không dùng.
+- Điều phối D-083 chạy thật lần đầu: P412 chưa có tài sản, quản lý chuyển 4 món từ kho vào phòng có hợp đồng chưa bàn giao, thành công.
+- Còn lại: quay video. DC0007/DC0008 hết hạn thanh toán khoảng 05:00 ngày 21/11.

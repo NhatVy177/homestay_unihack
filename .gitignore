@@ -46,3 +46,6 @@ web/backend/uploads/avatars/*
 !web/backend/uploads/avatars/.gitkeep
 web/backend/uploads/sua-chua/*
 !web/backend/uploads/sua-chua/.gitkeep
+
+# Trạng thái script dựng dữ liệu video demo (mã hồ sơ đã tạo trên máy này)
+web/backend/scripts/.demo-video-state.json
