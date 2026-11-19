@@ -109,6 +109,7 @@ export function Icon({ name, className = '', style = {} }) {
     room_service: <><path d="M3 18h18" /><path d="M4.5 18a7.5 7.5 0 0 1 15 0" /><path d="M12 7V4.5M10 4.5h4" /></>,
     lock: <><rect x="5" y="10" width="14" height="11" rx="3" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" /></>,
     inventory_2: <><path d="M3 3h18v4H3z" /><path d="M4 7v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7" /><line x1="10" y1="12" x2="14" y2="12" /></>,
+    swap_horiz: <><path d="M7 7h14" /><path d="m17 3 4 4-4 4" /><path d="M17 17H3" /><path d="m7 13-4 4 4 4" /></>,
     inventory: <><path d="M3 3h18v4H3z" /><path d="M4 7v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7" /><line x1="10" y1="12" x2="14" y2="12" /></>,
     policy: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></>,
     favorite: <><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8Z" /></>,
@@ -140,7 +141,6 @@ export function Icon({ name, className = '', style = {} }) {
     layers: <><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></>,
     sparkle: <><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z" /></>,
     send: <><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></>,
-    schedule: <><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>,
     pending: <><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></>,
   };
 

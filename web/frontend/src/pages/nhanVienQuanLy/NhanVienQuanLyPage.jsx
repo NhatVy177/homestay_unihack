@@ -11,6 +11,7 @@ import ManagerRepairTab from '../../components/suaChua/ManagerRepairTab.jsx';
 import SaleKpiReport from '../../components/kpiSale/SaleKpiReport.jsx';
 import SaleCustomerWorkspace from '../nhanVienSale/SaleCustomerWorkspace.jsx';
 import SaleProfile from '../nhanVienSale/SaleProfile.jsx';
+import AssetTransferWorkspace from '../../components/assetTransfer/AssetTransferWorkspace.jsx';
 import '../../styles/saleWorkspace.css';
 const QuanLyXacNhanTab = lazy(() => import('../../components/xacNhan/QuanLyXacNhanTab.jsx'));
 
@@ -24,6 +25,7 @@ const navItems = [
   { id: 'xac-nhan-dien-tu', label: 'Khách xác nhận biên bản', icon: 'verified_user' },
   { id: 'khach-hang', label: 'Tra cứu khách hàng', icon: 'search' },
   { id: 'kpi-sale', label: 'KPI Sale', icon: 'percent' },
+  { id: 'dieu-phoi-tai-san', label: 'Điều phối tài sản', icon: 'swap_horiz' },
   { id: 'ho-so-ca-nhan', label: 'Hồ sơ cá nhân', icon: 'person' }
 ];
 
@@ -46,6 +48,7 @@ export default function NhanVienQuanLyPage() {
       {activeTab === 'xac-nhan-dien-tu' && <Suspense fallback={null}><QuanLyXacNhanTab /></Suspense>}
       {activeTab === 'khach-hang' && <SaleCustomerWorkspace />}
       {activeTab === 'kpi-sale' && <SaleKpiReport title="KPI Sale chi nhánh" />}
+      {activeTab === 'dieu-phoi-tai-san' && <AssetTransferWorkspace />}
       {activeTab === 'ho-so-ca-nhan' && <SaleProfile user={user} roleLabel="Nhân viên Quản lý" />}
     </WorkspaceShell>
   );
