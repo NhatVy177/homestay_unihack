@@ -100,8 +100,7 @@ export default function XuLyTraPhongTab() {
         <div className="ktp-modal-header"><div><h3 id="qlhd-modal-title">{ACTIONS[open.viecCanLam]} · {open.maHopDong}</h3><p>{open.hoTen} · {open.tenPhong}</p></div>
           <button type="button" className="ktp-modal-close" aria-label="Đóng" onClick={close}><Icon name="close" /></button></div>
         <div className="qlhd-modal-body">
-          {open.viecCanLam === 'kiem-tra' && <RepairHistoryPanel maHopDong={open.maHopDong} />}
-          {open.viecCanLam === 'kiem-tra' && <KiemTraTraPhong focusPhieuTra={open.maPhieuTra} />}
+          {open.viecCanLam === 'kiem-tra' && <KiemTraTraPhong focusPhieuTra={open.maPhieuTra} aside={<RepairHistoryPanel maHopDong={open.maHopDong} />} onClose={close} />}
           {open.viecCanLam === 'phan-hoi' && <XacNhanPhanHoi focusPhieuTra={open.maPhieuTra} />}
           {open.viecCanLam === 'ket-thuc' && <CheckoutLifecyclePanel focusContractId={open.maHopDong} />}
         </div>

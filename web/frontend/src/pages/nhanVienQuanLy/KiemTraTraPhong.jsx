@@ -31,7 +31,7 @@ function timLucNhanPhong(asset, moveIn) {
     || null;
 }
 
-const AssetRow = ({ asset, onChange, readOnly, lucVao, coBienBanVao }) => {
+const AssetRow = ({ asset, onChange, readOnly, lucVao, coBienBanVao, compact = false }) => {
   const [status, setStatus] = useState(asset.mucDoHuHong || 'Bình thường');
   const [soLuongLoi, setSoLuongLoi] = useState(asset.soLuongHuMat || 0);
   const [note, setNote] = useState(asset.moTaHuHong || '');
@@ -72,6 +72,53 @@ const AssetRow = ({ asset, onChange, readOnly, lucVao, coBienBanVao }) => {
 
   // D-030 (1): hư hỏng đã ghi lúc nhận phòng không được tính cho khách; chỉ cảnh báo vì món đó có thể hư thêm.
   const canhBaoHuCu = !isNormal && lucVao?.coHuHongLucVao;
+
+  const changeStatus = (newStatus) => {
+    setStatus(newStatus);
+    if (newStatus === 'Bình thường') {
+      setNote(''); setSoLuongLoi(0); setCost(0);
+    } else {
+      const newSl = soLuongLoi === 0 ? 1 : soLuongLoi;
+      setSoLuongLoi(newSl);
+      updateCost(newStatus, newSl);
+    }
+  };
+  const changeQty = (raw) => {
+    const valStr = raw.replace(/[^0-9]/g, '');
+    if (valStr === '') { setSoLuongLoi(''); updateCost(status, 0); return; }
+    const val = Math.min(parseInt(valStr, 10), asset.soLuongBanGiao);
+    setSoLuongLoi(val);
+    updateCost(status, val);
+  };
+
+  if (compact) {
+    return (
+      <tr data-status={status} className={isNormal ? '' : 'is-flagged'}>
+        <td>
+          <div className="kttp-asset-name">{asset.tenTaiSan} <span className="kttp-asset-qty">×{asset.soLuongBanGiao}</span></div>
+          {asset.donGiaBoiThuong > 0 && <div className="kttp-asset-price">Đơn giá: {Number(asset.donGiaBoiThuong).toLocaleString()}đ</div>}
+        </td>
+        <td>{lucVao
+          ? <span className={`kttp-movein-chip${lucVao.coHuHongLucVao ? ' is-defect' : ''}`}>{lucVao.tinhTrang}</span>
+          : <span className="kttp-movein-chip is-missing">{coBienBanVao ? 'Không có trong biên bản' : '—'}</span>}</td>
+        <td>
+          <select className={`kttp-control kttp-control--status${isNormal ? '' : ' is-bad'}`} aria-label={`Hiện trạng ${asset.tenTaiSan}`}
+            value={status} onChange={(e) => changeStatus(e.target.value)} disabled={readOnly}>
+            <option value="Bình thường">Bình thường</option>
+            <option value="Hư hỏng nhẹ">Hư hỏng nhẹ (20%)</option>
+            <option value="Hư hỏng nặng">Hư hỏng nặng (60%)</option>
+            <option value="Mất mát">Mất (100%)</option>
+          </select>
+          {!isNormal && <textarea rows="2" className="kttp-control kttp-note" aria-label={`Mô tả hư/mất ${asset.tenTaiSan}`}
+            value={note} onChange={(e) => setNote(e.target.value)} placeholder="Mô tả hư/mất..." disabled={readOnly} spellCheck={false} />}
+          {canhBaoHuCu && <p className="kttp-warning" role="note"><Icon name="warning" /><span>Lúc nhận đã ghi “{lucVao.tinhTrang}”, chỉ tính phần hư thêm.</span></p>}
+        </td>
+        <td><input type="text" className="kttp-control is-center kttp-qty" aria-label={`Số lượng hư/mất ${asset.tenTaiSan}`}
+          value={isNormal ? '–' : soLuongLoi} onChange={(e) => changeQty(e.target.value)} disabled={isNormal || readOnly} /></td>
+        <td className="ui-num"><div className="kttp-cost">{Number(cost).toLocaleString()}đ</div></td>
+      </tr>
+    );
+  }
 
   return (
     <tr data-status={status}>
@@ -259,7 +306,11 @@ function CheckoutPhotos({ maPhieuTra, taiSan, readOnly, onToast }) {
 }
 
 // focusPhieuTra: mở từ trang Quản lý hợp đồng, chỉ hiện phiếu trả của hợp đồng đó.
-export default function KiemTraTraPhong({ focusPhieuTra = null } = {}) {
+// Có focusPhieuTra (mở từ Quản lý hợp đồng): bỏ danh sách, mở thẳng form của phiếu đó trong modal của trang cha.
+// aside: nội dung thêm ở cột phải (lịch sử sửa chữa); onClose: đóng modal cha (sau khi lưu hoặc bấm Hủy).
+export default function KiemTraTraPhong({ focusPhieuTra = null, aside = null, onClose = null } = {}) {
+  const focused = Boolean(focusPhieuTra);
+  const autoOpened = useRef(false);
   const [dsPhieu, setDsPhieu] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -371,6 +422,7 @@ export default function KiemTraTraPhong({ focusPhieuTra = null } = {}) {
       loadDanhSach();
       setModalType(null);
       setSuccessToast('Hồ sơ đặt cọc đã được xác nhận thành công.');
+      if (focused) onClose?.();
     } catch (err) {
       console.error(err);
       setToast(err.response?.data?.message || 'Lỗi khi xác nhận hồ sơ.');
@@ -401,6 +453,7 @@ export default function KiemTraTraPhong({ focusPhieuTra = null } = {}) {
       loadDanhSach();
       setModalType(null);
       setSuccessToast('Biên bản kiểm tra trả phòng đã được lưu vào hệ thống.');
+      if (focused) onClose?.();
     } catch (err) {
       console.error(err);
       const msg = err.response?.data?.message;
@@ -443,6 +496,95 @@ export default function KiemTraTraPhong({ focusPhieuTra = null } = {}) {
   const viPham = chiTiet?.nghiaVu?.filter(nv => nv.LoaiNghiaVu === 'ViPham') || [];
   const trangThaiHoSo = chiTiet ? (chiTiet.maHopDong ? chiTiet.trangThaiHopDong : chiTiet.trangThaiCoc) : '';
   const coBienBanVao = Boolean(moveIn?.taiSan?.length);
+
+  useEffect(() => {
+    if (!focused || autoOpened.current || loading) return;
+    const row = dsPhieu.find((p) => p.maPhieuTra === focusPhieuTra);
+    if (row) { autoOpened.current = true; openModal(row); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focused, loading, dsPhieu, focusPhieuTra]);
+
+  if (focused) {
+    const sum = (rows) => rows.reduce((s, nv) => s + (Number(nv.SoTien) || 0), 0);
+    const phiTaiSan = Object.values(dsHuHong).reduce((s, item) => s + (Number(item.cost) || 0), 0);
+    const tongNo = sum(hoaDonNo), tongViPham = sum(viPham);
+    const cancel = () => onClose?.();
+    if (loading || loadingDetail || (!chiTiet && !loadError)) return <p className="kttp-empty-note">Đang tải phiếu trả phòng...</p>;
+    if (loadError || !chiTiet) return <p className="kttp-field-error">{loadError || 'Không tìm thấy phiếu trả phòng của hợp đồng này.'}</p>;
+    return (
+      <div className="kttp-focus">
+        <dl className="kttp-focus-facts">
+          <div><dt>Mã phiếu trả</dt><dd>{chiTiet.maPhieuTra}</dd></div>
+          <div><dt>Dự kiến trả</dt><dd>{fmtDate(chiTiet.ngayDuKienTra)}</dd></div>
+          <div><dt>Số điện thoại</dt><dd>{chiTiet.sdtKhach || '—'}</dd></div>
+          <div><dt>Trạng thái</dt><dd><StatusBadge status={chiTiet.trangThai} tone={chiTiet.trangThai === 'Chờ xử lý' ? 'warning' : 'success'} /></dd></div>
+        </dl>
+        {modalType === 'kiem-tra-hd' ? (
+          <div className="kttp-focus-grid">
+            <div className="kttp-focus-main">
+              <section className="kttp-card">
+                <h4 className="kttp-card-title"><span className="kttp-step">1</span> Tình trạng phòng khi trả</h4>
+                <div className="kttp-focus-row">
+                  <label className="ui-form-field">
+                    <span>Ngày kiểm tra</span>
+                    <input type="date" className="ui-input" value={ngayTraThucTe} onChange={(e) => setNgayTraThucTe(e.target.value)} disabled={readOnly} />
+                    {errors.ngayTra && <span className="kttp-field-error">{errors.ngayTra}</span>}
+                  </label>
+                  <label className="ui-form-field">
+                    <span>Đánh giá chung <span className="ui-required">*</span></span>
+                    <textarea rows="2" className="ui-input" value={tinhTrangPhong} aria-invalid={Boolean(errors.tinhTrang)}
+                      onChange={(e) => { setTinhTrangPhong(e.target.value); setErrors(prev => ({ ...prev, tinhTrang: null })); }}
+                      placeholder="Ví dụ: phòng sạch, tường không trầy, đủ chìa khóa..." disabled={readOnly} spellCheck={false} />
+                    {errors.tinhTrang && <span className="kttp-field-error">{errors.tinhTrang}</span>}
+                  </label>
+                </div>
+              </section>
+              {chiTiet.taiSan?.length > 0 && (
+                <section className="kttp-card" aria-label="Kiểm tra tài sản">
+                  <h4 className="kttp-card-title"><span className="kttp-step">2</span> Kiểm tra tài sản <span className="kttp-card-aside">so với lúc bàn giao</span></h4>
+                  <div className="kttp-table-wrap">
+                    <table className="kttp-assets is-compact">
+                      <thead><tr><th>Tài sản</th><th>Lúc nhận</th><th>Hiện trạng</th><th className="is-center">SL hư/mất</th><th className="ui-num">Phí tạm tính</th></tr></thead>
+                      <tbody>
+                        {chiTiet.taiSan.map((asset) => (
+                          <AssetRow key={asset.maTaiSan} asset={asset} onChange={handleAssetChange} readOnly={readOnly}
+                            lucVao={timLucNhanPhong(asset, moveIn)} coBienBanVao={coBienBanVao} compact />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {moveInError && <p className="kttp-empty-note">{moveInError}</p>}
+                </section>
+              )}
+              <CheckoutPhotos maPhieuTra={chiTiet.maPhieuTra} taiSan={chiTiet.taiSan} readOnly={readOnly} onToast={setToast} />
+            </div>
+            <aside className="kttp-focus-side">
+              {aside}
+              <section className="kttp-card kttp-sum" aria-label="Tạm tính khi trả phòng">
+                <h4 className="kttp-card-title">Tạm tính khi trả phòng</h4>
+                <div><span>Hư/mất tài sản</span><span>{fmtTien(phiTaiSan)}</span></div>
+                <div><span>Hóa đơn còn nợ</span><span>{fmtTien(tongNo)}</span></div>
+                <div><span>Vi phạm</span><span>{fmtTien(tongViPham)}</span></div>
+                <div className="is-total"><span>Dự kiến trừ cọc</span><span>{fmtTien(phiTaiSan + tongNo + tongViPham)}</span></div>
+                <p className="kttp-empty-note">Kế toán chốt số cuối ở phiếu đối soát.</p>
+              </section>
+            </aside>
+          </div>
+        ) : (
+          <p className="kttp-empty-note">Phiếu trả phòng của hồ sơ đặt cọc: kiểm tra thông tin rồi xác nhận để hoàn tất.</p>
+        )}
+        <div className="kttp-focus-foot">
+          <p>{readOnly ? 'Biên bản đã lưu, chỉ xem.' : 'Lưu xong, kế toán lập phiếu đối soát và khách xác nhận trên hệ thống.'}</p>
+          <div className="kttp-actions">
+            <button type="button" className="ui-btn ui-btn--secondary" onClick={cancel}>{readOnly ? 'Đóng' : 'Hủy'}</button>
+            {!readOnly && modalType === 'kiem-tra-hd' && <button type="button" className="ui-btn ui-btn--primary" onClick={submitKiemTra}>Xác nhận lưu biên bản</button>}
+            {!readOnly && modalType === 'xac-nhan-pdc' && <button type="button" className="ui-btn ui-btn--primary" onClick={submitXacNhanHuyCoc}>Xác nhận hồ sơ</button>}
+          </div>
+        </div>
+        {toast && <div className="ui-toast ui-toast--error" role="alert"><Icon name="error_outline" />{toast}</div>}
+      </div>
+    );
+  }
 
   return (
     <div>

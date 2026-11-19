@@ -2144,3 +2144,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `web/frontend/src/pages/khachHang/InvoiceDetailModal.jsx` (mới), `CustomerInvoicesList.jsx`, `customerInvoices.css`, `web/backend/services/khachHoaDon.service.js`.
 - Kiểm tra: `npm run build`, `check:ui-tokens` qua; backend 166 qua, 0 lỗi. Chưa xem hộp thoại trên giao diện thật.
 - Còn lại: khởi động lại backend để hiện dòng "Cách trả" của hóa đơn tháng.
+
+## 2026-11-19 17:12:13 +07:00 — J-C203 — Thiết kế lại form Kiểm tra trả phòng mở từ Quản lý hợp đồng
+
+- Người thực hiện: Claude, nhánh `feat/checkout-inspection-form`, theo bản phác thảo Vy đã chốt (hiện trạng dùng ô chọn, căn lại mục tình trạng phòng).
+- Trước đây modal "Kiểm tra trả phòng · <hợp đồng>" nhét nguyên trang danh sách (thẻ đếm, ô tìm, bộ lọc, bảng cuộn ngang) rồi mới mở form ở modal thứ hai. Nay `KiemTraTraPhong` có chế độ `focusPhieuTra`: tự mở phiếu, vẽ thẳng form trong modal của trang cha: dải thông tin (mã phiếu, dự kiến trả, SĐT, trạng thái); cột trái 3 bước (1 tình trạng phòng khi trả, 2 kiểm tra tài sản với cột "Lúc nhận" và ô chọn hiện trạng Bình thường/Hư nhẹ 20%/Hư nặng 60%/Mất 100%, mô tả hiện khi có hư/mất, 3 ảnh lúc trả); cột phải lịch sử báo hỏng và "Tạm tính khi trả phòng" (hư/mất, hóa đơn nợ, vi phạm, dự kiến trừ cọc); chân modal cố định với Hủy/Xác nhận lưu biên bản. Lưu xong tự đóng modal cha. Trang danh sách Kiểm tra trả phòng riêng giữ nguyên.
+- File: `web/frontend/src/pages/nhanVienQuanLy/KiemTraTraPhong.jsx`, `kiemTraTraPhong.css`, `XuLyTraPhongTab.jsx`.
+- Kiểm tra: `npm run build`, `check:ui-tokens`, `test:avalanche-ui` qua; Playwright 1280/390 với API giả lập: form tự mở, bảng không tràn ngang, tạm tính cộng đúng khi chọn hư hỏng, không lỗi JavaScript. Chưa lưu biên bản thật trên HOMEDORM4.
