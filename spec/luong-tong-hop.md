@@ -157,12 +157,12 @@ Email cọc thành công kèm **lịch nhận phòng + danh sách cần mang (CC
 
 ### 3.6 Giai đoạn 6: Bàn giao phòng và xác nhận điện tử (D-009, D-010, D-028)
 
-1. Bàn giao diễn ra **trong buổi ký hợp đồng**. Quản lý lập **biên bản tài sản trên web** (không có ô ký giấy). **Có thể chụp ảnh tình trạng** (vài tấm cho cả phòng hoặc món có vết sẵn, không bắt buộc từng món). Ảnh không lên chuỗi; **mã băm ảnh đi vào gói biên bản** để trả phòng so trước/sau.
+1. Bàn giao diễn ra **trong buổi ký hợp đồng**. Quản lý lập **biên bản tài sản trên web** (không có ô ký giấy); mỗi món có **tình trạng Tốt / Dùng được / Hư hỏng** (D-079, hỏng bắt buộc ghi chú, hiện màu đỏ). **Có thể chụp ảnh tình trạng** (vài tấm cho cả phòng hoặc món có vết sẵn, không bắt buộc từng món). Ảnh không lên chuỗi; **mã băm ảnh đi vào gói biên bản** để trả phòng so trước/sau.
 2. Hệ thống **tự phát hành bản xem** cho khách (tab Hợp đồng + email).
 3. Khách **xác nhận ngay hoặc về nhà xác nhận.** Nếu chưa ổn, khách **yêu cầu chỉnh sửa** (kèm lý do) → quản lý phát hành bản mới, **giữ lịch sử** (vòng này chạy ở Web2, D-010).
 4. Khi khách bấm xác nhận: trình duyệt đối chiếu nội dung đang xem với snapshot → backend ghi đúng bản đó lên chuỗi → khách ký → **bản bị khóa**. **← MỐC CHUỖI 1.**
 5. **Không ép xác nhận tại chỗ.** Giao chìa khóa là trạng thái Web2 riêng, **không chờ chữ ký**. Chưa xác nhận → **email nhắc sau 24 giờ và 72 giờ**. **Không tự xác nhận thay khách.** Quản lý thấy danh sách **"Chờ khách xác nhận"**.
-6. **OTP (D-015, giữ nguyên):** Privy cần gói trả phí mới bỏ được OTP. Để giảm vướng: thẻ **"Kích hoạt xác nhận điện tử"** hiện ngay sau khi khách trả cọc, để lúc bàn giao thường chỉ còn bấm Xác nhận; nút **"Gửi lại mã"** có đếm ngược, nhắc kiểm tra thư rác. Thời hạn phiên Privy sẽ thử thật ở đợt Fuji. Vẫn hỏi BTC (Q-10); có gói thì bật lại D-011 (bỏ OTP). Không dùng ví do máy chủ giữ hộ.
+6. **OTP (D-015; D-079 dời lên lúc vào cổng):** khách xác nhận email một lần ngay khi vào cổng sau đăng ký, lúc ký biên bản chỉ còn bấm; ô nhập mã ở bước biên bản là dự phòng khi phiên hết hạn. Privy cần gói trả phí mới bỏ được OTP. Để giảm vướng: thẻ **"Kích hoạt xác nhận điện tử"** hiện ngay sau khi khách trả cọc, để lúc bàn giao thường chỉ còn bấm Xác nhận; nút **"Gửi lại mã"** có đếm ngược, nhắc kiểm tra thư rác. Thời hạn phiên Privy sẽ thử thật ở đợt Fuji. Vẫn hỏi BTC (Q-10); có gói thì bật lại D-011 (bỏ OTP). Không dùng ví do máy chủ giữ hộ.
 
 7. **Xem lại tài sản đã bàn giao (D-075):** thẻ tài sản trong tab Hợp đồng của khách hiện mã biên bản, ngày, quản lý bàn giao, ghi chú chung và tình trạng từng món.
 

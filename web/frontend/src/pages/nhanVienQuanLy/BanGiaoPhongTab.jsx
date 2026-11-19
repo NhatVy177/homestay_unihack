@@ -8,6 +8,10 @@ import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import { ConfirmationNotice } from '../../components/xacNhan/ConfirmationFeedback.jsx';
 import '../nhanPhong/cuTru.css';
 
+const TINH_TRANG_TAI_SAN = ['Tốt', 'Dùng được', 'Hư hỏng'];
+const conditionClass = (value) => (value === 'Hư hỏng' ? 'ui-condition--bad' : value === 'Dùng được' ? 'ui-condition--ok' : value === 'Tốt' ? 'ui-condition--good' : 'ui-condition--none');
+const ConditionTag = ({ value }) => <span className={`ui-condition ${conditionClass(value)}`}>{value || 'Chưa ghi nhận'}</span>;
+
 function getErrorMessage(error, fallback) {
   return error?.response?.data?.message || error?.message || fallback;
 }
@@ -217,7 +221,8 @@ export default function BanGiaoPhongTab() {
       setDanhSachTaiSan((res.data.danhSachTaiSan || []).map((item) => ({
         ...item,
         soLuongThucTe: item.soLuongThucTe ?? item.soLuongHeThong ?? 0,
-        ghiChu: item.ghiChu || ''
+        ghiChu: item.ghiChu || '',
+        tinhTrang: item.tinhTrang || 'Tốt'
       })));
       if (!res.data.hopDong?.daCoBienBanBanGiaoVao) {
         setNotice({
@@ -254,6 +259,9 @@ export default function BanGiaoPhongTab() {
       }
       if (Number.isFinite(expected) && actual !== expected && !String(item.ghiChu || '').trim()) {
         return `Tài sản ${item.tenTaiSan} chênh lệch số lượng, vui lòng nhập ghi chú.`;
+      }
+      if (item.tinhTrang === 'Hư hỏng' && !String(item.ghiChu || '').trim()) {
+        return `Tài sản ${item.tenTaiSan} đang hư hỏng, vui lòng ghi chú tình trạng.`;
       }
     }
 
@@ -682,7 +690,8 @@ export default function BanGiaoPhongTab() {
                         <th style={{ width: '240px', color: '#4A6549' }}>Tên tài sản</th>
                         <th style={{ width: '170px', color: '#4A6549' }}>Phạm vi</th>
                         <th style={{ width: '210px', color: '#4A6549' }}>Kiểm kê</th>
-                        <th style={{ width: '320px', color: '#4A6549' }}>Ghi chú khi chênh lệch</th>
+                        <th style={{ width: '140px', color: '#4A6549' }}>Tình trạng</th>
+                        <th style={{ width: '320px', color: '#4A6549' }}>Ghi chú</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -727,6 +736,7 @@ export default function BanGiaoPhongTab() {
                                 </div>
                               )}
                             </td>
+                            <td style={{ verticalAlign: 'middle' }}><ConditionTag value={item.tinhTrang} /></td>
                             <td style={{ verticalAlign: 'middle' }}>
                               <span style={{
                                 color: item.ghiChu ? '#191c1d' : '#8a9495',
@@ -886,21 +896,23 @@ export default function BanGiaoPhongTab() {
                     <th style={{ width: '240px' }}>Tên tài sản</th>
                     <th style={{ width: '170px' }}>Phạm vi</th>
                     <th style={{ width: '210px' }}>Kiểm kê</th>
-                    <th style={{ width: '320px' }}>Ghi chú khi chênh lệch</th>
+                    <th style={{ width: '150px' }}>Tình trạng</th>
+                    <th style={{ width: '320px' }}>Ghi chú</th>
                   </tr>
                 </thead>
                 <tbody>
                   {danhSachTaiSan.length === 0 ? (
                     <tr>
-                      <td colSpan="5" style={{ textAlign: 'center', color: '#6f797a', padding: '28px' }}>
+                      <td colSpan="6" style={{ textAlign: 'center', color: '#6f797a', padding: '28px' }}>
                         Chưa có tài sản bàn giao cho hợp đồng này.
                       </td>
                     </tr>
                   ) : danhSachTaiSan.map((item, index) => {
                     const hasDifference = Number(item.soLuongThucTe) !== Number(item.soLuongHeThong);
-                    const missingNote = hasDifference && !String(item.ghiChu || '').trim();
+                    const damaged = item.tinhTrang === 'Hư hỏng';
+                    const missingNote = (hasDifference || damaged) && !String(item.ghiChu || '').trim();
                     return (
-                      <tr key={`${item.maPhong}-${item.maTaiSan}-${index}`} style={{ backgroundColor: hasDifference ? '#fffaf3' : '#ffffff' }}>
+                      <tr key={`${item.maPhong}-${item.maTaiSan}-${index}`} style={{ backgroundColor: damaged ? '#fff5f4' : hasDifference ? '#fffaf3' : '#ffffff' }}>
                         <td style={{ fontWeight: 700, color: '#4A6549', verticalAlign: 'middle' }}>{item.maTaiSan}</td>
                         <td>
                           <div style={{ fontWeight: '700', color: '#191c1d' }}>{item.tenTaiSan}</div>
@@ -946,11 +958,21 @@ export default function BanGiaoPhongTab() {
                           </div>
                         </td>
                         <td>
+                          <select
+                            className={`ui-condition-select ${conditionClass(item.tinhTrang)}`}
+                            aria-label={`Tình trạng ${item.tenTaiSan}`}
+                            value={item.tinhTrang || 'Tốt'}
+                            onChange={(event) => updateAsset(index, 'tinhTrang', event.target.value)}
+                          >
+                            {TINH_TRANG_TAI_SAN.map((option) => <option key={option} value={option}>{option}</option>)}
+                          </select>
+                        </td>
+                        <td>
                           <input
                             type="text"
                             value={item.ghiChu}
                             onChange={(event) => updateAsset(index, 'ghiChu', event.target.value)}
-                            placeholder={hasDifference ? 'Bắt buộc nhập lý do chênh lệch' : 'Không bắt buộc'}
+                            placeholder={damaged ? 'Bắt buộc ghi chú hư hỏng' : hasDifference ? 'Bắt buộc nhập lý do chênh lệch' : 'Không bắt buộc'}
                             style={{
                               width: '100%',
                               maxWidth: '320px',

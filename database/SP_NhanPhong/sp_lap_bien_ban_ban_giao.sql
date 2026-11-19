@@ -53,6 +53,20 @@ BEGIN
 END
 GO
 
+-- Bản V2 có thêm TinhTrang (Tốt / Dùng được / Hư hỏng) cho từng tài sản; SP_LapBienBanBanGiaoVao dùng bản này.
+IF TYPE_ID(N'dbo.TVP_ChiTietBanGiao_V2') IS NULL
+BEGIN
+    CREATE TYPE dbo.TVP_ChiTietBanGiao_V2 AS TABLE
+    (
+        MaPhong VARCHAR(4) NOT NULL,
+        MaTaiSan VARCHAR(6) NOT NULL,
+        SoLuongThucTe INT NULL,
+        GhiChu NVARCHAR(255) NULL,
+        TinhTrang NVARCHAR(20) NULL
+    );
+END
+GO
+
 -- ============================================================
 -- PHẦN 3: STORED PROCEDURES
 -- ============================================================
@@ -735,7 +749,7 @@ CREATE OR ALTER PROCEDURE SP_LapBienBanBanGiaoVao
     @KhachCoMat         BIT,
     @DaKyBienBan        BIT,
     @GhiChuChung        NVARCHAR(500) = NULL,
-    @DanhSachTaiSan     dbo.TVP_ChiTietBanGiao READONLY,
+    @DanhSachTaiSan     dbo.TVP_ChiTietBanGiao_V2 READONLY,
     @MaBienBan          VARCHAR(6)          OUTPUT,
     @MaLoi              INT                 OUTPUT,
     @ThongBao           NVARCHAR(500)       OUTPUT
@@ -1100,27 +1114,28 @@ BEGIN
 
         -- Dùng cursor để duyệt qua danh sách và sinh mã
         DECLARE ts_cursor CURSOR LOCAL FAST_FORWARD FOR
-            SELECT MaPhong, MaTaiSan, SoLuongThucTe, GhiChu
+            SELECT MaPhong, MaTaiSan, SoLuongThucTe, GhiChu, TinhTrang
             FROM @DanhSachTaiSan;
 
         DECLARE
             @MaPhong2    VARCHAR(4),
             @MaTaiSan2   VARCHAR(6),
             @SLThucTe2   INT,
-            @GhiChu2     NVARCHAR(255);
+            @GhiChu2     NVARCHAR(255),
+            @TinhTrang2  NVARCHAR(20);
 
         OPEN ts_cursor;
-        FETCH NEXT FROM ts_cursor INTO @MaPhong2, @MaTaiSan2, @SLThucTe2, @GhiChu2;
+        FETCH NEXT FROM ts_cursor INTO @MaPhong2, @MaTaiSan2, @SLThucTe2, @GhiChu2, @TinhTrang2;
 
         WHILE @@FETCH_STATUS = 0
         BEGIN
             SET @SoMaCTMax = @SoMaCTMax + 1;
             DECLARE @MaChiTietBG VARCHAR(6) = 'CT' + RIGHT('0000' + CAST(@SoMaCTMax AS VARCHAR(4)), 4);
 
-            INSERT INTO ChiTietBanGiao (MaChiTietBG, MaBienBan, MaPhong, MaTaiSan, SoLuongThucTe, GhiChu)
-            VALUES (@MaChiTietBG, @MaBienBan, @MaPhong2, @MaTaiSan2, @SLThucTe2, @GhiChu2);
+            INSERT INTO ChiTietBanGiao (MaChiTietBG, MaBienBan, MaPhong, MaTaiSan, SoLuongThucTe, GhiChu, TinhTrang)
+            VALUES (@MaChiTietBG, @MaBienBan, @MaPhong2, @MaTaiSan2, @SLThucTe2, @GhiChu2, ISNULL(@TinhTrang2, N'Tốt'));
 
-            FETCH NEXT FROM ts_cursor INTO @MaPhong2, @MaTaiSan2, @SLThucTe2, @GhiChu2;
+            FETCH NEXT FROM ts_cursor INTO @MaPhong2, @MaTaiSan2, @SLThucTe2, @GhiChu2, @TinhTrang2;
         END;
 
         CLOSE ts_cursor;
@@ -1320,7 +1335,8 @@ BEGIN
         ctbg.SoLuongThucTe,
         (ctbg.SoLuongThucTe - calc.SoLuongHeThong) AS ChenhLech,
         ts.DonGia,
-        ctbg.GhiChu
+        ctbg.GhiChu,
+        ctbg.TinhTrang
     FROM ChiTietBanGiao ctbg
     JOIN TaiSan ts ON ts.MaPhong = ctbg.MaPhong AND ts.MaTaiSan = ctbg.MaTaiSan
     CROSS APPLY (

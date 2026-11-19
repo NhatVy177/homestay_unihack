@@ -3,7 +3,7 @@ import { getPool } from '../database/connection.js';
 const command = process.argv[2] || 'check';
 if (!['check', 'migrate'].includes(command)) throw new Error('Usage: node scripts/avalanche-db.mjs check|migrate');
 const root = new URL('../../../database/', import.meta.url);
-const migrations = ['migrations/20261105_avalanche.sql', 'migrations/20261105b_payment_simulator.sql', 'migrations/20261106_first_charge_payment.sql'];
+const migrations = ['migrations/20261105_avalanche.sql', 'migrations/20261105b_payment_simulator.sql', 'migrations/20261106_first_charge_payment.sql', 'migrations/20261119_handover_asset_condition.sql'];
 // D-012: SP05 no longer requires a paper signature. The SP file stays the single source of truth;
 // only its SP_LapBienBanBanGiaoVao batch is re-applied here.
 async function handoverProcedure() {

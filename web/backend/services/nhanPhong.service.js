@@ -357,6 +357,9 @@ export async function ghiNhanThuDauKy(data = {}) {
   }
 }
 
+// Tình trạng từng tài sản lúc bàn giao (cột ChiTietBanGiao.TinhTrang); biên bản cũ để trống.
+export const TINH_TRANG_TAI_SAN = ['Tốt', 'Dùng được', 'Hư hỏng'];
+
 async function lapBienBanBanGiaoCu(data = {}) {
   const hopDongId = String(data.hopDongId || '').trim();
   const phongGiuongId = String(data.phongGiuongId || '').trim();
@@ -404,6 +407,7 @@ export async function lapBienBanBanGiao(data = {}) {
     const soLuongThucTe = item.soLuongThucTe === '' || item.soLuongThucTe == null ? null : Number(item.soLuongThucTe);
     const soLuongHeThong = Number(item.soLuongHeThong);
     const ghiChu = String(item.ghiChu || '').trim();
+    const tinhTrang = TINH_TRANG_TAI_SAN.includes(item.tinhTrang) ? item.tinhTrang : 'Tốt';
 
     if (!item.maPhong || !item.maTaiSan) {
       throw createServiceError(`Dòng tài sản ${index + 1} thiếu mã phòng hoặc mã tài sản.`);
@@ -415,11 +419,16 @@ export async function lapBienBanBanGiao(data = {}) {
       throw createServiceError(`Tài sản ${item.tenTaiSan || item.maTaiSan} chênh lệch số lượng, vui lòng nhập ghi chú.`);
     }
 
+    if (tinhTrang === 'Hư hỏng' && !ghiChu) {
+      throw createServiceError(`Tài sản ${item.tenTaiSan || item.maTaiSan} đang hư hỏng, vui lòng ghi chú tình trạng.`);
+    }
+
     return {
       maPhong: String(item.maPhong).trim(),
       maTaiSan: String(item.maTaiSan).trim(),
       soLuongThucTe,
-      ghiChu: ghiChu || null
+      ghiChu: ghiChu || null,
+      tinhTrang
     };
   });
 

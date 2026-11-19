@@ -41,6 +41,7 @@ export class TaiSanBanGiaoDTO {
     this.soLuongHeThong = numberOrZero(row.SoLuongHeThong ?? row.SoLuong);
     this.soLuongThucTe = row.SoLuongThucTe == null ? numberOrZero(row.SoLuongHeThong ?? row.SoLuong) : numberOrZero(row.SoLuongThucTe);
     this.ghiChu = row.GhiChu || '';
+    this.tinhTrang = row.TinhTrang || null;
   }
 
   static fromList(rows = []) {
