@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Icon } from '../../components/common/Icon.jsx';
 import StatusFilterTabs from '../../components/common/StatusFilterTabs.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
+import InvoiceDetailModal from './InvoiceDetailModal.jsx';
 import './customerInvoices.css';
 
 // Bố cục, nhãn và cách tính theo màn "Hóa đơn của tôi" (dự án nhóm, InvoicesDashboardPage.tsx).
@@ -52,6 +53,7 @@ function StatusPill({ group, status }) {
 
 export default function CustomerInvoicesList({ deposits, invoices, firstCharges = [], loading, error, onOpenDeposit, onOpenContract, onPayFirstCharge, onPayInvoice }) {
   const rows = useMemo(() => buildInvoiceRows({ deposits, invoices, firstCharges }), [deposits, invoices, firstCharges]);
+  const [detail, setDetail] = useState(null);
   const [group, setGroup] = useState('all'), [month, setMonth] = useState('Tất cả'), [year, setYear] = useState('Tất cả'), [loai, setLoai] = useState('Tất cả loại');
   const years = [...new Set(rows.map((row) => String(row.period).slice(0, 4)).filter(Boolean))].sort().reverse();
   const nowMonth = new Date().getMonth() + 1, nowYear = String(new Date().getFullYear()), nowKey = `${nowYear}-${String(nowMonth).padStart(2, '0')}`;
@@ -107,10 +109,12 @@ export default function CustomerInvoicesList({ deposits, invoices, firstCharges 
         <td data-label="Hạn thanh toán">{dateLabel(row.due)}</td>
         <td data-label="Trạng thái"><StatusPill group={row.group} status={row.kind} /></td>
         <td data-label="Hành động"><div className="cinv-actions">
-          <button type="button" className="ui-btn ui-btn--ghost ui-btn--sm" aria-label={`Xem ${row.id}`} onClick={() => openRow(row)}><Icon name="visibility" /></button>
+          <button type="button" className="ui-btn ui-btn--ghost ui-btn--sm" aria-label={`Xem ${row.id}`} onClick={() => setDetail(row)}><Icon name="visibility" /></button>
           {row.canPay && <button type="button" className="ui-btn ui-btn--primary ui-btn--sm" onClick={() => payRow(row)}><Icon name="payments" /> Thanh toán</button>}
         </div></td>
       </tr>)}</tbody>
     </table></div>}
+    {detail && <InvoiceDetailModal row={detail} statusLabel={STATUS_LABEL[detail.group] || detail.kind} onClose={() => setDetail(null)}
+      onOpenContract={(maHopDong) => onOpenContract?.(maHopDong)} onPay={payRow} />}
   </section>;
 }

@@ -38,3 +38,17 @@
 .cinv-table td:nth-child(2), .cinv-table td:nth-child(4), .cinv-table td:nth-child(5) { white-space: nowrap; }
 .cinv-type--movein { background: var(--color-success-soft); border-color: #c9dfc6; color: var(--color-success); font-weight: 600; }
 .cinv-type--period { background: var(--color-info-soft); border-color: #c4d9e6; color: var(--color-info); font-weight: 600; }
+
+/* Hộp thoại chi tiết thanh toán. */
+.cinv-modal { width: min(520px, 100%); }
+.cinv-modal-amount { display: grid; gap: var(--space-1); margin-bottom: var(--space-4); padding: var(--space-4); border-radius: var(--radius-md); background: var(--color-surface-alt); }
+.cinv-modal-amount span { color: var(--color-text-muted); font-size: 14px; }
+.cinv-modal-amount strong { color: var(--color-primary); font-size: 1.5rem; font-weight: 800; }
+.cinv-modal-amount small { color: var(--color-success); font-size: 13px; }
+.cinv-modal-info { display: grid; margin: 0; }
+.cinv-modal-info > div { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); padding: var(--space-3) 0; border-bottom: 1px solid var(--color-border); }
+.cinv-modal-info > div:last-child { border-bottom: 0; }
+.cinv-modal-info dt { color: var(--color-text-muted); font-size: 14px; flex-shrink: 0; }
+.cinv-modal-info dd { margin: 0; font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+.cinv-modal-proof dd { font-weight: 400; color: var(--color-text-muted); font-size: 14px; }
+.cinv-modal-proof a { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--color-primary); font-weight: 600; }
