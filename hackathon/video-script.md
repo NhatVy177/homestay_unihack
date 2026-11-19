@@ -15,6 +15,13 @@ Mentor hướng dẫn cách làm video demo. Bản chép tự động của Fath
 - **Giọng đọc:** có thể dùng TTS cho rõ ràng, chọn giọng dễ nghe.
 - Sản phẩm phải dễ dùng; chụp hoặc quay từng màn rồi ghép.
 
+**Nhắc của mentor (19/11):** video do AI dựng hay để chữ che mất phần demo, che hết ô nhập và nút, giám khảo khó chấm. Quy tắc dựng cho video này:
+
+- Không chữ nào đè lên giao diện. Khung 1920×1080 chia hai vùng: màn hình app (1440×900, thu nhỏ vừa khung) và **một dải chữ riêng ở dưới** cho phụ đề; nhãn "Nhánh: …" nằm ở **dải trên**, ngoài vùng app.
+- Phóng to (zoom) chỉ dùng để làm rõ, không có khung hay mũi tên che ô nhập; phóng xong trả về toàn màn.
+- Mỗi cảnh có thao tác nhập liệu phải nhìn rõ chữ đang gõ và nút đang bấm.
+- Trước khi gửi, xem lại từng cảnh ở 1× để chắc không có chữ che ô nào.
+
 Áp vào kịch bản này: thêm 3 đoạn motion ngắn (sơ đồ luồng ở 0:00–0:05, thẻ "Mốc 1" ở 1:06, thẻ "Mốc 2" ở 2:06), mỗi đoạn 2–4 giây, cùng màu xanh lá của HomeStayDorm; cảnh terminal chỉ hiện lệnh và kết quả, không mở `.env`. Lời đọc: Vy tự lồng tiếng, nếu muốn dùng TTS thì Claude xuất file lời đọc theo từng cảnh.
 
 ## Cách đạt 3 phút mà vẫn đủ trường hợp

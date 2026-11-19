@@ -2182,3 +2182,8 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Đọc bản chép lời Fathom (tải được một phần, nhiều chỗ sai chữ). Ý chính buổi 12/11 khoảng phút 1:03: video dưới 3 phút đủ tính năng; quay localhost được, không lộ khóa; cho agent tự chạy và quay, gặp lỗi thì sửa; thêm motion cho luồng quan trọng theo một phong cách thống nhất; có thể dùng TTS cho giọng rõ.
 - `hackathon/video-script.md`: thêm mục "Theo hướng dẫn workshop", 3 đoạn motion (sơ đồ luồng mở đầu, thẻ Mốc 1, thẻ Mốc 2), cảnh terminal không mở `.env`, tùy chọn TTS.
 - Chưa làm: tạo dữ liệu demo, dựng motion, quay.
+
+## 2026-11-19 19:51:49 +07:00 — J-C208 — Quy tắc dựng video: không để chữ che giao diện
+
+- Người thực hiện: Claude, theo nhắc của mentor Vy chuyển lại (video AI dựng hay để chữ che ô nhập, nút, giám khảo khó chấm).
+- `hackathon/video-script.md`: khung 1920×1080 tách vùng app và dải chữ riêng (phụ đề dưới, nhãn nhánh trên), zoom không che ô nhập, xem lại từng cảnh ở 1× trước khi gửi.
