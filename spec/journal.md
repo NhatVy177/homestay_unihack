@@ -1982,3 +1982,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: unit điều phối 4/4; SQL disposable 1/1 gồm sáu thao tác, đúng một lịch sử, chặn vượt tồn/chuyển chéo/phòng có khách/thiếu lý do và rollback; backend 165 pass/7 skip/0 fail; blockchain 26 pass/1 skip/0 fail; frontend build PASS và `test:avalanche-ui` PASS. Giao diện thật nối `HOMEDORM_DEMO_1118_RENT`: P203 → kho → P301 với TS0001 tạo hai lịch sử; P101/P102 có khách bị khóa; 1440/390 không tràn ngang hoặc lỗi browser. `style={{` trong hai màn mới/sửa: 0.
 - An toàn SQL: D-076 chỉ được cài trên database demo và database test dùng một lần; database test đã xóa. Một lần thử nâng schema demo bằng `admin.sql` gặp dòng `USE HOMEDORM4` có sẵn trong file, dừng tại constraint phòng; không đổi dữ liệu. Constraint `CHK_Phong_TinhTrang` trên HOMEDORM4 được khôi phục ngay đúng tập giá trị ban đầu và xác nhận enabled/trusted; không cài D-076 lên HOMEDORM4.
 - Còn lại: Vy duyệt nhánh rồi mới gộp; khi triển khai thật chạy `cd web/backend && npm run assets:db:migrate` sau khi trỏ `DB_NAME` đúng và được Vy cho phép. Chưa chạy Fuji.
+
+## 2026-11-19 13:10:25 +07:00 — J-X107 — Vy duyệt gộp và cài schema D-076 trên HOMEDORM4
+
+- Người thực hiện: Codex. Sau khi nhận báo cáo J-X106, Vy trả lời “oke làm đi”, duyệt tiếp tục phần còn lại: cài migration D-076 và đưa nhánh vào `main`.
+- Kiểm tra Git: `origin/main` đã chứa trọn D-075/J-C186 ở `240a3e1`; `feat/asset-transfer` dựng trực tiếp trên commit này nên có thể fast-forward, không conflict. Checkout gốc đang có thay đổi dở của Vy/AI khác nên không dùng để gộp và không chạm các file đó.
+- SQL: chạy `npm run assets:db:check` với `DB_NAME=HOMEDORM4`, xác nhận cả bảy object D-076 chưa có; sau đó chạy `npm run assets:db:migrate` thành công. Kiểm tra sau migration thấy bảng kho, bảng lịch sử, sequence và bốn thủ tục đều có. Migration báo không thay đổi tài sản phòng hoặc hợp đồng hiện có; không nạp dữ liệu kho demo vào HOMEDORM4.
+- Git: bổ sung trạng thái hiện hành vào `spec/progress.md` và mục này; commit bằng danh tính `NhatVy177`, cập nhật nhánh `feat/asset-transfer`, rồi fast-forward `origin/main`. Không thêm `Co-Authored-By`.
+- Còn lại: Vy kiểm luồng trên giao diện đang chạy; triển khai/nghiệm thu Fuji là đợt riêng.
