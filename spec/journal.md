@@ -2187,3 +2187,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 
 - Người thực hiện: Claude, theo nhắc của mentor Vy chuyển lại (video AI dựng hay để chữ che ô nhập, nút, giám khảo khó chấm).
 - `hackathon/video-script.md`: khung 1920×1080 tách vùng app và dải chữ riêng (phụ đề dưới, nhãn nhánh trên), zoom không che ô nhập, xem lại từng cảnh ở 1× trước khi gửi.
+
+## 2026-11-19 20:18:47 +07:00 — J-C209 — Sửa kịch bản demo theo 7 góp ý của Vy
+
+- Người thực hiện: Claude, theo bình luận của Vy trên trang kịch bản.
+- Đối chiếu code: thuê nhóm báo lỗi giới tính khi bấm "Tiếp tục" ở bước 1 (không báo ngay lúc nhập thành viên; thuê một mình thì cảnh báo hiện ngay dưới ô giới tính); Sale thêm được phòng ngoài phòng khách thả tim (`SaleBookingView`); quản lý thấy nhãn "Yêu cầu gửi trước" khi nhiều yêu cầu cùng phòng (`XacNhanNhanPhongTab`); tiền cọc do hệ thống tự tính; trả phòng của phiếu cọc chưa ký hợp đồng hoàn 80% theo chính sách.
+- `hackathon/video-script.md`: viết lại bảng chia thời gian và bảng chi tiết: thêm nhánh nhóm có Nữ vào phòng Nam, Sale thêm phòng, lịch xem tiếp với phòng chưa xem, bỏ cảnh kế toán chốt tiền (thay bằng ưu tiên người gửi trước, phòng Giữ chỗ hạn 1 ngày), nhánh thành viên không đạt (bỏ người đó hoặc cả nhóm dừng, hoàn 80%), món hư lúc bàn giao sang Điều phối tài sản, đổi thứ tự đoạn Đang ở (báo hỏng trước, hóa đơn có phí sửa sau); thêm dữ liệu K2b, K1b.
+- Còn thiếu trong code (đánh dấu "cần làm"): Sale lập lịch xem tiếp chỉ hiện phòng chưa xem; thông báo và nút sang Điều phối tài sản khi bàn giao có món hư.
