@@ -71,7 +71,9 @@ const CONTRACT_SELECT = `SELECT h.MaHopDong AS maHopDong, h.GiaThue AS giaThue, 
     ph.MaChiNhanh AS maChiNhanh, cn.TenChiNhanh AS tenChiNhanh,
     (SELECT STRING_AGG(c.MaGiuong, ', ') FROM dbo.ChiTietDatCoc c WHERE c.MaPhieuDatCoc = h.MaPhieuCoc AND c.MaGiuong IS NOT NULL) AS giuong,
     (SELECT MAX(x.KyThanhToan) FROM dbo.HoaDon x WHERE x.MaHopDong = h.MaHopDong
-       AND x.KyThanhToan LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9]') AS kyCuoi
+       AND x.KyThanhToan LIKE '[0-9][0-9][0-9][0-9]-[0-9][0-9]') AS kyCuoi,
+    CASE WHEN EXISTS (SELECT 1 FROM dbo.HoaDon k WHERE k.MaHopDong = h.MaHopDong
+       AND k.KyThanhToan = CONVERT(char(7), h.NgayBatDau, 120) AND k.TrangThai = N'Đã TT') THEN 1 ELSE 0 END AS daThuKyDau
   FROM dbo.HopDongThue h
   JOIN dbo.PhieuDatCoc p ON p.MaPhieuDatCoc = h.MaPhieuCoc
   JOIN dbo.NguoiDung nd ON nd.MaNguoiDung = h.MaKhachHang
@@ -86,6 +88,7 @@ function toContract(row) {
     tenPhong: row.tenPhong, giuong: row.giuong || '', hinhThucThue: row.hinhThucThue,
     giaThue: Number(row.giaThue) || 0, soGiuongThue: Number(row.soGiuongThue) || 1,
     maChiNhanh: row.maChiNhanh, tenChiNhanh: row.tenChiNhanh, kyCuoi: row.kyCuoi || null, kyCanLap,
+    daThuKyDau: Boolean(row.daThuKyDau),
     hetHan: kyCanLap > periodOf(row.ngayKetThuc),
   };
 }
@@ -94,7 +97,8 @@ export async function danhSachHopDong(user, { query = executeQuery } = {}) {
   assertAccountant(user);
   const result = await query(`${CONTRACT_SELECT}
     WHERE h.TrangThai = N'Hiệu lực' AND ph.MaChiNhanh = @MaChiNhanh ORDER BY h.MaHopDong`, [branchParam(user)]);
-  return (result.recordset || []).map(toContract).filter((c) => !c.hetHan);
+  // Chưa thu kỳ đầu (hóa đơn nhận phòng) thì chưa có hóa đơn định kỳ để lập.
+  return (result.recordset || []).map(toContract).filter((c) => !c.hetHan && c.daThuKyDau);
 }
 
 async function loadContract(user, maHopDong, query) {
@@ -105,7 +109,9 @@ async function loadContract(user, maHopDong, query) {
     { name: 'MaHopDong', type: sql.VarChar(6), value: id }, branchParam(user),
   ])).recordset?.[0];
   if (!row) throw createServiceError('Không tìm thấy hợp đồng đang hiệu lực trong chi nhánh.', 404);
-  return toContract(row);
+  const contract = toContract(row);
+  if (!contract.daThuKyDau) throw createServiceError('Hợp đồng chưa thanh toán khoản thu kỳ đầu (hóa đơn nhận phòng) nên chưa thể lập hóa đơn định kỳ.', 409);
+  return contract;
 }
 
 // Tỷ lệ chia điện nước: nguyên phòng chịu toàn bộ; ghép giường chia theo số giường thuê trong phòng.
