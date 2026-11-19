@@ -2400,24 +2400,38 @@ export default function KhachHangPortalPage() {
                     <h3>Danh sách tài sản bàn giao</h3>
                   </div>
                   <div className="hd-card-body">
-                    <table className="hd-table">
-                      <thead>
-                        <tr>
-                          <th>Tên tài sản</th>
-                          <th style={{ textAlign: 'center' }}>Số lượng</th>
-                          <th style={{ textAlign: 'right' }}>Chi phí đền bù/Sửa chữa (/ 1 món)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedHd.taiSan.map((ts) => (
-                          <tr key={ts.MaTaiSan}>
-                            <td>{ts.TenTaiSan}</td>
-                            <td style={{ textAlign: 'center' }}>{ts.SoLuong}</td>
-                            <td style={{ textAlign: 'right' }}>{formatSettlementMoney(ts.DonGia)}<span style={{ color: '#888', fontSize: '12px', marginLeft: '4px' }}>/ 1 món</span></td>
+                    {selectedHd.bienBanBanGiao && (
+                      <div className="hd-handover-meta">
+                        <p>
+                          <span>Biên bản <strong>{selectedHd.bienBanBanGiao.maBienBan}</strong></span>
+                          <span>Bàn giao ngày <strong>{formatDate(selectedHd.bienBanBanGiao.ngayBanGiao)}</strong></span>
+                          {selectedHd.bienBanBanGiao.quanLy && <span>Quản lý <strong>{selectedHd.bienBanBanGiao.quanLy}</strong></span>}
+                        </p>
+                        {selectedHd.bienBanBanGiao.ghiChuChung && <p className="hd-handover-note">Ghi chú chung: {selectedHd.bienBanBanGiao.ghiChuChung}</p>}
+                      </div>
+                    )}
+                    <div className="hd-table-scroll">
+                      <table className="hd-table">
+                        <thead>
+                          <tr>
+                            <th>Tên tài sản</th>
+                            <th className="hd-col-center">Số lượng</th>
+                            {selectedHd.bienBanBanGiao && <th>Tình trạng khi bàn giao</th>}
+                            <th className="hd-col-right">Chi phí đền bù/Sửa chữa (/ 1 món)</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          {selectedHd.taiSan.map((ts) => (
+                            <tr key={ts.MaTaiSan}>
+                              <td>{ts.TenTaiSan}</td>
+                              <td className="hd-col-center">{ts.SoLuong}</td>
+                              {selectedHd.bienBanBanGiao && <td>{selectedHd.bienBanBanGiao.ghiChuTaiSan?.[ts.MaTaiSan] || 'Không ghi chú'}</td>}
+                              <td className="hd-col-right">{formatSettlementMoney(ts.DonGia)}<span className="hd-unit-note">/ 1 món</span></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               )}

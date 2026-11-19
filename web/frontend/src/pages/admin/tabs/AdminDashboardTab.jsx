@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Icon } from '../../../components/common/Icon.jsx';
+import SaleKpiReport from '../../../components/kpiSale/SaleKpiReport.jsx';
 import { adminApi } from '../admin.api.js';
 import { extractArray, formatVND } from '../admin.utils.js';
 
@@ -305,6 +306,8 @@ export default function AdminDashboardTab() {
           </div>
         </div>
       </div>
+
+      <SaleKpiReport title="KPI Sale toàn hệ thống" />
     </div>
   );
 }

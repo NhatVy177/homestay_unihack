@@ -3357,6 +3357,15 @@
   margin-right: 8px;
   vertical-align: -3px;
 }
+/* D-075: thông tin biên bản bàn giao và tình trạng từng món */
+.hd-handover-meta { display: grid; gap: var(--space-2); margin-bottom: var(--space-3); padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface-alt); font-size: 13px; color: var(--kp-text); }
+.hd-handover-meta p { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin: 0; }
+.hd-handover-meta .hd-handover-note { display: block; color: var(--kp-soft-text); }
+.hd-table-scroll { overflow-x: auto; }
+.hd-table-scroll .hd-table { min-width: 520px; }
+.hd-table .hd-col-center { text-align: center; }
+.hd-table .hd-col-right { text-align: right; }
+.hd-unit-note { margin-left: var(--space-1); font-size: 12px; color: var(--kp-soft-text); }
 .hd-status-good {
   color: #059669 !important;
   font-weight: 800;

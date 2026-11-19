@@ -6,6 +6,7 @@ import { checkProfileEditable, checkRoomCanJoin } from './interestedRoomsRules.j
 import * as phongQuanTamRepository from '../repositories/phongQuanTam.repository.js';
 import { createServiceError, mapDatabaseError } from './serviceErrors.js';
 import * as phieuTraPhongRepository from '../repositories/phieuTraPhong.repository.js';
+import * as banGiaoRepository from '../repositories/banGiao.repository.js';
 import { getPaymentAccount } from '../config/payment.js';
 import { attachViewingConfirmations } from './viewingConfirmation.service.js';
 import { cachTinhCoc } from './tienCoc.js';
@@ -1075,6 +1076,31 @@ export async function uploadMinhChungKhachHang(user, maPhieuCoc, data = {}) {
   return { maPhieuCoc, trangThai: 'Chờ xác nhận' };
 }
 
+// D-075: khách xem lại biên bản tài sản đã bàn giao — mã biên bản, ngày, quản lý, ghi chú chung và ghi chú từng món.
+export async function tomTatBanGiaoVao(maHopDong, { query = executeQuery, chiTiet = banGiaoRepository.layChiTietBienBanBanGiao } = {}) {
+  if (!maHopDong) return null;
+  const row = (await query(`SELECT TOP (1) MaBienBan AS maBienBan FROM dbo.BienBanBanGiao
+    WHERE MaHopDong = @MaHopDong AND LoaiBanGiao = N'Bàn giao vào' ORDER BY NgayBanGiao DESC, MaBienBan DESC`, [
+    { name: 'MaHopDong', type: sql.VarChar(6), value: String(maHopDong) },
+  ])).recordset?.[0];
+  if (!row) return null;
+  const detail = await chiTiet(row.maBienBan);
+  const bienBan = detail?.bienBan;
+  if (!bienBan) return null;
+  const ghiChuTaiSan = {};
+  for (const item of detail.taiSan || []) {
+    const note = String(item.GhiChu || '').trim();
+    if (note) ghiChuTaiSan[item.MaTaiSan] = ghiChuTaiSan[item.MaTaiSan] ? `${ghiChuTaiSan[item.MaTaiSan]}; ${note}` : note;
+  }
+  return {
+    maBienBan: bienBan.MaBienBan,
+    ngayBanGiao: bienBan.NgayBanGiao,
+    quanLy: bienBan.HoTenNhanVienQuanLy || null,
+    ghiChuChung: String(bienBan.GhiChuChung || '').trim(),
+    ghiChuTaiSan,
+  };
+}
+
 export async function getHopDongDashboard(user, options = {}) {
   const khachHangId = requireCustomer(user);
   const maHopDongChon = String(options.maHopDong || options.MaHopDong || '').trim() || null;
@@ -1276,6 +1302,7 @@ export async function getHopDongDashboard(user, options = {}) {
   const hopDongDaChon = normalizeHopDongDashboardItem(hopDong, chiTietKhauTru);
 
   hopDongDaChon.taiSan = result.recordsets[2] || [];
+  hopDongDaChon.bienBanBanGiao = await tomTatBanGiaoVao(hopDongDaChon.MaHopDong).catch(() => null);
   hopDongDaChon.quyDinh = result.recordsets[3] || [];
   hopDongDaChon.thanhVien = result.recordsets[4] || [];
   hopDongDaChon.dichVu = result.recordsets[5] || [];
