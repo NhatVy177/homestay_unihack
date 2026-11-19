@@ -2110,3 +2110,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Kiểm tra: backend 166 qua, 0 lỗi, 7 bỏ qua; `npm run build`, `check:ui-tokens` qua. Đọc thử chỉ đọc trên HOMEDORM4 với kế toán NV0004: chỉ HD0004 được đề nghị lập (kỳ 2026-12), HD0003 (chưa thu kỳ đầu) không còn. Chưa xem giao diện Bàn giao tài sản ở 1440/390.
 - Không làm: hai hình thứ hai của mục 11 (danh sách "Loại hư hỏng" có hai dòng cùng tô nền) không có lời nhắn kèm nên không sửa; hóa đơn HO0005 đã tạo từ lần trước vẫn nằm trong HOMEDORM4 (không xóa khi chưa được đồng ý).
 - Còn lại: Vy xem lại màn Bàn giao tài sản; quyết định xử lý HO0005 (HD0003 đang ở trạng thái chờ thanh toán với hóa đơn kỳ đầu lạ 5.393.000 đ trong khi khoản thu kỳ đầu tính ra 4.681.000 đ).
+
+## 2026-11-19 16:05:15 +07:00 — J-C199 — Chế độ demo: hợp đồng đủ điều kiện luôn hiện ở màn Lập hóa đơn định kỳ
+
+- Người thực hiện: Claude, nhánh `fix/periodic-demo-period`, theo yêu cầu của Vy (không nhập được hóa đơn định kỳ cho tài khoản Ivan, HD0004 đã thu kỳ đầu và bàn giao).
+- Nguyên nhân: `HoaDonDinhKyTab.jsx` chỉ liệt kê hợp đồng có kỳ cần lập nhỏ hơn hoặc bằng kỳ đang chọn ở đầu trang. HD0004 cần lập kỳ 2026-12 trong khi kỳ đang chọn là 2026-11 (ngày hiện tại 19/11/2026), nên danh sách báo "Không tìm thấy hợp đồng nào". Máy chủ không có quy định thời gian nào chặn lập kỳ tương lai (`lapHoaDon` chỉ chặn trùng kỳ, phí chưa xác nhận, chỉ số giảm).
+- Sửa: bỏ điều kiện theo kỳ, danh sách luôn hiện mọi hợp đồng đủ điều kiện lập (đã thu kỳ đầu, D-081); lập xong màn hình tự chuyển sang kỳ vừa lập như trước.
+- File: `web/frontend/src/pages/nhanVienKeToan/HoaDonDinhKyTab.jsx`.
+- Kiểm tra: `npm run build` qua; đọc thử chỉ đọc trên HOMEDORM4: `chiTietLapHoaDon` của HD0004 với kế toán NV0004 chạy được (kỳ 2026-12, chưa có chỉ số, có 1 khoản phí phát sinh). Chưa lập hóa đơn thật.
+- Lưu ý: nếu khoản phí phát sinh của HD0004 đang "Chưa xác nhận" thì phải xác nhận hoặc xóa trước khi lập; kỳ chưa có chỉ số nên cần nhập chỉ số điện nước mới.

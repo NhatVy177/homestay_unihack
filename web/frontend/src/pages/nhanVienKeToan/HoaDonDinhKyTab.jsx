@@ -89,7 +89,8 @@ export default function HoaDonDinhKyTab() {
   const q = search.trim().toLocaleLowerCase('vi-VN'), cq = contractSearch.trim().toLocaleLowerCase('vi-VN');
   const filteredInvoices = invoices.filter((i) => i.kyThanhToan === period && inBranch(i) && (status === 'all' || i.nhom === status)
     && (!q || [i.hoTen, i.tenPhong, i.maHoaDon].join(' ').toLocaleLowerCase('vi-VN').includes(q)));
-  const filteredContracts = contracts.filter((c) => inBranch(c) && c.kyCanLap <= period
+  // Chế độ demo: hiện mọi hợp đồng đủ điều kiện lập, không phụ thuộc kỳ đang chọn ở đầu trang (trước đây chỉ hiện khi kỳ cần lập <= kỳ đang chọn).
+  const filteredContracts = contracts.filter((c) => inBranch(c)
     && (!cq || [c.hoTen, c.tenPhong, c.maHopDong].join(' ').toLocaleLowerCase('vi-VN').includes(cq)));
   const reviewCount = invoices.filter((i) => i.nhom === 'review').length;
   const reviewPeriods = [...new Set(invoices.filter((i) => i.nhom === 'review').map((i) => i.kyThanhToan))].filter((p) => p !== period);
