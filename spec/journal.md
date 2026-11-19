@@ -2001,3 +2001,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - SQL: chạy `npm run assets:db:check` với `DB_NAME=HOMEDORM4`, xác nhận cả bảy object D-076 chưa có; sau đó chạy `npm run assets:db:migrate` thành công. Kiểm tra sau migration thấy bảng kho, bảng lịch sử, sequence và bốn thủ tục đều có. Migration báo không thay đổi tài sản phòng hoặc hợp đồng hiện có; không nạp dữ liệu kho demo vào HOMEDORM4.
 - Git: bổ sung trạng thái hiện hành vào `spec/progress.md` và mục này; commit bằng danh tính `NhatVy177`, cập nhật nhánh `feat/asset-transfer`, rồi fast-forward `origin/main`. Không thêm `Co-Authored-By`.
 - Còn lại: Vy kiểm luồng trên giao diện đang chạy; triển khai/nghiệm thu Fuji là đợt riêng.
+
+## 2026-11-19 13:19:15 +07:00 — J-C188 — Thêm biến --space-5, sửa màu "Còn trống"; kiểm tra lại main sau khi gộp D-076
+
+- Người thực hiện: Claude, nhánh `fix/space-5-token`, theo ý Vy ("làm 1 2").
+- Thêm `--space-5: 20px` vào `tokens.css` (sửa 5 chỗ CSS cũ dùng biến chưa khai báo); `KhachMoiPage.jsx` dòng 727 đổi `--success` thành `--color-success`. `npm run check:ui-tokens` nay báo OK.
+- File: `web/frontend/src/styles/tokens.css`, `web/frontend/src/pages/khachMoi/KhachMoiPage.jsx`.
+- Kiểm tra: trên code đã gộp D-076, backend 165 qua/7 bỏ qua/0 lỗi; `npm run build` và `test:avalanche-ui` qua. Chưa xem lại bằng mắt các trang có `--space-5` (sourceReport, suaChua, chiTietPhong, saleWorkspace).
+- Còn lại: Vy xem nhanh 4 trang trên.
