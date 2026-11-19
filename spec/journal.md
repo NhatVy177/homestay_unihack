@@ -2208,3 +2208,9 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, theo bình luận của Vy: quản lý ghi "Tốt" hết, lỗi để khách phát hiện qua "Yêu cầu chỉnh sửa".
 - `hackathon/video-script.md`: cảnh 1:13 khách yêu cầu sửa vì "Nệm có vết rách sẵn" (bản 2 ghi vết rách), cảnh 2:19 khách phản đối "Vết rách đã có trong biên bản nhận phòng"; lời đọc 1:08 thêm "khách đọc lại trước khi xác nhận". Thay phần đổi lý do sang "2 ghế" và "hao mòn" ghi ở J-C210.
 - Kiểm tra: không có (chỉ đổi kịch bản).
+
+## 2026-11-19 21:29:17 +07:00 — J-C212 — Thêm cảnh đăng ký và xác nhận email vào đầu kịch bản demo
+
+- Người thực hiện: Claude, theo bình luận của Vy ("làm đăng ký để có xác nhận email từ đầu, nói rõ làm vậy để làm gì").
+- `hackathon/video-script.md`: cảnh 0:05–0:10 K1 đăng ký tài khoản → thẻ "Xác nhận email của bạn" → nhập OTP → "Email đã xác nhận"; lời đọc nêu lý do (ví nhúng tạo sẵn, sau này ký trên Avalanche chỉ một lần bấm). Rút các cảnh 0:10–0:28 cho vừa 25 giây; cảnh 1:20 chỉ nhắc lại ngắn. K1 đăng ký trong cảnh bằng `vynhat2k5+k1@gmail.com`, K2 dùng tài khoản đã xác nhận sẵn.
+- Kiểm tra: đối chiếu code `TrangChu.jsx` (form Tạo tài khoản) và `EmailActivationCard.jsx` (thẻ xác nhận email ở cổng khách).

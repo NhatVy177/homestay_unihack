@@ -36,7 +36,7 @@ Mentor hướng dẫn cách làm video demo. Bản chép tự động của Fath
 | Đoạn | Thời gian | Nội dung | Nhánh phụ hiện bằng cảnh cắt |
 |---|---|---|---|
 | 0. Mở | 0:00–0:05 | Motion sơ đồ luồng, logo | |
-| 1. Tìm phòng và hồ sơ | 0:05–0:30 | Lọc phòng, tim quan tâm, thuê nhóm, Sale xếp lịch (thêm phòng), kết quả buổi xem | Nhóm có Nữ vào phòng Nam → báo lỗi; khách đổi/hủy lịch; khách không đến; xem xong không ưng → lịch mới với phòng chưa xem |
+| 1. Đăng ký, tìm phòng và hồ sơ | 0:05–0:30 | Đăng ký tài khoản, xác nhận email một lần, lọc phòng, tim quan tâm, thuê nhóm, Sale xếp lịch (thêm phòng), kết quả buổi xem | Nhóm có Nữ vào phòng Nam → báo lỗi; khách đổi/hủy lịch; khách không đến; xem xong không ưng → lịch mới với phòng chưa xem |
 | 2. Giữ chỗ và cọc | 0:30–0:52 | Khách muốn đặt cọc, quản lý duyệt (ưu tiên người gửi trước), hệ thống tự tính cọc, phòng "Giữ chỗ" 1 ngày, trả MoMo | Chuyển khoản kèm minh chứng → kế toán duyệt; tiền mặt → kế toán "Thu tiền mặt" |
 | 3. Cư trú, hợp đồng, kỳ đầu | 0:52–1:08 | Khai người ở cùng, Sale lập hợp đồng, tải bản ký, trả kỳ đầu | Thành viên không đạt: bỏ người đó rồi khai tiếp, hoặc cả nhóm dừng → trả phòng, hoàn 80% cọc |
 | 4. Mốc 1: bàn giao trên Avalanche | 1:08–1:38 | Biên bản có tình trạng từng món (mặc định "Tốt"), khách yêu cầu sửa, bản 2, khách xác nhận, Snowtrace | |
@@ -52,11 +52,12 @@ Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, *
 | Giây | Vai | Quay gì | Tốc độ | Lời đọc |
 |---|---|---|---|---|
 | 0:00–0:05 | | Motion: logo HomeStayDorm, rồi dải sơ đồ luồng chạy từ trái sang phải (Tìm phòng → Cọc → Hợp đồng → **Bàn giao ⛓** → Đang ở → **Trả phòng ⛓**), hai mốc chuỗi sáng lên. Dải dưới: "Avalanche Fuji · dữ liệu demo · thanh toán sandbox" | 1× | "HomeStayDorm: một nền tảng cho cả người thuê và nhà trọ, dùng Avalanche để hai bên tin nhau." |
-| 0:05–0:11 | K1 | Trang chủ → lọc khu vực, giá → chi tiết phòng (ảnh, giá/giường, giới tính) → bấm **tim** trên thẻ phòng, tim chuyển đỏ, "Đã thêm vào hồ sơ" | 1,5× | "Khách lọc phòng theo khu vực và giá. Thả tim là phòng vào ngay hồ sơ đăng ký." |
-| 0:11–0:16 | K1 | **Đăng ký thuê theo nhóm** vào phòng Nam: thêm một thành viên Nữ → bấm **Tiếp tục** → báo lỗi phòng chỉ nhận Nam → sửa lại thành viên → qua bước 2 | 1,5× | "Thuê nhóm thì hệ thống kiểm tra giới tính và số giường trống; nhóm có nữ vào phòng nam sẽ bị chặn ngay khi bấm tiếp tục." |
-| 0:16–0:22 | S | Hồ sơ chờ xếp lịch → phòng khách thả tim được chọn sẵn, Sale **tích thêm phòng khác** để dẫn khách xem thêm → đặt giờ | 2× | "Sale thấy phòng khách quan tâm, có thể thêm phòng khác để dẫn khách xem, rồi đặt giờ." |
-| 0:22–0:25 | K1 | Lịch xem: Xác nhận / Đổi lịch / Hủy lịch | 2× | "Khách nhận email, xác nhận hoặc xin đổi, hủy lịch." |
-| 0:25–0:28 | S | Ghi kết quả "Đã xem". Cảnh cắt "Nhánh: khách không đến" | 2× | "Sau buổi xem, Sale ghi đã xem hoặc khách không đến." |
+| 0:05–0:10 | K1 | Trang chủ → **Đăng ký tài khoản** (họ tên, email, số điện thoại, mật khẩu) → vào cổng khách → thẻ **Xác nhận email của bạn** → nhập mã OTP gửi về email → "Email đã xác nhận. Bạn sẵn sàng xác nhận biên bản chỉ bằng một lần bấm." | 1,5× (tua đoạn chờ mã) | "Khách đăng ký và xác nhận email một lần ngay khi vào cổng. Hệ thống tạo sẵn ví nhúng cho khách, nên về sau ký biên bản trên Avalanche chỉ cần một lần bấm, không cài ví, không cần AVAX." |
+| 0:10–0:15 | K1 | Trang chủ → lọc khu vực, giá → chi tiết phòng (ảnh, giá/giường, giới tính) → bấm **tim** trên thẻ phòng, tim chuyển đỏ, "Đã thêm vào hồ sơ" | 2× | "Khách lọc phòng theo khu vực và giá. Thả tim là phòng vào ngay hồ sơ đăng ký." |
+| 0:15–0:19 | K1 | **Đăng ký thuê theo nhóm** vào phòng Nam: thêm một thành viên Nữ → bấm **Tiếp tục** → báo lỗi phòng chỉ nhận Nam → sửa lại thành viên → qua bước 2 | 2× | "Thuê nhóm thì hệ thống kiểm tra giới tính và số giường trống; nhóm có nữ vào phòng nam bị chặn ngay." |
+| 0:19–0:24 | S | Hồ sơ chờ xếp lịch → phòng khách thả tim được chọn sẵn, Sale **tích thêm phòng khác** để dẫn khách xem thêm → đặt giờ | 2× | "Sale thấy phòng khách quan tâm, có thể thêm phòng khác để dẫn khách xem, rồi đặt giờ." |
+| 0:24–0:26 | K1 | Lịch xem: Xác nhận / Đổi lịch / Hủy lịch | 2× | "Khách nhận email, xác nhận hoặc xin đổi, hủy lịch." |
+| 0:26–0:28 | S | Ghi kết quả "Đã xem". Cảnh cắt "Nhánh: khách không đến" | 2× | "Sau buổi xem, Sale ghi đã xem hoặc khách không đến." |
 | 0:28–0:30 | S | Cảnh cắt "Nhánh: xem xong chưa ưng": Sale lập lịch xem tiếp, danh sách chỉ còn phòng chưa xem | 2× | "Khách chưa ưng thì Sale lập lịch xem tiếp với các phòng chưa xem." |
 | 0:30–0:35 | K2 | Bấm **Tôi muốn đặt cọc** → modal chọn phòng, hình thức, giường, cột "Yêu cầu của bạn" → gửi | 1,5× | "Ưng phòng, khách gửi yêu cầu giữ chỗ ngay trên web." |
 | 0:35–0:40 | QL | Kiểm duyệt đặt cọc: hai yêu cầu cùng phòng, nhãn **"Yêu cầu gửi trước"** → duyệt người gửi trước; phiếu cọc hiện số tiền hệ thống tự tính, phòng chuyển **Giữ chỗ**, hạn thanh toán 1 ngày | 1,5× | "Nhiều yêu cầu cùng một phòng thì ưu tiên người gửi trước. Hệ thống tự tính tiền cọc, phòng chuyển giữ chỗ, khách có một ngày để thanh toán." |
@@ -69,7 +70,7 @@ Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, *
 | 1:05–1:08 | K2 | Trả kỳ đầu bằng MoMo; hộp thư có email báo | 2× | "Khách trả khoản kỳ đầu; mỗi bước đều có email báo đúng người." |
 | 1:08–1:13 | QL | Motion 2 giây: thẻ "Mốc 1 · Nhận phòng". Bàn giao tài sản, bộ lọc **Chưa bàn giao** → lập biên bản, mọi món mặc định "Tốt" | 1,5× | "Avalanche xuất hiện đúng hai lúc cần cả hai bên đồng ý. Lúc nhận phòng, quản lý ghi tình trạng từng món; khách đọc lại trước khi xác nhận." |
 | 1:13–1:20 | K2 | Tab Hợp đồng: đọc biên bản → **Yêu cầu chỉnh sửa** "Nệm có vết rách sẵn" → QL phát hành bản 2 có ghi vết rách, lịch sử 2 bản | 1,5× | "Khách đọc lại, thấy thiếu vết rách có sẵn nên yêu cầu sửa; quản lý phát hành bản hai, bản một vẫn được giữ." |
-| 1:20–1:30 | K2 | Bấm **Xác nhận** → chỉ một lần bấm (email đã xác nhận lúc vào cổng) → "Bạn đã xác nhận biên bản lúc …" | 1× | "Khách đã xác nhận email lúc vào cổng, giờ chỉ cần bấm. Ví nhúng Privy ký EIP-712 đúng phiên bản này; không cài ví, không cần AVAX." |
+| 1:20–1:30 | K2 | Bấm **Xác nhận** → chỉ một lần bấm (email đã xác nhận lúc vào cổng) → "Bạn đã xác nhận biên bản lúc …" | 1× | "Email đã xác nhận từ lúc đăng ký nên giờ chỉ cần bấm. Ví nhúng Privy ký EIP-712 đúng phiên bản này; không cài ví, không cần AVAX." |
 | 1:30–1:38 | QL | "Đã ghi nhận" + mã giao dịch → Snowtrace, phóng to "Success" và hàm `confirm` | 1× | "Relayer trả phí gas nhưng không giả được chữ ký, vì contract chỉ nhận đúng chữ ký của ví khách." |
 | 1:38–1:43 | K6 → QL | Khách **báo hỏng** có ảnh → QL tiếp nhận, hoàn tất "Do khách gây ra", phí sửa 100.000đ. Cảnh cắt "Nhánh: không do khách gây ra" | 2× | "Trong thời gian ở, khách báo hỏng có ảnh; do khách gây ra thì tính phí sửa, không do khách thì không tính." |
 | 1:43–1:48 | KT | Hóa đơn định kỳ: chọn hợp đồng, nhập chỉ số điện nước, dòng **"Sửa chữa SC…"** tự có trong chi phí phát sinh → Lập | 2× | "Đến kỳ, kế toán lập hóa đơn tháng; phí sửa đó tự cộng vào, không nhập tay." |
@@ -92,8 +93,8 @@ Quay trên HOMEDORM4 vì cần Fuji thật. Mỗi cảnh dùng một hồ sơ đ
 
 | Mã | Dùng cho cảnh | Trạng thái cần có |
 |---|---|---|
-| K1 `demo.tim` | 0:05–0:28 | Khách mới, chưa có hồ sơ |
-| K2 `demo.thue` | 0:28–1:36 | Đã xem phòng, chưa giữ chỗ; tiếp tục đi hết tới bàn giao. Email **chưa** xác nhận để quay một lần xác nhận lúc vào cổng (hoặc dùng sẵn tài khoản đã xác nhận) |
+| K1 `demo.tim` | 0:05–0:28 | Chưa có tài khoản: đăng ký ngay trong cảnh bằng email `vynhat2k5+k1@gmail.com` (mã OTP về hộp thư Vy) |
+| K2 `demo.thue` | 0:28–1:36 | Đã xem phòng, chưa giữ chỗ; tiếp tục đi hết tới bàn giao. Email **đã** xác nhận sẵn (cảnh xác nhận email chỉ quay với K1) |
 | K2b `demo.ganguoi` | 0:35–0:40 | Gửi yêu cầu giữ chỗ **cùng phòng** với K2 nhưng **sau** K2, để quản lý thấy nhãn "Yêu cầu gửi trước" |
 | K1b `demo.nhom` | 0:57–1:01 | Đã cọc theo nhóm, chưa ký hợp đồng, có một thành viên không đạt điều kiện cư trú (ví dụ dưới 18 tuổi) |
 | K3 `demo.ck` | 0:46–0:49 | Phiếu cọc chờ thanh toán, chuẩn bị ảnh minh chứng |
