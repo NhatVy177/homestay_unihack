@@ -11,6 +11,7 @@
     "loyalty:db:migrate": "node scripts/loyalty-db.mjs",
     "room-gender:db:migrate": "node scripts/room-gender-db.mjs",
     "asset-condition:db:migrate": "node scripts/asset-condition-db.mjs",
+    "warehouse-seed:db:migrate": "node scripts/warehouse-seed-db.mjs",
     "demo:db:migrate": "node scripts/demo-scenarios-db.mjs",
     "assets:db:check": "node scripts/assets-db.mjs check",
     "assets:db:migrate": "node scripts/assets-db.mjs migrate",

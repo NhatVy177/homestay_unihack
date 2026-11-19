@@ -35,6 +35,9 @@ export default function NhanVienQuanLyPage() {
     const tab = new URLSearchParams(window.location.search).get('tab');
     return navItems.some(item => item.id === tab) ? tab : 'xac-nhan-nhan-phong';
   });
+  // Món hư lúc bàn giao: mang phòng và tài sản sang Điều phối để thay trước khi giao (D-083).
+  const [thayMon, setThayMon] = useState(null);
+  const moDieuPhoi = (item) => { setThayMon(item); setActiveTab('dieu-phoi-tai-san'); };
 
   return (
     <WorkspaceShell roleLabel="Nhân viên Quản lý" eyebrow="Không gian Quản lý"
@@ -42,13 +45,13 @@ export default function NhanVienQuanLyPage() {
       activeTab={activeTab} onSelect={setActiveTab} user={user} onLogout={dangXuat}>
       {activeTab === 'xac-nhan-nhan-phong' && <XacNhanNhanPhongTab />}
       {activeTab === 'duyet-cu-tru' && <DuyetCuTruTab />}
-      {activeTab === 'lap-bien-ban-ban-giao' && <BanGiaoPhongTab />}
+      {activeTab === 'lap-bien-ban-ban-giao' && <BanGiaoPhongTab onDieuPhoi={moDieuPhoi} />}
       {activeTab === 'lap-bien-ban-kiem-tra-phong' && <XuLyTraPhongTab />}
       {activeTab === 'bao-hong' && <ManagerRepairTab />}
       {activeTab === 'xac-nhan-dien-tu' && <Suspense fallback={null}><QuanLyXacNhanTab /></Suspense>}
       {activeTab === 'khach-hang' && <SaleCustomerWorkspace />}
       {activeTab === 'kpi-sale' && <SaleKpiReport title="KPI Sale chi nhánh" />}
-      {activeTab === 'dieu-phoi-tai-san' && <AssetTransferWorkspace />}
+      {activeTab === 'dieu-phoi-tai-san' && <AssetTransferWorkspace thayMon={thayMon} onDoneThayMon={() => setThayMon(null)} onBackToHandover={() => { setThayMon(null); setActiveTab('lap-bien-ban-ban-giao'); }} />}
       {activeTab === 'ho-so-ca-nhan' && <SaleProfile user={user} roleLabel="Nhân viên Quản lý" />}
     </WorkspaceShell>
   );

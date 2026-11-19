@@ -22,6 +22,7 @@ Cập nhật: **2026-11-19 16:38:50 +07:00** (J-C201: đổi điểm lúc thanh 
 
 - KPI Sale và thẻ tài sản bàn giao (D-075) đã ở `main`: test tự động qua, đã xem giao diện với SQL Server HOMEDORM4 ở chế độ chỉ đọc (J-C186).
 - Điều phối tài sản (D-076) đã được Vy duyệt đưa vào `main`: kho dùng được/chờ sửa theo chi nhánh, đủ sáu loại chuyển, lịch sử bất biến và chặn phòng có hợp đồng hiệu lực. API khóa quản lý trong chi nhánh; Admin chỉ đọc và tab Tài sản dùng dữ liệu thật của toàn bộ phòng. Unit test, SQL trên database dùng một lần, backend, blockchain, build/smoke và giao diện SQL demo 1440/390 đều qua (J-X106). Schema D-076 đã cài lên HOMEDORM4 bằng `npm run assets:db:migrate`, kiểm tra đủ bảy object và không đổi tài sản phòng/hợp đồng hiện có (J-X107). Chưa nghiệm thu Fuji.
+- D-083 (J-C210): nới khóa sang "đã có biên bản bàn giao vào", nút "Sang Điều phối tài sản" khi bàn giao có món hư, hướng dẫn ba bước thay món; SQL đã áp lên HOMEDORM4 (`npm run assets:db:migrate`), kho ba chi nhánh đã nạp hàng dự phòng (`npm run warehouse-seed:db:migrate`). Build và backend test qua; chưa bấm thử qua giao diện.
 - Sau khi gộp, Vy kiểm lại luồng; Claude quay video demo không tiếng để Vy lồng tiếng.
 
 ## Nhận diện và slideshow trang chủ — D-073 / D-074

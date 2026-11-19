@@ -21,7 +21,14 @@ const rowsOf = (response) => response?.data?.data || [];
 const errorText = (error) => error?.response?.data?.message || error?.response?.data?.error || 'Không thể hoàn tất yêu cầu. Vui lòng thử lại.';
 const location = (type, roomCode, roomName) => roomCode ? `${roomName || roomCode} (${roomCode})` : type;
 
-export default function AssetTransferWorkspace() {
+// Thay một món hư trong phòng chưa bàn giao: đưa món hư ra kho, chuyển nó sang chờ sửa, đưa món tốt vào phòng.
+const thayMonSteps = (m) => [
+  { label: `1. Đưa ${m.tenTaiSan} hư về kho`, form: { loaiThaoTac: 'PHONG_KHO', maPhongNguon: m.maPhong, maTaiSan: m.maTaiSan, lyDo: `${m.tenTaiSan} hư hỏng, thu về trước bàn giao` } },
+  { label: '2. Chuyển món hư sang chờ sửa', form: { loaiThaoTac: 'DUNGDUOC_CHO_SUA', maTaiSan: m.maTaiSan, lyDo: `${m.tenTaiSan} hư hỏng từ phòng ${m.maPhong}` } },
+  { label: `3. Đưa ${m.tenTaiSan} tốt vào phòng`, form: { loaiThaoTac: 'KHO_PHONG', maPhongDich: m.maPhong, maTaiSan: m.maTaiSan, lyDo: `Thay ${m.tenTaiSan} hư trước bàn giao` } },
+];
+
+export default function AssetTransferWorkspace({ thayMon = null, onDoneThayMon, onBackToHandover }) {
   const [warehouse, setWarehouse] = useState([]);
   const [roomAssets, setRoomAssets] = useState([]);
   const [history, setHistory] = useState([]);
@@ -30,6 +37,10 @@ export default function AssetTransferWorkspace() {
   const [notice, setNotice] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState(initialForm);
+  const [buocThay, setBuocThay] = useState(0);
+  const steps = thayMon ? thayMonSteps(thayMon) : [];
+  const chonBuoc = (index) => { setBuocThay(index); setForm({ ...initialForm, ...steps[index].form }); document.getElementById('asset-transfer-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  useEffect(() => { if (thayMon) { setBuocThay(0); setForm({ ...initialForm, ...thayMonSteps(thayMon)[0].form }); } }, [thayMon]);
 
   const load = async () => {
     setLoading(true);
@@ -83,7 +94,9 @@ export default function AssetTransferWorkspace() {
     try {
       await assetTransferApi.transfer({ ...form, soLuong: Number(form.soLuong) });
       setNotice('Đã điều chuyển tài sản và ghi đúng một dòng lịch sử.');
-      setForm((current) => ({ ...initialForm, loaiThaoTac: current.loaiThaoTac }));
+      if (thayMon && buocThay < steps.length - 1) { setBuocThay(buocThay + 1); setForm({ ...initialForm, ...steps[buocThay + 1].form }); }
+      else if (thayMon) { setBuocThay(steps.length); setForm(initialForm); }
+      else setForm((current) => ({ ...initialForm, loaiThaoTac: current.loaiThaoTac }));
       await load();
     } catch (submitError) {
       setError(errorText(submitError));
@@ -107,6 +120,16 @@ export default function AssetTransferWorkspace() {
 
       {error && <div className="ui-list-alert ui-list-alert--danger" role="alert"><Icon name="error_outline" />{error}</div>}
       {notice && <div className="ui-list-alert ui-list-alert--success" role="status"><Icon name="check_circle" />{notice}</div>}
+      {thayMon && (
+        <div className="asset-swap-guide">
+          <div className="asset-swap-guide-head">
+            <strong>Thay {thayMon.tenTaiSan} hư ở {thayMon.tenPhong || thayMon.maPhong} trước bàn giao</strong>
+            <button type="button" className="ui-btn ui-btn--ghost ui-btn--sm" onClick={onDoneThayMon}>Đóng</button>
+          </div>
+          <ol>{steps.map((step, index) => <li key={step.label} className={index < buocThay ? 'is-done' : index === buocThay ? 'is-current' : ''}><button type="button" onClick={() => chonBuoc(index)} disabled={index < buocThay}>{index < buocThay && <Icon name="check" />}{step.label}</button></li>)}</ol>
+          {buocThay >= steps.length && <button type="button" className="ui-btn ui-btn--primary ui-btn--sm" onClick={onBackToHandover}><Icon name="arrow_back" /> Quay lại Bàn giao tài sản</button>}
+        </div>
+      )}
 
       <OverviewCards items={[
         { key: 'usable', label: 'Trong kho dùng được', value: totalUsable, icon: 'inventory_2' },
@@ -147,7 +170,7 @@ export default function AssetTransferWorkspace() {
         <div className="asset-room-grid">
           {loading ? <p>Đang tải danh sách phòng...</p> : rooms.map((room) => (
             <article className={`asset-room${room.dangCoKhach ? ' is-occupied' : ''}`} key={room.maPhong}>
-              <div className="asset-room-head"><div><strong>{room.tenPhong}</strong><span>{room.maPhong}</span></div><StatusBadge status={room.dangCoKhach ? 'Đang có khách' : 'Phòng trống'} tone={room.dangCoKhach ? 'warning' : 'success'} /></div>
+              <div className="asset-room-head"><div><strong>{room.tenPhong}</strong><span>{room.maPhong}</span></div><StatusBadge status={room.dangCoKhach ? 'Đang có khách' : room.choBanGiao ? 'Chờ bàn giao' : 'Phòng trống'} tone={room.dangCoKhach ? 'warning' : room.choBanGiao ? 'info' : 'success'} /></div>
               <p>{room.assets.length ? room.assets.map((item) => `${item.tenTaiSan}: ${item.soLuong}`).join(' · ') : 'Chưa có tài sản dùng chung'}</p>
               <div className="asset-room-actions"><button type="button" className="ui-btn ui-btn--secondary ui-btn--sm" disabled={room.dangCoKhach || !operation.source} onClick={() => selectRoom('maPhongNguon', room)}>Chọn nguồn</button><button type="button" className="ui-btn ui-btn--secondary ui-btn--sm" disabled={room.dangCoKhach || !operation.destination || room.maPhong === form.maPhongNguon} onClick={() => selectRoom('maPhongDich', room)}>Chọn đích</button></div>
             </article>

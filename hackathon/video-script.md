@@ -1,6 +1,6 @@
 # Kịch bản video demo vòng 1 (3:00)
 
-Bản ngày 19/11/2026, thay bản 18/11 (J-C205), đã sửa theo 7 góp ý của Vy (J-C209). Đã thêm các phần làm sau đó: tim quan tâm, mã MoMo hiện ngay, kế toán thu tiền mặt, tình trạng tài sản khi bàn giao, xác nhận email lúc vào cổng, đổi điểm ngay lúc thanh toán, form kiểm tra trả phòng mới, điều phối tài sản, KPI Sale.
+Bản ngày 19/11/2026, thay bản 18/11 (J-C205), đã sửa theo 7 góp ý của Vy (J-C209). Đã thêm các phần làm sau đó: tim quan tâm, mã MoMo hiện ngay, kế toán thu tiền mặt, tình trạng tài sản khi bàn giao, xác nhận email lúc vào cổng, đổi điểm ngay lúc thanh toán, form kiểm tra trả phòng mới, KPI Sale. Ngày 19/11 Vy chốt bỏ cảnh điều phối tài sản: phòng bàn giao cho khách mặc định mọi món "Tốt".
 
 Vòng 1 chấm **kỹ thuật** và **mức tích hợp Avalanche**. Slide đã giới thiệu vấn đề, nên video vào thẳng sản phẩm. Claude quay màn hình tự động theo từng cảnh, Vy lồng tiếng sau.
 
@@ -39,7 +39,7 @@ Mentor hướng dẫn cách làm video demo. Bản chép tự động của Fath
 | 1. Tìm phòng và hồ sơ | 0:05–0:30 | Lọc phòng, tim quan tâm, thuê nhóm, Sale xếp lịch (thêm phòng), kết quả buổi xem | Nhóm có Nữ vào phòng Nam → báo lỗi; khách đổi/hủy lịch; khách không đến; xem xong không ưng → lịch mới với phòng chưa xem |
 | 2. Giữ chỗ và cọc | 0:30–0:52 | Khách muốn đặt cọc, quản lý duyệt (ưu tiên người gửi trước), hệ thống tự tính cọc, phòng "Giữ chỗ" 1 ngày, trả MoMo | Chuyển khoản kèm minh chứng → kế toán duyệt; tiền mặt → kế toán "Thu tiền mặt" |
 | 3. Cư trú, hợp đồng, kỳ đầu | 0:52–1:08 | Khai người ở cùng, Sale lập hợp đồng, tải bản ký, trả kỳ đầu | Thành viên không đạt: bỏ người đó rồi khai tiếp, hoặc cả nhóm dừng → trả phòng, hoàn 80% cọc |
-| 4. Mốc 1: bàn giao trên Avalanche | 1:08–1:38 | Biên bản có tình trạng từng món, món hư sẵn → điều phối thay món, khách yêu cầu sửa, bản 2, khách xác nhận, Snowtrace | |
+| 4. Mốc 1: bàn giao trên Avalanche | 1:08–1:38 | Biên bản có tình trạng từng món (mặc định "Tốt"), khách yêu cầu sửa, bản 2, khách xác nhận, Snowtrace | |
 | 5. Đang ở | 1:38–2:06 | Báo hỏng do khách → phí vào hóa đơn tháng, đổi điểm lúc thanh toán, kế toán xác nhận chuyển khoản | Hư hỏng "không do khách"; KPI Sale |
 | 6. Trả phòng và Mốc 2 | 2:06–2:44 | Kiểm tra phòng, đối soát tự soạn, khách phản đối, bản 2, đồng ý trên chuỗi, chi hoàn cọc, kết thúc hợp đồng | Khách nợ thêm → trả MoMo; số tiền bằng 0; thanh lý không có xác nhận |
 | 7. Kiểm chứng | 2:44–2:55 | Trang kiểm chứng, sửa file thì báo sai, lệnh khôi phục từ chuỗi | |
@@ -47,7 +47,7 @@ Mentor hướng dẫn cách làm video demo. Bản chép tự động của Fath
 
 ## Kịch bản chi tiết
 
-Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, **KT** kế toán. Tài khoản xem mục "Dữ liệu demo". Dòng có **(cần làm)** là nhánh code chưa có, phải làm trước khi quay.
+Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, **KT** kế toán. Tài khoản xem mục "Dữ liệu demo". Mọi cảnh trong bảng đều đã có code.
 
 | Giây | Vai | Quay gì | Tốc độ | Lời đọc |
 |---|---|---|---|---|
@@ -57,7 +57,7 @@ Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, *
 | 0:16–0:22 | S | Hồ sơ chờ xếp lịch → phòng khách thả tim được chọn sẵn, Sale **tích thêm phòng khác** để dẫn khách xem thêm → đặt giờ | 2× | "Sale thấy phòng khách quan tâm, có thể thêm phòng khác để dẫn khách xem, rồi đặt giờ." |
 | 0:22–0:25 | K1 | Lịch xem: Xác nhận / Đổi lịch / Hủy lịch | 2× | "Khách nhận email, xác nhận hoặc xin đổi, hủy lịch." |
 | 0:25–0:28 | S | Ghi kết quả "Đã xem". Cảnh cắt "Nhánh: khách không đến" | 2× | "Sau buổi xem, Sale ghi đã xem hoặc khách không đến." |
-| 0:28–0:30 | S | Cảnh cắt "Nhánh: xem xong chưa ưng": Sale lập lịch xem tiếp, danh sách chỉ còn phòng chưa xem **(cần làm)** | 2× | "Khách chưa ưng thì Sale lập lịch xem tiếp với các phòng chưa xem." |
+| 0:28–0:30 | S | Cảnh cắt "Nhánh: xem xong chưa ưng": Sale lập lịch xem tiếp, danh sách chỉ còn phòng chưa xem | 2× | "Khách chưa ưng thì Sale lập lịch xem tiếp với các phòng chưa xem." |
 | 0:30–0:35 | K2 | Bấm **Tôi muốn đặt cọc** → modal chọn phòng, hình thức, giường, cột "Yêu cầu của bạn" → gửi | 1,5× | "Ưng phòng, khách gửi yêu cầu giữ chỗ ngay trên web." |
 | 0:35–0:40 | QL | Kiểm duyệt đặt cọc: hai yêu cầu cùng phòng, nhãn **"Yêu cầu gửi trước"** → duyệt người gửi trước; phiếu cọc hiện số tiền hệ thống tự tính, phòng chuyển **Giữ chỗ**, hạn thanh toán 1 ngày | 1,5× | "Nhiều yêu cầu cùng một phòng thì ưu tiên người gửi trước. Hệ thống tự tính tiền cọc, phòng chuyển giữ chỗ, khách có một ngày để thanh toán." |
 | 0:40–0:46 | K2 | Thanh toán cọc → tab **MoMo**: mã QR kiểu MoMo hiện ngay, đồng hồ đếm ngược → "Đã thanh toán" | 1× (tua đoạn chờ) | "Chọn MoMo là mã hiện ngay, khách quét bằng app; trả xong trang tự chuyển sang đã thanh toán." |
@@ -67,11 +67,10 @@ Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, *
 | 0:57–1:01 | | Cảnh cắt "Nhánh: có người không đạt": (a) bỏ người đó rồi khai tiếp; (b) cả nhóm dừng → tab Trả phòng của phiếu cọc, hoàn **80% cọc** (đã cọc, chưa ký hợp đồng) → quản lý xác nhận hồ sơ | 2× | "Có thành viên không đạt: nhóm bỏ người đó để thuê tiếp, hoặc cả nhóm dừng và nhận lại tám mươi phần trăm cọc theo chính sách." |
 | 1:01–1:05 | S | Lập hợp đồng → ô kéo thả **Bản hợp đồng đã ký** → "Đã lưu" | 2× | "Sale lập hợp đồng, hai bên ký giấy, Sale tải bản ký; mã băm của file đi vào gói bằng chứng." |
 | 1:05–1:08 | K2 | Trả kỳ đầu bằng MoMo; hộp thư có email báo | 2× | "Khách trả khoản kỳ đầu; mỗi bước đều có email báo đúng người." |
-| 1:08–1:15 | QL | Motion 2 giây: thẻ "Mốc 1 · Nhận phòng". Bàn giao tài sản, bộ lọc **Chưa bàn giao** → lập biên bản, chọn tình trạng từng món; một món "Hư hỏng" → dòng đỏ, bắt buộc ghi chú, có thông báo gợi ý thay món | 1,5× | "Avalanche xuất hiện đúng hai lúc cần cả hai bên đồng ý. Lúc nhận phòng, quản lý ghi tình trạng từng món." |
-| 1:15–1:20 | QL | Bấm thông báo → **Điều phối tài sản**: chuyển món hư về kho chờ sửa, đưa món tốt từ kho vào phòng → quay lại biên bản, món đó thành "Tốt" **(cần làm: thông báo và nút sang Điều phối)** | 1,5× | "Món hư có sẵn thì quản lý điều phối, đổi món tốt từ kho trước khi giao." |
-| 1:20–1:25 | K2 | Tab Hợp đồng: đọc biên bản → **Yêu cầu chỉnh sửa** "Nệm có vết rách sẵn" → QL phát hành bản 2, lịch sử 2 bản | 1,5× | "Khách thấy thiếu vết rách có sẵn nên yêu cầu sửa; quản lý phát hành bản hai, bản một vẫn được giữ." |
-| 1:25–1:32 | K2 | Bấm **Xác nhận** → chỉ một lần bấm (email đã xác nhận lúc vào cổng) → "Bạn đã xác nhận biên bản lúc …" | 1× | "Khách đã xác nhận email lúc vào cổng, giờ chỉ cần bấm. Ví nhúng Privy ký EIP-712 đúng phiên bản này; không cài ví, không cần AVAX." |
-| 1:32–1:38 | QL | "Đã ghi nhận" + mã giao dịch → Snowtrace, phóng to "Success" và hàm `confirm` | 1× | "Relayer trả phí gas nhưng không giả được chữ ký, vì contract chỉ nhận đúng chữ ký của ví khách." |
+| 1:08–1:13 | QL | Motion 2 giây: thẻ "Mốc 1 · Nhận phòng". Bàn giao tài sản, bộ lọc **Chưa bàn giao** → lập biên bản, mọi món mặc định "Tốt" | 1,5× | "Avalanche xuất hiện đúng hai lúc cần cả hai bên đồng ý. Lúc nhận phòng, quản lý ghi tình trạng từng món." |
+| 1:13–1:20 | K2 | Tab Hợp đồng: đọc biên bản → **Yêu cầu chỉnh sửa** "Biên bản ghi 2 ghế, phòng chỉ có 1" → QL phát hành bản 2, lịch sử 2 bản | 1,5× | "Khách thấy biên bản ghi sai số lượng nên yêu cầu sửa; quản lý phát hành bản hai, bản một vẫn được giữ." |
+| 1:20–1:30 | K2 | Bấm **Xác nhận** → chỉ một lần bấm (email đã xác nhận lúc vào cổng) → "Bạn đã xác nhận biên bản lúc …" | 1× | "Khách đã xác nhận email lúc vào cổng, giờ chỉ cần bấm. Ví nhúng Privy ký EIP-712 đúng phiên bản này; không cài ví, không cần AVAX." |
+| 1:30–1:38 | QL | "Đã ghi nhận" + mã giao dịch → Snowtrace, phóng to "Success" và hàm `confirm` | 1× | "Relayer trả phí gas nhưng không giả được chữ ký, vì contract chỉ nhận đúng chữ ký của ví khách." |
 | 1:38–1:43 | K6 → QL | Khách **báo hỏng** có ảnh → QL tiếp nhận, hoàn tất "Do khách gây ra", phí sửa 100.000đ. Cảnh cắt "Nhánh: không do khách gây ra" | 2× | "Trong thời gian ở, khách báo hỏng có ảnh; do khách gây ra thì tính phí sửa, không do khách thì không tính." |
 | 1:43–1:48 | KT | Hóa đơn định kỳ: chọn hợp đồng, nhập chỉ số điện nước, dòng **"Sửa chữa SC…"** tự có trong chi phí phát sinh → Lập | 2× | "Đến kỳ, kế toán lập hóa đơn tháng; phí sửa đó tự cộng vào, không nhập tay." |
 | 1:48–1:56 | K6 | Thanh toán hóa đơn tháng → thẻ **Điểm thưởng của bạn** → "Dùng 100 điểm, giảm 20.000đ" → số tiền tự giảm | 1× | "Trả đúng hạn được điểm DormPoints trên Fuji. Lúc thanh toán khách dùng luôn 100 điểm để giảm hai mươi nghìn." |
@@ -79,7 +78,7 @@ Vai trò viết tắt: **K** khách, **S** Sale, **QL** quản lý chi nhánh, *
 | 2:01–2:06 | K6 / QL | Hóa đơn của tôi: nhãn màu theo loại, hộp thoại chi tiết thanh toán, "+100 điểm". Cảnh cắt "KPI Sale" của quản lý | 2× | "Khách xem lại từng khoản đã trả và lịch sử điểm; quản lý theo dõi KPI của Sale." |
 | 2:06–2:13 | K7 → QL | Motion 2 giây: thẻ "Mốc 2 · Trả phòng". Khách gửi yêu cầu trả phòng → QL Quản lý hợp đồng → **Kiểm tra trả phòng**: form một màn, cột "Lúc nhận", chọn hiện trạng, tạm tính → Lưu; dòng hợp đồng hiện "Chờ kế toán lập đối soát" | 1,5× | "Lúc thứ hai là trả phòng. Quản lý so từng món với lúc nhận, chỉ tính phần hư thêm." |
 | 2:13–2:19 | KT | **Đối soát trả phòng** → phiếu tự soạn: tỷ lệ hoàn theo chính sách đã khóa, khấu trừ, số tiền hoàn → Lập | 1× | "Hệ thống tự soạn đối soát theo chính sách cọc khách đã nhận; kế toán rà rồi gửi." |
-| 2:19–2:26 | K7 | Kết quả đối soát → **Không đồng ý / phản hồi** "Vết rách đã có trong biên bản nhận phòng" → KT lập bản 2 bỏ khoản đó | 1,5× | "Khách phản đối kèm lý do, lý do cũng lên chuỗi dạng mã băm. Kế toán lập bản hai." |
+| 2:19–2:26 | K7 | Kết quả đối soát → **Không đồng ý / phản hồi** "Khoản phí này là hao mòn bình thường" → KT lập bản 2 bỏ khoản đó | 1,5× | "Khách phản đối kèm lý do, lý do cũng lên chuỗi dạng mã băm. Kế toán lập bản hai." |
 | 2:26–2:32 | K7 | **Đồng ý đối soát** → "Bạn đã đồng ý kết quả đối soát lúc …" → Snowtrace | 1× | "Khách đồng ý, contract ghi kết quả. Cả hai phiên bản đều trên chuỗi, không bên nào sửa kín được." |
 | 2:32–2:38 | KT → QL | KT Ghi nhận hoàn cọc kèm chứng từ → dòng hợp đồng mới hiện **Kết thúc hợp đồng** → QL "Đã thu chìa khóa" → tự thanh lý | 2× | "Kế toán chi hoàn cọc có chứng từ; chỉ khi tiền xong quản lý mới kết thúc hợp đồng, thu chìa khóa, hợp đồng tự thanh lý." |
 | 2:38–2:44 | | Ba cảnh cắt: "Nhánh: khách nợ thêm" (K8 trả MoMo phần thu thêm); "Nhánh: bằng 0"; "Nhánh: thanh lý không có xác nhận" (liên kết "Thanh lý ngoại lệ", bắt buộc lý do và bằng chứng liên hệ) | 2× | "Khách nợ thêm thì trả trước khi thanh lý; khách im lặng quá hạn thì quản lý thanh lý có lý do và bằng chứng, không bao giờ ký thay." |

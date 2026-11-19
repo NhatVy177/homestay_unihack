@@ -1440,3 +1440,10 @@
 
 input[type='number'].no-spin::-webkit-inner-spin-button, input[type='number'].no-spin::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type='number'].no-spin { -moz-appearance: textfield; }
+
+/* Món hư lúc bàn giao: cảnh báo đỏ + nút sang Điều phối tài sản (D-083). */
+.handover-damage-alert { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-4) 24px 0; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-danger); border-radius: var(--radius-md); background: var(--color-danger-soft); color: var(--color-danger); }
+.handover-damage-alert > div { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.handover-damage-alert span { color: var(--color-text); font-size: 13px; }
+.handover-damage-alert .ui-btn { flex-shrink: 0; }
+@media (max-width: 640px) { .handover-damage-alert { flex-wrap: wrap; } }
