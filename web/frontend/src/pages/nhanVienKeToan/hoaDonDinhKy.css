@@ -198,3 +198,7 @@
 .hdk-alert.is-info { background: var(--color-info-soft); color: var(--color-info); }
 .hdk-page .hdk-link-btn { padding: 0; border: none; background: none; font: inherit; font-weight: 700; color: var(--color-primary); text-decoration: underline; cursor: pointer; }
 .hdk-tab-badge { display: inline-grid; place-items: center; min-width: 20px; height: 20px; margin-left: 6px; padding: 0 6px; border-radius: 999px; background: var(--color-info); color: #fff; font-size: 11px; font-weight: 700; }
+
+.hdk-open-note { display: grid; gap: var(--space-2); margin-top: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-info-soft); color: var(--color-text); font-size: 13px; }
+.hdk-open-note p { margin: 0; }
+.hdk-open-note button { justify-self: start; }

@@ -28,6 +28,7 @@ import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.j
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
 const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
 const CustomerProfileRewards = lazy(() => import('./CustomerProfileRewards.jsx'));
+const InvoiceRewardBox = lazy(() => import('./InvoiceRewardBox.jsx'));
 const EmailActivationCard = lazy(() => import('../../components/xacNhan/EmailActivationCard.jsx'));
 const showRewards = import.meta.env.VITE_LOYALTY_ENABLED === 'true';
 const PORTAL_TABS = ['tai-khoan', 'cu-tru', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'hop-dong', 'bao-hong', 'tra-phong'];
@@ -3482,6 +3483,17 @@ export default function KhachHangPortalPage() {
     }
   }
 
+  // D-082: sau khi đổi điểm, tải lại hóa đơn để trang thanh toán hiện số tiền đã giảm.
+  async function refreshInvoiceQuote(maHoaDon) {
+    try {
+      const { data } = await khachMoiApi.getHoaDon();
+      const list = Array.isArray(data) ? data : [];
+      setInvoices(list);
+      const inv = list.find((item) => item.maHoaDon === maHoaDon);
+      if (inv) setFirstChargePay((current) => (current?.refId === maHoaDon ? { ...current, amountVnd: Number(inv.tongTien) || 0, giamDiemThuong: inv.giamDiemThuong } : current));
+    } catch { /* trang vẫn dùng số cũ, khách có thể tải lại */ }
+  }
+
   async function guiChungTuKyDau(event, quote) {
     event.preventDefault();
     if (!fcFile) { setToast('Vui lòng chọn ảnh hoặc PDF chứng từ thanh toán.'); return; }
@@ -3527,6 +3539,9 @@ export default function KhachHangPortalPage() {
                 <p className="dpay-formula">{quote.kind === 'hoaDon' ? `Hóa đơn ${quote.refId} · hợp đồng ${quote.maHopDong}` : `Hợp đồng ${quote.refId}`}</p>
                 {quote.giamDiemThuong > 0 && <p className="dpay-formula">Ưu đãi điểm thưởng −{quote.giamDiemThuong.toLocaleString('vi-VN')}đ đã được áp dụng</p>}
               </section>
+              {quote.kind === 'hoaDon' && !(quote.giamDiemThuong > 0) && !fcProof && <Suspense fallback={null}>
+                <InvoiceRewardBox contractId={quote.maHopDong} invoiceId={quote.refId} onApplied={() => refreshInvoiceQuote(quote.refId)} />
+              </Suspense>}
               <section className="dc-section-card dpay-card">
                 <h3 className="dc-section-title">Phương thức thanh toán</h3>
                 <div className="dpay-tabs" role="group" aria-label="Chọn phương thức thanh toán">
@@ -3547,7 +3562,7 @@ export default function KhachHangPortalPage() {
                     <div><span>Nội dung</span><strong>{quote.kind === 'hoaDon' ? `Hóa đơn ${quote.refId}` : `Khoản thu kỳ đầu – hợp đồng ${quote.refId}`}</strong></div>
                     <div><span>Số tiền</span><strong>{amount.toLocaleString('vi-VN')} VNĐ</strong></div>
                   </div>
-                  <MomoQrPanel createPath={`/thanh-toan-mo-phong/${quote.kind === 'hoaDon' ? 'hoa-don' : 'thu-nhan-phong'}/${encodeURIComponent(quote.refId)}`} onPaid={(orderId) => navigate(`/thanh-toan-mo-phong/${encodeURIComponent(orderId)}`)} />
+                  <MomoQrPanel cacheTag={amount} createPath={`/thanh-toan-mo-phong/${quote.kind === 'hoaDon' ? 'hoa-don' : 'thu-nhan-phong'}/${encodeURIComponent(quote.refId)}`} onPaid={(orderId) => navigate(`/thanh-toan-mo-phong/${encodeURIComponent(orderId)}`)} />
                 </div>}
                 {fcMethod !== 'wallet' && <p className="dc-bank-note">Sau khi chuyển khoản hoặc nộp tiền, kế toán sẽ xác nhận. Khoản này sẽ chuyển sang "Đã thanh toán" khi được ghi nhận.</p>}
               </section>

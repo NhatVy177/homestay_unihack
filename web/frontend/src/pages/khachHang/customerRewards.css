@@ -45,3 +45,12 @@
   .reward-history-result { justify-items: start; text-align: left; }
   .reward-card { padding: var(--space-4); }
 }
+
+/* D-082: thẻ dùng điểm trên trang thanh toán hóa đơn tháng. */
+.reward-pay { display: grid; gap: var(--space-3); }
+.reward-pay-head { display: flex; align-items: center; gap: var(--space-3); }
+.reward-pay-head h3 { margin: 0; }
+.reward-pay-head p { margin: var(--space-1) 0 0; color: var(--color-text-muted); font-size: 14px; }
+.reward-pay-icon { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: var(--color-warning-soft); color: var(--color-warning); }
+.reward-pay-note { margin: 0; color: var(--color-text-muted); font-size: 14px; }
+.reward-pay .ui-btn { justify-self: start; }

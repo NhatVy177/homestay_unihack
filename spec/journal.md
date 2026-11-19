@@ -2126,3 +2126,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Quản lý hợp đồng (`XuLyTraPhongTab.jsx`): cột "Hành động" chỉ hiện khi có ít nhất một hợp đồng trong danh sách đang lọc có việc cần làm (kiểm tra/phản hồi/kết thúc trả phòng); trước đó cả cột chỉ toàn dấu gạch.
 - Hóa đơn của khách (`CustomerInvoicesList.jsx`, `customerInvoices.css`): nhãn "Nhận phòng" xanh lá, "Định kỳ" xanh dương, "Đặt cọc" giữ nâu nhạt; trước đó hai loại sau không có màu riêng.
 - Kiểm tra: `npm run build`, `check:ui-tokens` qua; chưa xem lại trên giao diện thật.
+
+## 2026-11-19 16:38:50 +07:00 — J-C201 — Đổi điểm lúc thanh toán hóa đơn tháng; kế toán thấy hóa đơn chờ xác nhận (D-082)
+
+- Người thực hiện: Claude, nhánh `feat/redeem-at-payment` (worktree `D:\HomeStayDorm-pts`), theo Vy chọn phương án (b).
+- Backend: `integrations/loyalty/store.js` thêm `applyToOpenInvoice` (chọn hóa đơn tháng "Chưa TT" sớm nhất sau kỳ đầu, chưa có voucher, chưa có minh chứng chuyển khoản, không có đơn ví "Processing", rồi gọi `SP_Loyalty_ApplyVoucher` trong giao dịch); `service.js` gọi hàm này ngay sau khi lượt đổi điểm được xác nhận. Không đổi lược đồ SQL hay contract.
+- Giao diện khách: `InvoiceRewardBox.jsx` (mới) trên trang thanh toán hóa đơn tháng: số dư, nút dùng điểm, ô xác nhận email khi cần, chờ chuỗi xác nhận rồi tải lại số tiền (`refreshInvoiceQuote`). `MomoQrPanel` nhận `cacheTag` (số tiền) để không dùng lại mã QR có số tiền cũ.
+- Giao diện kế toán (`HoaDonDinhKyTab.jsx`): hóa đơn khách đã gửi minh chứng luôn hiện trong "Danh sách hóa đơn" dù khác kỳ đang chọn; hợp đồng còn hóa đơn chưa trả không hiện trong danh sách lập mà có dòng nhắc "hóa đơn … khách đã gửi minh chứng, chờ bạn xác nhận" kèm nút "Xem hóa đơn". Nguyên nhân Vy không thấy chỗ xác nhận: HO0006 thuộc kỳ 12/2026 còn danh sách đang lọc kỳ 11/2026, và màn lập vẫn mời lập kỳ 01/2027.
+- File: `web/backend/integrations/loyalty/store.js`, `service.js`; `web/frontend/src/pages/khachHang/InvoiceRewardBox.jsx`, `KhachHangPortalPage.jsx`, `customerRewards.css`, `components/payment/MomoQrPanel.jsx`, `pages/nhanVienKeToan/HoaDonDinhKyTab.jsx`, `hoaDonDinhKy.css`; `spec/*`.
+- Kiểm tra: backend 166 qua, 0 lỗi; `blockchain` 26 qua, 0 lỗi, 1 bỏ qua (lần đầu fail do thư mục thử thiếu `node_modules`, nối đủ thì qua); `npm run build`, `check:ui-tokens`, `test:avalanche-ui` qua. Chưa đổi điểm thật trên Fuji qua giao diện, chưa có test tự động riêng cho `applyToOpenInvoice`.
+- Còn lại: khởi động lại backend; Vy thử với tài khoản có đủ 100 điểm (Ivan hiện chưa có điểm vì chưa có hóa đơn tháng nào trả đúng hạn).

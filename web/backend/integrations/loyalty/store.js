@@ -133,6 +133,29 @@ export class LoyaltyStore extends SqlStore {
     }, tx);
   }
 
+  // D-082: đổi điểm ngay lúc thanh toán. Voucher vừa được xác nhận trên chuỗi áp luôn vào hóa đơn tháng
+  // còn mở sớm nhất của hợp đồng (chưa gửi minh chứng chuyển khoản, chưa có đơn ví đang xử lý) để khách trả số đã giảm.
+  // Không có hóa đơn phù hợp thì voucher chờ, và hóa đơn kế tiếp tự trừ như D-070.
+  async applyToOpenInvoice(id) {
+    await this.query(`
+      DECLARE @c VARCHAR(6) = (SELECT ContractId FROM dbo.LoyaltyOperation
+        WHERE Id=@id AND Kind='Redeem' AND Status='Confirmed' AND AppliedInvoiceId IS NULL);
+      IF @c IS NULL RETURN;
+      DECLARE @hd VARCHAR(6) = (SELECT TOP (1) hd.MaHoaDon FROM dbo.HoaDon hd
+        JOIN dbo.HopDongThue h ON h.MaHopDong = hd.MaHopDong
+        WHERE hd.MaHopDong = @c AND hd.TrangThai = N'Chưa TT'
+          AND hd.KyThanhToan > CONVERT(CHAR(7), h.NgayBatDau, 126)
+          AND NOT EXISTS (SELECT 1 FROM dbo.LoyaltyOperation x WHERE x.AppliedInvoiceId = hd.MaHoaDon)
+          AND NOT EXISTS (SELECT 1 FROM dbo.ChungTuHoaDon ct WHERE ct.MaHoaDon = hd.MaHoaDon)
+          AND NOT EXISTS (SELECT 1 FROM dbo.PaymentSimOrder o WHERE o.Purpose = 'hoa-don' AND o.RefId = hd.MaHoaDon AND o.Status = 'Processing')
+        ORDER BY hd.KyThanhToan, hd.MaHoaDon);
+      IF @hd IS NULL RETURN;
+      DECLARE @g INT;
+      BEGIN TRAN;
+      EXEC dbo.SP_Loyalty_ApplyVoucher @hd, @c, @g OUTPUT;
+      COMMIT;`, { id });
+  }
+
   async finish(id, status, tx) {
     await this.query(`
       UPDATE dbo.LoyaltyOperation SET Status=@status, PendingTx=NULL, Signature=NULL,
