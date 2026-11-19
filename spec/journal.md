@@ -2151,3 +2151,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Trước đây modal "Kiểm tra trả phòng · <hợp đồng>" nhét nguyên trang danh sách (thẻ đếm, ô tìm, bộ lọc, bảng cuộn ngang) rồi mới mở form ở modal thứ hai. Nay `KiemTraTraPhong` có chế độ `focusPhieuTra`: tự mở phiếu, vẽ thẳng form trong modal của trang cha: dải thông tin (mã phiếu, dự kiến trả, SĐT, trạng thái); cột trái 3 bước (1 tình trạng phòng khi trả, 2 kiểm tra tài sản với cột "Lúc nhận" và ô chọn hiện trạng Bình thường/Hư nhẹ 20%/Hư nặng 60%/Mất 100%, mô tả hiện khi có hư/mất, 3 ảnh lúc trả); cột phải lịch sử báo hỏng và "Tạm tính khi trả phòng" (hư/mất, hóa đơn nợ, vi phạm, dự kiến trừ cọc); chân modal cố định với Hủy/Xác nhận lưu biên bản. Lưu xong tự đóng modal cha. Trang danh sách Kiểm tra trả phòng riêng giữ nguyên.
 - File: `web/frontend/src/pages/nhanVienQuanLy/KiemTraTraPhong.jsx`, `kiemTraTraPhong.css`, `XuLyTraPhongTab.jsx`.
 - Kiểm tra: `npm run build`, `check:ui-tokens`, `test:avalanche-ui` qua; Playwright 1280/390 với API giả lập: form tự mở, bảng không tràn ngang, tạm tính cộng đúng khi chọn hư hỏng, không lỗi JavaScript. Chưa lưu biên bản thật trên HOMEDORM4.
+
+## 2026-11-19 17:32:33 +07:00 — J-C204 — Sửa modal Kiểm tra trả phòng bị bó 680px
+
+- Người thực hiện: Claude, nhánh `fix/inspection-modal-width`, khi chụp luồng trả phòng thật cho Vy.
+- Nguyên nhân: quy tắc chung `.ktp-modal { max-width: 680px }` (từ `nhanVienKeToanPortal.css`) đè lên modal Quản lý hợp đồng nên form hai cột (J-C203) chen chúc. Sửa: `.qlhd-modal.ktp-modal` đặt `max-width: none`; form tự xếp một cột khi khung hẹp hơn 860px (container query).
+- File: `web/frontend/src/pages/nhanVienQuanLy/quanLyHopDong.css`, `kiemTraTraPhong.css`.
+- Kiểm tra: `npm run build`, `check:ui-tokens` qua; xem lại bằng ảnh chụp trên 5173.

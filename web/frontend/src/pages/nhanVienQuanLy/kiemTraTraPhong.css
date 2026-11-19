@@ -116,3 +116,10 @@ tr[data-status="Hư hỏng nặng"] .kttp-control--status, tr[data-status="Mất
 .kttp-assets.is-compact th:nth-child(4) { width: 10%; }
 .kttp-assets.is-compact th:nth-child(5) { width: 14%; }
 .kttp-assets.is-compact .kttp-control--status { text-align: left; }
+/* Khung hẹp (vd. modal bị giới hạn chiều rộng) thì tự xếp một cột, theo bề rộng thật của form. */
+.kttp-focus { container-type: inline-size; }
+@container (max-width: 860px) {
+  .kttp-focus-grid { grid-template-columns: 1fr; }
+  .kttp-focus-side { position: static; }
+  .kttp-focus-row { grid-template-columns: 1fr; }
+}
