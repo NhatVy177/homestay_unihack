@@ -18,7 +18,7 @@ const orderUrl = (id) => `/thanh-toan-mo-phong/${encodeURIComponent(id)}`;
 const errorText = (error, fallback) => error?.response?.data?.message || fallback;
 const money = (value) => `${Number(value || 0).toLocaleString('vi-VN')} đ`;
 const clock = (ms) => { const total = Math.max(0, Math.ceil(ms / 1000)); return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`; };
-const keyOf = (createPath, orderId) => `momo-panel:${orderId || createPath}`;
+const keyOf = (createPath, orderId, cacheTag = '') => `momo-panel:${orderId || createPath}:${cacheTag}`;
 const readCache = (key) => { try { return JSON.parse(sessionStorage.getItem(key)); } catch { return null; } };
 const writeCache = (key, value) => { try { sessionStorage.setItem(key, JSON.stringify(value)); } catch { /* mã vẫn hiện khi trình duyệt chặn lưu */ } };
 
@@ -30,8 +30,7 @@ async function loadQr(orderId) {
 }
 
 // Trả về { orderId, image, startedAt, status } cho đơn đang chờ; dùng lại đơn đã nhớ nếu còn hiệu lực.
-async function openOrder(createPath, fixedOrderId) {
-  const key = keyOf(createPath, fixedOrderId);
+async function openOrder(createPath, fixedOrderId, key) {
   const cached = readCache(key);
   if (cached?.orderId && cached.image) {
     try {
@@ -53,14 +52,14 @@ async function openOrder(createPath, fixedOrderId) {
   return result;
 }
 
-export default function MomoQrPanel({ createPath, orderId: fixedOrderId, amount, description, onPaid, onCancelled }) {
+export default function MomoQrPanel({ createPath, orderId: fixedOrderId, amount, description, onPaid, onCancelled, cacheTag = '' }) {
   const [state, setState] = useState({ phase: 'loading', orderId: '', image: null, startedAt: 0, error: '' });
   const [now, setNow] = useState(() => Date.now());
   const paidRef = useRef(false);
   const autoRef = useRef(false);
   const onPaidRef = useRef(onPaid);
   onPaidRef.current = onPaid;
-  const key = keyOf(createPath, fixedOrderId);
+  const key = keyOf(createPath, fixedOrderId, cacheTag);
 
   function markPaid(orderId) {
     if (paidRef.current) return;
@@ -74,7 +73,7 @@ export default function MomoQrPanel({ createPath, orderId: fixedOrderId, amount,
     autoRef.current = false;
     setState({ phase: 'loading', orderId: '', image: null, startedAt: 0, error: '' });
     let promise = inflight.get(key);
-    if (!promise) { promise = openOrder(createPath, fixedOrderId).finally(() => inflight.delete(key)); inflight.set(key, promise); }
+    if (!promise) { promise = openOrder(createPath, fixedOrderId, key).finally(() => inflight.delete(key)); inflight.set(key, promise); }
     let cancelled = false;
     promise.then((result) => {
       if (cancelled) return;

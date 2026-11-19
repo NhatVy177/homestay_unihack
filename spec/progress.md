@@ -1,6 +1,10 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-19 16:00:15 +07:00** (J-C198: sửa mục 11, 12, 13 của ghi chú lỗi homedorm). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-19 16:38:50 +07:00** (J-C201: đổi điểm lúc thanh toán, xác nhận hóa đơn định kỳ). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+
+## Đổi điểm lúc thanh toán và xác nhận hóa đơn định kỳ — D-082
+
+- Nhánh `feat/redeem-at-payment` (J-C201): thẻ điểm thưởng trên trang thanh toán hóa đơn tháng, voucher áp ngay vào hóa đơn đang mở; màn kế toán luôn hiện hóa đơn chờ xác nhận minh chứng. Backend 166 qua, blockchain 26 qua, build và smoke qua. Chưa đổi điểm thật trên Fuji qua giao diện.
 
 ## Ghi chú lỗi homedorm, mục 11–13 — D-081
 

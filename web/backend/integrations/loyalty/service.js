@@ -73,7 +73,7 @@ export class LoyaltyService {
       await this.store.discoverAwards(this.deployment, tx);
       const row = await this.store.next(this.deployment, tx);
       if (!row) return null;
-      if (row.pending) return { id: row.id, tx: JSON.parse(row.pending) };
+      if (row.pending) return { id: row.id, redeem: row.kind === 'Redeem', tx: JSON.parse(row.pending) };
 
       const redeem = row.kind === 'Redeem';
       const wallet = redeem ? row.wallet : row.linkedWallet;
@@ -92,12 +92,15 @@ export class LoyaltyService {
         return null;
       }
       await this.store.markSent(row, transaction, wallet, tx);
-      return { id: row.id, tx: transaction };
+      return { id: row.id, redeem, tx: transaction };
     });
     if (!pending) return false;
     // The signed bytes are already durable. A restart or SQL outage reuses the same transaction.
     const receipt = await this.chain.settle(pending.tx);
     await this.store.finish(pending.id, receipt.failed ? 'Failed' : 'Confirmed');
+    if (pending.redeem && !receipt.failed) {
+      await Promise.resolve().then(() => this.store.applyToOpenInvoice?.(pending.id)).catch((error) => console.warn('[loyalty] Chưa áp được voucher vào hóa đơn đang mở:', error.message));
+    }
     return true;
   }
 }

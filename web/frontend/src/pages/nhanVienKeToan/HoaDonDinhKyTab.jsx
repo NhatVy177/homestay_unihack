@@ -87,10 +87,14 @@ export default function HoaDonDinhKyTab() {
   const branchOptions = useMemo(() => [...new Map([...invoices, ...contracts].filter((x) => x.maChiNhanh).map((x) => [x.maChiNhanh, x.tenChiNhanh])).entries()], [invoices, contracts]);
   const inBranch = (x) => branch === 'all' || x.maChiNhanh === branch;
   const q = search.trim().toLocaleLowerCase('vi-VN'), cq = contractSearch.trim().toLocaleLowerCase('vi-VN');
-  const filteredInvoices = invoices.filter((i) => i.kyThanhToan === period && inBranch(i) && (status === 'all' || i.nhom === status)
+  // Hóa đơn khách đã gửi minh chứng luôn hiện ở danh sách dù thuộc kỳ khác, để kế toán không bỏ sót.
+  const filteredInvoices = invoices.filter((i) => (i.kyThanhToan === period || i.nhom === 'review') && inBranch(i) && (status === 'all' || i.nhom === status)
     && (!q || [i.hoTen, i.tenPhong, i.maHoaDon].join(' ').toLocaleLowerCase('vi-VN').includes(q)));
   // Chế độ demo: hiện mọi hợp đồng đủ điều kiện lập, không phụ thuộc kỳ đang chọn ở đầu trang (trước đây chỉ hiện khi kỳ cần lập <= kỳ đang chọn).
-  const filteredContracts = contracts.filter((c) => inBranch(c)
+  // Còn hóa đơn chưa thanh toán thì chưa lập kỳ tiếp theo; hiện nhắc để kế toán xử lý hóa đơn đó trước.
+  const openInvoices = new Map(invoices.filter((i) => i.nhom !== 'paid').map((i) => [i.maHopDong, i]));
+  const blockedContracts = contracts.filter((c) => inBranch(c) && openInvoices.has(c.maHopDong));
+  const filteredContracts = contracts.filter((c) => inBranch(c) && !openInvoices.has(c.maHopDong)
     && (!cq || [c.hoTen, c.tenPhong, c.maHopDong].join(' ').toLocaleLowerCase('vi-VN').includes(cq)));
   const reviewCount = invoices.filter((i) => i.nhom === 'review').length;
   const reviewPeriods = [...new Set(invoices.filter((i) => i.nhom === 'review').map((i) => i.kyThanhToan))].filter((p) => p !== period);
@@ -196,6 +200,10 @@ export default function HoaDonDinhKyTab() {
               <span className="hdk-contract-bottom"><span>{c.tenPhong}{c.giuong ? ` · Giường ${c.giuong}` : ''}</span><b>{money(c.giaThue)}</b></span>
             </button>)}
             {!filteredContracts.length && <p className="hdk-empty-line">Không tìm thấy hợp đồng nào.</p>}
+            {blockedContracts.map((c) => { const inv = openInvoices.get(c.maHopDong); return <div key={`open-${c.maHopDong}`} className="hdk-open-note">
+              <p><b>{c.maHopDong}</b> · {c.hoTen}: hóa đơn {inv.maHoaDon} tháng {showPeriod(inv.kyThanhToan)} {inv.nhom === 'review' ? 'khách đã gửi minh chứng, chờ bạn xác nhận' : 'chưa thanh toán'}.</p>
+              <button type="button" className="hdk-btn-outline" onClick={() => { setPeriod(inv.kyThanhToan); setActiveTab('list'); }}>Xem hóa đơn</button>
+            </div>; })}
           </div>
         </aside>
 
