@@ -1,18 +1,20 @@
 import { executeProcedure, getPool, sql } from '../database/connection.js';
 
 function buildChiTietBanGiaoTable(items = []) {
-  const table = new sql.Table('dbo.TVP_ChiTietBanGiao');
+  const table = new sql.Table('dbo.TVP_ChiTietBanGiao_V2');
   table.columns.add('MaPhong', sql.VarChar(4), { nullable: false });
   table.columns.add('MaTaiSan', sql.VarChar(6), { nullable: false });
   table.columns.add('SoLuongThucTe', sql.Int, { nullable: true });
   table.columns.add('GhiChu', sql.NVarChar(255), { nullable: true });
+  table.columns.add('TinhTrang', sql.NVarChar(20), { nullable: true });
 
   for (const item of items) {
     table.rows.add(
       item.maPhong,
       item.maTaiSan,
       item.soLuongThucTe == null ? null : Number(item.soLuongThucTe),
-      item.ghiChu || null
+      item.ghiChu || null,
+      item.tinhTrang || null
     );
   }
 

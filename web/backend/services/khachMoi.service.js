@@ -1088,9 +1088,13 @@ export async function tomTatBanGiaoVao(maHopDong, { query = executeQuery, chiTie
   const bienBan = detail?.bienBan;
   if (!bienBan) return null;
   const ghiChuTaiSan = {};
+  const tinhTrangTaiSan = {};
   for (const item of detail.taiSan || []) {
     const note = String(item.GhiChu || '').trim();
     if (note) ghiChuTaiSan[item.MaTaiSan] = ghiChuTaiSan[item.MaTaiSan] ? `${ghiChuTaiSan[item.MaTaiSan]}; ${note}` : note;
+    // Một mã tài sản có thể ở nhiều giường: lấy mức xấu nhất (Hư hỏng > Dùng được > Tốt).
+    const rank = { 'Tốt': 1, 'Dùng được': 2, 'Hư hỏng': 3 };
+    if (rank[item.TinhTrang] > (rank[tinhTrangTaiSan[item.MaTaiSan]] || 0)) tinhTrangTaiSan[item.MaTaiSan] = item.TinhTrang;
   }
   return {
     maBienBan: bienBan.MaBienBan,
@@ -1098,6 +1102,7 @@ export async function tomTatBanGiaoVao(maHopDong, { query = executeQuery, chiTie
     quanLy: bienBan.HoTenNhanVienQuanLy || null,
     ghiChuChung: String(bienBan.GhiChuChung || '').trim(),
     ghiChuTaiSan,
+    tinhTrangTaiSan,
   };
 }
 

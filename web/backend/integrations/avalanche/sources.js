@@ -32,7 +32,7 @@ export const sqlSources = {
       notes: String(detail.bienBan?.GhiChuChung || ''),
       inventory: detail.taiSan.map(item => ({
         item: String(item.TenTaiSan || item.MaTaiSan), quantity: Number(item.SoLuongThucTe),
-        condition: String(item.GhiChu || 'Không có ghi chú'),
+        condition: [item.TinhTrang, String(item.GhiChu || '').trim()].filter(Boolean).join(' — ') || 'Không có ghi chú',
       })),
     };
   },

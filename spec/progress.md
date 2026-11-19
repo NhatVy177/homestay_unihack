@@ -1,6 +1,10 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-19 13:10:25 +07:00** (J-X107: Vy duyệt gộp và cài schema điều phối tài sản). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-19 15:16:47 +07:00** (J-C195: tình trạng tài sản bàn giao và xác nhận email lúc vào cổng). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+
+## Tình trạng tài sản bàn giao và xác nhận email lúc vào cổng — D-079
+
+- Nhánh `feat/asset-condition` (J-C195): ô tình trạng từng tài sản (Tốt/Dùng được/Hư hỏng, hỏng màu đỏ) trong form bàn giao và thẻ tài sản của khách; thẻ "Xác nhận email của bạn" ngay khi khách vào cổng. Schema đã cài lên HOMEDORM4 theo ý Vy (`npm run asset-condition:db:migrate`): cột `ChiTietBanGiao.TinhTrang` và kiểu `TVP_ChiTietBanGiao_V2`, 20 dòng cũ ghi "Chưa ghi nhận". Test backend qua; build frontend qua. Chưa lập biên bản thật qua giao diện, chưa thử OTP thật, chưa chạy trên Fuji.
 
 ## KPI Sale, tài sản bàn giao và điều phối tài sản — D-075 / D-076
 

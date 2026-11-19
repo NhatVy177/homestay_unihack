@@ -67,3 +67,10 @@
 .xn-alert--warning > .ui-icon { color: var(--color-warning); }
 .xn-alert--danger { background: var(--color-danger-soft); }
 .xn-alert--danger > .ui-icon { color: var(--color-danger); }
+
+/* Thẻ xác nhận email ngay sau khi đăng ký. */
+.xn-activation { display: grid; gap: var(--space-3); margin-bottom: var(--space-4); padding: var(--space-6); }
+.xn-activation h3, .xn-activation p { margin: 0; }
+.xn-activation-mini { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-4); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-surface-alt); color: var(--color-text-muted); font-size: 14px; }
+.xn-activation-mini.is-done { background: var(--color-success-soft); color: var(--color-success); font-weight: 600; }
+.xn-activation-mini.is-error { background: var(--color-danger-soft); color: var(--color-danger); }

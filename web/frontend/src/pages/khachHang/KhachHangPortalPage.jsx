@@ -28,6 +28,7 @@ import CheckoutClosureCard from '../../components/checkout/CheckoutClosureCard.j
 // D-012: xác nhận biên bản/đối soát nằm ngay trong tab Hợp đồng; tải riêng để không làm nặng trang.
 const HopDongXacNhanSection = lazy(() => import('../../components/xacNhan/HopDongXacNhanSection.jsx'));
 const CustomerProfileRewards = lazy(() => import('./CustomerProfileRewards.jsx'));
+const EmailActivationCard = lazy(() => import('../../components/xacNhan/EmailActivationCard.jsx'));
 const showRewards = import.meta.env.VITE_LOYALTY_ENABLED === 'true';
 const PORTAL_TABS = ['tai-khoan', 'cu-tru', 'ho-so', 'lich-xem', 'dat-coc', 'lich-su-coc', 'hop-dong', 'bao-hong', 'tra-phong'];
 
@@ -2446,7 +2447,16 @@ export default function KhachHangPortalPage() {
                             <tr key={ts.MaTaiSan}>
                               <td>{ts.TenTaiSan}</td>
                               <td className="hd-col-center">{ts.SoLuong}</td>
-                              {selectedHd.bienBanBanGiao && <td>{selectedHd.bienBanBanGiao.ghiChuTaiSan?.[ts.MaTaiSan] || 'Không ghi chú'}</td>}
+                              {selectedHd.bienBanBanGiao && <td>
+                                {(() => {
+                                  const status = selectedHd.bienBanBanGiao.tinhTrangTaiSan?.[ts.MaTaiSan];
+                                  const note = selectedHd.bienBanBanGiao.ghiChuTaiSan?.[ts.MaTaiSan];
+                                  return <>
+                                    <span className={`ui-condition ${status === 'Hư hỏng' ? 'ui-condition--bad' : status === 'Dùng được' ? 'ui-condition--ok' : status === 'Tốt' ? 'ui-condition--good' : 'ui-condition--none'}`}>{status || 'Chưa ghi nhận'}</span>
+                                    {note && <span className="hd-unit-note">{note}</span>}
+                                  </>;
+                                })()}
+                              </td>}
                               <td className="hd-col-right">{formatSettlementMoney(ts.DonGia)}<span className="hd-unit-note">/ 1 món</span></td>
                             </tr>
                           ))}
@@ -4372,6 +4382,7 @@ export default function KhachHangPortalPage() {
       activeTab={activeTab} onSelect={(id) => goTo(id)} user={user} showBranch={false}
       onAccount={() => goTo('tai-khoan')} onLogout={logout} mainClassName="kh-main"
       footer={<div className="kp-support-mini"><span>Hỗ trợ 24/7</span><strong>1900 6789</strong></div>}>
+          {!loading && !error && <Suspense fallback={null}><EmailActivationCard /></Suspense>}
           {loading && <div className="kp-loading"><span /><p>Đang tải cổng khách hàng...</p></div>}
           {!loading && error && <div className="kp-message error">{error}</div>}
           {!loading && !error && renderCurrentTab()}
