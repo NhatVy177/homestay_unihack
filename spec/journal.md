@@ -1963,3 +1963,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `spec/decisions.md`, `spec/scope.md`, `spec/luong-tong-hop.md`, `spec/progress.md`, `hackathon/plan.md`, `spec/journal.md`.
 - Kiểm tra: chỉ đổi hồ sơ, không chạy test.
 - Còn lại: Claude code D-075 trên `feat/sale-kpi`; Codex code D-076 theo prompt Vy chuyển.
+
+## 2026-11-19 10:54:35 +07:00 — J-C186 — KPI Sale và thông tin biên bản trong thẻ tài sản bàn giao
+
+- Người thực hiện: Claude, nhánh `feat/sale-kpi` (worktree `D:\HomeStayDorm-kpi`), theo D-075.
+- KPI Sale: `GET /api/bao-cao/kpi-sale?thang=YYYY-MM&chiNhanh=` (`kpiSale.service.js`). Đếm theo tháng đăng ký hồ sơ: hồ sơ, buổi đã xem, khách không đến, hồ sơ đã trả cọc, hồ sơ có hợp đồng, tỷ lệ cọc, tỷ lệ chốt. Sale chỉ thấy số của mình, Quản lý thấy chi nhánh mình, Admin thấy tất cả và lọc theo chi nhánh. Component `components/kpiSale/SaleKpiReport.jsx` đặt ở Tổng quan Sale, menu "KPI Sale" của Quản lý và cuối Tổng quan hệ thống của Admin. Không đổi schema.
+- Thẻ "Danh sách tài sản bàn giao" của khách: backend thêm `bienBanBanGiao` (mã biên bản, ngày, quản lý, ghi chú chung, ghi chú từng món) qua `SP_LayChiTietBienBanBanGiao` có sẵn. Giao diện thêm dòng thông tin biên bản và cột "Tình trạng khi bàn giao". Bỏ 4 `style={{` trong khối này (50 → 46 trong file).
+- File: `web/backend/services/kpiSale.service.js`, `routes/baoCao.routes.js`, `services/khachMoi.service.js`, `test/kpi-sale.test.mjs`, `test/handover-summary.test.mjs`; `web/frontend/src/components/kpiSale/*`, `pages/nhanVienSale/SaleOverview.jsx`, `pages/nhanVienQuanLy/NhanVienQuanLyPage.jsx`, `pages/admin/tabs/AdminDashboardTab.jsx`, `pages/khachHang/KhachHangPortalPage.jsx`, `khachHangPortal.css`; `spec/progress.md`.
+- Kiểm tra: backend 161 pass, 6 skip (thêm 5 test). Build frontend PASS, `test:avalanche-ui` PASS. Chạy bản riêng backend 5021 (tắt scheduler) và frontend 5191 nối HOMEDORM4, chỉ đọc: Sale, Quản lý, Admin, khách ở 1440/390 đều hiện đúng, không tràn ngang, không lỗi JavaScript. Số liệu thật: 6 Sale, 8 hồ sơ, 3 hợp đồng; biên bản BG0001 hiện đúng ngày và quản lý.
+- Còn lại: Vy duyệt và gộp nhánh. Codex làm D-076 trên `feat/asset-transfer`.

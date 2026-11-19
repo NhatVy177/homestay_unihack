@@ -1,10 +1,10 @@
 # Tiến độ hiện tại
 
-Cập nhật: **2026-11-19 10:18:41 +07:00** (J-C185: chốt KPI Sale, tài sản bàn giao và điều phối tài sản). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
+Cập nhật: **2026-11-19 10:54:35 +07:00** (J-C186: code KPI Sale và thẻ tài sản bàn giao trên nhánh). File này chỉ giữ trạng thái hiện tại; sửa tại chỗ, không chồng thêm mục. Lịch sử trước 11/11 nằm ở [archive/progress-den-2026-11-10.md](archive/progress-den-2026-11-10.md), [journal.md](journal.md) và Git. Luồng và quyết định: [luong-tong-hop.md](luong-tong-hop.md). Kết quả rà soát: [audit-2026-11-11.md](audit-2026-11-11.md). Việc giao cho AI: [viec-cho-agent.md](viec-cho-agent.md).
 
 ## KPI Sale, tài sản bàn giao và điều phối tài sản — D-075 / D-076
 
-- Claude làm KPI Sale và thẻ tài sản bàn giao của khách trên nhánh `feat/sale-kpi` (worktree `D:\HomeStayDorm-kpi`). Codex làm điều phối tài sản trên nhánh `feat/asset-transfer`. Hai nhánh chờ Vy duyệt rồi mới gộp.
+- KPI Sale và thẻ tài sản bàn giao (D-075) đã có code trên nhánh `feat/sale-kpi` (worktree `D:\HomeStayDorm-kpi`): test tự động qua, đã xem giao diện với SQL Server HOMEDORM4 ở chế độ chỉ đọc (J-C186). Chờ Vy duyệt gộp. Codex làm điều phối tài sản trên nhánh `feat/asset-transfer`. Hai nhánh chờ Vy duyệt rồi mới gộp.
 - Sau khi gộp, Vy kiểm lại luồng; Claude quay video demo không tiếng để Vy lồng tiếng.
 
 ## Nhận diện và slideshow trang chủ — D-073 / D-074
