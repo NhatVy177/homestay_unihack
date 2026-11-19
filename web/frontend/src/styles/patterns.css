@@ -226,6 +226,70 @@
   .kp-page .ui-registration-form .ktp-modal-footer > button { flex: 1; min-width: 0; }
 }
 
+/* Khung modal nghiệp vụ dùng chung: header trắng, thân cuộn, footer cố định. */
+body :is(.lxp-modal, .ktp-modal, .kp-modal, .km-modal, .dktp-modal, .admin-modal, .admin-modal-box) {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text);
+  min-width: 0;
+}
+
+body :is(.lxp-modal-head, .ktp-modal-header, .ktp-modal-header-primary, .ktp-modal-header-primary-container, .kp-modal-head, .km-modal-head, .dktp-modal-header, .admin-modal-head) {
+  align-items: center;
+  background: var(--color-surface) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+  flex-shrink: 0;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+body :is(.lxp-modal-head, .ktp-modal-header, .ktp-modal-header-primary, .ktp-modal-header-primary-container, .kp-modal-head, .km-modal-head, .dktp-modal-header, .admin-modal-head) :is(h2, h3, p) {
+  color: inherit;
+}
+
+body :is(.lxp-modal-close, .ktp-modal-close, .kp-modal-head > button, .km-modal-head > button, .dktp-modal-close, .admin-modal-close) {
+  align-items: center;
+  background: var(--color-surface-alt) !important;
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted) !important;
+  display: inline-flex;
+  flex-shrink: 0;
+  height: var(--space-10);
+  justify-content: center;
+  padding: 0;
+  width: var(--space-10);
+}
+
+body :is(.lxp-modal-close, .ktp-modal-close, .kp-modal-head > button, .km-modal-head > button, .dktp-modal-close, .admin-modal-close):hover {
+  background: var(--color-primary-soft) !important;
+  color: var(--color-primary) !important;
+}
+
+body :is(.lxp-modal-body, .ktp-modal-body, .dktp-modal-body, .admin-modal-form) {
+  background: var(--color-surface);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+body :is(.lxp-modal-footer, .ktp-modal-footer, .kp-modal-actions, .dktp-modal-footer, .admin-modal-actions, .admin-form-actions) {
+  background: var(--color-surface) !important;
+  border-top: 1px solid var(--color-border) !important;
+  flex-shrink: 0;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+}
+
+@media (max-width: 600px) {
+  body :is(.lxp-modal-head, .ktp-modal-header, .ktp-modal-header-primary, .ktp-modal-header-primary-container, .kp-modal-head, .km-modal-head, .dktp-modal-header, .admin-modal-head),
+  body :is(.lxp-modal-footer, .ktp-modal-footer, .kp-modal-actions, .dktp-modal-footer, .admin-modal-actions, .admin-form-actions) {
+    padding: var(--space-4);
+  }
+}
+
 /* Short confirmation toast (J-C064). Pages render it with role="status" so screen readers announce it. */
 .ui-toast { position: fixed; right: var(--space-6); bottom: var(--space-6); z-index: 200; display: flex; align-items: center; gap: var(--space-2); max-width: min(420px, calc(100vw - 32px)); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-text); color: var(--color-surface); box-shadow: var(--shadow-md); font-size: 14px; font-weight: 600; --ui-icon-size: var(--icon-md); }
 .ui-toast--success { background: var(--color-success); }

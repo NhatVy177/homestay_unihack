@@ -103,16 +103,55 @@
 }
 
 .customer-deposit-cta { width: 100%; justify-content: center; }
-.customer-deposit-cta.ui-btn--primary { background: #76634a; border-color: #76634a; color: #fff; }
-.customer-deposit-cta.ui-btn--primary:hover:not(:disabled) { background: #5f4f3a; border-color: #5f4f3a; }
-.customer-deposit-form { display: grid; gap: var(--space-4, 16px); }
-.customer-deposit-form fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
-.customer-deposit-form legend { font-weight: 700; margin-bottom: 8px; }
-.customer-deposit-option { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface); cursor: pointer; }
-.customer-deposit-option.is-selected { border-color: var(--color-primary); background: var(--color-surface-alt, var(--color-surface)); }
+.customer-deposit-cta.ui-btn--primary { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-surface); }
+.customer-deposit-cta.ui-btn--primary:hover:not(:disabled) { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.customer-viewing-page .customer-deposit-modal { display: flex; flex-direction: column; max-width: 980px; overflow: hidden; width: min(980px, 100%); }
+.customer-deposit-modal .customer-deposit-head { flex-shrink: 0; }
+.customer-deposit-head .ui-dialog-heading > div { min-width: 0; }
+.customer-deposit-head .ui-dialog-heading p { color: var(--color-text-muted); margin: var(--space-1) 0 0; }
+.customer-deposit-shell { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.customer-deposit-form { display: grid; flex: 1; gap: var(--space-4); min-height: 0; overflow-y: auto; }
+.customer-deposit-layout { display: grid; gap: var(--space-6); grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.85fr); }
+.customer-deposit-fields { display: grid; gap: var(--space-6); min-width: 0; }
+.customer-deposit-form fieldset { border: 0; display: grid; gap: var(--space-3); margin: 0; min-width: 0; padding: 0; }
+.customer-deposit-form legend { align-items: center; display: flex; font-family: var(--font-heading); font-weight: 700; gap: var(--space-2); margin-bottom: var(--space-3); }
+.customer-deposit-form legend > span { align-items: center; background: var(--color-primary-soft); border-radius: var(--radius-pill); color: var(--color-primary); display: inline-flex; height: var(--space-6); justify-content: center; width: var(--space-6); }
+.customer-deposit-option { align-items: center; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; display: flex; gap: var(--space-3); min-width: 0; padding: var(--space-3) var(--space-4); }
+.customer-deposit-option.is-selected { background: var(--color-primary-soft); border-color: var(--color-primary); }
 .customer-deposit-option.is-disabled { opacity: .55; cursor: not-allowed; }
-.customer-deposit-option small { color: var(--color-text-muted); margin-left: auto; }
-.customer-deposit-beds { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.customer-deposit-beds label { display: inline-flex; gap: 6px; align-items: center; padding: 6px 12px; border: 1px solid var(--color-border); border-radius: 999px; background: var(--color-surface); }
-.customer-deposit-beds label.is-selected { border-color: var(--color-primary); }
-.customer-deposit-actions { display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px 24px; }
+.customer-deposit-room { min-height: calc(var(--space-10) + var(--space-6)); }
+.customer-deposit-room-icon { align-items: center; align-self: stretch; background: var(--color-surface-alt); border-radius: var(--radius-md); color: var(--color-text-muted); display: inline-flex; flex: 0 0 56px; justify-content: center; }
+.customer-deposit-room-icon .ui-icon { --ui-icon-size: var(--icon-lg); }
+.customer-deposit-room-copy { display: grid; flex: 1; gap: var(--space-1); min-width: 0; }
+.customer-deposit-room-copy strong { color: var(--color-text); font-family: var(--font-heading); }
+.customer-deposit-room-copy small { color: var(--color-text-muted); }
+.customer-deposit-room-state { background: var(--color-surface-alt); border-radius: var(--radius-pill); color: var(--color-text-muted); flex-shrink: 0; padding: var(--space-1) var(--space-3); }
+.customer-deposit-room-state.is-ready { background: var(--color-success-soft); color: var(--color-success); }
+.customer-deposit-rent-types { display: grid; gap: var(--space-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.customer-deposit-field-note { color: var(--color-warning); margin: 0; }
+.customer-deposit-beds { align-items: center; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.customer-deposit-beds label { align-items: center; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-pill); display: inline-flex; gap: var(--space-2); padding: var(--space-2) var(--space-4); }
+.customer-deposit-beds label.is-selected { background: var(--color-primary-soft); border-color: var(--color-primary); }
+.customer-deposit-beds > small { color: var(--color-text-muted); flex-basis: 100%; }
+.customer-deposit-summary { align-self: start; background: var(--color-primary-soft); border-radius: var(--radius-lg); display: grid; gap: var(--space-4); padding: var(--space-6); position: sticky; top: 0; }
+.customer-deposit-summary h4 { font-family: var(--font-heading); margin: 0; }
+.customer-deposit-summary dl { background: var(--color-surface); border-radius: var(--radius-md); margin: 0; padding: 0 var(--space-4); }
+.customer-deposit-summary dl > div { align-items: center; border-bottom: 1px solid var(--color-border); display: grid; gap: var(--space-3); grid-template-columns: minmax(0, 1fr) auto; padding: var(--space-3) 0; }
+.customer-deposit-summary dl > div:last-child { border-bottom: 0; }
+.customer-deposit-summary dt { align-items: center; color: var(--color-text-muted); display: flex; gap: var(--space-2); }
+.customer-deposit-summary dd { color: var(--color-text); font-weight: 700; margin: 0; text-align: right; }
+.customer-deposit-progress { align-items: center; background: var(--color-surface); border-radius: var(--radius-md); color: var(--color-text-muted); display: flex; font-weight: 700; gap: var(--space-2); margin: 0; padding: var(--space-3); }
+.customer-deposit-progress.is-complete { background: var(--color-success-soft); color: var(--color-success); }
+.customer-deposit-summary .customer-viewing-hint { align-items: flex-start; color: var(--color-text-muted); display: flex; gap: var(--space-2); line-height: 1.5; margin: 0; }
+.customer-deposit-summary .customer-viewing-hint .ui-icon { flex-shrink: 0; margin-top: var(--space-1); }
+.customer-deposit-actions { background: var(--color-surface); border-top: 1px solid var(--color-border); display: flex; flex-shrink: 0; gap: var(--space-3); justify-content: flex-end; padding: var(--space-4) var(--space-6); }
+@media (max-width: 760px) {
+  .customer-viewing-page .customer-deposit-modal { max-height: calc(100dvh - var(--space-6)); }
+  .customer-deposit-layout { grid-template-columns: 1fr; }
+  .customer-deposit-summary { position: static; }
+  .customer-deposit-rent-types { grid-template-columns: 1fr; }
+  .customer-deposit-room { align-items: flex-start; flex-wrap: wrap; }
+  .customer-deposit-room-icon { align-self: auto; height: 48px; }
+  .customer-deposit-room-state { margin-left: calc(var(--space-8) + var(--space-8)); }
+  .customer-deposit-actions > button { flex: 1; min-width: 0; }
+}

@@ -2035,3 +2035,12 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - File: `web/frontend/scripts/avalanche-smoke.mjs` (bỏ kiểm dòng chữ cũ, kiểm mã QR tự hiện), `web/frontend/src/components/payment/MomoQrPanel.jsx`, `momoQrPanel.css` (mới), `pages/khachHang/KhachHangPortalPage.jsx`, `pages/thanhToanMoPhong/ThanhToanMoPhongPage.jsx`.
 - Kiểm tra: build, `test:avalanche-ui` (đã sửa theo trang mới; lần chạy đầu fail vì còn kiểm dòng chữ cũ), `check:ui-tokens` qua; Playwright 1440/390 với API MoMo giả lập: một đơn và một lần lấy mã (kể cả React StrictMode), tự kiểm tra rồi báo đã thanh toán, không tràn ngang, không lỗi JavaScript. Chưa quét bằng app MoMo Test thật và chưa thử với MoMo Sandbox thật.
 - Còn lại: Vy thử với MoMo Sandbox thật (cần backend có khóa Sandbox); duyệt gộp.
+
+## 2026-11-19 14:14:59 +07:00 — J-C191 — Gộp khung modal nghiệp vụ dùng chung và mẫu modal đặt cọc của Codex
+
+- Người thực hiện: code do Codex viết (chưa commit, nằm trong thư mục chính); Claude xem diff, kiểm tra và commit theo yêu cầu của Vy.
+- Nội dung: `patterns.css` thêm khung chung cho các họ modal `lxp, ktp, kp, km, dktp, admin` (header trắng, nút đóng tròn, thân cuộn, footer cố định); `CustomerDepositRequestModal.jsx` và `customerViewingSchedule.css` làm lại modal đặt cọc của khách (2 bước, cột "Yêu cầu của bạn", footer cố định).
+- File: `web/frontend/src/styles/patterns.css`, `web/frontend/src/pages/lichXemPhong/CustomerDepositRequestModal.jsx`, `web/frontend/src/pages/lichXemPhong/customerViewingSchedule.css`.
+- Kiểm tra (Claude): `npm run build`, `test:avalanche-ui`, `check:ui-tokens` qua; chạy modal đặt cọc ở 1440 và 390 với API giả lập: header, nút đóng tròn, thân cuộn trên điện thoại, footer luôn thấy, không tràn ngang, không lỗi JavaScript. Codex chưa chạy build hay test giao diện.
+- Chưa kiểm: khung chung dùng `!important` và áp cho 5 họ modal còn lại (`ktp, kp, km, dktp, admin`); chưa mở từng modal đó xem có bị lệch.
+- Còn lại: Vy lướt các modal thuộc 5 họ kia; nếu lệch thì báo để sửa.
