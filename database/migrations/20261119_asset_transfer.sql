@@ -138,11 +138,13 @@ BEGIN
             FROM dbo.ChiTietDatCoc ctdc
             JOIN dbo.HopDongThue hd ON hd.MaPhieuCoc = ctdc.MaPhieuDatCoc
             WHERE ctdc.MaPhong = @MaPhongNguon AND hd.TrangThai = N'Hiệu lực'
+              AND EXISTS (SELECT 1 FROM dbo.BienBanBanGiao bb WHERE bb.MaHopDong = hd.MaHopDong AND bb.LoaiBanGiao = N'Bàn giao vào' AND bb.TrangThai <> N'Đã hủy')
         )) OR (@CanPhongDich = 1 AND EXISTS (
             SELECT 1
             FROM dbo.ChiTietDatCoc ctdc
             JOIN dbo.HopDongThue hd ON hd.MaPhieuCoc = ctdc.MaPhieuDatCoc
             WHERE ctdc.MaPhong = @MaPhongDich AND hd.TrangThai = N'Hiệu lực'
+              AND EXISTS (SELECT 1 FROM dbo.BienBanBanGiao bb WHERE bb.MaHopDong = hd.MaHopDong AND bb.LoaiBanGiao = N'Bàn giao vào' AND bb.TrangThai <> N'Đã hủy')
         ))
         THROW 51411, N'Phòng đang có khách, biên bản bàn giao đã ghi nhận nên không chuyển tài sản được', 1;
 
@@ -291,11 +293,19 @@ BEGIN
     SET NOCOUNT ON;
     SELECT p.MaChiNhanh AS maChiNhanh, cn.TenChiNhanh AS tenChiNhanh,
            p.MaPhong AS maPhong, p.TenPhong AS tenPhong,
+           -- D-083: chỉ khóa khi phòng đã có biên bản bàn giao vào (đã băm lên chuỗi); hợp đồng hiệu lực mà chưa bàn giao vẫn điều phối được.
            CAST(CASE WHEN EXISTS (
                SELECT 1 FROM dbo.ChiTietDatCoc ctdc
                JOIN dbo.HopDongThue hd ON hd.MaPhieuCoc = ctdc.MaPhieuDatCoc
                WHERE ctdc.MaPhong = p.MaPhong AND hd.TrangThai = N'Hiệu lực'
+                 AND EXISTS (SELECT 1 FROM dbo.BienBanBanGiao bb WHERE bb.MaHopDong = hd.MaHopDong AND bb.LoaiBanGiao = N'Bàn giao vào' AND bb.TrangThai <> N'Đã hủy')
            ) THEN 1 ELSE 0 END AS BIT) AS dangCoKhach,
+           CAST(CASE WHEN EXISTS (
+               SELECT 1 FROM dbo.ChiTietDatCoc ctdc
+               JOIN dbo.HopDongThue hd ON hd.MaPhieuCoc = ctdc.MaPhieuDatCoc
+               WHERE ctdc.MaPhong = p.MaPhong AND hd.TrangThai = N'Hiệu lực'
+                 AND NOT EXISTS (SELECT 1 FROM dbo.BienBanBanGiao bb WHERE bb.MaHopDong = hd.MaHopDong AND bb.LoaiBanGiao = N'Bàn giao vào' AND bb.TrangThai <> N'Đã hủy')
+           ) THEN 1 ELSE 0 END AS BIT) AS choBanGiao,
            ts.MaTaiSan AS maTaiSan, ts.TenTaiSan AS tenTaiSan, ts.SoLuong AS soLuong,
            ts.DonGia AS donGia, ts.LoaiTaiSan AS loaiTaiSan, ts.MaGiuong AS maGiuong
     FROM dbo.Phong p

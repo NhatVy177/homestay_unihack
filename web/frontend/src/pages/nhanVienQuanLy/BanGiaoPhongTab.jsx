@@ -94,7 +94,7 @@ function SummaryCard({ icon, title, children, accentColor = '#4A6549' }) {
   );
 }
 
-export default function BanGiaoPhongTab() {
+export default function BanGiaoPhongTab({ onDieuPhoi }) {
   const [maHopDong, setMaHopDong] = useState('');
   const [hopDong, setHopDong] = useState(null);
   const [dieuKien, setDieuKien] = useState(null);
@@ -885,6 +885,25 @@ export default function BanGiaoPhongTab() {
                 </div>
               </div>
             </div>
+
+            {(() => {
+              const monHu = danhSachTaiSan.filter((item) => item.tinhTrang === 'Hư hỏng');
+              if (!monHu.length) return null;
+              return (
+                <div className="handover-damage-alert" role="alert">
+                  <Icon name="build" />
+                  <div>
+                    <strong>Có {monHu.length} tài sản hư hỏng: {monHu.map((item) => item.tenTaiSan).join(', ')}</strong>
+                    <span>Nên điều phối món tốt từ kho thay vào trước khi giao phòng. Thay xong, mở lại hợp đồng này để lập biên bản với số liệu mới.</span>
+                  </div>
+                  {onDieuPhoi && (
+                    <button type="button" className="ui-btn ui-btn--secondary ui-btn--sm" onClick={() => onDieuPhoi({ maPhong: monHu[0].maPhong, tenPhong: monHu[0].tenPhong, maTaiSan: monHu[0].maTaiSan, tenTaiSan: monHu[0].tenTaiSan })}>
+                      <Icon name="swap_horiz" /> Sang Điều phối tài sản
+                    </button>
+                  )}
+                </div>
+              );
+            })()}
 
             <div className="handover-table-scroll">
               <table className="ktp-table" style={{ tableLayout: 'fixed', minWidth: '900px' }}>
