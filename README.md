@@ -1,8 +1,8 @@
 # HomeStayDorm
 
-**Quản lý thuê phòng ký túc/homestay trọn vòng đời, với hai lần khách thuê tự xác nhận trên Avalanche: lúc nhận phòng và lúc chốt tiền cọc.**
+HomeStayDorm là hệ thống quản lý thuê phòng ký túc/homestay: từ đăng ký xem phòng, đặt cọc, ký hợp đồng, bàn giao phòng và tài sản, hóa đơn hàng tháng cho đến trả phòng và hoàn cọc.
 
-> **Một câu:** cho sinh viên và người đi làm thuê giường/phòng, HomeStayDorm chấm dứt cảnh cãi nhau về tiền cọc khi trả phòng, vì biên bản lúc nhận phòng và bảng trừ cọc đều do chính khách ký xác nhận, lưu trên Avalanche, ai cũng tự kiểm tra được.
+Điểm riêng của dự án: biên bản bàn giao lúc nhận phòng và bảng đối soát tiền cọc lúc trả phòng do chính khách thuê xác nhận trên Avalanche, nên hai bên không còn cãi nhau về tiền cọc và ai cũng tự kiểm tra lại được.
 
 > **English summary.** A full dorm/homestay rental system (React + Express + SQL Server, five roles, multi-branch). On Avalanche, the tenant signs (EIP-712, Privy embedded wallet, gas paid by a relayer) the exact version of the move-in handover report and of the deposit settlement. Disputes create a new version and keep the old one. Anyone holding the evidence file can verify it against the chain without the operator. A second contract issues non-transferable loyalty points for on-time rent. No funds are held on-chain.
 
