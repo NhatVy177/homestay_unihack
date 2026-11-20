@@ -7,6 +7,8 @@ HomeStayDorm là hệ thống quản lý thuê phòng ký túc/homestay: từ đ
 | | |
 |---|---|
 | Đội | SnowDorm · Team1 Vietnam UniHack 2026 |
+| Bản chạy trực tuyến | <https://homestaydorm.jollyforest-8decfa4f.southeastasia.azurecontainerapps.io> (tài khoản mẫu, mật khẩu chung `123`: khách `kh0001`; Sale `nv0001`; quản lý `nv0003`; kế toán `nv0004`; Admin `nv0013`) |
+| Video demo (3 phút) | <https://drive.google.com/file/d/1HVHUXqW0r_LF3uB8AJ626fOfYSRubSvQ/view?usp=sharing> |
 | Mạng | Avalanche Fuji C-Chain (chain ID `43113`) |
 | Contract chính | `DormSettlement` [`0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C`](https://subnets-test.avax.network/c-chain/address/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C), mã nguồn xác minh khớp chính xác trên [Sourcify](https://repo.sourcify.dev/43113/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C) |
 | Contract điểm thưởng | `DormPoints` [`0x982d63b78cf4fda0cd9e7d3fa4be57ba897bd971`](https://subnets-test.avax.network/c-chain/address/0x982d63b78cf4fda0cd9e7d3fa4be57ba897bd971), cũng xác minh khớp chính xác trên [Sourcify](https://repo.sourcify.dev/43113/0x982d63b78cf4fda0cd9e7d3fa4be57ba897bd971) |
