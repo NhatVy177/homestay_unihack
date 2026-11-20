@@ -2256,3 +2256,10 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Số liệu lấy từ code và dữ liệu thật: mã giao dịch đọc từ `AvalancheCase`/`LoyaltyOperation` (chỉ đọc), kết quả `avalanche:recover` khớp 5/5 hợp đồng; Sourcify xác nhận DormSettlement exact match, DormPoints chưa xác minh (README ghi rõ).
 - Kiểm tra vừa chạy: `blockchain npm test` 26 qua/1 bỏ qua; `web/backend npm test` 167 qua/7 bỏ qua; `web/frontend npm run build` qua; `npm run test:avalanche-ui` qua.
 - Còn lại: xác minh mã nguồn DormPoints trên explorer (cần Vy đồng ý); thêm link video và slide khi Vy có link; mục ghi công thành viên nhóm cũ (Q-07) đã bỏ khỏi README, chờ Vy quyết.
+
+## 2026-11-20 15:27:36 +07:00 — J-C219 — Xác minh mã nguồn DormPoints trên Sourcify; bỏ English summary khỏi README
+
+- Người thực hiện: Claude, Vy đồng ý ("xác minh mã luôn nhen", "bỏ english summary").
+- Xác minh DormPoints `0x982d63b78cf4fda0cd9e7d3fa4be57ba897bd971` (Fuji): biên dịch lại `contracts/DormPoints.sol` bằng đúng cài đặt của `compile.mjs` (solc 0.8.38, optimizer 200, cancun); đối chiếu creation input của giao dịch deploy `0x019f1535…acb8` (operator `0x6597e88b…d2f9`) và runtime với bản biên dịch: khớp. Gửi Sourcify API v2: `creationMatch` và `runtimeMatch` đều `exact_match` (matchId 59576811).
+- `README.md`: bỏ đoạn English summary, thêm link Sourcify của DormPoints, bỏ câu "chưa xác minh". Không đổi code hay contract; file tạm dùng để gửi nằm ngoài repo.
+- Còn lại: link video và slide cho README.

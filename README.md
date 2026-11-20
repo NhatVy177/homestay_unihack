@@ -4,14 +4,12 @@ HomeStayDorm là hệ thống quản lý thuê phòng ký túc/homestay: từ đ
 
 Điểm riêng của dự án: biên bản bàn giao lúc nhận phòng và bảng đối soát tiền cọc lúc trả phòng do chính khách thuê xác nhận trên Avalanche, nên hai bên không còn cãi nhau về tiền cọc và ai cũng tự kiểm tra lại được.
 
-> **English summary.** A full dorm/homestay rental system (React + Express + SQL Server, five roles, multi-branch). On Avalanche, the tenant signs (EIP-712, Privy embedded wallet, gas paid by a relayer) the exact version of the move-in handover report and of the deposit settlement. Disputes create a new version and keep the old one. Anyone holding the evidence file can verify it against the chain without the operator. A second contract issues non-transferable loyalty points for on-time rent. No funds are held on-chain.
-
 | | |
 |---|---|
 | Đội | SnowDorm · Team1 Vietnam UniHack 2026 |
 | Mạng | Avalanche Fuji C-Chain (chain ID `43113`) |
 | Contract chính | `DormSettlement` [`0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C`](https://subnets-test.avax.network/c-chain/address/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C), mã nguồn xác minh khớp chính xác trên [Sourcify](https://repo.sourcify.dev/43113/0x70bF83f4742BEE4093Aa51622b0BCb53Ed91389C) |
-| Contract điểm thưởng | `DormPoints` [`0x982d63b78cf4fda0cd9e7d3fa4be57ba897bd971`](https://subnets-test.avax.network/c-chain/address/0x982d63b78cf4fda0cd9e7d3fa4be57ba897bd971) |
+| Contract điểm thưởng | `DormPoints` [`0x982d63b78cf4fda0cd9e7d3fa4be57ba897bd971`](https://subnets-test.avax.network/c-chain/address/0x982d63b78cf4fda0cd9e7d3fa4be57ba897bd971), cũng xác minh khớp chính xác trên [Sourcify](https://repo.sourcify.dev/43113/0x982d63b78cf4fda0cd9e7d3fa4be57ba897bd971) |
 | Mã nguồn | <https://github.com/NhatVy177/homestay_unihack> |
 
 ---
@@ -262,7 +260,7 @@ HandoverProposed → Active → SettlementProposed ⇄ Disputed → Accepted
 | **Đồng bộ chịu lỗi** | Chỉ ghi "thành công" sau receipt và đúng event; gửi lặp không ghi trùng; chuỗi thành công mà SQL lỗi thì đọc lại để phục hồi |
 | **Khôi phục từ chuỗi** | [`scripts/avalanche-recover.mjs`](web/backend/scripts/avalanche-recover.mjs) đọc toàn bộ event của contract và dựng lại trạng thái từng hồ sơ |
 | **Một mã băm cho mọi nơi** | Module dùng chung [`blockchain/`](blockchain/) (`@homestaydorm/settlement`) chứa ABI, hàm băm chuẩn hóa, typed data và gói bằng chứng; backend và frontend import cùng một mã, nên mã băm ở hai đầu luôn giống nhau |
-| **Mã nguồn xác minh** | `DormSettlement` khớp chính xác (creation + runtime) trên Sourcify; manifest triển khai ở [blockchain/deployments/fuji.json](blockchain/deployments/fuji.json) |
+| **Mã nguồn xác minh** | Cả hai contract khớp chính xác (creation + runtime) trên Sourcify; manifest triển khai ở [blockchain/deployments/fuji.json](blockchain/deployments/fuji.json) |
 
 ### 7.3 Lên chuỗi những gì
 
@@ -481,7 +479,7 @@ Test luồng tích hợp ([`blockchain/test/workflow.test.mjs`](blockchain/test/
 - **Khóa vận hành:** một khóa "quản lý" và một khóa "kế toán" cho cả hệ thống, đặt trên máy chủ; chưa có multisig. Lộ khóa thì kẻ xấu gửi được đề xuất, nhưng vẫn không giả được chữ ký khách.
 - **Ví khách** phụ thuộc Privy và quyền vào email. Bỏ hẳn bước OTP cần gói Privy trả phí.
 - **Riêng tư:** mã băm có salt, nhưng số tiền đối soát công khai với ai biết mã hồ sơ.
-- Contract chưa được kiểm toán bảo mật. `DormPoints` đã chạy thật trên Fuji, mã nguồn có trong repo nhưng **chưa xác minh trên explorer**.
+- Contract chưa được kiểm toán bảo mật.
 
 Bảng giới hạn đầy đủ: [docs/minh-bach-ky-thuat.md](docs/minh-bach-ky-thuat.md).
 
