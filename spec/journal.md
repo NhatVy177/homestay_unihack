@@ -2240,3 +2240,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Người thực hiện: Claude, Vy báo lỗi khi quay demo: chưa có hồ sơ đăng ký mà bấm tim chỉ mở trang chi tiết phòng.
 - `web/frontend/src/pages/homeExperience/HomeExperience.jsx`: khách chưa có hồ sơ mở → chuyển tới `/khach-hang?phong=<mã>&dangKy=1` để cổng khách mở form lập hồ sơ với phòng đó; khách có hồ sơ mở (chưa lập lịch) vẫn thêm/gỡ phòng quan tâm tại thẻ như cũ.
 - Kiểm tra: `npm run build` qua; khớp kỳ vọng sẵn có của `scripts/ui-public-room.mjs` (`&dangKy=1`).
+
+## 2026-11-20 11:05:46 +07:00 — J-C217 — Video demo: luồng chính chỉ đổi khách một lần
+
+- Người thực hiện: Claude, theo Vy (bản nháp đổi khách liên tục: đăng ký là Phan Minh Tuấn, tới cọc là người khác).
+- `web/backend/scripts/demo-video-seed.mjs`: thêm khách mẫu K6 Lý Hoàng Nam (P102) làm người gửi sau trong cảnh "ai gửi trước được duyệt trước". Đã chạy chặng 1 trên HOMEDORM4 (chỉ thêm mới): KH9335, DK0020 đã xem P102.
+- Quay lại bằng K1 Phan Minh Tuấn: gửi giữ chỗ nguyên phòng P102 (DK0019), K6 gửi ghép giường sau → quản lý duyệt K1 (phiếu DC0013, 8.800.000đ = 2 tháng nguyên phòng), K6 tự bị từ chối; K1 chuyển khoản tải minh chứng → kế toán xác nhận. Từ khai cư trú trở đi vẫn là K2 Trần Minh Khang.
+- Bản nháp 2:59, 28 đoạn, tốc độ 1,0–1,3×; ghép, cắt nằm ngoài repo (thư mục tạm của phiên).
+- Còn lại: Vy duyệt bản nháp, ghi âm; sửa `hackathon/video-script.md` theo bản cuối.

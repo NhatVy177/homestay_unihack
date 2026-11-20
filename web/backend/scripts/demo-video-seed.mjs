@@ -41,6 +41,7 @@ export const CUSTOMERS = {
   k5: { hoTen: 'Bùi Đức Anh', gioiTinh: 'Nam', ngaySinh: '2004-02-17', soDienThoai: '0907100005', phong: 'P104' },
   k5b: { hoTen: 'Hồ Minh Trí', gioiTinh: 'Nam', ngaySinh: '2003-10-04', soDienThoai: '0907100055', phong: 'P104' },
   k8: { hoTen: 'Võ Hoàng Phúc', gioiTinh: 'Nam', ngaySinh: '2003-06-09', soDienThoai: '0907100008', phong: 'P412', loaiPhong: 'Phòng 6 người' },
+  k6: { hoTen: 'Lý Hoàng Nam', gioiTinh: 'Nam', ngaySinh: '2003-04-08', soDienThoai: '0907100006', phong: 'P102' },
   k1b: { hoTen: 'Ngô Thanh Tâm', gioiTinh: 'Nữ', ngaySinh: '2003-01-15', soDienThoai: '0907100011', phong: 'P409', soNguoi: 3, soNam: 1, soNu: 2 },
 };
 const email = (key) => `vynhat2k5+${key}@gmail.com`;
