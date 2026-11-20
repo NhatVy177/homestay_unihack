@@ -2248,3 +2248,11 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Quay lại bằng K1 Phan Minh Tuấn: gửi giữ chỗ nguyên phòng P102 (DK0019), K6 gửi ghép giường sau → quản lý duyệt K1 (phiếu DC0013, 8.800.000đ = 2 tháng nguyên phòng), K6 tự bị từ chối; K1 chuyển khoản tải minh chứng → kế toán xác nhận. Từ khai cư trú trở đi vẫn là K2 Trần Minh Khang.
 - Bản nháp 2:59, 28 đoạn, tốc độ 1,0–1,3×; ghép, cắt nằm ngoài repo (thư mục tạm của phiên).
 - Còn lại: Vy duyệt bản nháp, ghi âm; sửa `hackathon/video-script.md` theo bản cuối.
+
+## 2026-11-20 14:48:44 +07:00 — J-C218 — Viết lại README cho ban giám khảo
+
+- Người thực hiện: Claude, theo Vy (README kỹ: ý tưởng, đã làm được, luồng, các trường hợp, quy định hoàn cọc, kỹ thuật Avalanche, cách cài đặt và công nghệ).
+- `README.md`: viết lại toàn bộ. Thêm mục ý tưởng một câu, bảng "Đã làm được" kèm mức bằng chứng, 9 giai đoạn, 23 trường hợp, quy định cọc 2 tháng và hoàn 80/50/70/100% kèm ví dụ thật HD0006, hai contract (DormSettlement, DormPoints), bảng kỹ thuật đã áp dụng, 6 giao dịch Fuji thật của HD0006 và 2 giao dịch điểm thưởng (link trình xem chính thức), công nghệ, cài đặt (cách nhanh `demo:db:migrate` và cách đầy đủ HOMEDORM4), chế độ demo, kiểm thử, giới hạn.
+- Số liệu lấy từ code và dữ liệu thật: mã giao dịch đọc từ `AvalancheCase`/`LoyaltyOperation` (chỉ đọc), kết quả `avalanche:recover` khớp 5/5 hợp đồng; Sourcify xác nhận DormSettlement exact match, DormPoints chưa xác minh (README ghi rõ).
+- Kiểm tra vừa chạy: `blockchain npm test` 26 qua/1 bỏ qua; `web/backend npm test` 167 qua/7 bỏ qua; `web/frontend npm run build` qua; `npm run test:avalanche-ui` qua.
+- Còn lại: xác minh mã nguồn DormPoints trên explorer (cần Vy đồng ý); thêm link video và slide khi Vy có link; mục ghi công thành viên nhóm cũ (Q-07) đã bỏ khỏi README, chờ Vy quyết.
