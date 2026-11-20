@@ -2263,3 +2263,13 @@ Múi giờ: **Asia/Saigon (UTC+07:00)**. Mục mới thêm ở cuối. Ghi kết
 - Xác minh DormPoints `0x982d63b78cf4fda0cd9e7d3fa4be57ba897bd971` (Fuji): biên dịch lại `contracts/DormPoints.sol` bằng đúng cài đặt của `compile.mjs` (solc 0.8.38, optimizer 200, cancun); đối chiếu creation input của giao dịch deploy `0x019f1535…acb8` (operator `0x6597e88b…d2f9`) và runtime với bản biên dịch: khớp. Gửi Sourcify API v2: `creationMatch` và `runtimeMatch` đều `exact_match` (matchId 59576811).
 - `README.md`: bỏ đoạn English summary, thêm link Sourcify của DormPoints, bỏ câu "chưa xác minh". Không đổi code hay contract; file tạm dùng để gửi nằm ngoài repo.
 - Còn lại: link video và slide cho README.
+
+## 2026-11-20 16:27:22 +07:00 — J-C220 — Cập nhật bản live trên Azure lên code mới nhất
+
+- Người thực hiện: Claude, theo Vy ("deploy live dự án cho t đi"; chọn Azure, giữ khóa Fuji hiện có).
+- Hiện trạng tìm thấy: Container App `homestaydorm` (nhóm `rg-homestaydorm`, Azure for Students, Southeast Asia) chạy image dựng 18/11, kèm Azure SQL `hsd-sql-clzet/HOMEDORM4` (bản riêng, không phải HOMEDORM4 local) và registry `hsdacrwpxncd`. Địa chỉ: https://homestaydorm.jollyforest-8decfa4f.southeastasia.azurecontainerapps.io
+- SQL (chỉ trên database Azure, Vy đồng ý): mở tạm tường lửa cho IP máy làm việc (đã xóa), chạy các migration còn thiếu theo thứ tự README, gồm loyalty, room-gender, asset-condition, assets (D-076/D-083), warehouse-seed. Không đụng HOMEDORM4 local. Azure SQL Basic có sao lưu theo thời điểm 7 ngày.
+- Image: ACR Tasks bị chặn trên gói Azure for Students (`TasksOperationsNotAllowed`), nên dựng bằng Docker ở máy rồi đẩy lên registry (`homestaydorm:20261120`, digest `sha256:636edb1a…`). Cập nhật Container App sang image mới, thêm biến điểm thưởng (`LOYALTY_*`, khóa ví vận hành đặt thành secret `loyalty-operator-key`) và `PUBLIC_WEB_URL`, `PUBLIC_API_URL`.
+- Kiểm tra từ bên ngoài sau cập nhật: `/`, `/phong`, `/kiem-chung-avalanche` 200; `/api/avalanche/config` đúng chain 43113 và contract; `/api/trang-chu/phong-noi-bat` có trường giới tính phòng; `/api/trang-chu/minh-bach` 200; log khởi động sạch, kết nối SQL thành công. **Chưa đăng nhập thử** với tài khoản thật trên bản live.
+- Sự cố: một lệnh `az containerapp secret set` lỗi cú pháp và thông báo lỗi in nguyên dòng lệnh, làm lộ khóa ví điểm thưởng trong nhật ký phiên (ví Fuji, chỉ có AVAX thử). Lệnh chạy lại đã chặn đầu ra.
+- Còn lại: Vy đăng nhập thử trên bản live; điền link live vào form nộp bài; cân nhắc đổi khóa ví điểm thưởng sau cuộc thi.
